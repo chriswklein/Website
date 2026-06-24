@@ -1,0 +1,151 @@
+/* ================================
+   BASE RESET
+================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ================================
+   ROOT TOKENS
+================================ */
+:root {
+    /* Colours */
+    --color-background-base: #111111;
+    --color-background-surface: #1A1A1A;
+    --color-background-subtle: #2A2A2A;
+
+    --color-text-primary: #F5F5F5;
+    --color-text-secondary: #AAAAAA;
+    --color-text-disabled: #666666;
+
+    --color-border-default: #2A2A2A;
+    --color-border-strong: #666666;
+
+    --color-interactive-default: #F5F5F5;
+    --color-interactive-hover: #CCCCCC;
+    --color-interactive-focus: #FFFFFF;
+
+    /* Typography */
+    --font-family-base: 'Noto Sans', sans-serif;
+
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-md: 18px;
+    --font-size-lg: 20px;
+    --font-size-xl: 24px;
+    --font-size-2xl: 30px;
+    --font-size-3xl: 36px;
+    --font-size-4xl: 48px;
+
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.2;
+    --line-height-snug: 1.3;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.6;
+    --line-height-loose: 1.75;
+
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+
+    /* Layout */
+    --max-content: 1200px;
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+}
+
+/* ================================
+   BASE STYLES
+================================ */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+    background-color: var(--color-background-base);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ================================
+   FOCUS STYLES (Accessibility)
+================================ */
+:focus-visible {
+    outline: 2px solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* ================================
+   TYPOGRAPHY
+================================ */
+h1, h2, h3, h4 {
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--color-text-primary);
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-2xl); line-height: var(--line-height-snug); }
+h3 { font-size: var(--font-size-xl);  line-height: var(--line-height-snug); font-weight: var(--font-weight-semibold); }
+h4 { font-size: var(--font-size-lg);  line-height: var(--line-height-normal); font-weight: var(--font-weight-semibold); }
+
+p {
+    max-width: 65ch;
+    color: var(--color-text-primary);
+}
+
+/* ================================
+   LAYOUT
+================================ */
+.container {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+}
+
+/* ================================
+   REDUCED MOTION
+================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* ================================
+   MOBILE
+================================ */
+@media (max-width: 768px) {
+    h1 { font-size: var(--font-size-3xl); }
+    h2 { font-size: var(--font-size-2xl); }
+
+    .container {
+        padding: 0 var(--space-4);
+    }
+}
