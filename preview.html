@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* ================================
+           PREVIEW LAYOUT
+        ================================ */
+        .preview {
+            padding: var(--space-16) var(--space-8);
+            max-width: var(--max-content);
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-20);
+        }
+
+        .preview-intro {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+
+        /* ================================
+           SAMPLE TEXT STYLES
+           (demo-only styles, not real headings,
+           so the page keeps a single real <h1>)
+        ================================ */
+        .style-h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            line-height: var(--line-height-tight);
+        }
+
+        .style-h2 {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            line-height: var(--line-height-snug);
+        }
+
+        .style-h3 {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            line-height: var(--line-height-snug);
+        }
+
+        .style-h4 {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            line-height: var(--line-height-normal);
+        }
+
+        .style-body-lg {
+            font-size: var(--font-size-md);
+            font-weight: var(--font-weight-regular);
+            line-height: var(--line-height-relaxed);
+        }
+
+        .style-body {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-regular);
+            line-height: var(--line-height-relaxed);
+        }
+
+        .style-caption {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-regular);
+            line-height: var(--line-height-loose);
+            color: var(--color-text-secondary);
+        }
+
+        .style-label {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            line-height: var(--line-height-normal);
+            color: var(--color-text-secondary);
+        }
+
+        .sample-row {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-6);
+            border-bottom: 1px solid var(--color-border-default);
+            padding-bottom: var(--space-4);
+        }
+
+        .sample-tag {
+            flex: 0 0 auto;
+            width: var(--space-20);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-disabled);
+        }
+
+        /* ================================
+           COLOUR SWATCHES
+        ================================ */
+        .swatch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .swatch {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .swatch-fill {
+            width: 100%;
+            height: var(--space-16);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--color-border-default);
+        }
+
+        .swatch-name {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-primary);
+        }
+
+        .swatch-hex {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+        }
+
+        .swatch-background-base { background-color: var(--color-background-base); }
+        .swatch-background-surface { background-color: var(--color-background-surface); }
+        .swatch-background-subtle { background-color: var(--color-background-subtle); }
+        .swatch-text-primary { background-color: var(--color-text-primary); }
+        .swatch-text-secondary { background-color: var(--color-text-secondary); }
+        .swatch-text-disabled { background-color: var(--color-text-disabled); }
+        .swatch-interactive-default { background-color: var(--color-interactive-default); }
+        .swatch-interactive-hover { background-color: var(--color-interactive-hover); }
+        .swatch-interactive-focus { background-color: var(--color-interactive-focus); }
+
+        .swatch-border {
+            background-color: var(--color-background-surface);
+            border-width: var(--space-1);
+            border-style: solid;
+        }
+
+        .swatch-border-default { border-color: var(--color-border-default); }
+        .swatch-border-strong { border-color: var(--color-border-strong); }
+
+        /* ================================
+           TYPOGRAPHY SCALE
+        ================================ */
+        .type-scale-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+
+        .type-scale-row {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-6);
+            border-bottom: 1px solid var(--color-border-default);
+            padding-bottom: var(--space-4);
+        }
+
+        .type-scale-meta {
+            flex: 0 0 auto;
+            width: var(--space-20);
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+        }
+
+        .type-xs { font-size: var(--font-size-xs); }
+        .type-sm { font-size: var(--font-size-sm); }
+        .type-base { font-size: var(--font-size-base); }
+        .type-md { font-size: var(--font-size-md); }
+        .type-lg { font-size: var(--font-size-lg); }
+        .type-xl { font-size: var(--font-size-xl); }
+        .type-2xl { font-size: var(--font-size-2xl); }
+        .type-3xl { font-size: var(--font-size-3xl); }
+        .type-4xl { font-size: var(--font-size-4xl); }
+
+        /* ================================
+           SURFACE CARD
+        ================================ */
+        .surface-card {
+            background-color: var(--color-background-surface);
+            border: 1px solid var(--color-border-default);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-8);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            max-width: 480px;
+        }
+
+        /* ================================
+           BUTTON STATES
+        ================================ */
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-8);
+        }
+
+        .button-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-2);
+        }
+
+        .btn-preview {
+            font-family: inherit;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--color-border-strong);
+            background-color: var(--color-interactive-default);
+            color: var(--color-background-base);
+            cursor: pointer;
+            transition: background-color 200ms ease, outline 200ms ease;
+        }
+
+        .btn-preview:hover,
+        .btn-preview.is-hover {
+            background-color: var(--color-interactive-hover);
+        }
+
+        .btn-preview:focus-visible,
+        .btn-preview.is-focus {
+            outline: 2px solid var(--color-interactive-focus);
+            outline-offset: 3px;
+        }
+
+        .btn-preview:disabled,
+        .btn-preview.is-disabled {
+            background-color: var(--color-background-subtle);
+            color: var(--color-text-disabled);
+            border-color: var(--color-border-default);
+            cursor: not-allowed;
+        }
+
+        /* ================================
+           SPACING SCALE
+        ================================ */
+        .spacing-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .spacing-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+        }
+
+        .spacing-meta {
+            flex: 0 0 auto;
+            width: var(--space-20);
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+        }
+
+        .space-block {
+            height: var(--space-4);
+            background-color: var(--color-interactive-default);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .space-block-1 { width: var(--space-1); }
+        .space-block-2 { width: var(--space-2); }
+        .space-block-3 { width: var(--space-3); }
+        .space-block-4 { width: var(--space-4); }
+        .space-block-6 { width: var(--space-6); }
+        .space-block-8 { width: var(--space-8); }
+        .space-block-10 { width: var(--space-10); }
+        .space-block-12 { width: var(--space-12); }
+        .space-block-16 { width: var(--space-16); }
+        .space-block-20 { width: var(--space-20); }
+
+        @media (max-width: 768px) {
+            .preview {
+                padding: var(--space-8) var(--space-4);
+                gap: var(--space-12);
+            }
+
+            .sample-tag,
+            .type-scale-meta,
+            .spacing-meta {
+                width: var(--space-12);
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="preview">
+        <div class="preview-intro">
+            <h1>Design System Preview</h1>
+            <p class="style-body-lg">A living reference for the colour, typography, spacing, and component tokens defined in style.css.</p>
+        </div>
+
+        <section class="preview-section" aria-labelledby="colours-heading">
+            <h2 id="colours-heading">Colour Tokens</h2>
+            <div class="swatch-grid">
+                <div class="swatch">
+                    <div class="swatch-fill swatch-background-base"></div>
+                    <p class="swatch-name">--color-background-base</p>
+                    <p class="swatch-hex">#111111</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-background-surface"></div>
+                    <p class="swatch-name">--color-background-surface</p>
+                    <p class="swatch-hex">#1A1A1A</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-background-subtle"></div>
+                    <p class="swatch-name">--color-background-subtle</p>
+                    <p class="swatch-hex">#2A2A2A</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-text-primary"></div>
+                    <p class="swatch-name">--color-text-primary</p>
+                    <p class="swatch-hex">#F5F5F5</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-text-secondary"></div>
+                    <p class="swatch-name">--color-text-secondary</p>
+                    <p class="swatch-hex">#AAAAAA</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-text-disabled"></div>
+                    <p class="swatch-name">--color-text-disabled</p>
+                    <p class="swatch-hex">#666666</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-border swatch-border-default"></div>
+                    <p class="swatch-name">--color-border-default</p>
+                    <p class="swatch-hex">#2A2A2A</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-border swatch-border-strong"></div>
+                    <p class="swatch-name">--color-border-strong</p>
+                    <p class="swatch-hex">#666666</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-interactive-default"></div>
+                    <p class="swatch-name">--color-interactive-default</p>
+                    <p class="swatch-hex">#F5F5F5</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-interactive-hover"></div>
+                    <p class="swatch-name">--color-interactive-hover</p>
+                    <p class="swatch-hex">#CCCCCC</p>
+                </div>
+                <div class="swatch">
+                    <div class="swatch-fill swatch-interactive-focus"></div>
+                    <p class="swatch-name">--color-interactive-focus</p>
+                    <p class="swatch-hex">#FFFFFF</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section" aria-labelledby="type-scale-heading">
+            <h2 id="type-scale-heading">Typography Scale</h2>
+            <div class="type-scale-list">
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-xs<br>12px</p>
+                    <p class="type-xs">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-sm<br>14px</p>
+                    <p class="type-sm">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-base<br>16px</p>
+                    <p class="type-base">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-md<br>18px</p>
+                    <p class="type-md">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-lg<br>20px</p>
+                    <p class="type-lg">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-xl<br>24px</p>
+                    <p class="type-xl">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-2xl<br>30px</p>
+                    <p class="type-2xl">The quick brown fox jumps over the lazy dog.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-3xl<br>36px</p>
+                    <p class="type-3xl">The quick brown fox jumps.</p>
+                </div>
+                <div class="type-scale-row">
+                    <p class="type-scale-meta">--font-size-4xl<br>48px</p>
+                    <p class="type-4xl">The quick brown fox jumps.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section" aria-labelledby="sample-text-heading">
+            <h2 id="sample-text-heading">Sample Text Block</h2>
+            <div class="sample-text-list">
+                <div class="sample-row">
+                    <p class="sample-tag">H1</p>
+                    <p class="style-h1">Your Name</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">H2</p>
+                    <p class="style-h2">Section heading</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">H3</p>
+                    <p class="style-h3">Subsection heading</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">H4</p>
+                    <p class="style-h4">Minor heading</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">Body Large</p>
+                    <p class="style-body-lg">An intro paragraph that introduces the page or section with a touch more presence than standard body copy.</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">Body</p>
+                    <p class="style-body">Standard body copy, used for the majority of running text across the site.</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">Caption</p>
+                    <p class="style-caption">A caption or piece of metadata, set small and quiet.</p>
+                </div>
+                <div class="sample-row">
+                    <p class="sample-tag">Label</p>
+                    <p class="style-label">A UI label, such as a form field name</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section" aria-labelledby="surface-card-heading">
+            <h2 id="surface-card-heading">Surface Card</h2>
+            <div class="surface-card">
+                <h3>Card heading</h3>
+                <p class="style-body">This card sits on --color-background-surface, layered on top of the page's --color-background-base, with a --color-border-default outline and --border-radius-md corners.</p>
+            </div>
+        </section>
+
+        <section class="preview-section" aria-labelledby="button-states-heading">
+            <h2 id="button-states-heading">Button States</h2>
+            <div class="button-row">
+                <div class="button-demo">
+                    <button class="btn-preview" type="button">Default</button>
+                    <p class="style-caption">Default</p>
+                </div>
+                <div class="button-demo">
+                    <button class="btn-preview is-hover" type="button">Hover</button>
+                    <p class="style-caption">Hover (try hovering any button too)</p>
+                </div>
+                <div class="button-demo">
+                    <button class="btn-preview is-focus" type="button">Focus</button>
+                    <p class="style-caption">Focus (try tabbing to any button too)</p>
+                </div>
+                <div class="button-demo">
+                    <button class="btn-preview is-disabled" type="button" disabled>Disabled</button>
+                    <p class="style-caption">Disabled</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="preview-section" aria-labelledby="spacing-heading">
+            <h2 id="spacing-heading">Spacing Scale</h2>
+            <div class="spacing-list">
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-1<br>4px</p>
+                    <div class="space-block space-block-1"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-2<br>8px</p>
+                    <div class="space-block space-block-2"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-3<br>12px</p>
+                    <div class="space-block space-block-3"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-4<br>16px</p>
+                    <div class="space-block space-block-4"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-6<br>24px</p>
+                    <div class="space-block space-block-6"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-8<br>32px</p>
+                    <div class="space-block space-block-8"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-10<br>40px</p>
+                    <div class="space-block space-block-10"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-12<br>48px</p>
+                    <div class="space-block space-block-12"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-16<br>64px</p>
+                    <div class="space-block space-block-16"></div>
+                </div>
+                <div class="spacing-row">
+                    <p class="spacing-meta">--space-20<br>80px</p>
+                    <div class="space-block space-block-20"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
