@@ -1,280 +1,237 @@
 {
-  "$metadata": {
-    "name": "Personal Website Design System",
-    "version": "1.0.0",
-    "description": "Accessible dark-theme design system using Noto Sans. Built to WCAG AA standards.",
-    "tokenFormat": "W3C Design Tokens Community Group"
-  },
+  "global": {
+    "grey-0":    { "value": "#FFFFFF", "type": "color", "description": "Pure white" },
+    "grey-50":   { "value": "#F5F5F5", "type": "color", "description": "Near white" },
+    "grey-100":  { "value": "#E8E8E8", "type": "color", "description": "Light grey" },
+    "grey-200":  { "value": "#CCCCCC", "type": "color", "description": "Soft grey" },
+    "grey-300":  { "value": "#AAAAAA", "type": "color", "description": "Mid-light grey" },
+    "grey-400":  { "value": "#888888", "type": "color", "description": "Mid grey" },
+    "grey-500":  { "value": "#666666", "type": "color", "description": "Mid-dark grey" },
+    "grey-600":  { "value": "#444444", "type": "color", "description": "Dark grey" },
+    "grey-700":  { "value": "#2A2A2A", "type": "color", "description": "Deeper dark grey" },
+    "grey-800":  { "value": "#1A1A1A", "type": "color", "description": "Near black" },
+    "grey-900":  { "value": "#111111", "type": "color", "description": "Almost black" },
+    "grey-1000": { "value": "#000000", "type": "color", "description": "Pure black" },
 
-  "color": {
-    "grey": {
-      "$description": "Primitive colour scale. 0 = white, 1000 = black. Reference only via semantic tokens.",
-      "0":    { "$value": "#FFFFFF", "$type": "color" },
-      "50":   { "$value": "#F5F5F5", "$type": "color" },
-      "100":  { "$value": "#E8E8E8", "$type": "color" },
-      "200":  { "$value": "#CCCCCC", "$type": "color" },
-      "300":  { "$value": "#AAAAAA", "$type": "color" },
-      "400":  { "$value": "#888888", "$type": "color" },
-      "500":  { "$value": "#666666", "$type": "color" },
-      "600":  { "$value": "#444444", "$type": "color" },
-      "700":  { "$value": "#2A2A2A", "$type": "color" },
-      "800":  { "$value": "#1A1A1A", "$type": "color" },
-      "900":  { "$value": "#111111", "$type": "color" },
-      "1000": { "$value": "#000000", "$type": "color" }
-    },
+    "color-background-base":    { "value": "{global.grey-900}", "type": "color", "description": "Main page background" },
+    "color-background-surface": { "value": "{global.grey-800}", "type": "color", "description": "Cards, panels, elevated surfaces" },
+    "color-background-subtle":  { "value": "{global.grey-700}", "type": "color", "description": "Hover states, section dividers" },
 
-    "background": {
-      "base":    { "$value": "{color.grey.900}", "$type": "color", "$description": "Main page background" },
-      "surface": { "$value": "{color.grey.800}", "$type": "color", "$description": "Cards, panels, elevated surfaces" },
-      "subtle":  { "$value": "{color.grey.700}", "$type": "color", "$description": "Hover states, section dividers" }
-    },
+    "color-text-primary":   { "value": "{global.grey-50}",   "type": "color", "description": "Body text and headings. ~15:1 contrast" },
+    "color-text-secondary": { "value": "{global.grey-300}",  "type": "color", "description": "Captions, metadata. ~7.5:1 contrast" },
+    "color-text-tertiary":  { "value": "{global.grey-400}",  "type": "color", "description": "Placeholder, decorative. Large sizes only." },
+    "color-text-disabled":  { "value": "{global.grey-500}",  "type": "color", "description": "Disabled state. Not required to meet contrast." },
+    "color-text-inverse":   { "value": "{global.grey-900}",  "type": "color", "description": "Text placed on light surfaces" },
 
-    "text": {
-      "primary":   { "$value": "{color.grey.50}",  "$type": "color", "$description": "Body text and headings. Contrast vs base: ~15:1" },
-      "secondary": { "$value": "{color.grey.300}", "$type": "color", "$description": "Captions, metadata. Contrast vs base: ~7.5:1" },
-      "tertiary":  { "$value": "{color.grey.400}", "$type": "color", "$description": "Placeholder, decorative. Contrast vs base: ~4.6:1 — use only at large sizes" },
-      "disabled":  { "$value": "{color.grey.500}", "$type": "color", "$description": "Disabled state. Not required to meet contrast." },
-      "inverse":   { "$value": "{color.grey.900}", "$type": "color", "$description": "Text placed on light surfaces" }
-    },
+    "color-border-default": { "value": "{global.grey-700}", "type": "color", "description": "Subtle dividers and rule lines" },
+    "color-border-strong":  { "value": "{global.grey-500}", "type": "color", "description": "Emphasized borders, input outlines" },
 
-    "border": {
-      "default": { "$value": "{color.grey.700}", "$type": "color", "$description": "Subtle dividers and rule lines" },
-      "strong":  { "$value": "{color.grey.500}", "$type": "color", "$description": "Emphasized borders, input outlines" }
-    },
+    "color-interactive-default":  { "value": "{global.grey-50}",  "type": "color", "description": "Default interactive element. ~15:1 contrast" },
+    "color-interactive-hover":    { "value": "{global.grey-200}", "type": "color", "description": "Hover state" },
+    "color-interactive-active":   { "value": "{global.grey-0}",   "type": "color", "description": "Active/pressed state" },
+    "color-interactive-focus":    { "value": "{global.grey-0}",   "type": "color", "description": "Focus ring colour. Meets 3:1." },
+    "color-interactive-disabled": { "value": "{global.grey-500}", "type": "color", "description": "Disabled interactive elements" },
 
-    "interactive": {
-      "default":  { "$value": "{color.grey.50}",  "$type": "color", "$description": "Default interactive element. Contrast vs base: ~15:1" },
-      "hover":    { "$value": "{color.grey.200}", "$type": "color", "$description": "Hover state" },
-      "active":   { "$value": "{color.grey.0}",   "$type": "color", "$description": "Active/pressed state" },
-      "focus":    { "$value": "{color.grey.0}",   "$type": "color", "$description": "Focus ring colour. Must meet 3:1 against adjacent colours." },
-      "disabled": { "$value": "{color.grey.500}", "$type": "color", "$description": "Disabled interactive elements" }
-    }
-  },
+    "font-family-base": { "value": "Noto Sans", "type": "fontFamilies", "description": "Primary typeface" },
 
-  "typography": {
-    "$description": "All values use Noto Sans. Scale based on a 1.25 (Major Third) modular ratio from a 16px base.",
+    "font-size-xs":   { "value": "12", "type": "fontSizes", "description": "Legal, fine print only" },
+    "font-size-sm":   { "value": "14", "type": "fontSizes", "description": "Captions, labels, metadata" },
+    "font-size-base": { "value": "16", "type": "fontSizes", "description": "Body text" },
+    "font-size-md":   { "value": "18", "type": "fontSizes", "description": "Large body, intro paragraphs" },
+    "font-size-lg":   { "value": "20", "type": "fontSizes", "description": "H4" },
+    "font-size-xl":   { "value": "24", "type": "fontSizes", "description": "H3" },
+    "font-size-2xl":  { "value": "30", "type": "fontSizes", "description": "H2" },
+    "font-size-3xl":  { "value": "36", "type": "fontSizes", "description": "H1 mobile" },
+    "font-size-4xl":  { "value": "48", "type": "fontSizes", "description": "H1 desktop" },
+    "font-size-5xl":  { "value": "60", "type": "fontSizes", "description": "Display / hero headline" },
 
-    "fontFamily": {
-      "base": { "$value": "'Noto Sans', sans-serif", "$type": "fontFamily", "$description": "Primary typeface for all text" }
-    },
+    "font-weight-regular":  { "value": "Regular",  "type": "fontWeights", "description": "Body text" },
+    "font-weight-medium":   { "value": "Medium",   "type": "fontWeights", "description": "Labels, captions" },
+    "font-weight-semibold": { "value": "SemiBold", "type": "fontWeights", "description": "H3, H4" },
+    "font-weight-bold":     { "value": "Bold",     "type": "fontWeights", "description": "H1, H2, display" },
 
-    "fontSize": {
-      "xs":   { "$value": "12px", "$type": "dimension", "$description": "Legal, fine print only. Never body text." },
-      "sm":   { "$value": "14px", "$type": "dimension", "$description": "Captions, labels, metadata" },
-      "base": { "$value": "16px", "$type": "dimension", "$description": "Body text — browser default, WCAG recommended minimum" },
-      "md":   { "$value": "18px", "$type": "dimension", "$description": "Large body, intro paragraphs" },
-      "lg":   { "$value": "20px", "$type": "dimension", "$description": "H4 / section subheadings" },
-      "xl":   { "$value": "24px", "$type": "dimension", "$description": "H3" },
-      "2xl":  { "$value": "30px", "$type": "dimension", "$description": "H2" },
-      "3xl":  { "$value": "36px", "$type": "dimension", "$description": "H1 mobile" },
-      "4xl":  { "$value": "48px", "$type": "dimension", "$description": "H1 desktop" },
-      "5xl":  { "$value": "60px", "$type": "dimension", "$description": "Display / hero headline desktop" }
-    },
+    "line-height-tight":   { "value": "120", "type": "lineHeights", "description": "Display and H1" },
+    "line-height-snug":    { "value": "130", "type": "lineHeights", "description": "H2, H3" },
+    "line-height-normal":  { "value": "150", "type": "lineHeights", "description": "H4, UI labels" },
+    "line-height-relaxed": { "value": "160", "type": "lineHeights", "description": "Body text" },
+    "line-height-loose":   { "value": "175", "type": "lineHeights", "description": "Captions, small text" },
 
-    "fontWeight": {
-      "regular":   { "$value": "400", "$type": "fontWeight", "$description": "Body text" },
-      "medium":    { "$value": "500", "$type": "fontWeight", "$description": "Labels, captions, emphasized body" },
-      "semibold":  { "$value": "600", "$type": "fontWeight", "$description": "Subheadings, H3, H4" },
-      "bold":      { "$value": "700", "$type": "fontWeight", "$description": "H1, H2, display text" }
-    },
+    "letter-spacing-tight":  { "value": "-0.02em", "type": "letterSpacing", "description": "Display / H1" },
+    "letter-spacing-normal": { "value": "0em",     "type": "letterSpacing", "description": "Body text default" },
+    "letter-spacing-wide":   { "value": "0.04em",  "type": "letterSpacing", "description": "Labels, captions" },
+    "letter-spacing-widest": { "value": "0.08em",  "type": "letterSpacing", "description": "Navigation, badges" },
 
-    "lineHeight": {
-      "tight":    { "$value": "1.2",  "$type": "number", "$description": "Display and H1 — large type needs less leading" },
-      "snug":     { "$value": "1.3",  "$type": "number", "$description": "H2, H3" },
-      "normal":   { "$value": "1.5",  "$type": "number", "$description": "H4, large body, UI labels" },
-      "relaxed":  { "$value": "1.6",  "$type": "number", "$description": "Body text — optimal for sustained reading" },
-      "loose":    { "$value": "1.75", "$type": "number", "$description": "Small text (captions, sm) — compensates for reduced size" }
-    },
+    "paragraph-spacing-sm":   { "value": "12", "type": "paragraphSpacing", "description": "Caption-level text blocks" },
+    "paragraph-spacing-base": { "value": "16", "type": "paragraphSpacing", "description": "Standard paragraph spacing" },
+    "paragraph-spacing-md":   { "value": "24", "type": "paragraphSpacing", "description": "Between body paragraphs" },
+    "paragraph-spacing-lg":   { "value": "32", "type": "paragraphSpacing", "description": "Between major content sections" },
 
-    "letterSpacing": {
-      "tight":   { "$value": "-0.02em", "$type": "dimension", "$description": "Display / H1 at large sizes" },
-      "normal":  { "$value": "0em",     "$type": "dimension", "$description": "Body text default" },
-      "wide":    { "$value": "0.04em",  "$type": "dimension", "$description": "Labels, captions, uppercase contexts" },
-      "widest":  { "$value": "0.08em",  "$type": "dimension", "$description": "Navigation items, badges" }
-    },
-
-    "paragraphSpacing": {
-      "sm":   { "$value": "12px", "$type": "dimension", "$description": "Between caption-level text blocks" },
-      "base": { "$value": "16px", "$type": "dimension", "$description": "Standard paragraph spacing (1× base font size)" },
-      "md":   { "$value": "24px", "$type": "dimension", "$description": "Between body paragraphs for long-form reading" },
-      "lg":   { "$value": "32px", "$type": "dimension", "$description": "Between major content sections within a page" }
-    },
-
-    "scale": {
-      "$description": "Assembled type styles. Each role maps font size, weight, line height, and letter spacing.",
-      "display": {
-        "fontSize":      { "$value": "{typography.fontSize.5xl}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.bold}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.tight}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.tight}" },
-        "$description":  "Hero headline. Desktop only."
+    "type-display": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-5xl}",
+        "fontWeight":      "{global.font-weight-bold}",
+        "lineHeight":      "{global.line-height-tight}",
+        "letterSpacing":   "{global.letter-spacing-tight}",
+        "paragraphSpacing":"{global.paragraph-spacing-lg}"
       },
-      "h1": {
-        "fontSize":      { "$value": "{typography.fontSize.4xl}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.bold}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.tight}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.tight}" },
-        "$description":  "Page title. Desktop: 48px. Mobile: use 3xl (36px)."
-      },
-      "h2": {
-        "fontSize":      { "$value": "{typography.fontSize.2xl}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.bold}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.snug}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
-        "$description":  "Section headings."
-      },
-      "h3": {
-        "fontSize":      { "$value": "{typography.fontSize.xl}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.semibold}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.snug}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
-        "$description":  "Subsection headings."
-      },
-      "h4": {
-        "fontSize":      { "$value": "{typography.fontSize.lg}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.semibold}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.normal}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
-        "$description":  "Card titles, grouped content labels."
-      },
-      "bodyLarge": {
-        "fontSize":      { "$value": "{typography.fontSize.md}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.regular}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.relaxed}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
-        "$description":  "Intro paragraphs, lead text."
-      },
-      "body": {
-        "fontSize":      { "$value": "{typography.fontSize.base}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.regular}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.relaxed}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
-        "$description":  "Default body text."
-      },
-      "caption": {
-        "fontSize":      { "$value": "{typography.fontSize.sm}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.medium}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.loose}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.wide}" },
-        "$description":  "Image captions, metadata, timestamps."
-      },
-      "label": {
-        "fontSize":      { "$value": "{typography.fontSize.sm}" },
-        "fontWeight":    { "$value": "{typography.fontWeight.medium}" },
-        "lineHeight":    { "$value": "{typography.lineHeight.normal}" },
-        "letterSpacing": { "$value": "{typography.letterSpacing.widest}" },
-        "$description":  "Navigation, buttons, form labels, badges."
-      }
-    }
-  },
-
-  "spacing": {
-    "$description": "Base-4 spacing scale. All layout spacing should come from these tokens.",
-    "0":   { "$value": "0px",   "$type": "dimension" },
-    "1":   { "$value": "4px",   "$type": "dimension" },
-    "2":   { "$value": "8px",   "$type": "dimension" },
-    "3":   { "$value": "12px",  "$type": "dimension" },
-    "4":   { "$value": "16px",  "$type": "dimension" },
-    "5":   { "$value": "20px",  "$type": "dimension" },
-    "6":   { "$value": "24px",  "$type": "dimension" },
-    "8":   { "$value": "32px",  "$type": "dimension" },
-    "10":  { "$value": "40px",  "$type": "dimension" },
-    "12":  { "$value": "48px",  "$type": "dimension" },
-    "16":  { "$value": "64px",  "$type": "dimension" },
-    "20":  { "$value": "80px",  "$type": "dimension" },
-    "24":  { "$value": "96px",  "$type": "dimension" },
-    "32":  { "$value": "128px", "$type": "dimension" }
-  },
-
-  "grid": {
-    "desktop": {
-      "frameWidth":  { "$value": "1440px", "$type": "dimension", "$description": "Standard design canvas width" },
-      "maxContent":  { "$value": "1200px", "$type": "dimension", "$description": "Maximum readable content width" },
-      "columns":     { "$value": "12",     "$type": "number",    "$description": "12-column grid" },
-      "gutter":      { "$value": "32px",   "$type": "dimension", "$description": "Space between columns" },
-      "margin":      { "$value": "120px",  "$type": "dimension", "$description": "Left and right page margin" },
-      "columnWidth": { "$value": "72px",   "$type": "dimension", "$description": "Calculated column width at 1440px frame" }
+      "type": "typography",
+      "description": "Hero headline. Desktop only."
     },
-    "tablet": {
-      "frameWidth":  { "$value": "768px",  "$type": "dimension", "$description": "Standard tablet canvas width" },
-      "maxContent":  { "$value": "688px",  "$type": "dimension", "$description": "Maximum readable content width" },
-      "columns":     { "$value": "8",      "$type": "number",    "$description": "8-column grid" },
-      "gutter":      { "$value": "24px",   "$type": "dimension", "$description": "Space between columns" },
-      "margin":      { "$value": "40px",   "$type": "dimension", "$description": "Left and right page margin" }
+    "type-h1": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-4xl}",
+        "fontWeight":      "{global.font-weight-bold}",
+        "lineHeight":      "{global.line-height-tight}",
+        "letterSpacing":   "{global.letter-spacing-tight}",
+        "paragraphSpacing":"{global.paragraph-spacing-lg}"
+      },
+      "type": "typography",
+      "description": "Page title. Desktop: 48px. Mobile: 36px."
     },
-    "mobile": {
-      "frameWidth":  { "$value": "390px",  "$type": "dimension", "$description": "iPhone 14 canvas width — standard mobile target" },
-      "maxContent":  { "$value": "358px",  "$type": "dimension", "$description": "Maximum readable content width" },
-      "columns":     { "$value": "4",      "$type": "number",    "$description": "4-column grid" },
-      "gutter":      { "$value": "16px",   "$type": "dimension", "$description": "Space between columns" },
-      "margin":      { "$value": "16px",   "$type": "dimension", "$description": "Left and right page margin" }
-    }
-  },
-
-  "borderRadius": {
-    "none":   { "$value": "0px",   "$type": "dimension", "$description": "Sharp corners — use for editorial elements" },
-    "sm":     { "$value": "4px",   "$type": "dimension", "$description": "Subtle rounding — inputs, tags" },
-    "md":     { "$value": "8px",   "$type": "dimension", "$description": "Cards, panels" },
-    "lg":     { "$value": "12px",  "$type": "dimension", "$description": "Modals, large containers" },
-    "full":   { "$value": "9999px","$type": "dimension", "$description": "Pills, fully rounded badges" }
-  },
-
-  "borderWidth": {
-    "thin":   { "$value": "1px", "$type": "dimension", "$description": "Default border weight" },
-    "medium": { "$value": "2px", "$type": "dimension", "$description": "Focus rings, emphasized borders" },
-    "thick":  { "$value": "4px", "$type": "dimension", "$description": "Active states, accent lines" }
-  },
-
-  "focus": {
-    "$description": "WCAG 2.2 requires focus indicators to meet 3:1 contrast and have a minimum area. These tokens encode that.",
-    "ringWidth":  { "$value": "{borderWidth.medium}", "$type": "dimension", "$description": "2px minimum per WCAG 2.2 SC 2.4.11" },
-    "ringColor":  { "$value": "{color.interactive.focus}", "$type": "color", "$description": "White ring against dark background — exceeds 3:1" },
-    "ringOffset": { "$value": "3px", "$type": "dimension", "$description": "Offset separates ring from element for clarity" }
-  },
-
-  "motion": {
-    "$description": "Animation values. Always respect prefers-reduced-motion — these should be disabled or minimised when that media query fires.",
-    "duration": {
-      "instant":  { "$value": "0ms",   "$type": "duration" },
-      "fast":     { "$value": "100ms", "$type": "duration", "$description": "Micro-interactions: hover, toggle" },
-      "base":     { "$value": "200ms", "$type": "duration", "$description": "Standard transitions" },
-      "slow":     { "$value": "350ms", "$type": "duration", "$description": "Page-level transitions, reveals" },
-      "slower":   { "$value": "500ms", "$type": "duration", "$description": "Emphasis animations" }
+    "type-h2": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-2xl}",
+        "fontWeight":      "{global.font-weight-bold}",
+        "lineHeight":      "{global.line-height-snug}",
+        "letterSpacing":   "{global.letter-spacing-normal}",
+        "paragraphSpacing":"{global.paragraph-spacing-md}"
+      },
+      "type": "typography",
+      "description": "Section headings."
     },
-    "easing": {
-      "linear":   { "$value": "linear",                    "$type": "cubicBezier" },
-      "easeIn":   { "$value": "cubic-bezier(0.4, 0, 1, 1)", "$type": "cubicBezier", "$description": "Elements leaving screen" },
-      "easeOut":  { "$value": "cubic-bezier(0, 0, 0.2, 1)", "$type": "cubicBezier", "$description": "Elements entering screen" },
-      "easeInOut":{ "$value": "cubic-bezier(0.4, 0, 0.2, 1)","$type": "cubicBezier", "$description": "Elements changing position" }
-    }
-  },
-
-  "elevation": {
-    "$description": "Shadow scale for dark themes. Shadows on dark backgrounds use lighter, more diffuse values.",
-    "sm":   { "$value": "0 1px 3px rgba(0,0,0,0.4)",                    "$type": "shadow", "$description": "Subtle lift — tags, badges" },
-    "md":   { "$value": "0 4px 12px rgba(0,0,0,0.5)",                   "$type": "shadow", "$description": "Cards, dropdowns" },
-    "lg":   { "$value": "0 8px 24px rgba(0,0,0,0.6)",                   "$type": "shadow", "$description": "Modals, overlays" },
-    "xl":   { "$value": "0 16px 48px rgba(0,0,0,0.7)",                  "$type": "shadow", "$description": "Floating elements" }
-  },
-
-  "accessibility": {
-    "$description": "Reference values used to verify WCAG AA compliance. Not applied directly — used for audit documentation.",
-    "contrastRatios": {
-      "textPrimaryOnBase":     { "$value": "~15:1",  "$description": "grey.50 on grey.900 — far exceeds 4.5:1 AA" },
-      "textSecondaryOnBase":   { "$value": "~7.5:1", "$description": "grey.300 on grey.900 — exceeds 4.5:1 AA" },
-      "textTertiaryOnBase":    { "$value": "~4.6:1", "$description": "grey.400 on grey.900 — passes AA at large sizes only" },
-      "textPrimaryOnSurface":  { "$value": "~12:1",  "$description": "grey.50 on grey.800 — exceeds 4.5:1 AA" },
-      "textSecondaryOnSurface":{ "$value": "~6:1",   "$description": "grey.300 on grey.800 — exceeds 4.5:1 AA" },
-      "focusRingOnBase":       { "$value": "~19:1",  "$description": "grey.0 on grey.900 — far exceeds 3:1 UI component requirement" }
+    "type-h3": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-xl}",
+        "fontWeight":      "{global.font-weight-semibold}",
+        "lineHeight":      "{global.line-height-snug}",
+        "letterSpacing":   "{global.letter-spacing-normal}",
+        "paragraphSpacing":"{global.paragraph-spacing-md}"
+      },
+      "type": "typography",
+      "description": "Subsection headings."
     },
-    "touchTargets": {
-      "minimum": { "$value": "44px", "$type": "dimension", "$description": "WCAG 2.5.5 AA minimum touch target size" },
-      "comfortable": { "$value": "48px", "$type": "dimension", "$description": "Recommended comfortable tap target" }
+    "type-h4": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-lg}",
+        "fontWeight":      "{global.font-weight-semibold}",
+        "lineHeight":      "{global.line-height-normal}",
+        "letterSpacing":   "{global.letter-spacing-normal}",
+        "paragraphSpacing":"{global.paragraph-spacing-base}"
+      },
+      "type": "typography",
+      "description": "Card titles, grouped content labels."
     },
-    "lineLength": {
-      "minimum": { "$value": "45ch", "$type": "dimension", "$description": "Below this, reading feels choppy" },
-      "optimal":  { "$value": "65ch", "$type": "dimension", "$description": "Ideal for sustained reading — WCAG 1.4.8" },
-      "maximum":  { "$value": "80ch", "$type": "dimension", "$description": "Beyond this, eye tracking becomes difficult" }
-    }
+    "type-body-large": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-md}",
+        "fontWeight":      "{global.font-weight-regular}",
+        "lineHeight":      "{global.line-height-relaxed}",
+        "letterSpacing":   "{global.letter-spacing-normal}",
+        "paragraphSpacing":"{global.paragraph-spacing-md}"
+      },
+      "type": "typography",
+      "description": "Intro paragraphs, lead text."
+    },
+    "type-body": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-base}",
+        "fontWeight":      "{global.font-weight-regular}",
+        "lineHeight":      "{global.line-height-relaxed}",
+        "letterSpacing":   "{global.letter-spacing-normal}",
+        "paragraphSpacing":"{global.paragraph-spacing-base}"
+      },
+      "type": "typography",
+      "description": "Default body text."
+    },
+    "type-caption": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-sm}",
+        "fontWeight":      "{global.font-weight-medium}",
+        "lineHeight":      "{global.line-height-loose}",
+        "letterSpacing":   "{global.letter-spacing-wide}",
+        "paragraphSpacing":"{global.paragraph-spacing-sm}"
+      },
+      "type": "typography",
+      "description": "Image captions, metadata, timestamps."
+    },
+    "type-label": {
+      "value": {
+        "fontFamily":      "{global.font-family-base}",
+        "fontSize":        "{global.font-size-sm}",
+        "fontWeight":      "{global.font-weight-medium}",
+        "lineHeight":      "{global.line-height-normal}",
+        "letterSpacing":   "{global.letter-spacing-widest}",
+        "paragraphSpacing":"{global.paragraph-spacing-sm}"
+      },
+      "type": "typography",
+      "description": "Navigation, buttons, form labels, badges."
+    },
+
+    "spacing-0":  { "value": "0",   "type": "spacing" },
+    "spacing-1":  { "value": "4",   "type": "spacing" },
+    "spacing-2":  { "value": "8",   "type": "spacing" },
+    "spacing-3":  { "value": "12",  "type": "spacing" },
+    "spacing-4":  { "value": "16",  "type": "spacing" },
+    "spacing-5":  { "value": "20",  "type": "spacing" },
+    "spacing-6":  { "value": "24",  "type": "spacing" },
+    "spacing-8":  { "value": "32",  "type": "spacing" },
+    "spacing-10": { "value": "40",  "type": "spacing" },
+    "spacing-12": { "value": "48",  "type": "spacing" },
+    "spacing-16": { "value": "64",  "type": "spacing" },
+    "spacing-20": { "value": "80",  "type": "spacing" },
+    "spacing-24": { "value": "96",  "type": "spacing" },
+    "spacing-32": { "value": "128", "type": "spacing" },
+
+    "border-radius-none": { "value": "0",    "type": "borderRadius", "description": "Sharp corners" },
+    "border-radius-sm":   { "value": "4",    "type": "borderRadius", "description": "Inputs, tags" },
+    "border-radius-md":   { "value": "8",    "type": "borderRadius", "description": "Cards, panels" },
+    "border-radius-lg":   { "value": "12",   "type": "borderRadius", "description": "Modals, large containers" },
+    "border-radius-full": { "value": "9999", "type": "borderRadius", "description": "Pills, fully rounded" },
+
+    "border-width-thin":   { "value": "1", "type": "borderWidth", "description": "Default border weight" },
+    "border-width-medium": { "value": "2", "type": "borderWidth", "description": "Focus rings, emphasized borders" },
+    "border-width-thick":  { "value": "4", "type": "borderWidth", "description": "Active states, accent lines" },
+
+    "focus-ring-width":  { "value": "2",                    "type": "borderWidth", "description": "2px minimum per WCAG 2.2" },
+    "focus-ring-offset": { "value": "3",                    "type": "spacing",     "description": "Offset separates ring from element" },
+    "focus-ring-color":  { "value": "{global.grey-0}",      "type": "color",       "description": "White ring — exceeds 3:1" },
+
+    "motion-duration-instant": { "value": "0",   "type": "other", "description": "No transition" },
+    "motion-duration-fast":    { "value": "100", "type": "other", "description": "Micro-interactions" },
+    "motion-duration-base":    { "value": "200", "type": "other", "description": "Standard transitions" },
+    "motion-duration-slow":    { "value": "350", "type": "other", "description": "Page-level transitions" },
+    "motion-duration-slower":  { "value": "500", "type": "other", "description": "Emphasis animations" },
+
+    "elevation-sm": {
+      "value": { "x": "0", "y": "1",  "blur": "3",  "spread": "0", "color": "rgba(0,0,0,0.4)", "type": "dropShadow" },
+      "type": "boxShadow",
+      "description": "Subtle lift — tags, badges"
+    },
+    "elevation-md": {
+      "value": { "x": "0", "y": "4",  "blur": "12", "spread": "0", "color": "rgba(0,0,0,0.5)", "type": "dropShadow" },
+      "type": "boxShadow",
+      "description": "Cards, dropdowns"
+    },
+    "elevation-lg": {
+      "value": { "x": "0", "y": "8",  "blur": "24", "spread": "0", "color": "rgba(0,0,0,0.6)", "type": "dropShadow" },
+      "type": "boxShadow",
+      "description": "Modals, overlays"
+    },
+    "elevation-xl": {
+      "value": { "x": "0", "y": "16", "blur": "48", "spread": "0", "color": "rgba(0,0,0,0.7)", "type": "dropShadow" },
+      "type": "boxShadow",
+      "description": "Floating elements"
+    },
+
+    "touch-target-minimum":     { "value": "44", "type": "sizing", "description": "WCAG 2.5.5 AA minimum touch target" },
+    "touch-target-comfortable": { "value": "48", "type": "sizing", "description": "Recommended comfortable tap target" }
   }
 }
