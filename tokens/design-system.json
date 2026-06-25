@@ -1,0 +1,280 @@
+{
+  "$metadata": {
+    "name": "Personal Website Design System",
+    "version": "1.0.0",
+    "description": "Accessible dark-theme design system using Noto Sans. Built to WCAG AA standards.",
+    "tokenFormat": "W3C Design Tokens Community Group"
+  },
+
+  "color": {
+    "grey": {
+      "$description": "Primitive colour scale. 0 = white, 1000 = black. Reference only via semantic tokens.",
+      "0":    { "$value": "#FFFFFF", "$type": "color" },
+      "50":   { "$value": "#F5F5F5", "$type": "color" },
+      "100":  { "$value": "#E8E8E8", "$type": "color" },
+      "200":  { "$value": "#CCCCCC", "$type": "color" },
+      "300":  { "$value": "#AAAAAA", "$type": "color" },
+      "400":  { "$value": "#888888", "$type": "color" },
+      "500":  { "$value": "#666666", "$type": "color" },
+      "600":  { "$value": "#444444", "$type": "color" },
+      "700":  { "$value": "#2A2A2A", "$type": "color" },
+      "800":  { "$value": "#1A1A1A", "$type": "color" },
+      "900":  { "$value": "#111111", "$type": "color" },
+      "1000": { "$value": "#000000", "$type": "color" }
+    },
+
+    "background": {
+      "base":    { "$value": "{color.grey.900}", "$type": "color", "$description": "Main page background" },
+      "surface": { "$value": "{color.grey.800}", "$type": "color", "$description": "Cards, panels, elevated surfaces" },
+      "subtle":  { "$value": "{color.grey.700}", "$type": "color", "$description": "Hover states, section dividers" }
+    },
+
+    "text": {
+      "primary":   { "$value": "{color.grey.50}",  "$type": "color", "$description": "Body text and headings. Contrast vs base: ~15:1" },
+      "secondary": { "$value": "{color.grey.300}", "$type": "color", "$description": "Captions, metadata. Contrast vs base: ~7.5:1" },
+      "tertiary":  { "$value": "{color.grey.400}", "$type": "color", "$description": "Placeholder, decorative. Contrast vs base: ~4.6:1 — use only at large sizes" },
+      "disabled":  { "$value": "{color.grey.500}", "$type": "color", "$description": "Disabled state. Not required to meet contrast." },
+      "inverse":   { "$value": "{color.grey.900}", "$type": "color", "$description": "Text placed on light surfaces" }
+    },
+
+    "border": {
+      "default": { "$value": "{color.grey.700}", "$type": "color", "$description": "Subtle dividers and rule lines" },
+      "strong":  { "$value": "{color.grey.500}", "$type": "color", "$description": "Emphasized borders, input outlines" }
+    },
+
+    "interactive": {
+      "default":  { "$value": "{color.grey.50}",  "$type": "color", "$description": "Default interactive element. Contrast vs base: ~15:1" },
+      "hover":    { "$value": "{color.grey.200}", "$type": "color", "$description": "Hover state" },
+      "active":   { "$value": "{color.grey.0}",   "$type": "color", "$description": "Active/pressed state" },
+      "focus":    { "$value": "{color.grey.0}",   "$type": "color", "$description": "Focus ring colour. Must meet 3:1 against adjacent colours." },
+      "disabled": { "$value": "{color.grey.500}", "$type": "color", "$description": "Disabled interactive elements" }
+    }
+  },
+
+  "typography": {
+    "$description": "All values use Noto Sans. Scale based on a 1.25 (Major Third) modular ratio from a 16px base.",
+
+    "fontFamily": {
+      "base": { "$value": "'Noto Sans', sans-serif", "$type": "fontFamily", "$description": "Primary typeface for all text" }
+    },
+
+    "fontSize": {
+      "xs":   { "$value": "12px", "$type": "dimension", "$description": "Legal, fine print only. Never body text." },
+      "sm":   { "$value": "14px", "$type": "dimension", "$description": "Captions, labels, metadata" },
+      "base": { "$value": "16px", "$type": "dimension", "$description": "Body text — browser default, WCAG recommended minimum" },
+      "md":   { "$value": "18px", "$type": "dimension", "$description": "Large body, intro paragraphs" },
+      "lg":   { "$value": "20px", "$type": "dimension", "$description": "H4 / section subheadings" },
+      "xl":   { "$value": "24px", "$type": "dimension", "$description": "H3" },
+      "2xl":  { "$value": "30px", "$type": "dimension", "$description": "H2" },
+      "3xl":  { "$value": "36px", "$type": "dimension", "$description": "H1 mobile" },
+      "4xl":  { "$value": "48px", "$type": "dimension", "$description": "H1 desktop" },
+      "5xl":  { "$value": "60px", "$type": "dimension", "$description": "Display / hero headline desktop" }
+    },
+
+    "fontWeight": {
+      "regular":   { "$value": "400", "$type": "fontWeight", "$description": "Body text" },
+      "medium":    { "$value": "500", "$type": "fontWeight", "$description": "Labels, captions, emphasized body" },
+      "semibold":  { "$value": "600", "$type": "fontWeight", "$description": "Subheadings, H3, H4" },
+      "bold":      { "$value": "700", "$type": "fontWeight", "$description": "H1, H2, display text" }
+    },
+
+    "lineHeight": {
+      "tight":    { "$value": "1.2",  "$type": "number", "$description": "Display and H1 — large type needs less leading" },
+      "snug":     { "$value": "1.3",  "$type": "number", "$description": "H2, H3" },
+      "normal":   { "$value": "1.5",  "$type": "number", "$description": "H4, large body, UI labels" },
+      "relaxed":  { "$value": "1.6",  "$type": "number", "$description": "Body text — optimal for sustained reading" },
+      "loose":    { "$value": "1.75", "$type": "number", "$description": "Small text (captions, sm) — compensates for reduced size" }
+    },
+
+    "letterSpacing": {
+      "tight":   { "$value": "-0.02em", "$type": "dimension", "$description": "Display / H1 at large sizes" },
+      "normal":  { "$value": "0em",     "$type": "dimension", "$description": "Body text default" },
+      "wide":    { "$value": "0.04em",  "$type": "dimension", "$description": "Labels, captions, uppercase contexts" },
+      "widest":  { "$value": "0.08em",  "$type": "dimension", "$description": "Navigation items, badges" }
+    },
+
+    "paragraphSpacing": {
+      "sm":   { "$value": "12px", "$type": "dimension", "$description": "Between caption-level text blocks" },
+      "base": { "$value": "16px", "$type": "dimension", "$description": "Standard paragraph spacing (1× base font size)" },
+      "md":   { "$value": "24px", "$type": "dimension", "$description": "Between body paragraphs for long-form reading" },
+      "lg":   { "$value": "32px", "$type": "dimension", "$description": "Between major content sections within a page" }
+    },
+
+    "scale": {
+      "$description": "Assembled type styles. Each role maps font size, weight, line height, and letter spacing.",
+      "display": {
+        "fontSize":      { "$value": "{typography.fontSize.5xl}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.bold}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.tight}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.tight}" },
+        "$description":  "Hero headline. Desktop only."
+      },
+      "h1": {
+        "fontSize":      { "$value": "{typography.fontSize.4xl}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.bold}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.tight}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.tight}" },
+        "$description":  "Page title. Desktop: 48px. Mobile: use 3xl (36px)."
+      },
+      "h2": {
+        "fontSize":      { "$value": "{typography.fontSize.2xl}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.bold}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.snug}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
+        "$description":  "Section headings."
+      },
+      "h3": {
+        "fontSize":      { "$value": "{typography.fontSize.xl}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.semibold}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.snug}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
+        "$description":  "Subsection headings."
+      },
+      "h4": {
+        "fontSize":      { "$value": "{typography.fontSize.lg}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.semibold}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.normal}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
+        "$description":  "Card titles, grouped content labels."
+      },
+      "bodyLarge": {
+        "fontSize":      { "$value": "{typography.fontSize.md}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.regular}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.relaxed}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
+        "$description":  "Intro paragraphs, lead text."
+      },
+      "body": {
+        "fontSize":      { "$value": "{typography.fontSize.base}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.regular}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.relaxed}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.normal}" },
+        "$description":  "Default body text."
+      },
+      "caption": {
+        "fontSize":      { "$value": "{typography.fontSize.sm}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.medium}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.loose}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.wide}" },
+        "$description":  "Image captions, metadata, timestamps."
+      },
+      "label": {
+        "fontSize":      { "$value": "{typography.fontSize.sm}" },
+        "fontWeight":    { "$value": "{typography.fontWeight.medium}" },
+        "lineHeight":    { "$value": "{typography.lineHeight.normal}" },
+        "letterSpacing": { "$value": "{typography.letterSpacing.widest}" },
+        "$description":  "Navigation, buttons, form labels, badges."
+      }
+    }
+  },
+
+  "spacing": {
+    "$description": "Base-4 spacing scale. All layout spacing should come from these tokens.",
+    "0":   { "$value": "0px",   "$type": "dimension" },
+    "1":   { "$value": "4px",   "$type": "dimension" },
+    "2":   { "$value": "8px",   "$type": "dimension" },
+    "3":   { "$value": "12px",  "$type": "dimension" },
+    "4":   { "$value": "16px",  "$type": "dimension" },
+    "5":   { "$value": "20px",  "$type": "dimension" },
+    "6":   { "$value": "24px",  "$type": "dimension" },
+    "8":   { "$value": "32px",  "$type": "dimension" },
+    "10":  { "$value": "40px",  "$type": "dimension" },
+    "12":  { "$value": "48px",  "$type": "dimension" },
+    "16":  { "$value": "64px",  "$type": "dimension" },
+    "20":  { "$value": "80px",  "$type": "dimension" },
+    "24":  { "$value": "96px",  "$type": "dimension" },
+    "32":  { "$value": "128px", "$type": "dimension" }
+  },
+
+  "grid": {
+    "desktop": {
+      "frameWidth":  { "$value": "1440px", "$type": "dimension", "$description": "Standard design canvas width" },
+      "maxContent":  { "$value": "1200px", "$type": "dimension", "$description": "Maximum readable content width" },
+      "columns":     { "$value": "12",     "$type": "number",    "$description": "12-column grid" },
+      "gutter":      { "$value": "32px",   "$type": "dimension", "$description": "Space between columns" },
+      "margin":      { "$value": "120px",  "$type": "dimension", "$description": "Left and right page margin" },
+      "columnWidth": { "$value": "72px",   "$type": "dimension", "$description": "Calculated column width at 1440px frame" }
+    },
+    "tablet": {
+      "frameWidth":  { "$value": "768px",  "$type": "dimension", "$description": "Standard tablet canvas width" },
+      "maxContent":  { "$value": "688px",  "$type": "dimension", "$description": "Maximum readable content width" },
+      "columns":     { "$value": "8",      "$type": "number",    "$description": "8-column grid" },
+      "gutter":      { "$value": "24px",   "$type": "dimension", "$description": "Space between columns" },
+      "margin":      { "$value": "40px",   "$type": "dimension", "$description": "Left and right page margin" }
+    },
+    "mobile": {
+      "frameWidth":  { "$value": "390px",  "$type": "dimension", "$description": "iPhone 14 canvas width — standard mobile target" },
+      "maxContent":  { "$value": "358px",  "$type": "dimension", "$description": "Maximum readable content width" },
+      "columns":     { "$value": "4",      "$type": "number",    "$description": "4-column grid" },
+      "gutter":      { "$value": "16px",   "$type": "dimension", "$description": "Space between columns" },
+      "margin":      { "$value": "16px",   "$type": "dimension", "$description": "Left and right page margin" }
+    }
+  },
+
+  "borderRadius": {
+    "none":   { "$value": "0px",   "$type": "dimension", "$description": "Sharp corners — use for editorial elements" },
+    "sm":     { "$value": "4px",   "$type": "dimension", "$description": "Subtle rounding — inputs, tags" },
+    "md":     { "$value": "8px",   "$type": "dimension", "$description": "Cards, panels" },
+    "lg":     { "$value": "12px",  "$type": "dimension", "$description": "Modals, large containers" },
+    "full":   { "$value": "9999px","$type": "dimension", "$description": "Pills, fully rounded badges" }
+  },
+
+  "borderWidth": {
+    "thin":   { "$value": "1px", "$type": "dimension", "$description": "Default border weight" },
+    "medium": { "$value": "2px", "$type": "dimension", "$description": "Focus rings, emphasized borders" },
+    "thick":  { "$value": "4px", "$type": "dimension", "$description": "Active states, accent lines" }
+  },
+
+  "focus": {
+    "$description": "WCAG 2.2 requires focus indicators to meet 3:1 contrast and have a minimum area. These tokens encode that.",
+    "ringWidth":  { "$value": "{borderWidth.medium}", "$type": "dimension", "$description": "2px minimum per WCAG 2.2 SC 2.4.11" },
+    "ringColor":  { "$value": "{color.interactive.focus}", "$type": "color", "$description": "White ring against dark background — exceeds 3:1" },
+    "ringOffset": { "$value": "3px", "$type": "dimension", "$description": "Offset separates ring from element for clarity" }
+  },
+
+  "motion": {
+    "$description": "Animation values. Always respect prefers-reduced-motion — these should be disabled or minimised when that media query fires.",
+    "duration": {
+      "instant":  { "$value": "0ms",   "$type": "duration" },
+      "fast":     { "$value": "100ms", "$type": "duration", "$description": "Micro-interactions: hover, toggle" },
+      "base":     { "$value": "200ms", "$type": "duration", "$description": "Standard transitions" },
+      "slow":     { "$value": "350ms", "$type": "duration", "$description": "Page-level transitions, reveals" },
+      "slower":   { "$value": "500ms", "$type": "duration", "$description": "Emphasis animations" }
+    },
+    "easing": {
+      "linear":   { "$value": "linear",                    "$type": "cubicBezier" },
+      "easeIn":   { "$value": "cubic-bezier(0.4, 0, 1, 1)", "$type": "cubicBezier", "$description": "Elements leaving screen" },
+      "easeOut":  { "$value": "cubic-bezier(0, 0, 0.2, 1)", "$type": "cubicBezier", "$description": "Elements entering screen" },
+      "easeInOut":{ "$value": "cubic-bezier(0.4, 0, 0.2, 1)","$type": "cubicBezier", "$description": "Elements changing position" }
+    }
+  },
+
+  "elevation": {
+    "$description": "Shadow scale for dark themes. Shadows on dark backgrounds use lighter, more diffuse values.",
+    "sm":   { "$value": "0 1px 3px rgba(0,0,0,0.4)",                    "$type": "shadow", "$description": "Subtle lift — tags, badges" },
+    "md":   { "$value": "0 4px 12px rgba(0,0,0,0.5)",                   "$type": "shadow", "$description": "Cards, dropdowns" },
+    "lg":   { "$value": "0 8px 24px rgba(0,0,0,0.6)",                   "$type": "shadow", "$description": "Modals, overlays" },
+    "xl":   { "$value": "0 16px 48px rgba(0,0,0,0.7)",                  "$type": "shadow", "$description": "Floating elements" }
+  },
+
+  "accessibility": {
+    "$description": "Reference values used to verify WCAG AA compliance. Not applied directly — used for audit documentation.",
+    "contrastRatios": {
+      "textPrimaryOnBase":     { "$value": "~15:1",  "$description": "grey.50 on grey.900 — far exceeds 4.5:1 AA" },
+      "textSecondaryOnBase":   { "$value": "~7.5:1", "$description": "grey.300 on grey.900 — exceeds 4.5:1 AA" },
+      "textTertiaryOnBase":    { "$value": "~4.6:1", "$description": "grey.400 on grey.900 — passes AA at large sizes only" },
+      "textPrimaryOnSurface":  { "$value": "~12:1",  "$description": "grey.50 on grey.800 — exceeds 4.5:1 AA" },
+      "textSecondaryOnSurface":{ "$value": "~6:1",   "$description": "grey.300 on grey.800 — exceeds 4.5:1 AA" },
+      "focusRingOnBase":       { "$value": "~19:1",  "$description": "grey.0 on grey.900 — far exceeds 3:1 UI component requirement" }
+    },
+    "touchTargets": {
+      "minimum": { "$value": "44px", "$type": "dimension", "$description": "WCAG 2.5.5 AA minimum touch target size" },
+      "comfortable": { "$value": "48px", "$type": "dimension", "$description": "Recommended comfortable tap target" }
+    },
+    "lineLength": {
+      "minimum": { "$value": "45ch", "$type": "dimension", "$description": "Below this, reading feels choppy" },
+      "optimal":  { "$value": "65ch", "$type": "dimension", "$description": "Ideal for sustained reading — WCAG 1.4.8" },
+      "maximum":  { "$value": "80ch", "$type": "dimension", "$description": "Beyond this, eye tracking becomes difficult" }
+    }
+  }
+}
