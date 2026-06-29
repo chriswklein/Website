@@ -1,7 +1,7 @@
 # Personal Website — Project Reference Document
-**Version:** 1.2.0
-**Last Updated:** 2026-06-28
-**Status:** In Progress
+**Version:** 1.3.0
+**Last Updated:** 2026-06-29
+**Status:** In Progress — Home page ready to build
 
 ---
 
@@ -28,6 +28,7 @@ A personal website built with plain HTML, CSS, and JavaScript. The goal is full 
 | Version Control | GitHub | Public repository |
 | Hosting | Netlify | Free tier, automatic deploys on push |
 | Fonts | Noto Sans | Via Google Fonts — chosen for universal script/localization coverage |
+| Icons | Tabler Icons | Via CDN webfont — outline style only, never filled variants |
 
 ### Tokens Studio Note
 Tokens Studio free tier does not reliably resolve aliases between token sets. Figma Variables are set up manually in a single `global` collection instead. The `tokens/design-system.json` file is kept as a reference and backup but is not actively synced via Tokens Studio.
@@ -66,7 +67,10 @@ my-website/
 ├── nav.html            — Navigation component (partial)
 ├── footer.html         — Footer component (partial)
 ├── style.css           — All styles and design tokens as CSS variables
-├── script.js           — JS: component injection, mobile nav, aria-current, back-to-top
+├── script.js           — JS: component injection, mobile nav, aria-current, back-to-top, tooltip escape
+├── assets/
+│   ├── images/         — WebP images, srcset variants
+│   └── icons/          — SVG icons if needed beyond Tabler
 ├── tokens/
 │   └── design-system.json — Design tokens in Tokens Studio format (reference only)
 ├── REFERENCE.md        — This document
@@ -74,12 +78,14 @@ my-website/
 ```
 
 ### Adding New Pages
-Every new page only needs four things:
+Every new page needs:
 1. `<a href="#main-content" class="skip-link">Skip to main content</a>` as first child of `<body>`
 2. `<div id="nav-placeholder"></div>` after skip link
 3. Page content wrapped in `<main id="main-content">`
 4. `<div id="footer-placeholder"></div>` at the bottom of `<body>`
-5. `<script src="script.js"></script>` before closing `</body>`
+5. Mobile tab bar `<nav class="tab-bar">` before footer placeholder
+6. `<script src="script.js"></script>` before closing `</body>`
+7. Tabler Icons CDN in `<head>`
 
 Nav and footer inject automatically via `script.js`.
 
@@ -94,12 +100,19 @@ Nav and footer inject automatically via `script.js`.
 - Loaded via Google Fonts at weights: 400, 500, 600, 700
 - "No tofu" — renders all scripts without missing character boxes
 
+### Icons
+**Tabler Icons** — loaded via CDN webfont.
+- Outline style only — never use `-filled` suffix variants
+- Always include `aria-hidden="true"` on decorative icons
+- Icon-only interactive elements must have `aria-label`
+- CDN: `https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css`
+
 ### Type Scale (Major Third — 1.25 ratio from 16px base)
 
 | Token | Size | Usage |
 |---|---|---|
-| `--font-size-xs` | 12px | Legal/fine print only |
-| `--font-size-sm` | 14px | Captions, labels, metadata, nav tab labels |
+| `--font-size-xs` | 12px | Legal/fine print, tab bar labels |
+| `--font-size-sm` | 14px | Captions, labels, metadata, tags |
 | `--font-size-base` | 16px | Body text (browser default) |
 | `--font-size-md` | 18px | Large body, intro paragraphs |
 | `--font-size-lg` | 20px | H4 |
@@ -113,7 +126,7 @@ Nav and footer inject automatically via `script.js`.
 | Token | Value | Usage |
 |---|---|---|
 | `--font-weight-regular` | 400 | Body text |
-| `--font-weight-medium` | 500 | Labels, captions |
+| `--font-weight-medium` | 500 | Labels, captions, tags |
 | `--font-weight-semibold` | 600 | H3, H4 |
 | `--font-weight-bold` | 700 | H1, H2 |
 
@@ -129,7 +142,7 @@ Nav and footer inject automatically via `script.js`.
 
 ### Colour System
 
-**Palette:** Black, white, and greyscale only. Dark background, light text.
+**Palette:** Greyscale dark theme with two accent colours for tags, dividers, links, and interactive highlights.
 
 #### Primitive Scale
 | Token | Value |
@@ -147,6 +160,14 @@ Nav and footer inject automatically via `script.js`.
 | `grey-900` | #111111 |
 | `grey-1000` | #000000 |
 
+#### Accent Primitives
+| Token | Value | Notes |
+|---|---|---|
+| `--color-accent-gold` | #BA8200 | Primary tag fill, dividers, code border. Contrast on base: ~5.2:1 ✅ |
+| `--color-accent-gold-text` | #E5A000 | Gold text on dark, hyperlinks, tooltip border. Contrast on base: ~8.9:1 ✅ |
+| `--color-accent-pink` | #A9407C | Secondary tag fill, quote block border. Contrast on base: ~4.6:1 ✅ |
+| `--color-accent-pink-text` | #FF60BB | Pink text on dark, alt text contexts |
+
 #### Semantic Tokens (as CSS variables in style.css)
 | Token | Value | Contrast vs Base |
 |---|---|---|
@@ -161,6 +182,18 @@ Nav and footer inject automatically via `script.js`.
 | `--color-interactive-default` | #F5F5F5 | ~15:1 ✅ |
 | `--color-interactive-hover` | #CCCCCC | — |
 | `--color-interactive-focus` | #FFFFFF | ~19:1 ✅ |
+| `--color-tag-primary` | var(--color-accent-gold) | Primary tag background |
+| `--color-tag-secondary` | var(--color-accent-pink) | Secondary tag background |
+| `--color-tag-text` | var(--color-text-primary) | Text on all tags |
+| `--color-link` | var(--color-accent-gold-text) | Hyperlink default |
+| `--color-link-hover` | var(--color-accent-gold) | Hyperlink hover |
+| `--color-divider-accent` | var(--color-accent-gold) | hr and section dividers |
+| `--color-quote-border` | var(--color-accent-pink) | Blockquote left border |
+| `--color-code-bg` | var(--color-background-subtle) | Code and pre background |
+| `--color-code-border` | var(--color-accent-gold) | Code left border |
+| `--color-tooltip-bg` | var(--color-background-surface) | Tooltip background |
+| `--color-tooltip-border` | var(--color-accent-gold) | Tooltip border |
+| `--color-tooltip-text` | var(--color-text-primary) | Tooltip text |
 
 All text pairings meet WCAG AA (4.5:1 minimum for normal text).
 
@@ -181,7 +214,7 @@ Max content width: `1200px` (`--max-content`)
 ### Image Standards
 - **Format:** WebP primary, JPG fallback for photos, SVG for icons and illustrations
 - **Aspect ratios:** 16:9 (320×180px), 3:2 (320×213px), 1:1 (320×320px), 3:1 banner (1200×400px)
-- **Card thumbnails:** 3:2 ratio on index/listing pages
+- **Card thumbnails:** 16:9 ratio on Home page cards
 - **Article header banners:** 3:1 ratio on individual post pages
 - **Always use:** `loading="lazy"`, explicit `width` and `height`, `srcset` for responsive images
 - **Alt text:** Descriptive on meaningful images, `alt=""` and `aria-hidden="true"` on decorative images
@@ -209,7 +242,6 @@ img {
 ### Accessibility Utility Classes
 
 #### `.sr-only` — Screen Reader Only
-Hides text visually, keeps it announced by screen readers. Use on short button/link labels.
 ```css
 .sr-only {
     position: absolute;
@@ -225,7 +257,6 @@ Hides text visually, keeps it announced by screen readers. Use on short button/l
 ```
 
 #### `.skip-link` — Skip to Main Content
-Visually hidden link at top of every page. Appears on keyboard focus. Allows keyboard users to bypass navigation.
 ```css
 .skip-link {
     position: absolute;
@@ -236,19 +267,18 @@ Visually hidden link at top of every page. Appears on keyboard focus. Allows key
     top: 0;
 }
 ```
-Usage in HTML — first child of `<body>`:
-```html
-<a href="#main-content" class="skip-link">Skip to main content</a>
-```
+First child of `<body>` on every page. Links to `<main id="main-content">`.
 
 ### ARIA Standards
 | Attribute | Usage | Status |
 |---|---|---|
-| `aria-label` | Explicit labels on elements where visible text isn't descriptive enough | Apply as needed |
+| `aria-label` | Explicit labels on elements where visible text isn't descriptive | Apply as needed |
 | `aria-expanded` | Hamburger toggle state | ✅ Implemented in nav |
 | `aria-hidden="true"` | Decorative images, icons | Apply to all decorative elements |
 | `aria-current="page"` | Active nav link | Set dynamically in script.js after nav injection |
-| `aria-live="polite"` | Dynamic content (search results) | Deferred — implement with search feature |
+| `aria-live="polite"` | Dynamic content (search results, toast notifications) | Implement with search and share button |
+| `role="tooltip"` | Tooltip elements | ✅ Confirmed for this build |
+| `aria-describedby` | Links trigger element to tooltip | ✅ Confirmed for this build |
 | Focus trapping | Overlays and modals | Deferred — implement with search overlay |
 
 ### Link and Button Label Standards
@@ -258,7 +288,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 |---|---|---|
 | Thoughts / Blog entries | Read | "Read [Article Title]" |
 | Work / Project entries | View | "View [Project Title]" |
-| Profile | More about me | "More about me" |
+| Profile | Read More about Chris | Already descriptive |
 | Section links | More Thoughts / More Work | Already descriptive |
 
 ### Localization Standards
@@ -275,25 +305,37 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Home (index.html)
 **Purpose:** First impression. Dashboard layout — profile, featured work, recent thoughts.
-**Status:** Design complete (Draft 3) — ready to build
-**Layout:** Three column desktop (Profile sidebar left, Hero + Featured Work centre, Thoughts right)
-**Mobile:** Single column — Hero, Featured Work, Thoughts, Profile
-**Content counts:** 3 Featured Work cards, 3 Thoughts entries (most recent)
+**Status:** Design locked (Draft 4) — ready to build
+**Layout:** Three column desktop (Profile sidebar left 280px, Featured Work centre 1fr, Thoughts right 300px)
+**Mobile:** Single column — Profile, Featured Work, Thoughts. Bottom tab bar navigation.
+**Content counts:** 3 Featured Work cards (built to expand), 3 Thoughts entries (1 large featured + 2 smaller recent)
 
 ### Work (work.html)
-**Purpose:** Portfolio or professional work showcase.
+**Purpose:** Portfolio or professional work showcase — index of all projects.
 **Status:** Scaffolded — design pending
-**Layout:** Standard page template — TBD Monday
+
+### Standard Page Template (Work entries, Thoughts entries)
+**Purpose:** Individual work or blog post pages.
+**Status:** Design locked — ready to build after Home
+**Layout:** Single column, centred, max-width content
+**Elements:**
+- Breadcrumb navigation: Section > Month/Year > Title
+- Full width banner image (3:1 ratio) with caption
+- Centre aligned H1 title
+- Author avatar, name, published date, updated date
+- Tags and Share button (copy URL to clipboard with toast confirmation)
+- Left-aligned section headings (H2, H3)
+- Left-aligned body text
+- Tags and Share repeated at bottom of content
+- Back to Top button
 
 ### Thoughts (thoughts.html)
-**Purpose:** Blog / writing index. Links to individual post pages.
+**Purpose:** Blog / writing index.
 **Status:** Scaffolded — design pending
-**Layout:** Standard page template — TBD Monday
 
 ### About (about.html)
-**Purpose:** Detailed personal bio. Handles contact. Feedback link lives here (not footer).
+**Purpose:** Detailed personal bio. Handles contact and feedback link.
 **Status:** Scaffolded — design pending
-**Layout:** Standard page template — TBD Monday
 
 ---
 
@@ -301,96 +343,135 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Navigation (nav.html)
 - **Desktop:** Sticky top header — logo/name left, links right
-- **Mobile:** Bottom tab bar — replaces hamburger menu entirely
-- Mobile tab bar items: Home, Work, Thoughts, About (icon + text label)
-- Icon + text label required — never icon only (accessibility and localization)
-- `aria-expanded` toggled for screen reader support (desktop)
+- **Mobile:** Bottom tab bar — replaces hamburger entirely
+- Nav links: Home, Work, Thoughts, About
 - `aria-current="page"` set dynamically via `script.js` after nav injection
 - Injected via `script.js` fetch into `#nav-placeholder`
-- Tab bar label font size: `--font-size-xs` (12px) — allows for text expansion
+
+### Mobile Bottom Tab Bar
+- Fixed to bottom of viewport
+- Items: Home (ti-home), Work (ti-briefcase), Thoughts (ti-pencil), About (ti-user)
+- Icon + text label — never icon only
+- Font size xs (12px) for labels
+- Active state uses `--color-interactive-default`
+- Min touch target 44px per item
+- Body gets `padding-bottom: 80px` on mobile to prevent content overlap
+- Hidden on desktop via `display: none` outside mobile media query
 
 ### Footer (footer.html)
 - **Desktop:** Visible — author credit, feedback link, site updated date
-- **Mobile:** Hidden via `display: none` — not contextually relevant on mobile
+- **Mobile:** Hidden via `display: none`
 - Contact and feedback link also lives on About page
 - Injected via `script.js` fetch into `#footer-placeholder`
 
 ### Back to Top Button
-- **Status:** Planned — include in Home page build
-- Appears after user scrolls past a threshold
+- Appears after user scrolls 400px
 - Smooth scrolls to top
-- Accessible — keyboard operable, labelled for screen readers
+- `aria-label="Back to top"`
 - Respects `prefers-reduced-motion`
-- Position: above bottom tab bar on mobile (account for tab bar height in positioning)
+- Positioned above bottom tab bar on mobile
 
 ### Card Component
-- **Status:** Design decided — not yet built
-- Style: Editorial image card
-- Image: CSS background image (decorative, no alt text needed)
-- Link pattern: Block link via `::after` pseudo-element on heading `<a>` tag
-- Full card is clickable — heading link expands to cover card area
-- Screen reader output: "Article → Heading link" — clean, not repetitive
-- Tag label: `aria-hidden="true"` if decorative, `aria-label="Category: X"` if meaningful
-- CTA label pattern: Short visible label + `.sr-only` hidden context
+- Style: Image card with CSS background image
+- Image: `background-image` CSS property — decorative, no alt needed
+- Block link pattern: `::after` pseudo-element on `.card-link` covers full card
+- CTA label: "Read about this piece of work" (Work), "Read this thought" (Thoughts)
+- Tags: `.tag` and `.tag--secondary` classes
+- Screen reader: heading link announces destination cleanly
 
-### Profile Sidebar
-- **Status:** Included in Home page build
-- Contains: illustration image, greeting H2, skill tags, bio blurb, LinkedIn button, Email button, More about me link
-- **Desktop:** Sticky — stays visible while user scrolls through work cards
-- **Mobile:** Appears at bottom of page below Thoughts section
+### Tag Component
+- `.tag` — gold background `--color-tag-primary`, white text
+- `.tag--secondary` — pink background `--color-tag-secondary`, white text
+- Shape: pill (border-radius full)
+- Font: sm, medium weight, wide letter spacing
+- Always `aria-hidden="true"` if decorative, `aria-label="Category: X"` if meaningful
+
+### Tooltip Component
+- **Desktop only** — hidden on touch devices via `@media (hover: none)`
+- Trigger: hover and keyboard focus (`:focus-within`)
+- Dismiss: `Escape` key via JavaScript
+- `role="tooltip"` on tooltip element
+- `aria-describedby` on trigger pointing to tooltip id
+- Content: supplementary only — never required information
+- Styles: `--color-tooltip-bg`, `--color-tooltip-border`, border-radius md, max-width 240px
+
+### Share Button (Standard Pages)
+- Action: Copy current page URL to clipboard using the Clipboard API
+- Confirmation: Toast notification appears near button after copy
+- Toast: small temporary message, fades out after ~2 seconds
+- Toast uses `aria-live="polite"` so screen readers announce it
+- Label: "Share" with icon
+
+### Breadcrumb Navigation (Standard Pages)
+- Pattern: Section > Month/Year Posted > Title of Piece
+- Semantic: `<nav aria-label="Breadcrumb"><ol>` with `<li>` items
+- Current page item gets `aria-current="page"`
+- Separator: `>` character, `aria-hidden="true"`
+
+### Blockquote
+- Option A — left border stroke only
+- 4px solid `--color-quote-border` (pink `#A9407C`)
+- Background: `--color-background-surface`
+- Border radius on right side only
+- Body text italic, cite in secondary colour
+
+### Code / Pre Blocks
+- Background: `--color-code-bg`
+- Left border: `--color-code-border` (gold)
+- Monospace font
+
+### Dividers (hr)
+- 1px solid `--color-divider-accent` (gold `#BA8200`)
+- Used as section separators site-wide
+
+### Profile Sidebar (Home page only)
+- **Desktop:** Sticky — `position: sticky`, `top: 80px`
+- **Mobile:** Appears at top of page (first in source order)
+- Contains: illustration, caption, H2 greeting, skill tags, bio, LinkedIn button, Email button, Read More about Chris link
 
 ---
 
 ## 8. Planned Features (Deferred — Post Launch)
 
 ### Floating Table of Contents
-- Target pages: Thoughts individual post pages, potentially About
+- Target: Thoughts individual post pages
 - Behaviour: Sidebar on desktop, floating collapsed button on mobile
-- Auto-tracks scroll position using `IntersectionObserver` API
-- Mobile: collapses to compact button, expands to drawer on tap
-- Implementation: vanilla JS + CSS `position: sticky` + `IntersectionObserver`
+- Auto-tracks scroll with `IntersectionObserver` API
 - Status: Logged — build after Thoughts page content exists
 
+### Advanced Tooltips
+- Inspired by Baldur's Gate 3 — rich contextual cards with nested information
+- Status: Logged — post launch
+
 ### Search Overlay
-- Trigger: Search icon in nav opens full-width overlay
-- Input: Single text field — "Search posts, tags, and authors"
-- Results grouped: Tags first (prefixed with #), Posts second
-- Matched query term bolded within results
-- Dismiss: Cancel button or Escape key
-- Background: Page content blurs behind overlay
-- Implementation: Fuse.js for client-side fuzzy search on static JSON index
-- Requires: `aria-live="polite"` for dynamic results announcement
-- Requires: Focus trapping while overlay is open
-- Status: Logged — build when Thoughts page content exists
+- Trigger: Search icon in nav
+- Full-width overlay, results grouped by Tags then Posts
+- Implementation: Fuse.js client-side fuzzy search
+- Requires: `aria-live="polite"`, focus trapping
+- Status: Logged — build when Thoughts content exists
 
 ### Tag and Author Filtering
 - Lives on Thoughts index page
-- Filter by: Tag, Author
-- Status: Logged — design TBD
+- Status: Logged
 
 ### Draggable Floating Button / Context Menu
-- Press and hold to drag, release to place
-- Tap triggers context menu expansion (Reddit mobile pattern)
-- Implementation: JS `pointerdown`, `pointermove`, `pointerup` events for drag
+- Press and hold to drag, tap to expand context menu
+- Implementation: JS pointer events
 - Status: Logged — use case TBD
 
-### Card Tag Colours
-- Tags currently use placeholder colours (gold, pink) from previous project
-- Decision needed: greyscale tags or intentional colour system for tags
-- Status: Deferred — decide before Thoughts page build
-
-### "More Work" / "More Thoughts" Link Treatment
-- Current arrow line treatment needs refinement
-- Status: Deferred — refine during page build
+### Related Content Footer (Standard Pages)
+- Footer section on each standard page showing related work or posts
+- Keeps users browsing the site
+- Status: Logged — post launch
 
 ---
 
 ## 9. Future Project Ideas
 
 ### Figma Token Management Tool
-- Motivation: Tokens Studio free tier is painful — no bulk delete, no reliable alias resolution across sets, core features paywalled
+- Motivation: Tokens Studio free tier is painful
 - Goal: Clean JSON import/export, bulk reset, reliable alias resolution, one-click Figma Variables sync
-- Status: Idea logged — future standalone project
+- Status: Idea logged
 
 ---
 
@@ -418,47 +499,93 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - One `<h1>` per page
 - `.skip-link` as first child of `<body>` on every page
 - `<main id="main-content">` on every page
+- Tabler Icons CDN in `<head>` on every page
 
 ### CSS
 - All values reference CSS variables — no hardcoded colours or sizes
 - Mobile styles in `@media (max-width: 768px)` blocks
+- Touch device styles in `@media (hover: none)` blocks
 - No inline styles
 - Comments mark every section clearly
 - `prefers-reduced-motion` block maintained at bottom of file
-- `.sr-only` and `.skip-link` utility classes maintained in style.css
+- `.sr-only` and `.skip-link` utility classes in style.css
 
 ### JavaScript
 - Vanilla JS only — no libraries or frameworks
 - Components injected via `fetch()` on `DOMContentLoaded`
 - `initNav()` called only after nav markup is in the DOM
 - `aria-current="page"` set on active nav link after injection
+- Tooltip Escape key dismiss handled globally
 - No inline JavaScript in HTML files
 
 ### Git
 - All work on `dev` branch
-- Commit messages descriptive and lowercase: `"add back to top button"`
+- Commit messages descriptive and lowercase
 - Push to `dev`, review at Netlify dev URL, merge to `main` to go live
 - Never commit `.env` files
 
 ---
 
-## 12. Session Handoff Notes
+## 12. Designer to Engineer Handoff Standards
+
+For reference when working with engineers or handing off to Claude Code:
+
+**From Figma:**
+- Dev Mode access for spacing, colour, font inspection
+- Named components with documented variants and states
+- Annotations for non-obvious behaviour — interactions, responsive rules, accessibility intent
+
+**Supplementary Documentation (this REFERENCE.md covers):**
+- Stack and hosting decisions
+- Full design token documentation
+- Component inventory with behaviour specs
+- Accessibility requirements per component
+- Coding standards and conventions
+- Session handoff notes
+
+**Acceptance Criteria per build:**
+- No hardcoded colours or sizes — CSS variables only
+- All images have explicit width and height
+- One H1 per page, logical heading hierarchy
+- aria-current set on active nav link
+- Skip link present and functional
+- Tab bar hidden desktop, visible mobile
+- Footer hidden mobile
+- All interactive elements keyboard operable
+- Touch targets minimum 44px
+
+---
+
+## 13. Session Handoff Notes
 
 **2026-06-24**
 - Base HTML, CSS, and JS set up and live on Netlify
 - Nav and footer extracted as components, injected via script.js
 - Two branches active: `main` (production) and `dev` (development)
-- Design system tokens established — Tokens Studio abandoned for free tier limitations, Figma Variables set up manually
+- Design system tokens established — Tokens Studio abandoned, Figma Variables set up manually
 - preview.html generated by Claude Code as design system reference
 
 **2026-06-28**
-- Home page design complete — Draft 3 locked and ready to build
-- Navigation decision: sticky top on desktop, bottom tab bar on mobile
-- Footer decision: visible on desktop, hidden on mobile
+- Home page design complete — Draft 3 locked
+- Navigation decision: sticky top desktop, bottom tab bar mobile
+- Footer: visible desktop, hidden mobile
 - Accessibility utilities confirmed: `.sr-only`, `.skip-link`, `aria-current`, `aria-hidden`
 - Link label standard confirmed: short visible label + `.sr-only` hidden context
-- Image standards established and documented
-- Card component pattern decided: CSS background image + block link via `::after`
-- Deferred features logged: floating TOC, search overlay, tag filtering, draggable button
-- Next session (Monday): Design standard page template for Work, Thoughts, About — then build Home page with Claude Code
-- End of week goal: Home page implemented and live on `dev`
+- Image standards established
+- Card component pattern decided
+- Deferred features logged
+
+**2026-06-29**
+- Home page design refined to Draft 4 — locked and ready to build
+- Standard page template designed and locked — ready to build after Home
+- Accent colour system confirmed: gold (#BA8200, #E5A000) and pink (#A9407C, #FF60BB)
+- All semantic accent tokens defined and documented
+- Divider: gold site-wide
+- Blockquote: Option A left border, pink
+- Code blocks: gold left border
+- Tooltips: simple hover implementation, desktop only, confirmed for this build
+- Share button: copy URL to clipboard with toast notification
+- Breadcrumb navigation confirmed for standard pages
+- Tabler Icons added to stack via CDN
+- Claude Code prompt written for Home page build — ready to execute
+- Next: Run Claude Code prompt, review build, commit to dev
