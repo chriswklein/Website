@@ -589,3 +589,11 @@ For reference when working with engineers or handing off to Claude Code:
 - Tabler Icons added to stack via CDN
 - Claude Code prompt written for Home page build — ready to execute
 - Next: Run Claude Code prompt, review build, commit to dev
+
+2026-06-29 EOD
+
+Home page initial build complete and committed to dev
+Visual review pending — gaps between Figma design and implementation to be assessed tomorrow
+Next: Full visual review, fix list, precision Claude Code fix prompt
+Figma layer naming to be aligned with CSS class names before next build session
+Figma MCP connection via Claude Code to be explored for tighter design-to-code fidelity
