@@ -5,16 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="nav-placeholder"></div>
-    <main>
-    <div class="container">
-        <h1>Your Name</h1>
-        <p>A short sentence about who you are and what you do.</p>
-    </div>
-</main>
+
+    <main id="main-content">
+        <h1 class="sr-only">Chris — Home</h1>
+
+        <div class="container">
+            <div class="home-grid">
+
+                <!-- Left column: Profile sidebar -->
+                <div class="profile-sidebar">
+                    <figure>
+                        <img src="assets/images/C-Rex-by-Bob-Nelson-2017.png" alt="" aria-hidden="true" width="300" height="300">
+                        <figcaption>A small illustrated dinosaur, because why not. Illustration by Bob Nelson.</figcaption>
+                    </figure>
+
+                    <h2>Hello, my name is Chris</h2>
+
+                    <p><span class="tag">User Experience</span> <span class="tag tag--secondary">Quality Assurance</span></p>
+
+                    <p>I design and build digital products end to end, with a focus on accessibility, clarity, and craft. I care as much about how something works as how it looks.</p>
+                    <p>Outside of work I'm usually tinkering with side projects, reading, or finding new ways to make the web a little better.</p>
+
+                    <a href="https://www.linkedin.com/in/crzdev/" class="card-cta">Connect on LinkedIn</a>
+                    <a href="mailto:christopherwalterklein@gmail.com" class="card-cta">Send me an Email</a>
+
+                    <p><a href="about.html">Read More about Chris<span class="sr-only"> — full bio, background, and contact details</span></a></p>
+                </div>
+
+                <!-- Centre column: Featured Work -->
+                <div>
+                    <h2 class="section-heading">Featured Work</h2>
+
+                    <div class="card">
+                        <div class="card-image"></div>
+                        <div class="card-content">
+                            <h3><a href="work.html" class="card-link">Card Heading One<span class="sr-only"> — view this project</span></a></h3>
+                            <p><span class="tag">User Experience</span> <span class="tag tag--secondary">Quality Assurance</span></p>
+                            <p>A short description of this piece of work and the problem it solved.</p>
+                            <a href="work.html" class="card-cta">Read about this piece of work</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image"></div>
+                        <div class="card-content">
+                            <h3><a href="work.html" class="card-link">Card Heading Two<span class="sr-only"> — view this project</span></a></h3>
+                            <p><span class="tag">User Experience</span></p>
+                            <p>A short description of this piece of work and the problem it solved.</p>
+                            <a href="work.html" class="card-cta">Read about this piece of work</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image"></div>
+                        <div class="card-content">
+                            <h3><a href="work.html" class="card-link">Card Heading Three<span class="sr-only"> — view this project</span></a></h3>
+                            <p><span class="tag tag--secondary">Quality Assurance</span></p>
+                            <p>A short description of this piece of work and the problem it solved.</p>
+                            <a href="work.html" class="card-cta">Read about this piece of work</a>
+                        </div>
+                    </div>
+
+                    <p><a href="work.html">See more of my work</a></p>
+                </div>
+
+                <!-- Right column: Thoughts -->
+                <div>
+                    <h2 class="section-heading">Thoughts</h2>
+
+                    <article class="card">
+                        <div class="card-image"></div>
+                        <div class="card-content">
+                            <h3><a href="thoughts.html" class="card-link">Featured Thought Title<span class="sr-only"> — read this thought</span></a></h3>
+                            <p>A short summary of the featured thought, enough to draw someone in.</p>
+                            <p><span class="tag">Reflection</span> <span class="tag tag--secondary">Career</span></p>
+                            <p>Published June 20, 2026 · Chris</p>
+                            <a href="thoughts.html" class="card-cta">Read this thought</a>
+                        </div>
+                    </article>
+
+                    <article class="card card--compact">
+                        <div class="card-image"></div>
+                        <div class="card-content">
+                            <h3><a href="thoughts.html" class="card-link">Smaller Thought Title One<span class="sr-only"> — read this thought</span></a></h3>
+                            <p><span class="tag">Design</span></p>
+                            <p>Published June 14, 2026 · Chris</p>
+                            <a href="thoughts.html" class="card-cta">Read this thought</a>
+                        </div>
+                    </article>
+
+                    <article class="card card--compact">
+                        <div class="card-image"></div>
+                        <div class="card-content">
+                            <h3><a href="thoughts.html" class="card-link">Smaller Thought Title Two<span class="sr-only"> — read this thought</span></a></h3>
+                            <p><span class="tag tag--secondary">Quality Assurance</span></p>
+                            <p>Published June 8, 2026 · Chris</p>
+                            <a href="thoughts.html" class="card-cta">Read this thought</a>
+                        </div>
+                    </article>
+
+                    <p><a href="thoughts.html">Read More Thoughts</a></p>
+                </div>
+
+            </div>
+
+            <div class="back-to-top-row">
+                <button class="back-to-top" aria-label="Back to top">Back to Top</button>
+            </div>
+        </div>
+    </main>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="index.html" class="tab-bar-item is-active" aria-current="page">
+            <i class="ti ti-home" aria-hidden="true"></i>
+            <span>Home</span>
+        </a>
+        <a href="work.html" class="tab-bar-item">
+            <i class="ti ti-briefcase" aria-hidden="true"></i>
+            <span>Work</span>
+        </a>
+        <a href="thoughts.html" class="tab-bar-item">
+            <i class="ti ti-pencil" aria-hidden="true"></i>
+            <span>Thoughts</span>
+        </a>
+        <a href="about.html" class="tab-bar-item">
+            <i class="ti ti-user" aria-hidden="true"></i>
+            <span>About</span>
+        </a>
+    </nav>
+
     <div id="footer-placeholder"></div>
     <script src="script.js"></script>
 </body>
