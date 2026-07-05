@@ -1,10 +1,11 @@
-// Inject shared components, then wire up behavior that depends on them
+// Inject shared components, then wire up behaviour that depends on them
 document.addEventListener('DOMContentLoaded', () => {
     loadComponent('nav-placeholder', 'nav.html', () => {
         initNav();
         setActiveNavLink();
     });
     loadComponent('footer-placeholder', 'footer.html');
+    setActiveTabBar();
     initBackToTop();
 });
 
@@ -21,20 +22,19 @@ function loadComponent(placeholderId, file, callback) {
         .catch(error => console.error(`Error loading ${file}:`, error));
 }
 
-// Mobile Navigation Toggle
+// Mobile nav toggle — guarded since hamburger is hidden on mobile (tab bar replaces it)
 function initNav() {
     const navToggle = document.querySelector('.nav-toggle');
     const navMenu = document.querySelector('.nav-links');
+    if (!navToggle || !navMenu) return;
 
     navToggle.addEventListener('click', () => {
         const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
-
         navToggle.setAttribute('aria-expanded', !isOpen);
         navMenu.classList.toggle('is-open');
         navToggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
     });
 
-    // Close menu when a link is clicked
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             navToggle.setAttribute('aria-expanded', 'false');
@@ -44,17 +44,28 @@ function initNav() {
     });
 }
 
-// Mark the nav link matching the current page as active
+// Set aria-current="page" on the injected desktop nav link matching the current page
 function setActiveNavLink() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 
     document.querySelectorAll('.nav-links a').forEach(link => {
-        const linkPage = link.getAttribute('href');
-
-        if (linkPage === currentPage) {
+        if (link.getAttribute('href') === currentPage) {
             link.setAttribute('aria-current', 'page');
         } else {
             link.removeAttribute('aria-current');
+        }
+    });
+}
+
+// Set aria-current="page" on the static tab bar item matching the current page
+function setActiveTabBar() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+    document.querySelectorAll('.tab-bar-item').forEach(item => {
+        if (item.getAttribute('href') === currentPage) {
+            item.setAttribute('aria-current', 'page');
+        } else {
+            item.removeAttribute('aria-current');
         }
     });
 }
@@ -75,15 +86,11 @@ function initBackToTop() {
     if (!button) return;
 
     window.addEventListener('scroll', () => {
-        button.classList.toggle('is-visible', window.scrollY > 400);
+        button.classList.toggle('back-to-top--visible', window.scrollY > 400);
     });
 
     button.addEventListener('click', () => {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        window.scrollTo({
-            top: 0,
-            behavior: prefersReducedMotion ? 'auto' : 'smooth'
-        });
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     });
 }

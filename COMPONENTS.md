@@ -478,7 +478,20 @@ The tab bar replaces the desktop nav entirely on mobile. It is always visible at
 --tab-bar-z-index:          200;
 ```
 
-### Anatomy
+### Icons — Deferred
+
+> **Current state: text-only.** Icons have been removed pending self-hosting. Future iteration will add Tabler Icons once the webfont is downloaded and placed in `assets/icons/`. Do not use the CDN.
+
+### Anatomy — Current (text-only)
+
+```
+[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
+  [ Home ]          [ Work ]          [ Thoughts ]      [ About ]
+```
+
+Each item: `<a href="{page}.html" class="tab-bar-item"><span>{Label}</span></a>`
+
+### Anatomy — Future (with self-hosted icons)
 
 ```
 [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
@@ -486,7 +499,7 @@ The tab bar replaces the desktop nav entirely on mobile. It is always visible at
   [ Home ]          [ Work ]          [ Thoughts ]      [ About ]
 ```
 
-Items and their Tabler icons:
+Planned icon mapping (Tabler Icons, outline):
 - Home: `ti-home`
 - Work: `ti-briefcase`
 - Thoughts: `ti-pencil`
@@ -908,7 +921,20 @@ The Back to Top button appears after the user has scrolled 400px down the page. 
 --back-to-top-min-height:   44px;
 ```
 
-### Anatomy
+### Icon — Deferred
+
+> **Current state: text-only.** The arrow-up icon has been removed pending self-hosting. Future iteration will add the `ti-arrow-up` icon once Tabler Icons is self-hosted in `assets/icons/`. Do not use the CDN.
+
+### Anatomy — Current (text-only)
+
+```
+[ .back-to-top ]
+  [ "Back to Top" ]
+```
+
+- Button: `<button class="back-to-top" aria-label="Back to top"><span>Back to Top</span></button>`
+
+### Anatomy — Future (with self-hosted icon)
 
 ```
 [ .back-to-top ]
@@ -1022,4 +1048,14 @@ Quick reference mapping every component token to its semantic source.
 | `--blockquote-border-color` | `--color-quote-border` → `--color-accent-pink` | `#A9407C` |
 | `--code-border-color` | `--color-code-border` → `--color-accent-gold` | `#BA8200` |
 | `--divider-color` | `--color-divider-accent` → `--color-accent-gold` | `#BA8200` |
+
+---
+
+## Next Claude Code Fix List
+
+Tracked fixes and enhancements queued for future Claude Code sessions.
+
+| # | Item | Status |
+|---|---|---|
+| 6 | Remove Tabler Icons CDN from all pages, remove all icon elements, text-only tab bar and back to top button, update any CSS that sizes or positions icons | ✅ Done 2026-07-05 |
 
