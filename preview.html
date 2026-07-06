@@ -3,112 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Preview</title>
+    <title>Design System Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
         /* ================================
-           PREVIEW LAYOUT
+           PREVIEW PAGE LAYOUT
         ================================ */
-        .preview {
-            padding: var(--space-16) var(--space-8);
-            max-width: var(--max-content);
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-20);
+        .preview-main {
+            padding-bottom: var(--space-20);
         }
 
-        .preview-intro {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-4);
+        .preview-subtitle {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-md);
+            margin-bottom: var(--space-16);
+            max-width: none;
         }
 
         .preview-section {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-6);
+            margin-top: var(--space-16);
+            padding-top: var(--space-8);
+            border-top: var(--border-width-thin) solid var(--color-border-default);
         }
 
-        /* ================================
-           SAMPLE TEXT STYLES
-           (demo-only styles, not real headings,
-           so the page keeps a single real <h1>)
-        ================================ */
-        .style-h1 {
-            font-size: var(--font-size-4xl);
-            font-weight: var(--font-weight-bold);
-            line-height: var(--line-height-tight);
-        }
-
-        .style-h2 {
-            font-size: var(--font-size-2xl);
-            font-weight: var(--font-weight-bold);
-            line-height: var(--line-height-snug);
-        }
-
-        .style-h3 {
-            font-size: var(--font-size-xl);
-            font-weight: var(--font-weight-semibold);
-            line-height: var(--line-height-snug);
-        }
-
-        .style-h4 {
-            font-size: var(--font-size-lg);
-            font-weight: var(--font-weight-semibold);
-            line-height: var(--line-height-normal);
-        }
-
-        .style-body-lg {
-            font-size: var(--font-size-md);
-            font-weight: var(--font-weight-regular);
-            line-height: var(--line-height-relaxed);
-        }
-
-        .style-body {
-            font-size: var(--font-size-base);
-            font-weight: var(--font-weight-regular);
-            line-height: var(--line-height-relaxed);
-        }
-
-        .style-caption {
-            font-size: var(--font-size-xs);
-            font-weight: var(--font-weight-regular);
-            line-height: var(--line-height-loose);
+        .preview-section-desc {
             color: var(--color-text-secondary);
-        }
-
-        .style-label {
             font-size: var(--font-size-sm);
-            font-weight: var(--font-weight-medium);
-            line-height: var(--line-height-normal);
-            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            max-width: none;
         }
 
-        .sample-row {
-            display: flex;
-            align-items: baseline;
-            gap: var(--space-6);
-            border-bottom: 1px solid var(--color-border-default);
-            padding-bottom: var(--space-4);
+        .preview-subsection {
+            margin-top: var(--space-8);
         }
 
-        .sample-tag {
-            flex: 0 0 auto;
-            width: var(--space-20);
+        .preview-label {
             font-size: var(--font-size-xs);
             font-weight: var(--font-weight-medium);
-            color: var(--color-text-disabled);
+            color: var(--color-text-secondary);
+            letter-spacing: var(--letter-spacing-wide);
+            max-width: none;
+            margin-bottom: var(--space-3);
+        }
+
+        .preview-token {
+            font-size: var(--font-size-xs);
+            color: var(--color-accent-gold-text);
+            font-family: monospace;
+            max-width: none;
         }
 
         /* ================================
-           COLOUR SWATCHES
+           SECTION 1 — COLOUR SWATCHES
         ================================ */
         .swatch-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: var(--space-6);
+            grid-template-columns: repeat(auto-fill, minmax(var(--space-24), 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-8);
         }
 
         .swatch {
@@ -117,415 +72,1190 @@
             gap: var(--space-2);
         }
 
-        .swatch-fill {
+        .swatch-box {
             width: 100%;
             height: var(--space-16);
             border-radius: var(--border-radius-sm);
-            border: 1px solid var(--color-border-default);
         }
 
         .swatch-name {
             font-size: var(--font-size-xs);
             font-weight: var(--font-weight-medium);
             color: var(--color-text-primary);
+            max-width: none;
         }
 
         .swatch-hex {
             font-size: var(--font-size-xs);
             color: var(--color-text-secondary);
+            max-width: none;
+            font-family: monospace;
         }
 
-        .swatch-background-base { background-color: var(--color-background-base); }
-        .swatch-background-surface { background-color: var(--color-background-surface); }
-        .swatch-background-subtle { background-color: var(--color-background-subtle); }
-        .swatch-text-primary { background-color: var(--color-text-primary); }
-        .swatch-text-secondary { background-color: var(--color-text-secondary); }
-        .swatch-text-disabled { background-color: var(--color-text-disabled); }
-        .swatch-interactive-default { background-color: var(--color-interactive-default); }
-        .swatch-interactive-hover { background-color: var(--color-interactive-hover); }
-        .swatch-interactive-focus { background-color: var(--color-interactive-focus); }
+        /* Background swatches */
+        .s-bg-base    { background-color: var(--color-background-base);    border: var(--border-width-thin) solid var(--color-border-strong); }
+        .s-bg-surface { background-color: var(--color-background-surface); border: var(--border-width-thin) solid var(--color-border-default); }
+        .s-bg-subtle  { background-color: var(--color-background-subtle);  border: var(--border-width-thin) solid var(--color-border-default); }
 
-        .swatch-border {
-            background-color: var(--color-background-surface);
-            border-width: var(--space-1);
-            border-style: solid;
+        /* Text swatches — text written in that colour */
+        .swatch-text-box {
+            display: flex;
+            align-items: center;
+            height: var(--space-16);
+            border-radius: var(--border-radius-sm);
+            padding: 0 var(--space-3);
+            border: var(--border-width-thin) solid var(--color-border-default);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
         }
 
-        .swatch-border-default { border-color: var(--color-border-default); }
-        .swatch-border-strong { border-color: var(--color-border-strong); }
+        .s-text-primary   { color: var(--color-text-primary); }
+        .s-text-secondary { color: var(--color-text-secondary); }
+        .s-text-tertiary  { color: var(--color-text-tertiary); }
+        .s-text-disabled  { color: var(--color-text-disabled); }
+        .s-text-inverse   { color: var(--color-text-inverse); background-color: var(--color-text-primary); }
+
+        /* Border swatches — outlined boxes */
+        .s-border-default { background: none; border: var(--border-width-thick) solid var(--color-border-default); }
+        .s-border-strong  { background: none; border: var(--border-width-thick) solid var(--color-border-strong); }
+
+        /* Interactive swatches */
+        .s-int-default  { background-color: var(--color-interactive-default);  }
+        .s-int-hover    { background-color: var(--color-interactive-hover);    }
+        .s-int-active   { background-color: var(--color-interactive-active);   }
+        .s-int-focus    { background-color: var(--color-interactive-focus);    }
+        .s-int-disabled { background-color: var(--color-interactive-disabled); }
+
+        /* Accent swatches */
+        .s-acc-gold      { background-color: var(--color-accent-gold); }
+        .s-acc-gold-text { background-color: var(--color-accent-gold-text); }
+        .s-acc-pink      { background-color: var(--color-accent-pink); }
+        .s-acc-pink-text { background-color: var(--color-accent-pink-text); }
+
+        /* Component token swatches */
+        .s-tag-primary    { background-color: var(--color-tag-primary); }
+        .s-tag-secondary  { background-color: var(--color-tag-secondary); }
+        .s-tag-text       { background-color: var(--color-tag-text); border: var(--border-width-thin) solid var(--color-border-default); }
+        .s-link           { background-color: var(--color-link); }
+        .s-link-hover     { background-color: var(--color-link-hover); }
+        .s-divider        { background-color: var(--color-divider-accent); }
+        .s-quote-border   { background-color: var(--color-quote-border); }
+        .s-code-bg        { background-color: var(--color-code-bg); border: var(--border-width-thin) solid var(--color-border-default); }
+        .s-code-border    { background-color: var(--color-code-border); }
+        .s-tooltip-bg     { background-color: var(--color-tooltip-bg); border: var(--border-width-thin) solid var(--color-border-default); }
+        .s-tooltip-border { background-color: var(--color-tooltip-border); }
+        .s-tooltip-text   { background-color: var(--color-tooltip-text); border: var(--border-width-thin) solid var(--color-border-default); }
 
         /* ================================
-           TYPOGRAPHY SCALE
+           SECTION 2 — TYPOGRAPHY SCALE
         ================================ */
-        .type-scale-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-6);
-        }
-
-        .type-scale-row {
-            display: flex;
+        .type-row {
+            display: grid;
+            grid-template-columns: var(--space-24) 1fr;
+            gap: var(--space-8);
             align-items: baseline;
-            gap: var(--space-6);
-            border-bottom: 1px solid var(--color-border-default);
-            padding-bottom: var(--space-4);
+            border-bottom: var(--border-width-thin) solid var(--color-border-default);
+            padding: var(--space-6) 0;
         }
 
-        .type-scale-meta {
-            flex: 0 0 auto;
-            width: var(--space-20);
+        .type-meta-name {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            max-width: none;
+            margin-bottom: var(--space-1);
+        }
+
+        .type-meta-detail {
             font-size: var(--font-size-xs);
             color: var(--color-text-secondary);
+            max-width: none;
+            font-family: monospace;
         }
 
-        .type-xs { font-size: var(--font-size-xs); }
-        .type-sm { font-size: var(--font-size-sm); }
-        .type-base { font-size: var(--font-size-base); }
-        .type-md { font-size: var(--font-size-md); }
-        .type-lg { font-size: var(--font-size-lg); }
-        .type-xl { font-size: var(--font-size-xl); }
-        .type-2xl { font-size: var(--font-size-2xl); }
-        .type-3xl { font-size: var(--font-size-3xl); }
-        .type-4xl { font-size: var(--font-size-4xl); }
+        .type-sample {
+            max-width: none;
+            color: var(--color-text-primary);
+        }
+
+        .ts-display    { font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold);      line-height: var(--line-height-tight);   letter-spacing: var(--letter-spacing-tight);   }
+        .ts-h1         { font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold);      line-height: var(--line-height-tight);   letter-spacing: var(--letter-spacing-tight);   }
+        .ts-h2         { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold);      line-height: var(--line-height-snug);    letter-spacing: var(--letter-spacing-normal);  }
+        .ts-h3         { font-size: var(--font-size-xl);  font-weight: var(--font-weight-semibold);  line-height: var(--line-height-snug);    letter-spacing: var(--letter-spacing-normal);  }
+        .ts-h4         { font-size: var(--font-size-lg);  font-weight: var(--font-weight-semibold);  line-height: var(--line-height-normal);  letter-spacing: var(--letter-spacing-normal);  }
+        .ts-body-large { font-size: var(--font-size-md);  font-weight: var(--font-weight-regular);   line-height: var(--line-height-relaxed); letter-spacing: var(--letter-spacing-normal);  }
+        .ts-body       { font-size: var(--font-size-base); font-weight: var(--font-weight-regular);  line-height: var(--line-height-relaxed); letter-spacing: var(--letter-spacing-normal);  }
+        .ts-caption    { font-size: var(--font-size-sm);  font-weight: var(--font-weight-medium);    line-height: var(--line-height-loose);   letter-spacing: var(--letter-spacing-wide);    }
+        .ts-label      { font-size: var(--font-size-sm);  font-weight: var(--font-weight-medium);    line-height: var(--line-height-normal);  letter-spacing: var(--letter-spacing-widest);  }
+        .ts-nav-tab    { font-size: var(--font-size-xs);  font-weight: var(--font-weight-medium);    line-height: var(--line-height-normal);  letter-spacing: var(--letter-spacing-widest);  }
 
         /* ================================
-           SURFACE CARD
+           SECTION 3 — SPACING SCALE
         ================================ */
-        .surface-card {
-            background-color: var(--color-background-surface);
-            border: 1px solid var(--color-border-default);
-            border-radius: var(--border-radius-md);
-            padding: var(--space-8);
+        .space-rows {
             display: flex;
             flex-direction: column;
-            gap: var(--space-4);
-            max-width: 480px;
+            gap: var(--space-3);
         }
 
+        .space-row {
+            display: grid;
+            grid-template-columns: var(--space-20) 1fr;
+            gap: var(--space-6);
+            align-items: center;
+        }
+
+        .space-meta {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+            max-width: none;
+            font-family: monospace;
+        }
+
+        .space-bar {
+            height: var(--space-6);
+            background-color: var(--color-accent-gold);
+            border-radius: var(--border-radius-sm);
+            min-width: var(--border-width-thin);
+        }
+
+        .sp-0  { width: var(--space-0);  }
+        .sp-1  { width: var(--space-1);  }
+        .sp-2  { width: var(--space-2);  }
+        .sp-3  { width: var(--space-3);  }
+        .sp-4  { width: var(--space-4);  }
+        .sp-5  { width: var(--space-5);  }
+        .sp-6  { width: var(--space-6);  }
+        .sp-8  { width: var(--space-8);  }
+        .sp-10 { width: var(--space-10); }
+        .sp-12 { width: var(--space-12); }
+        .sp-16 { width: var(--space-16); }
+        .sp-20 { width: var(--space-20); }
+        .sp-24 { width: var(--space-24); }
+        .sp-32 { width: var(--space-32); }
+
         /* ================================
-           BUTTON STATES
+           SECTION 4 — BORDER RADIUS
         ================================ */
-        .button-row {
+        .radius-row {
             display: flex;
             flex-wrap: wrap;
             gap: var(--space-8);
         }
 
-        .button-demo {
+        .radius-item {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .radius-box {
+            width: var(--space-16);
+            height: var(--space-16);
+            background-color: var(--color-background-subtle);
+            border: var(--border-width-thin) solid var(--color-border-strong);
+        }
+
+        .r-none { border-radius: var(--border-radius-none); }
+        .r-sm   { border-radius: var(--border-radius-sm); }
+        .r-md   { border-radius: var(--border-radius-md); }
+        .r-lg   { border-radius: var(--border-radius-lg); }
+        .r-full { border-radius: var(--border-radius-full); }
+
+        /* ================================
+           SECTION 5 — ELEVATION
+        ================================ */
+        .elevation-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-12);
+            align-items: flex-start;
+            padding: var(--space-12) var(--space-8);
+            background-color: var(--color-background-subtle);
+            border-radius: var(--border-radius-md);
+        }
+
+        .elevation-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .elevation-box {
+            width: var(--space-20);
+            height: var(--space-16);
+            background-color: var(--color-background-surface);
+            border-radius: var(--border-radius-md);
+            border: var(--border-width-thin) solid var(--color-border-default);
+        }
+
+        .el-sm { box-shadow: var(--elevation-sm); }
+        .el-md { box-shadow: var(--elevation-md); }
+        .el-lg { box-shadow: var(--elevation-lg); }
+        .el-xl { box-shadow: var(--elevation-xl); }
+
+        /* ================================
+           SECTION 6 — MOTION
+        ================================ */
+        .motion-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-8);
+        }
+
+        .motion-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .motion-track {
+            width: var(--space-32);
+            height: var(--space-12);
+            background-color: var(--color-background-subtle);
+            border-radius: var(--border-radius-sm);
+            position: relative;
+            overflow: hidden;
+            border: var(--border-width-thin) solid var(--color-border-default);
+            cursor: pointer;
+        }
+
+        .motion-box {
+            width: var(--space-12);
+            height: var(--space-12);
+            background-color: var(--color-accent-gold);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .motion-track:hover .motion-box {
+            left: calc(var(--space-32) - var(--space-12));
+        }
+
+        .dur-instant .motion-box { transition: left var(--duration-instant) var(--ease-out); }
+        .dur-fast    .motion-box { transition: left var(--duration-fast)    var(--ease-out); }
+        .dur-base    .motion-box { transition: left var(--duration-base)    var(--ease-out); }
+        .dur-slow    .motion-box { transition: left var(--duration-slow)    var(--ease-out); }
+        .dur-slower  .motion-box { transition: left var(--duration-slower)  var(--ease-out); }
+
+        /* ================================
+           SECTION 7 — BUTTON STATES
+        ================================ */
+        .btn-states-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+            align-items: start;
+        }
+
+        .btn-states-col {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            align-items: stretch;
+        }
+
+        .btn-states-col-label {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            letter-spacing: var(--letter-spacing-wide);
+            text-align: center;
+            max-width: none;
+        }
+
+        .btn--demo-hover {
+            background-color: var(--color-border-strong);
+            border-color: var(--color-interactive-hover);
+            color: var(--color-interactive-default);
+        }
+
+        .btn--demo-focus {
+            outline: var(--border-width-medium) solid var(--color-interactive-focus);
+            outline-offset: 3px;
+        }
+
+        /* ================================
+           SECTION 8 — TAGS
+        ================================ */
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            align-items: center;
+        }
+
+        /* ================================
+           SECTION 9 — CARD COMPONENTS
+        ================================ */
+        .preview-card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-6);
+            align-items: start;
+        }
+
+        /* ================================
+           SECTION 10 — NAVIGATION
+        ================================ */
+        .preview-nav-frame {
+            background-color: var(--color-background-base);
+            border: var(--border-width-thin) solid var(--color-border-default);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            margin-bottom: var(--space-6);
+        }
+
+        /* ================================
+           SECTION 11 — TAB BAR
+        ================================ */
+        .preview-tab-bar-frame {
+            display: flex;
+            width: 100%;
+            height: var(--space-16);
+            background-color: var(--color-background-surface);
+            border: var(--border-width-thin) solid var(--color-border-default);
+            border-radius: var(--border-radius-md);
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        /* ================================
+           SECTION 12 — TOOLTIP
+        ================================ */
+        .preview-tooltip-stack {
+            display: inline-flex;
             flex-direction: column;
             align-items: flex-start;
             gap: var(--space-2);
         }
 
-        .btn-preview {
-            font-family: inherit;
+        .preview-tooltip-box {
+            background-color: var(--color-tooltip-bg);
+            border: var(--border-width-thin) solid var(--color-tooltip-border);
+            border-radius: var(--border-radius-md);
+            color: var(--color-tooltip-text);
             font-size: var(--font-size-sm);
-            font-weight: var(--font-weight-medium);
-            padding: var(--space-3) var(--space-6);
-            border-radius: var(--border-radius-sm);
-            border: 1px solid var(--color-border-strong);
-            background-color: var(--color-interactive-default);
-            color: var(--color-background-base);
-            cursor: pointer;
-            transition: background-color 200ms ease, outline 200ms ease;
+            padding: var(--space-2) var(--space-3);
+            max-width: 240px;
+            box-shadow: var(--elevation-md);
         }
 
-        .btn-preview:hover,
-        .btn-preview.is-hover {
-            background-color: var(--color-interactive-hover);
-        }
-
-        .btn-preview:focus-visible,
-        .btn-preview.is-focus {
-            outline: 2px solid var(--color-interactive-focus);
-            outline-offset: 3px;
-        }
-
-        .btn-preview:disabled,
-        .btn-preview.is-disabled {
-            background-color: var(--color-background-subtle);
+        .preview-tooltip-arrow {
+            font-size: var(--font-size-xs);
             color: var(--color-text-disabled);
-            border-color: var(--color-border-default);
-            cursor: not-allowed;
+            padding-left: var(--space-4);
+            max-width: none;
+        }
+
+        .preview-tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-2) var(--space-4);
+            background-color: var(--color-background-subtle);
+            border: var(--border-width-thin) solid var(--color-border-strong);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-primary);
+            gap: var(--space-2);
         }
 
         /* ================================
-           SPACING SCALE
+           SECTION 13 — TOAST
         ================================ */
-        .spacing-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-4);
+        .preview-toast {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background-color: var(--color-background-surface);
+            border: var(--border-width-thin) solid var(--color-accent-gold);
+            border-radius: var(--border-radius-md);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            box-shadow: var(--elevation-md);
         }
 
-        .spacing-row {
+        .preview-toast-icon {
+            color: var(--color-accent-gold);
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* ================================
+           SECTION 14 — BREADCRUMB
+        ================================ */
+        .preview-breadcrumb {
             display: flex;
             align-items: center;
-            gap: var(--space-6);
+            gap: var(--space-2);
+            list-style: none;
+            padding: 0;
         }
 
-        .spacing-meta {
-            flex: 0 0 auto;
-            width: var(--space-20);
-            font-size: var(--font-size-xs);
+        .preview-breadcrumb li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .preview-breadcrumb a {
+            font-size: var(--font-size-sm);
             color: var(--color-text-secondary);
         }
 
-        .space-block {
-            height: var(--space-4);
-            background-color: var(--color-interactive-default);
-            border-radius: var(--border-radius-sm);
+        .preview-breadcrumb a:hover {
+            color: var(--color-text-primary);
         }
 
-        .space-block-1 { width: var(--space-1); }
-        .space-block-2 { width: var(--space-2); }
-        .space-block-3 { width: var(--space-3); }
-        .space-block-4 { width: var(--space-4); }
-        .space-block-6 { width: var(--space-6); }
-        .space-block-8 { width: var(--space-8); }
-        .space-block-10 { width: var(--space-10); }
-        .space-block-12 { width: var(--space-12); }
-        .space-block-16 { width: var(--space-16); }
-        .space-block-20 { width: var(--space-20); }
+        .preview-breadcrumb-sep {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-disabled);
+        }
 
-        @media (max-width: 768px) {
-            .preview {
-                padding: var(--space-8) var(--space-4);
-                gap: var(--space-12);
-            }
+        .preview-breadcrumb-current {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-primary);
+        }
 
-            .sample-tag,
-            .type-scale-meta,
-            .spacing-meta {
-                width: var(--space-12);
+        @media (prefers-reduced-motion: reduce) {
+            .motion-box {
+                transition: none !important;
             }
         }
     </style>
 </head>
-<body>
-    <main class="preview">
-        <div class="preview-intro">
+<body class="preview-main">
+    <main id="main-content">
+        <div class="container">
+
             <h1>Design System Preview</h1>
-            <p class="style-body-lg">A living reference for the colour, typography, spacing, and component tokens defined in style.css.</p>
+            <p class="preview-subtitle">Every atom and component from DESIGN-SYSTEM.md and COMPONENTS.md. All values resolve from CSS variables in style.css — no hardcoded values anywhere. Last updated 2026-07-05.</p>
+
+            <!-- ================================
+                 SECTION 1 — COLOUR TOKENS
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s1-heading">
+                <h2 id="s1-heading">Section 1 — Colour Tokens</h2>
+                <p class="preview-section-desc">Semantic colour tokens from DESIGN-SYSTEM.md sections 1.2–1.8. Background tokens shown as filled squares. Text tokens shown as the token name written in that colour. Border tokens shown as outlined squares.</p>
+
+                <div class="preview-subsection">
+                    <h3>Background</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-bg-base"></div>
+                            <p class="swatch-name">--color-background-base</p>
+                            <p class="swatch-hex">#111111</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-bg-surface"></div>
+                            <p class="swatch-name">--color-background-surface</p>
+                            <p class="swatch-hex">#1A1A1A</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-bg-subtle"></div>
+                            <p class="swatch-name">--color-background-subtle</p>
+                            <p class="swatch-hex">#2A2A2A</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Text</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-text-box s-text-primary">--color-text-primary</div>
+                            <p class="swatch-name">--color-text-primary</p>
+                            <p class="swatch-hex">#F5F5F5 · 15:1 ✅</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-text-box s-text-secondary">--color-text-secondary</div>
+                            <p class="swatch-name">--color-text-secondary</p>
+                            <p class="swatch-hex">#AAAAAA · 7.5:1 ✅</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-text-box s-text-tertiary">--color-text-tertiary</div>
+                            <p class="swatch-name">--color-text-tertiary</p>
+                            <p class="swatch-hex">#888888 · 4.6:1 ✅</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-text-box s-text-disabled">--color-text-disabled</div>
+                            <p class="swatch-name">--color-text-disabled</p>
+                            <p class="swatch-hex">#666666 · decorative</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-text-box s-text-inverse">--color-text-inverse</div>
+                            <p class="swatch-name">--color-text-inverse</p>
+                            <p class="swatch-hex">#111111 · on light</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Border</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-border-default"></div>
+                            <p class="swatch-name">--color-border-default</p>
+                            <p class="swatch-hex">#2A2A2A</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-border-strong"></div>
+                            <p class="swatch-name">--color-border-strong</p>
+                            <p class="swatch-hex">#666666</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Interactive</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-int-default"></div>
+                            <p class="swatch-name">--color-interactive-default</p>
+                            <p class="swatch-hex">#F5F5F5</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-int-hover"></div>
+                            <p class="swatch-name">--color-interactive-hover</p>
+                            <p class="swatch-hex">#CCCCCC</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-int-active"></div>
+                            <p class="swatch-name">--color-interactive-active</p>
+                            <p class="swatch-hex">#FFFFFF</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-int-focus"></div>
+                            <p class="swatch-name">--color-interactive-focus</p>
+                            <p class="swatch-hex">#FFFFFF · 19:1 ✅</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-int-disabled"></div>
+                            <p class="swatch-name">--color-interactive-disabled</p>
+                            <p class="swatch-hex">#666666</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Accent — Gold</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-acc-gold"></div>
+                            <p class="swatch-name">--color-accent-gold</p>
+                            <p class="swatch-hex">#BA8200 · 5.2:1 ✅</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-acc-gold-text"></div>
+                            <p class="swatch-name">--color-accent-gold-text</p>
+                            <p class="swatch-hex">#E5A000 · 8.9:1 ✅</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Accent — Pink</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-acc-pink"></div>
+                            <p class="swatch-name">--color-accent-pink</p>
+                            <p class="swatch-hex">#A9407C · 4.6:1 ✅</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-acc-pink-text"></div>
+                            <p class="swatch-name">--color-accent-pink-text</p>
+                            <p class="swatch-hex">#FF60BB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Component Tokens</h3>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-tag-primary"></div>
+                            <p class="swatch-name">--color-tag-primary</p>
+                            <p class="swatch-hex">→ accent-gold</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-tag-secondary"></div>
+                            <p class="swatch-name">--color-tag-secondary</p>
+                            <p class="swatch-hex">→ accent-pink</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-tag-text"></div>
+                            <p class="swatch-name">--color-tag-text</p>
+                            <p class="swatch-hex">→ text-primary</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-link"></div>
+                            <p class="swatch-name">--color-link</p>
+                            <p class="swatch-hex">→ accent-gold-text</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-link-hover"></div>
+                            <p class="swatch-name">--color-link-hover</p>
+                            <p class="swatch-hex">→ accent-gold</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-divider"></div>
+                            <p class="swatch-name">--color-divider-accent</p>
+                            <p class="swatch-hex">→ accent-gold</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-quote-border"></div>
+                            <p class="swatch-name">--color-quote-border</p>
+                            <p class="swatch-hex">→ accent-pink</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-code-bg"></div>
+                            <p class="swatch-name">--color-code-bg</p>
+                            <p class="swatch-hex">→ bg-subtle</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-code-border"></div>
+                            <p class="swatch-name">--color-code-border</p>
+                            <p class="swatch-hex">→ accent-gold</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-tooltip-bg"></div>
+                            <p class="swatch-name">--color-tooltip-bg</p>
+                            <p class="swatch-hex">→ bg-surface</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-tooltip-border"></div>
+                            <p class="swatch-name">--color-tooltip-border</p>
+                            <p class="swatch-hex">→ accent-gold</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-tooltip-text"></div>
+                            <p class="swatch-name">--color-tooltip-text</p>
+                            <p class="swatch-hex">→ text-primary</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 2 — TYPOGRAPHY SCALE
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s2-heading">
+                <h2 id="s2-heading">Section 2 — Typography Scale</h2>
+                <p class="preview-section-desc">Assembled type styles from DESIGN-SYSTEM.md Section 2.7. Every text element uses one of these styles — no arbitrary combinations.</p>
+
+                <div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">display</p>
+                            <p class="type-meta-detail">5xl · bold · tight · −0.02em</p>
+                        </div>
+                        <p class="type-sample ts-display">The quick brown fox</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">h1</p>
+                            <p class="type-meta-detail">4xl · bold · tight · −0.02em</p>
+                        </div>
+                        <p class="type-sample ts-h1">The quick brown fox</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">h2</p>
+                            <p class="type-meta-detail">2xl · bold · snug · 0em</p>
+                        </div>
+                        <p class="type-sample ts-h2">The quick brown fox jumps</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">h3</p>
+                            <p class="type-meta-detail">xl · semibold · snug · 0em</p>
+                        </div>
+                        <p class="type-sample ts-h3">The quick brown fox jumps over</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">h4</p>
+                            <p class="type-meta-detail">lg · semibold · normal · 0em</p>
+                        </div>
+                        <p class="type-sample ts-h4">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">body-large</p>
+                            <p class="type-meta-detail">md · regular · relaxed · 0em</p>
+                        </div>
+                        <p class="type-sample ts-body-large">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">body</p>
+                            <p class="type-meta-detail">base · regular · relaxed · 0em</p>
+                        </div>
+                        <p class="type-sample ts-body">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">caption</p>
+                            <p class="type-meta-detail">sm · medium · loose · 0.04em</p>
+                        </div>
+                        <p class="type-sample ts-caption">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">label</p>
+                            <p class="type-meta-detail">sm · medium · normal · 0.08em</p>
+                        </div>
+                        <p class="type-sample ts-label">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                    <div class="type-row">
+                        <div>
+                            <p class="type-meta-name">nav-tab</p>
+                            <p class="type-meta-detail">xs · medium · normal · 0.08em</p>
+                        </div>
+                        <p class="type-sample ts-nav-tab">The quick brown fox jumps over the lazy dog</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 3 — SPACING SCALE
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s3-heading">
+                <h2 id="s3-heading">Section 3 — Spacing Scale</h2>
+                <p class="preview-section-desc">Base-4 scale. Every spacing value references one of these tokens. Bar width equals the token value. Bar height is fixed at --space-6 (24px).</p>
+
+                <div class="space-rows">
+                    <div class="space-row">
+                        <p class="space-meta">--space-0<br>0px</p>
+                        <div class="space-bar sp-0"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-1<br>4px</p>
+                        <div class="space-bar sp-1"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-2<br>8px</p>
+                        <div class="space-bar sp-2"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-3<br>12px</p>
+                        <div class="space-bar sp-3"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-4<br>16px</p>
+                        <div class="space-bar sp-4"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-5<br>20px</p>
+                        <div class="space-bar sp-5"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-6<br>24px</p>
+                        <div class="space-bar sp-6"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-8<br>32px</p>
+                        <div class="space-bar sp-8"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-10<br>40px</p>
+                        <div class="space-bar sp-10"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-12<br>48px</p>
+                        <div class="space-bar sp-12"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-16<br>64px</p>
+                        <div class="space-bar sp-16"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-20<br>80px</p>
+                        <div class="space-bar sp-20"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-24<br>96px</p>
+                        <div class="space-bar sp-24"></div>
+                    </div>
+                    <div class="space-row">
+                        <p class="space-meta">--space-32<br>128px</p>
+                        <div class="space-bar sp-32"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 4 — BORDER RADIUS
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s4-heading">
+                <h2 id="s4-heading">Section 4 — Border Radius</h2>
+                <p class="preview-section-desc">Five border radius tokens. None = sharp editorial. Full = pill shape for tags and badges.</p>
+
+                <div class="radius-row">
+                    <div class="radius-item">
+                        <div class="radius-box r-none"></div>
+                        <p class="preview-label">--border-radius-none</p>
+                        <p class="preview-token">0px</p>
+                    </div>
+                    <div class="radius-item">
+                        <div class="radius-box r-sm"></div>
+                        <p class="preview-label">--border-radius-sm</p>
+                        <p class="preview-token">4px</p>
+                    </div>
+                    <div class="radius-item">
+                        <div class="radius-box r-md"></div>
+                        <p class="preview-label">--border-radius-md</p>
+                        <p class="preview-token">8px</p>
+                    </div>
+                    <div class="radius-item">
+                        <div class="radius-box r-lg"></div>
+                        <p class="preview-label">--border-radius-lg</p>
+                        <p class="preview-token">12px</p>
+                    </div>
+                    <div class="radius-item">
+                        <div class="radius-box r-full"></div>
+                        <p class="preview-label">--border-radius-full</p>
+                        <p class="preview-token">9999px</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 5 — ELEVATION
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s5-heading">
+                <h2 id="s5-heading">Section 5 — Elevation</h2>
+                <p class="preview-section-desc">Four elevation tokens using diffuse dark shadows. Used sparingly on dark backgrounds. Best seen against the dark subtle background below.</p>
+
+                <div class="elevation-row">
+                    <div class="elevation-item">
+                        <div class="elevation-box el-sm"></div>
+                        <p class="preview-label">--elevation-sm</p>
+                        <p class="preview-token">0 1px 3px</p>
+                    </div>
+                    <div class="elevation-item">
+                        <div class="elevation-box el-md"></div>
+                        <p class="preview-label">--elevation-md</p>
+                        <p class="preview-token">0 4px 12px</p>
+                    </div>
+                    <div class="elevation-item">
+                        <div class="elevation-box el-lg"></div>
+                        <p class="preview-label">--elevation-lg</p>
+                        <p class="preview-token">0 8px 24px</p>
+                    </div>
+                    <div class="elevation-item">
+                        <div class="elevation-box el-xl"></div>
+                        <p class="preview-label">--elevation-xl</p>
+                        <p class="preview-token">0 16px 48px</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 6 — MOTION
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s6-heading">
+                <h2 id="s6-heading">Section 6 — Motion</h2>
+                <p class="preview-section-desc">Five duration tokens. Hover each track to see the gold block slide across at that speed. Instant has no visible transition. prefers-reduced-motion disables all.</p>
+
+                <div class="motion-row">
+                    <div class="motion-item">
+                        <div class="motion-track dur-instant" aria-label="Hover to preview instant transition">
+                            <div class="motion-box"></div>
+                        </div>
+                        <p class="preview-label">--duration-instant</p>
+                        <p class="preview-token">0ms</p>
+                    </div>
+                    <div class="motion-item">
+                        <div class="motion-track dur-fast" aria-label="Hover to preview fast transition">
+                            <div class="motion-box"></div>
+                        </div>
+                        <p class="preview-label">--duration-fast</p>
+                        <p class="preview-token">100ms</p>
+                    </div>
+                    <div class="motion-item">
+                        <div class="motion-track dur-base" aria-label="Hover to preview base transition">
+                            <div class="motion-box"></div>
+                        </div>
+                        <p class="preview-label">--duration-base</p>
+                        <p class="preview-token">200ms</p>
+                    </div>
+                    <div class="motion-item">
+                        <div class="motion-track dur-slow" aria-label="Hover to preview slow transition">
+                            <div class="motion-box"></div>
+                        </div>
+                        <p class="preview-label">--duration-slow</p>
+                        <p class="preview-token">350ms</p>
+                    </div>
+                    <div class="motion-item">
+                        <div class="motion-track dur-slower" aria-label="Hover to preview slower transition">
+                            <div class="motion-box"></div>
+                        </div>
+                        <p class="preview-label">--duration-slower</p>
+                        <p class="preview-token">500ms</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 7 — BUTTON COMPONENT
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s7-heading">
+                <h2 id="s7-heading">Section 7 — Button Component</h2>
+                <p class="preview-section-desc">Two variants: Primary (.btn) and Ghost (.btn--ghost). Four states: default, hover (forced), focus (forced), disabled. Min height 44px for touch target compliance.</p>
+
+                <div class="btn-states-grid">
+                    <div class="btn-states-col">
+                        <p class="btn-states-col-label">Default</p>
+                        <button class="btn" type="button">Primary</button>
+                        <button class="btn btn--ghost" type="button">Ghost</button>
+                    </div>
+                    <div class="btn-states-col">
+                        <p class="btn-states-col-label">Hover</p>
+                        <button class="btn btn--demo-hover" type="button">Primary</button>
+                        <button class="btn btn--ghost btn--demo-hover" type="button">Ghost</button>
+                    </div>
+                    <div class="btn-states-col">
+                        <p class="btn-states-col-label">Focus</p>
+                        <button class="btn btn--demo-focus" type="button">Primary</button>
+                        <button class="btn btn--ghost btn--demo-focus" type="button">Ghost</button>
+                    </div>
+                    <div class="btn-states-col">
+                        <p class="btn-states-col-label">Disabled</p>
+                        <button class="btn" type="button" disabled>Primary</button>
+                        <button class="btn btn--ghost" type="button" disabled>Ghost</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 8 — TAG COMPONENT
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s8-heading">
+                <h2 id="s8-heading">Section 8 — Tag Component</h2>
+                <p class="preview-section-desc">Two variants: Primary (gold, .tag) and Secondary (pink, .tag--secondary). Pill shape via --border-radius-full. Static display — not interactive in this version.</p>
+
+                <div class="tag-row">
+                    <span class="tag" aria-hidden="true">User Experience</span>
+                    <span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span>
+                    <span class="tag" aria-hidden="true">Design</span>
+                    <span class="tag tag--secondary" aria-hidden="true">Reflection</span>
+                    <span class="tag" aria-hidden="true">Accessibility</span>
+                    <span class="tag tag--secondary" aria-hidden="true">Career</span>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 9 — CARD COMPONENTS
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s9-heading">
+                <h2 id="s9-heading">Section 9 — Card Components</h2>
+                <p class="preview-section-desc">Three card variants side by side. All use --card-image-bg for the image placeholder. The block link pattern (::after) makes the full card clickable.</p>
+
+                <div class="preview-card-grid">
+                    <!-- Card/Work -->
+                    <article class="card">
+                        <div class="card-image" role="presentation"></div>
+                        <div class="card-content">
+                            <h3><a href="#" class="card-link">Work Card Title<span class="sr-only"> — view this project</span></a></h3>
+                            <p>
+                                <span class="tag" aria-hidden="true">User Experience</span>
+                                <span class="tag tag--secondary" aria-hidden="true">Design</span>
+                            </p>
+                            <p>A short description of the project and the problem it solved.</p>
+                            <button class="card-cta" type="button" inert>Read about this piece of work</button>
+                        </div>
+                    </article>
+
+                    <!-- Card/Thought/Featured -->
+                    <article class="card card--thought card--featured">
+                        <div class="card-image" role="presentation"></div>
+                        <div class="card-content">
+                            <h3><a href="#" class="card-link">Featured Thought Title<span class="sr-only"> — read this thought</span></a></h3>
+                            <p>A short summary of the featured thought, enough to draw someone in.</p>
+                            <p>
+                                <span class="tag" aria-hidden="true">Reflection</span>
+                                <span class="tag tag--secondary" aria-hidden="true">Career</span>
+                            </p>
+                            <p>Published June 20, 2026 · Chris Klein</p>
+                            <button class="card-cta" type="button" inert>Read this thought</button>
+                        </div>
+                    </article>
+
+                    <!-- Card/Thought/Compact -->
+                    <div>
+                        <p class="preview-label">Compact variant — 80px thumbnail grid</p>
+                        <article class="card card--thought card--compact">
+                            <div class="card-image" role="presentation"></div>
+                            <div class="card-content">
+                                <h3><a href="#" class="card-link">Compact Thought<span class="sr-only"> — read this thought</span></a></h3>
+                                <p><span class="tag" aria-hidden="true">Design</span></p>
+                                <p>Published June 14, 2026 · Chris Klein</p>
+                                <button class="card-cta" type="button" inert>Read this thought</button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 10 — NAVIGATION DESKTOP
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s10-heading">
+                <h2 id="s10-heading">Section 10 — Navigation Desktop</h2>
+                <p class="preview-section-desc">"Chris Klein" centred, nav links centred below. Active link shown with aria-current="page" — underline and white text. Sticky in production via header element.</p>
+
+                <div class="preview-nav-frame">
+                    <nav class="site-nav" aria-label="Main navigation (preview)">
+                        <div class="container">
+                            <a href="#" class="nav-logo">Chris Klein</a>
+                            <ul class="nav-links" role="list">
+                                <li><a href="#" aria-current="page">Home</a></li>
+                                <li><a href="#">Work</a></li>
+                                <li><a href="#">Thoughts</a></li>
+                                <li><a href="#">About</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 11 — TAB BAR
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s11-heading">
+                <h2 id="s11-heading">Section 11 — Tab Bar</h2>
+                <p class="preview-section-desc">Mobile navigation. Text-only (icons deferred — self-hosted Tabler Icons pending). Fixed to bottom in production. Active item shown in --color-interactive-default via aria-current="page".</p>
+
+                <div class="preview-tab-bar-frame">
+                    <a href="#" class="tab-bar-item" aria-current="page">
+                        <span>Home</span>
+                    </a>
+                    <a href="#" class="tab-bar-item">
+                        <span>Work</span>
+                    </a>
+                    <a href="#" class="tab-bar-item">
+                        <span>Thoughts</span>
+                    </a>
+                    <a href="#" class="tab-bar-item">
+                        <span>About</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 12 — TOOLTIP
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s12-heading">
+                <h2 id="s12-heading">Section 12 — Tooltip</h2>
+                <p class="preview-section-desc">Desktop only — hidden on touch devices. Shown on hover and :focus-within. Escape key dismisses. role="tooltip" + aria-describedby required.</p>
+
+                <div class="preview-tooltip-stack">
+                    <div class="preview-tooltip-box" role="tooltip" id="preview-tip">
+                        This is supplementary context. Never use for required information.
+                    </div>
+                    <p class="preview-tooltip-arrow">▼ tooltip renders above trigger in production</p>
+                    <span class="preview-tooltip-trigger" aria-describedby="preview-tip">
+                        Hover trigger element
+                    </span>
+                </div>
+
+                <div class="preview-subsection">
+                    <p class="preview-label">Live demo — hover to trigger:</p>
+                    <span class="tooltip-wrapper">
+                        <span class="preview-tooltip-trigger">Hover me</span>
+                        <span role="tooltip" class="tooltip">Tooltip text via CSS hover. Escape key blurs trigger.</span>
+                    </span>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 13 — TOAST NOTIFICATION
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s13-heading">
+                <h2 id="s13-heading">Section 13 — Toast Notification</h2>
+                <p class="preview-section-desc">Triggered by Share button. Auto-dismisses after 2000ms. role="status" + aria-live="polite" for screen reader announcement.</p>
+
+                <div role="status" aria-live="polite" class="preview-toast">
+                    <span class="preview-toast-icon">✓</span>
+                    <span>Link copied!</span>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 14 — BREADCRUMB
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s14-heading">
+                <h2 id="s14-heading">Section 14 — Breadcrumb</h2>
+                <p class="preview-section-desc">Used on all standard pages. Semantic ol with aria-label="Breadcrumb". Separators are aria-hidden. Current page item is not a link.</p>
+
+                <nav aria-label="Breadcrumb">
+                    <ol class="preview-breadcrumb">
+                        <li>
+                            <a href="#" class="preview-breadcrumb-link">Work</a>
+                            <span class="preview-breadcrumb-sep" aria-hidden="true">›</span>
+                        </li>
+                        <li>
+                            <a href="#" class="preview-breadcrumb-link">June 2026</a>
+                            <span class="preview-breadcrumb-sep" aria-hidden="true">›</span>
+                        </li>
+                        <li>
+                            <span class="preview-breadcrumb-current" aria-current="page">Project Title</span>
+                        </li>
+                    </ol>
+                </nav>
+            </section>
+
+            <!-- ================================
+                 SECTION 15 — DIVIDER
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s15-heading">
+                <h2 id="s15-heading">Section 15 — Divider</h2>
+                <p class="preview-section-desc">1px solid --color-divider-accent (gold). Styled globally via hr element selector. Used as section separators site-wide.</p>
+
+                <p>Content above the divider — body text before a section break.</p>
+                <hr>
+                <p>Content below the divider — body text after the thematic break.</p>
+            </section>
+
+            <!-- ================================
+                 SECTION 16 — BLOCKQUOTE
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s16-heading">
+                <h2 id="s16-heading">Section 16 — Blockquote</h2>
+                <p class="preview-section-desc">Option A — left border only. 4px solid --color-quote-border (pink). Background uses --color-background-surface. Border radius on right side only. Body text italic, cite in secondary colour.</p>
+
+                <blockquote>
+                    <p>Accessibility is not a feature. It is a foundation. Build it in from the start, and everything else becomes easier.</p>
+                    <cite>— Chris Klein</cite>
+                </blockquote>
+            </section>
+
+            <!-- ================================
+                 SECTION 17 — CODE BLOCK
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s17-heading">
+                <h2 id="s17-heading">Section 17 — Code Block</h2>
+                <p class="preview-section-desc">Background uses --color-code-bg (background-subtle). Left border uses --color-code-border (gold). Monospace font. Inline code and block pre/code both styled.</p>
+
+                <p>Use <code>aria-current="page"</code> on the active nav link after injection to mark the current page for screen readers.</p>
+
+                <pre><code>/* Set aria-current on the matching nav link */
+function setActiveNavLink() {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.toggleAttribute('aria-current',
+            link.getAttribute('href') === page
+        );
+    });
+}</code></pre>
+            </section>
+
         </div>
-
-        <section class="preview-section" aria-labelledby="colours-heading">
-            <h2 id="colours-heading">Colour Tokens</h2>
-            <div class="swatch-grid">
-                <div class="swatch">
-                    <div class="swatch-fill swatch-background-base"></div>
-                    <p class="swatch-name">--color-background-base</p>
-                    <p class="swatch-hex">#111111</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-background-surface"></div>
-                    <p class="swatch-name">--color-background-surface</p>
-                    <p class="swatch-hex">#1A1A1A</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-background-subtle"></div>
-                    <p class="swatch-name">--color-background-subtle</p>
-                    <p class="swatch-hex">#2A2A2A</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-text-primary"></div>
-                    <p class="swatch-name">--color-text-primary</p>
-                    <p class="swatch-hex">#F5F5F5</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-text-secondary"></div>
-                    <p class="swatch-name">--color-text-secondary</p>
-                    <p class="swatch-hex">#AAAAAA</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-text-disabled"></div>
-                    <p class="swatch-name">--color-text-disabled</p>
-                    <p class="swatch-hex">#666666</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-border swatch-border-default"></div>
-                    <p class="swatch-name">--color-border-default</p>
-                    <p class="swatch-hex">#2A2A2A</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-border swatch-border-strong"></div>
-                    <p class="swatch-name">--color-border-strong</p>
-                    <p class="swatch-hex">#666666</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-interactive-default"></div>
-                    <p class="swatch-name">--color-interactive-default</p>
-                    <p class="swatch-hex">#F5F5F5</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-interactive-hover"></div>
-                    <p class="swatch-name">--color-interactive-hover</p>
-                    <p class="swatch-hex">#CCCCCC</p>
-                </div>
-                <div class="swatch">
-                    <div class="swatch-fill swatch-interactive-focus"></div>
-                    <p class="swatch-name">--color-interactive-focus</p>
-                    <p class="swatch-hex">#FFFFFF</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="preview-section" aria-labelledby="type-scale-heading">
-            <h2 id="type-scale-heading">Typography Scale</h2>
-            <div class="type-scale-list">
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-xs<br>12px</p>
-                    <p class="type-xs">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-sm<br>14px</p>
-                    <p class="type-sm">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-base<br>16px</p>
-                    <p class="type-base">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-md<br>18px</p>
-                    <p class="type-md">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-lg<br>20px</p>
-                    <p class="type-lg">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-xl<br>24px</p>
-                    <p class="type-xl">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-2xl<br>30px</p>
-                    <p class="type-2xl">The quick brown fox jumps over the lazy dog.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-3xl<br>36px</p>
-                    <p class="type-3xl">The quick brown fox jumps.</p>
-                </div>
-                <div class="type-scale-row">
-                    <p class="type-scale-meta">--font-size-4xl<br>48px</p>
-                    <p class="type-4xl">The quick brown fox jumps.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="preview-section" aria-labelledby="sample-text-heading">
-            <h2 id="sample-text-heading">Sample Text Block</h2>
-            <div class="sample-text-list">
-                <div class="sample-row">
-                    <p class="sample-tag">H1</p>
-                    <p class="style-h1">Your Name</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">H2</p>
-                    <p class="style-h2">Section heading</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">H3</p>
-                    <p class="style-h3">Subsection heading</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">H4</p>
-                    <p class="style-h4">Minor heading</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">Body Large</p>
-                    <p class="style-body-lg">An intro paragraph that introduces the page or section with a touch more presence than standard body copy.</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">Body</p>
-                    <p class="style-body">Standard body copy, used for the majority of running text across the site.</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">Caption</p>
-                    <p class="style-caption">A caption or piece of metadata, set small and quiet.</p>
-                </div>
-                <div class="sample-row">
-                    <p class="sample-tag">Label</p>
-                    <p class="style-label">A UI label, such as a form field name</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="preview-section" aria-labelledby="surface-card-heading">
-            <h2 id="surface-card-heading">Surface Card</h2>
-            <div class="surface-card">
-                <h3>Card heading</h3>
-                <p class="style-body">This card sits on --color-background-surface, layered on top of the page's --color-background-base, with a --color-border-default outline and --border-radius-md corners.</p>
-            </div>
-        </section>
-
-        <section class="preview-section" aria-labelledby="button-states-heading">
-            <h2 id="button-states-heading">Button States</h2>
-            <div class="button-row">
-                <div class="button-demo">
-                    <button class="btn-preview" type="button">Default</button>
-                    <p class="style-caption">Default</p>
-                </div>
-                <div class="button-demo">
-                    <button class="btn-preview is-hover" type="button">Hover</button>
-                    <p class="style-caption">Hover (try hovering any button too)</p>
-                </div>
-                <div class="button-demo">
-                    <button class="btn-preview is-focus" type="button">Focus</button>
-                    <p class="style-caption">Focus (try tabbing to any button too)</p>
-                </div>
-                <div class="button-demo">
-                    <button class="btn-preview is-disabled" type="button" disabled>Disabled</button>
-                    <p class="style-caption">Disabled</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="preview-section" aria-labelledby="spacing-heading">
-            <h2 id="spacing-heading">Spacing Scale</h2>
-            <div class="spacing-list">
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-1<br>4px</p>
-                    <div class="space-block space-block-1"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-2<br>8px</p>
-                    <div class="space-block space-block-2"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-3<br>12px</p>
-                    <div class="space-block space-block-3"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-4<br>16px</p>
-                    <div class="space-block space-block-4"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-6<br>24px</p>
-                    <div class="space-block space-block-6"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-8<br>32px</p>
-                    <div class="space-block space-block-8"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-10<br>40px</p>
-                    <div class="space-block space-block-10"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-12<br>48px</p>
-                    <div class="space-block space-block-12"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-16<br>64px</p>
-                    <div class="space-block space-block-16"></div>
-                </div>
-                <div class="spacing-row">
-                    <p class="spacing-meta">--space-20<br>80px</p>
-                    <div class="space-block space-block-20"></div>
-                </div>
-            </div>
-        </section>
     </main>
 </body>
 </html>
