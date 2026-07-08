@@ -1,6 +1,6 @@
 # Design System — Component Specifications
-**Version:** 1.0.0
-**Last Updated:** 2026-07-01
+**Version:** 2.0.0
+**Last Updated:** 2026-07-08
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -30,20 +30,17 @@ Rules for Claude Code:
 
 1. Button
 2. Tag
-3. Card — Work
-4. Card — Thought (Featured)
-5. Card — Thought (Compact)
-6. Navigation — Desktop
-7. Navigation — Mobile Tab Bar
-8. Profile Sidebar
-9. Tooltip
-10. Toast Notification
-11. Breadcrumb
-12. Divider
-13. Blockquote
-14. Code Block
-15. Back to Top Button
-16. Share Button
+3. Card
+4. Navigation — Desktop
+5. Navigation — Mobile Tab Bar
+6. Tooltip
+7. Toast Notification
+8. Breadcrumb
+9. Divider
+10. Blockquote
+11. Code Block
+12. Back to Top Button
+13. Share Button
 
 ---
 
@@ -150,7 +147,7 @@ Tags communicate category or classification. They are always decorative — they
 
 ### When to Use
 - Categorising Work entries and Thoughts entries
-- Displaying skill labels in the Profile sidebar
+- Displaying skill labels in the Profile card
 
 ### When NOT to Use
 - As interactive filters (that is a different component — Tag Filter, not yet built)
@@ -167,6 +164,7 @@ Tags communicate category or classification. They are always decorative — they
 
 ```css
 --tag-bg:               var(--color-tag-primary);
+--tag-bg-hover:         color-mix(in srgb, var(--color-tag-primary) 80%, black);
 --tag-text:             var(--color-tag-text);
 --tag-padding-x:        var(--space-3);
 --tag-padding-y:        var(--space-1);
@@ -176,8 +174,9 @@ Tags communicate category or classification. They are always decorative — they
 --tag-radius:           var(--border-radius-full);
 --tag-line-height:      var(--line-height-normal);
 
-/* Secondary variant override */
---tag-secondary-bg:     var(--color-tag-secondary);
+/* Secondary variant overrides */
+--tag-secondary-bg:       var(--color-tag-secondary);
+--tag-secondary-bg-hover: color-mix(in srgb, var(--color-tag-secondary) 80%, black);
 ```
 
 ### Anatomy
@@ -192,7 +191,10 @@ Tags communicate category or classification. They are always decorative — they
 
 ### States
 
-Tags have no interactive states in this version. They are static display elements.
+| State | Background | Notes |
+|---|---|---|
+| Default | `--tag-bg` | — |
+| Hover | `--tag-bg-hover` | Decorative — tags are not interactive, but hover is styled for visual polish |
 
 ### Accessibility
 
@@ -208,18 +210,33 @@ Tags have no interactive states in this version. They are static display element
 
 ---
 
-## 3. Card — Work
+## 3. Card
 
 **Figma Component Name:** `Card/Work`
-**CSS Class:** `.card`
-**HTML Element:** `<article class="card">`
+**CSS Base Class:** `.card`
+**HTML Element:** `<article class="card card--{variant}">`
 
 ### Design Intent
-Work cards showcase portfolio projects. The entire card is clickable via the block link pattern — the heading link expands to cover the full card using a CSS `::after` pseudo-element. The image is atmospheric and decorative — it sets the visual tone but the heading carries all the meaning.
+Cards are the primary content presentation unit. The entire card is clickable via the IxDF block link pattern — an absolutely positioned anchor (`card-block-link`) covers the full card for mouse users, while the CTA anchor (`card-cta`) is the sole keyboard-focusable element with a full, descriptive `aria-label`. This gives mouse users click-anywhere convenience and keyboard users a clean, descriptive tab stop.
 
-### When to Use
-- Displaying a portfolio project in the Featured Work section on Home
-- Displaying all projects on the Work index page
+### Variants
+
+| Variant | Modifier | Figma Style | Usage |
+|---|---|---|---|
+| Feature | `.card--feature` | `Style=Feature` | Work / portfolio cards on Home and Work index |
+| Thought | `.card--thought` | `Style=Thought` | Blog / writing entries on Home and Thoughts index |
+| Profile | `.card--profile` | `Style=Profile` | Profile card in left column on Home page |
+
+### Block Link Pattern (Feature and Thought variants only)
+
+The `.card-block-link` is an absolutely positioned empty anchor that covers the full card. It is `aria-hidden="true"` and `tabindex="-1"` — invisible to assistive technology and not keyboard focusable. Mouse users click anywhere on the card to navigate. The `.card-cta` anchor sits above the block link (`z-index: 2`) and is the only keyboard-accessible interactive element. It carries the full descriptive `aria-label`.
+
+```
+z-index stack (card has position: relative):
+  .card-cta            z-index: var(--card-cta-z)       ← keyboard focus lands here
+  .card-block-link     z-index: var(--card-block-link-z) ← intercepts mouse clicks on card body
+  card content         z-index: auto                     ← visible but not pointer-interactive
+```
 
 ### Component Tokens
 
@@ -233,8 +250,10 @@ Work cards showcase portfolio projects. The entire card is clickable via the blo
 --card-image-ratio:     16 / 9;
 --card-gap:             var(--space-4);
 --card-transition:      var(--duration-base) var(--ease-out);
+--card-block-link-z:    1;
+--card-cta-z:           2;
 
-/* Card CTA button — inherits from Button component */
+/* Card CTA button — inherits from Button component tokens */
 --card-cta-bg:          var(--btn-bg);
 --card-cta-border:      var(--btn-border);
 --card-cta-text:        var(--btn-text);
@@ -243,145 +262,173 @@ Work cards showcase portfolio projects. The entire card is clickable via the blo
 --card-cta-padding-y:   var(--btn-padding-y);
 ```
 
-### Anatomy
-
-```
-[ .card-image ]
-[ .card-content ]
-  [ h3 > .card-link ]
-  [ .tag ] [ .tag--secondary ]
-  [ p description ]
-  [ .card-cta ]
-```
-
-- Container: `<article class="card">`
-- Image: `<div class="card-image">` — CSS background-image, not `<img>`
-- Content wrapper: `<div class="card-content">`
-- Heading: `<h3><a href="{url}" class="card-link">{Title}<span class="sr-only"> — view this project</span></a></h3>`
-- Tags: `<span class="tag" aria-hidden="true">`
-- Description: `<p>`
-- CTA: `<button class="card-cta">Read about this piece of work</button>` — decorative, the card-link is the real interactive element
-
-### Block Link Pattern
-
-The `::after` pseudo-element on `.card-link` expands to cover the entire card, making every pixel clickable while keeping the semantic link on the heading:
-
-```css
-.card {
-    position: relative;
-}
-.card-link::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-}
-```
-
 ### States
 
 | State | Card Border | Card Background | Transition |
 |---|---|---|---|
 | Default | `--card-border` | `--card-bg` | — |
 | Hover | `--card-border-hover` | `--card-bg` | `--card-transition` |
-| Focus (keyboard) | Focus ring on `.card-link` | `--card-bg` | Focus ring appears |
+| Focus (keyboard) | Focus ring on `.card-cta` | `--card-bg` | Focus ring appears |
 
-### Accessibility
+---
 
-- `<article>` element announces as a landmark to screen readers
-- `.card-link` is the only interactive element — `.card-cta` is decorative and `aria-hidden="true"`
-- Screen reader output: "Article. {Title} — view this project. Link. Heading level 3."
+### Variant: Feature (Card/Feature)
+
+**CSS Class:** `.card.card--feature`
+**Usage:** Work / portfolio cards
+
+#### Anatomy
+
+```
+[ .card-block-link — empty, aria-hidden, tabindex=-1 ]
+[ .card-image — 16:9 decorative background ]
+[ .card-content ]
+  [ h3.card-title ]
+  [ .card-tags ]
+    [ .tag ] [ .tag--secondary ]
+  [ p description ]
+  [ a.card-cta ]
+```
+
+```html
+<article class="card card--feature">
+    <a href="{url}" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
+    <div class="card-image" role="presentation"></div>
+    <div class="card-content">
+        <h3 class="card-title">{Title}</h3>
+        <div class="card-tags">
+            <span class="tag" aria-hidden="true">{Tag}</span>
+        </div>
+        <p>{Description}</p>
+        <a href="{url}" class="card-cta" aria-label="{Title} — view this project">View</a>
+    </div>
+</article>
+```
+
+#### Accessibility
+
+- `<article>` announces as a landmark to screen readers
+- `.card-block-link` is `aria-hidden="true"` and `tabindex="-1"` — skipped entirely by keyboard and AT
+- `.card-cta` is the sole focusable element — carries full `aria-label`
+- Screen reader output: "Article. View. Link." (with aria-label: "{Title} — view this project")
 - Image: CSS background — no alt text needed
 - Tags: `aria-hidden="true"`
 
-### Responsive Behaviour
-
-- Desktop: constrained to centre column width, full width within that column
-- Mobile: full width, single column stack
-- Image ratio maintained at 16:9 at all sizes
-
 ---
 
-## 4. Card — Thought (Featured)
+### Variant: Thought (Card/Thought)
 
-**Figma Component Name:** `Card/Thought/Featured`
-**CSS Class:** `.card .card--thought .card--featured`
-**HTML Element:** `<article class="card card--thought card--featured">`
+**CSS Class:** `.card.card--thought`
+**Usage:** Blog / writing entries. No thumbnail image — content only.
 
-### Design Intent
-The featured thought card gives visual weight to the most recent post. Full-width image at top, then full content below. Used as the first entry in the Thoughts section on Home and the first entry on the Thoughts index page.
-
-### Component Tokens
-
-Inherits all `.card` tokens plus:
-
-```css
---card-thought-image-ratio:     16 / 9;
---card-thought-summary-lines:   3;
---card-thought-meta-color:      var(--color-text-secondary);
---card-thought-meta-size:       var(--font-size-sm);
-```
-
-### Anatomy
+#### Anatomy
 
 ```
-[ .card-image full width ]
+[ .card-block-link — empty, aria-hidden, tabindex=-1 ]
 [ .card-content ]
-  [ h3 > .card-link ]
-  [ p summary — max 3 lines ]
-  [ .tag ] [ .tag--secondary ]
-  [ .card-meta: Published {date} · {author} ]
-  [ .card-cta ]
+  [ h3.card-title ]
+  [ p summary ]
+  [ .card-tags ]
+    [ .tag ] [ .tag--secondary ]
+  [ p.card-meta — Published {date} · {author} ]
+  [ a.card-cta ]
 ```
 
-CTA label: "Read this thought" with `.sr-only` context: `<span class="sr-only">: {Title}</span>`
+```html
+<article class="card card--thought">
+    <a href="{url}" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
+    <div class="card-content">
+        <h3 class="card-title">{Title}</h3>
+        <p>{Summary — max 3 lines}</p>
+        <div class="card-tags">
+            <span class="tag" aria-hidden="true">{Tag}</span>
+        </div>
+        <p class="card-meta">Published {date} · {author}</p>
+        <a href="{url}" class="card-cta" aria-label="{Title} — read this thought">Read</a>
+    </div>
+</article>
+```
 
-### Accessibility
+#### Accessibility
 
-Screen reader output: "Article. {Title}: Read this thought. Link. Heading level 3."
+- `.card-cta` `aria-label` action: "read this thought"
+- Screen reader output: "Article. Read. Link." (with aria-label: "{Title} — read this thought")
 
 ---
 
-## 5. Card — Thought (Compact)
+### Variant: Profile (Card/Profile)
 
-**Figma Component Name:** `Card/Thought/Compact`
-**CSS Class:** `.card .card--thought .card--compact`
-**HTML Element:** `<article class="card card--thought card--compact">`
+**CSS Class:** `.card.card--profile`
+**Usage:** Profile card in the left column of the Home page. Desktop: sticky. Mobile: static, appears first in source order.
 
-### Design Intent
-Compact thought cards show secondary recent entries. Thumbnail image left, content right. Used as the second and third entries in the Thoughts section on Home.
+The Profile variant does not use the block link / CTA pattern. It has multiple action buttons (LinkedIn, About) and is not a single-destination card.
 
-### Component Tokens
+#### Anatomy
 
-Inherits all `.card` tokens plus:
+```
+[ .card-image — illustration, full width ]
+[ p.card-image-caption ]
+[ .card-content ]
+  [ h2.card-profile-name ]
+  [ .card-tags ]
+    [ .tag ] [ .tag--secondary ]
+  [ p bio ]
+  [ .card-profile-actions ]
+    [ a.btn — LinkedIn ]
+    [ a.btn--ghost — About ]
+```
+
+```html
+<article class="card card--profile">
+    <div class="card-image">
+        <img src="assets/images/C-Rex-by-Bob-Nelson-2017.png" alt="" aria-hidden="true" width="300" height="300" loading="lazy">
+    </div>
+    <p class="card-image-caption">{Caption}</p>
+    <div class="card-content">
+        <h2 class="card-profile-name">{Name}</h2>
+        <div class="card-tags">
+            <span class="tag" aria-hidden="true">{Skill}</span>
+            <span class="tag tag--secondary" aria-hidden="true">{Skill}</span>
+        </div>
+        <p>{Bio}</p>
+        <div class="card-profile-actions">
+            <a href="{linkedin-url}" class="btn">Connect on LinkedIn</a>
+            <a href="about.html" class="btn btn--ghost">Read More about Chris<span class="sr-only"> on the About page</span></a>
+        </div>
+    </div>
+</article>
+```
+
+#### Component Tokens (Profile-specific)
 
 ```css
---card-compact-image-size:      80px;
---card-compact-image-radius:    var(--border-radius-sm);
---card-compact-gap:             var(--space-4);
---card-compact-layout:          grid;
---card-compact-columns:         80px 1fr;
+--card-profile-name-size:       var(--font-size-2xl);
+--card-profile-name-weight:     var(--font-weight-bold);
+--card-profile-caption-size:    var(--font-size-xs);
+--card-profile-caption-color:   var(--color-text-secondary);
+--card-profile-sticky-top:      80px;
 ```
 
-### Anatomy
+#### States
 
-```
-[ .card-image 80×80px ] [ .card-content ]
-                           [ h3 > .card-link ]
-                           [ .tag ]
-                           [ .card-meta: date · author ]
-                           [ .card-cta ]
-```
+- Desktop: `position: sticky; top: var(--card-profile-sticky-top)`
+- Mobile: `position: static`
 
-Image is fixed `80px × 80px`, aspect ratio 1:1, `border-radius: var(--card-compact-image-radius)`.
+#### Accessibility
 
-### Responsive Behaviour
+- `<article>` announces as a landmark
+- Illustration: `alt=""` and `aria-hidden="true"` — decorative
+- "Read More about Chris" has `.sr-only` context: "on the About page"
+- LinkedIn button is a standard `<a>` — opens in same tab by default
 
-- Desktop and tablet: two-column grid layout (image left, content right)
-- Mobile: stacks to single column — image full width on top, content below
+#### Responsive Behaviour
+
+- Desktop: sticky, left column, `280px` width enforced by `.home-grid`
+- Mobile: static, full width, appears first in source order
 
 ---
 
-## 6. Navigation — Desktop
+## 4. Navigation — Desktop
 
 **Figma Component Name:** `Nav/Desktop`
 **CSS Class:** `.site-nav`
@@ -451,7 +498,7 @@ Active nav link:
 
 ---
 
-## 7. Navigation — Mobile Tab Bar
+## 5. Navigation — Mobile Tab Bar
 
 **Figma Component Name:** `Nav/TabBar`
 **CSS Class:** `.tab-bar`
@@ -534,70 +581,7 @@ Active item: `.tab-bar-item.is-active` or `[aria-current="page"]`
 
 ---
 
-## 8. Profile Sidebar
-
-**Figma Component Name:** `Profile/Sidebar`
-**CSS Class:** `.profile-sidebar`
-**HTML Element:** `<aside class="profile-sidebar">`
-
-### Design Intent
-The profile sidebar gives visitors an immediate, human sense of who this site belongs to. It combines a personality illustration, a greeting, skill tags, a short bio, and contact actions. On desktop it stays sticky so it remains visible as the user scrolls through the work cards.
-
-### Component Tokens
-
-```css
---sidebar-bg:               var(--color-background-surface);
---sidebar-border:           var(--color-border-default);
---sidebar-radius:           var(--border-radius-md);
---sidebar-padding:          var(--space-6);
---sidebar-gap:              var(--space-4);
---sidebar-image-radius:     var(--border-radius-md);
---sidebar-sticky-top:       80px;
---sidebar-caption-size:     var(--font-size-xs);
---sidebar-caption-color:    var(--color-text-secondary);
---sidebar-name-size:        var(--font-size-2xl);
---sidebar-name-weight:      var(--font-weight-bold);
---sidebar-bio-size:         var(--font-size-sm);
---sidebar-bio-color:        var(--color-text-secondary);
-```
-
-### Anatomy
-
-```
-[ .sidebar-image — illustration ]
-[ .sidebar-caption — attribution text ]
-[ h2 .sidebar-name — "Hello, my name is Chris" ]
-[ .tag ] [ .tag--secondary ]
-[ p .sidebar-bio × 2 paragraphs ]
-[ .btn — "Connect on LinkedIn" ]
-[ .btn--ghost — "Send me an Email" ]
-[ a .sidebar-more — "Read More about Chris" ]
-```
-
-- Image: `<img src="assets/images/C-Rex-by-Bob-Nelson-2017.png" alt="" aria-hidden="true" width="300" height="300">`
-- Caption: `<p class="sidebar-caption">A small illustrated dinosaur, because why not. Illustration by Bob Nelson.</p>`
-- Name: `<h2 class="sidebar-name">Hello, my name is Chris</h2>`
-- More link: `<a href="about.html" class="sidebar-more">Read More about Chris<span class="sr-only"> on the About page</span></a>`
-
-### States
-
-- Sticky on desktop: `position: sticky; top: var(--sidebar-sticky-top);`
-- Not sticky on mobile: `position: static`
-
-### Accessibility
-
-- `<aside>` element announces as a complementary landmark
-- Illustration: `alt=""` and `aria-hidden="true"` — decorative
-- "Read More about Chris" link has `.sr-only` context: "on the About page"
-
-### Responsive Behaviour
-
-- Desktop: sticky, left column, `280px` width
-- Mobile: static, full width, appears first in page order above Featured Work
-
----
-
-## 9. Tooltip
+## 6. Tooltip
 
 **Figma Component Name:** `Tooltip`
 **CSS Class:** `.tooltip`
@@ -669,7 +653,7 @@ Transition on show: `opacity` and `visibility`, `--tooltip-transition`.
 
 ---
 
-## 10. Toast Notification
+## 7. Toast Notification
 
 **Figma Component Name:** `Toast`
 **CSS Class:** `.toast`
@@ -733,7 +717,7 @@ Hide: remove `.toast--visible` after `--toast-duration`
 
 ---
 
-## 11. Breadcrumb
+## 8. Breadcrumb
 
 **Figma Component Name:** `Breadcrumb`
 **CSS Class:** `.breadcrumb`
@@ -782,7 +766,7 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 
 ---
 
-## 12. Divider
+## 9. Divider
 
 **Figma Component Name:** `Divider`
 **CSS Class:** `hr` (native element, no custom class needed)
@@ -813,7 +797,7 @@ No additional classes or attributes needed. Styled globally via the `hr` element
 
 ---
 
-## 13. Blockquote
+## 10. Blockquote
 
 **Figma Component Name:** `Blockquote`
 **CSS Class:** `.blockquote` applied to `<blockquote>`
@@ -861,7 +845,7 @@ blockquote {
 
 ---
 
-## 14. Code Block
+## 11. Code Block
 
 **Figma Component Name:** `CodeBlock`
 **CSS Class:** `code` and `pre` (native elements)
@@ -896,7 +880,7 @@ Block:
 
 ---
 
-## 15. Back to Top Button
+## 12. Back to Top Button
 
 **Figma Component Name:** `BackToTop`
 **CSS Class:** `.back-to-top`
@@ -974,7 +958,7 @@ window.scrollTo({ top: 0, behavior: 'auto' });
 
 ---
 
-## 16. Share Button
+## 13. Share Button
 
 **Figma Component Name:** `ShareButton`
 **CSS Class:** `.share-btn`
@@ -1032,9 +1016,14 @@ Quick reference mapping every component token to its semantic source.
 | `--btn-text` | `--color-text-primary` | `#F5F5F5` |
 | `--card-bg` | `--color-background-surface` | `#1A1A1A` |
 | `--card-border` | `--color-border-default` | `#2A2A2A` |
+| `--card-radius` | `--border-radius-md` | `8px` |
 | `--card-image-bg` | `--color-background-subtle` | `#2A2A2A` |
+| `--card-block-link-z` | — | `1` |
+| `--card-cta-z` | — | `2` |
 | `--tag-bg` | `--color-tag-primary` → `--color-accent-gold` | `#BA8200` |
+| `--tag-bg-hover` | `color-mix(in srgb, --color-tag-primary 80%, black)` | ~`#945E00` |
 | `--tag-secondary-bg` | `--color-tag-secondary` → `--color-accent-pink` | `#A9407C` |
+| `--tag-secondary-bg-hover` | `color-mix(in srgb, --color-tag-secondary 80%, black)` | ~`#873363` |
 | `--tag-text` | `--color-tag-text` → `--color-text-primary` | `#F5F5F5` |
 | `--nav-bg` | `--color-background-base` | `#111111` |
 | `--nav-link-color` | `--color-text-secondary` | `#AAAAAA` |
@@ -1058,4 +1047,3 @@ Tracked fixes and enhancements queued for future Claude Code sessions.
 | # | Item | Status |
 |---|---|---|
 | 6 | Remove Tabler Icons CDN from all pages, remove all icon elements, text-only tab bar and back to top button, update any CSS that sizes or positions icons | ✅ Done 2026-07-05 |
-

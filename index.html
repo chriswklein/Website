@@ -19,66 +19,70 @@
         <div class="container">
             <div class="home-grid">
 
-                <!-- Left column: Profile sidebar -->
-                <aside class="profile-sidebar">
-                    <figure>
+                <!-- Left column: Profile card -->
+                <article class="card card--profile">
+                    <div class="card-image">
                         <img src="assets/images/C-Rex-by-Bob-Nelson-2017.png" alt="" aria-hidden="true" width="300" height="300" loading="lazy">
-                        <figcaption>A photorealistic portrait of me, Illustration by Bob Nelson.</figcaption>
-                    </figure>
+                    </div>
+                    <p class="card-image-caption">A photorealistic portrait of me, Illustration by Bob Nelson.</p>
+                    <div class="card-content">
+                        <h2 class="card-profile-name">Hello, my name is Chris</h2>
 
-                    <h2>Hello, my name is Chris</h2>
+                        <p>
+                            <span class="tag" aria-hidden="true">User Experience</span>
+                            <span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span>
+                        </p>
 
-                    <p>
-                        <span class="tag" aria-hidden="true">User Experience</span>
-                        <span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span>
-                    </p>
+                        <p>Welcome to my site. Feel free to look around or get in contact with me.</p>
 
-                    <p>Welcome to my site. Feel free to look around or get in contact with me.</p>
-                    
-                    <a href="https://www.linkedin.com/in/crzdev/" class="btn">Connect on LinkedIn</a>
-                    <a href="mailto:christopherwalterklein@gmail.com" class="btn btn--ghost">Send me an Email</a>
-
-                    <p><a href="about.html">Read More about Chris<span class="sr-only"> on the About page</span></a></p>
-                </aside>
+                        <div class="card-profile-actions">
+                            <a href="https://www.linkedin.com/in/crzdev/" class="btn">Connect on LinkedIn</a>
+                            <a href="about.html" class="btn btn--ghost">Read More about Chris<span class="sr-only"> on the About page</span></a>
+                        </div>
+                    </div>
+                </article>
 
                 <!-- Centre column: Featured Work -->
                 <div>
                     <h2 class="section-heading">Featured Work</h2>
 
-                    <article class="card">
+                    <article class="card card--feature">
+                        <a href="work.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-image" role="presentation"></div>
                         <div class="card-content">
-                            <h3><a href="work.html" class="card-link">Card Heading One<span class="sr-only"> — view this project</span></a></h3>
+                            <h3 class="card-title">Card Heading One</h3>
                             <p>
                                 <span class="tag" aria-hidden="true">User Experience</span>
                                 <span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span>
                             </p>
                             <p>A short description of this piece of work and the problem it solved.</p>
-                            <button class="card-cta" type="button" inert>Read about this piece of work</button>
+                            <a href="work.html" class="card-cta" aria-label="Card Heading One — view this project">View</a>
                         </div>
                     </article>
 
-                    <article class="card">
+                    <article class="card card--feature">
+                        <a href="work.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-image" role="presentation"></div>
                         <div class="card-content">
-                            <h3><a href="work.html" class="card-link">Card Heading Two<span class="sr-only"> — view this project</span></a></h3>
+                            <h3 class="card-title">Card Heading Two</h3>
                             <p>
                                 <span class="tag" aria-hidden="true">User Experience</span>
                             </p>
                             <p>A short description of this piece of work and the problem it solved.</p>
-                            <button class="card-cta" type="button" inert>Read about this piece of work</button>
+                            <a href="work.html" class="card-cta" aria-label="Card Heading Two — view this project">View</a>
                         </div>
                     </article>
 
-                    <article class="card">
+                    <article class="card card--feature">
+                        <a href="work.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-image" role="presentation"></div>
                         <div class="card-content">
-                            <h3><a href="work.html" class="card-link">Card Heading Three<span class="sr-only"> — view this project</span></a></h3>
+                            <h3 class="card-title">Card Heading Three</h3>
                             <p>
                                 <span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span>
                             </p>
                             <p>A short description of this piece of work and the problem it solved.</p>
-                            <button class="card-cta" type="button" inert>Read about this piece of work</button>
+                            <a href="work.html" class="card-cta" aria-label="Card Heading Three — view this project">View</a>
                         </div>
                     </article>
 
@@ -89,37 +93,37 @@
                 <div>
                     <h2 class="section-heading">Thoughts</h2>
 
-                    <article class="card card--thought card--featured">
-                        <div class="card-image" role="presentation"></div>
+                    <article class="card card--thought">
+                        <a href="thoughts.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-content">
-                            <h3><a href="thoughts.html" class="card-link">Featured Thought Title<span class="sr-only"> — read this thought</span></a></h3>
+                            <h3 class="card-title">Featured Thought Title</h3>
                             <p>A short summary of the featured thought, enough to draw someone in.</p>
                             <p>
                                 <span class="tag" aria-hidden="true">Reflection</span>
                                 <span class="tag tag--secondary" aria-hidden="true">Career</span>
                             </p>
-                            <p>Published June 20, 2026 · Chris Klein</p>
-                            <button class="card-cta" type="button" inert>Read this thought</button>
+                            <p class="card-meta">Published June 20, 2026 · Chris Klein</p>
+                            <a href="thoughts.html" class="card-cta" aria-label="Featured Thought Title — read this thought">Read</a>
                         </div>
                     </article>
 
-                    <article class="card card--thought card--compact">
-                        <div class="card-image" role="presentation"></div>
+                    <article class="card card--thought">
+                        <a href="thoughts.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-content">
-                            <h3><a href="thoughts.html" class="card-link">Smaller Thought Title One<span class="sr-only"> — read this thought</span></a></h3>
+                            <h3 class="card-title">Smaller Thought Title One</h3>
                             <p><span class="tag" aria-hidden="true">Design</span></p>
-                            <p>Published June 14, 2026 · Chris Klein</p>
-                            <button class="card-cta" type="button" inert>Read this thought</button>
+                            <p class="card-meta">Published June 14, 2026 · Chris Klein</p>
+                            <a href="thoughts.html" class="card-cta" aria-label="Smaller Thought Title One — read this thought">Read</a>
                         </div>
                     </article>
 
-                    <article class="card card--thought card--compact">
-                        <div class="card-image" role="presentation"></div>
+                    <article class="card card--thought">
+                        <a href="thoughts.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-content">
-                            <h3><a href="thoughts.html" class="card-link">Smaller Thought Title Two<span class="sr-only"> — read this thought</span></a></h3>
+                            <h3 class="card-title">Smaller Thought Title Two</h3>
                             <p><span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span></p>
-                            <p>Published June 8, 2026 · Chris Klein</p>
-                            <button class="card-cta" type="button" inert>Read this thought</button>
+                            <p class="card-meta">Published June 8, 2026 · Chris Klein</p>
+                            <a href="thoughts.html" class="card-cta" aria-label="Smaller Thought Title Two — read this thought">Read</a>
                         </div>
                     </article>
 

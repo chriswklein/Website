@@ -311,6 +311,9 @@ pre code {
    TAGS
 ================================ */
 .tag {
+    --tag-bg-hover:           color-mix(in srgb, var(--color-tag-primary) 80%, black);
+    --tag-secondary-bg-hover: color-mix(in srgb, var(--color-tag-secondary) 80%, black);
+
     display: inline-block;
     background-color: var(--color-tag-primary);
     color: var(--color-tag-text);
@@ -320,10 +323,19 @@ pre code {
     line-height: var(--line-height-normal);
     letter-spacing: var(--letter-spacing-wide);
     padding: var(--space-1) var(--space-3);
+    transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.tag:hover {
+    background-color: var(--tag-bg-hover);
 }
 
 .tag--secondary {
     background-color: var(--color-tag-secondary);
+}
+
+.tag--secondary:hover {
+    background-color: var(--tag-secondary-bg-hover);
 }
 
 /* ================================
@@ -426,15 +438,18 @@ pre code {
    CARD
 ================================ */
 .card {
-    --card-bg:           var(--color-background-surface);
-    --card-border:       var(--color-border-default);
-    --card-border-hover: var(--color-border-strong);
-    --card-padding:      var(--space-6);
-    --card-image-bg:     var(--color-background-subtle);
+    --card-bg:              var(--color-background-surface);
+    --card-border:          var(--color-border-default);
+    --card-border-hover:    var(--color-border-strong);
+    --card-radius:          var(--border-radius-md);
+    --card-padding:         var(--space-6);
+    --card-image-bg:        var(--color-background-subtle);
+    --card-block-link-z:    1;
+    --card-cta-z:           2;
 
     background-color: var(--card-bg);
     border: var(--border-width-thin) solid var(--card-border);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--card-radius);
     overflow: hidden;
     position: relative;
     transition: border-color var(--duration-base) var(--ease-out);
@@ -458,31 +473,25 @@ pre code {
     gap: var(--space-3);
 }
 
-.card-link {
-    color: var(--color-text-primary);
-    text-decoration: none;
-    transition: color var(--duration-fast) var(--ease-out);
-}
-
-.card-link::after {
-    content: "";
+/* Block link — covers full card for mouse users, hidden from AT and keyboard */
+.card-block-link {
     position: absolute;
     inset: 0;
+    z-index: var(--card-block-link-z);
+    border-radius: var(--card-radius);
 }
 
-.card-link:hover {
-    color: var(--color-interactive-hover);
-}
-
-/* Card CTA — decorative visual affordance, not a real interactive element */
+/* Card CTA — sole keyboard-focusable element; carries full aria-label */
 .card-cta {
     --btn-bg:     var(--color-background-subtle);
     --btn-border: var(--color-border-strong);
     --btn-text:   var(--color-text-primary);
 
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    z-index: 1;
+    z-index: var(--card-cta-z);
     width: 100%;
     min-height: 44px;
     padding: var(--space-3) var(--space-5);
@@ -495,11 +504,26 @@ pre code {
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-wide);
     text-align: center;
+    text-decoration: none;
     margin-top: var(--space-1);
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
 }
 
-/* Gap between adjacent cards — work column */
-.card:not(.card--thought) + .card:not(.card--thought) {
+.card-cta:hover {
+    background-color: var(--color-border-strong);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-default);
+}
+
+.card-cta:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* Gap between adjacent feature cards */
+.card--feature + .card--feature {
     margin-top: var(--space-6);
 }
 
@@ -508,26 +532,53 @@ pre code {
     margin-top: var(--space-4);
 }
 
-/* Compact card — Thoughts secondary entries */
-.card--compact {
-    --card-compact-image-size: 80px;
-
-    display: grid;
-    grid-template-columns: var(--card-compact-image-size) 1fr;
-    gap: 0;
+/* Thought cards — no image */
+.card--thought .card-image {
+    display: none;
 }
 
-.card--compact .card-image {
-    width: var(--card-compact-image-size);
-    aspect-ratio: 1 / 1;
-    border-radius: 0;
-    flex-shrink: 0;
-    align-self: stretch;
+/* Profile card */
+.card--profile {
+    --card-profile-name-size:       var(--font-size-2xl);
+    --card-profile-name-weight:     var(--font-weight-bold);
+    --card-profile-caption-size:    var(--font-size-xs);
+    --card-profile-caption-color:   var(--color-text-secondary);
+    --card-profile-sticky-top:      80px;
+
+    position: sticky;
+    top: var(--card-profile-sticky-top);
+    overflow: visible;
 }
 
-.card--compact .card-content {
-    padding: var(--space-4);
-    gap: var(--space-2);
+.card--profile .card-image {
+    aspect-ratio: auto;
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+    overflow: hidden;
+}
+
+.card--profile .card-image img {
+    width: 100%;
+    height: auto;
+}
+
+.card-image-caption {
+    font-size: var(--card-profile-caption-size, var(--font-size-xs));
+    color: var(--card-profile-caption-color, var(--color-text-secondary));
+    line-height: var(--line-height-loose);
+    padding: var(--space-2) var(--card-padding);
+}
+
+.card-profile-name {
+    font-size: var(--card-profile-name-size);
+    font-weight: var(--card-profile-name-weight);
+    line-height: var(--line-height-snug);
+}
+
+.card-profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
 }
 
 /* ================================
@@ -546,16 +597,6 @@ pre code {
     margin-bottom: var(--space-6);
 }
 
-/* ================================
-   PROFILE SIDEBAR
-================================ */
-.profile-sidebar {
-    position: sticky;
-    top: 80px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
 
 /* ================================
    BACK TO TOP
@@ -738,18 +779,8 @@ footer p {
         grid-template-columns: 1fr;
     }
 
-    .profile-sidebar {
+    .card--profile {
         position: static;
-    }
-
-    .card--compact {
-        grid-template-columns: 1fr;
-    }
-
-    .card--compact .card-image {
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        border-radius: 0;
     }
 
     /* Bottom tab bar replaces desktop nav entirely on mobile */
