@@ -291,26 +291,44 @@ Base-4 scale. Every spacing decision must reference one of these tokens. No arbi
 
 ### 4.1 Breakpoints
 
-| Name | Width | Description |
-|---|---|---|
-| Mobile | `390px` | iPhone 14 — primary mobile target |
-| Tablet | `768px` | Breakpoint boundary — layout changes here |
-| Desktop | `1440px` | Design canvas width |
+| Name | Width | Layout | Nav | Tab Bar | Footer |
+|---|---|---|---|---|---|
+| Mobile | below 768px | Single column | Hidden | Fixed bottom | Hidden |
+| Tablet | 768px–1023px | Single column | Sticky top | Hidden | Visible |
+| Desktop | 1024px and above | Page grid with variable card sizing | Sticky top | Hidden | Visible |
 
-Mobile breakpoint in CSS: `@media (max-width: 768px)`
+Mobile breakpoint in CSS: `@media (max-width: 767px)`
+Tablet breakpoint in CSS: `@media (max-width: 1023px)`
 Touch device query: `@media (hover: none)` — use for tooltip and hover-only interactions
 
 ### 4.2 Grid Specification
 
-| Breakpoint | Columns | Gutter | Margin | Max Content Width |
-|---|---|---|---|---|
-| Desktop 1440px | 12 | `32px` | `120px` | `1200px` |
-| Tablet 768px | 8 | `24px` | `40px` | `688px` |
-| Mobile 390px | 4 | `16px` | `16px` | `358px` |
+Page grid: single column, max-width `1200px`, centred, padding `0 var(--space-8)`
+
+```
+Card row — full width:   grid-template-columns: 1fr
+Card row — two column:   grid-template-columns: 1fr 1fr, gap var(--space-6)
+Card row — three column: grid-template-columns: 1fr 1fr 1fr, gap var(--space-6)
+
+On tablet (≤1023px) and mobile (≤767px): all card rows collapse to single column
+```
 
 CSS variable for max content width: `--max-content: 1200px`
 
-The `.container` class enforces the max content width and centres content horizontally:
+The `.page-grid` class is used for page-level layouts:
+```css
+.page-grid {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+```
+
+The `.container` class is kept for standalone utility (not replaced by page-grid):
 ```css
 .container {
     width: 100%;
@@ -319,33 +337,22 @@ The `.container` class enforces the max content width and centres content horizo
     padding: 0 var(--space-8);
 }
 ```
-On mobile, container padding reduces to `var(--space-4)`.
 
 ### 4.3 Page Layout Templates
 
-**Home Page — Three Column Grid**
+**Home Page — Page Grid**
 
-| Column | Width | Content |
-|---|---|---|
-| Left — Profile Sidebar | `280px` fixed | Sticky profile card |
-| Centre — Main Content | `1fr` | Featured Work |
-| Right — Thoughts Sidebar | `300px` fixed | Recent Thoughts |
+Single column page-grid. Card rows control multi-column layout within sections:
 
-On mobile: all three columns stack into a single column in this order — Profile, Featured Work, Thoughts.
+- Profile card: `.card-row.card-row--full` (full width)
+- Featured Work section: first card full width, second and third cards side by side (`.card-row--two`)
+- Thoughts section: first card full width, second and third cards side by side (`.card-row--two`)
 
-CSS implementation:
-```css
-.home-grid {
-    display: grid;
-    grid-template-columns: 280px 1fr 300px;
-    gap: var(--space-8);
-    align-items: start;
-}
-```
+On tablet (≤1023px) and mobile: all card rows collapse to single column.
 
 **Standard Page — Single Column Centred**
 
-Content centred at max `680px` width for optimal reading line length. Used for Work entries and Thoughts entries.
+Content centred using `.standard-page` (max-width 1200px, horizontal padding). Body text constrained to 65ch. Used for Work entries and Thoughts entries.
 
 | Element | Width | Alignment |
 |---|---|---|

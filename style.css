@@ -4,8 +4,7 @@
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
-    padding: 0
-    ;
+    padding: 0;
 }
 
 /* ================================
@@ -168,6 +167,9 @@ body {
     color: var(--color-text-primary);
     background-color: var(--color-background-base);
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 img {
@@ -177,7 +179,12 @@ img {
 }
 
 main {
+    flex: 1;
     padding-top: var(--space-8);
+}
+
+footer {
+    margin-top: auto;
 }
 
 /* ================================
@@ -317,7 +324,7 @@ pre code {
     display: inline-block;
     background-color: var(--color-tag-primary);
     color: var(--color-tag-text);
-    border-radius: var(--border-radius-full);
+    border-radius: var(--border-radius-sm);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     line-height: var(--line-height-normal);
@@ -335,6 +342,15 @@ pre code {
 }
 
 .tag--secondary:hover {
+    background-color: var(--tag-secondary-bg-hover);
+}
+
+/* Tag hover inside cards (declared explicitly for specificity, even where block-link intercepts pointer events) */
+.card .tag:hover {
+    background-color: var(--tag-bg-hover);
+}
+
+.card .tag--secondary:hover {
     background-color: var(--tag-secondary-bg-hover);
 }
 
@@ -396,6 +412,12 @@ pre code {
     --btn-text:   var(--color-text-primary);
 }
 
+/* Share button — auto-width, not full-width like .btn default */
+.share-btn {
+    width: auto;
+    align-self: center;
+}
+
 /* ================================
    TOOLTIP
 ================================ */
@@ -435,6 +457,78 @@ pre code {
 }
 
 /* ================================
+   TOAST
+================================ */
+.toast {
+    position: fixed;
+    bottom: var(--space-8);
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--space-4));
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-accent-gold);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-2) var(--space-4);
+    box-shadow: var(--elevation-md);
+    z-index: 300;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--duration-base) var(--ease-out),
+                visibility var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-out);
+}
+
+.toast--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ================================
+   BREADCRUMB
+================================ */
+.breadcrumb {
+    margin-bottom: var(--space-6);
+}
+
+.breadcrumb-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.breadcrumb-item a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--color-text-primary);
+}
+
+.breadcrumb-separator {
+    color: var(--color-text-secondary);
+}
+
+.breadcrumb-item span[aria-current="page"] {
+    color: var(--color-text-primary);
+}
+
+/* ================================
    CARD
 ================================ */
 .card {
@@ -461,6 +555,7 @@ pre code {
 
 .card-image {
     aspect-ratio: 16 / 9;
+    width: 100%;
     background-size: cover;
     background-position: center;
     background-color: var(--card-image-bg);
@@ -522,14 +617,12 @@ pre code {
     outline-offset: 3px;
 }
 
-/* Gap between adjacent feature cards */
-.card--feature + .card--feature {
-    margin-top: var(--space-6);
-}
-
-/* Gap between adjacent thought cards */
-.card--thought + .card--thought {
-    margin-top: var(--space-4);
+/* Card meta — date and author line */
+.card-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-loose);
+    max-width: none;
 }
 
 /* Thought cards — no image */
@@ -566,6 +659,7 @@ pre code {
     color: var(--card-profile-caption-color, var(--color-text-secondary));
     line-height: var(--line-height-loose);
     padding: var(--space-2) var(--card-padding);
+    max-width: none;
 }
 
 .card-profile-name {
@@ -582,21 +676,61 @@ pre code {
 }
 
 /* ================================
-   HOME PAGE LAYOUT
+   PAGE GRID
 ================================ */
-.home-grid {
-    display: grid;
-    grid-template-columns: 280px 1fr 300px;
+.page-grid {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
     gap: var(--space-8);
-    align-items: start;
 }
 
-/* Section headings (Featured Work, Thoughts) — always centre aligned */
+.card-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+}
+
+.card-row--two {
+    grid-template-columns: 1fr 1fr;
+}
+
+.card-row--full {
+    grid-template-columns: 1fr;
+}
+
+/* Spacing between consecutive card-rows within a section */
+.card-row + .card-row {
+    margin-top: var(--space-6);
+}
+
 .section-heading {
     text-align: center;
-    margin-bottom: var(--space-6);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
 }
 
+.section-footer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: var(--space-4);
+}
+
+/* ================================
+   LAYOUT — CONTAINER (utility)
+================================ */
+.container {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+}
 
 /* ================================
    BACK TO TOP
@@ -664,16 +798,6 @@ pre code {
 .tab-bar-item[aria-current="page"],
 .tab-bar-item.is-active {
     color: var(--color-interactive-default);
-}
-
-/* ================================
-   LAYOUT
-================================ */
-.container {
-    width: 100%;
-    max-width: var(--max-content);
-    margin: 0 auto;
-    padding: 0 var(--space-8);
 }
 
 /* ================================
@@ -748,6 +872,128 @@ footer p {
 }
 
 /* ================================
+   STANDARD PAGE
+================================ */
+.standard-page {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+}
+
+.standard-page-banner {
+    width: 100%;
+    aspect-ratio: 3 / 1;
+    background-color: var(--color-background-subtle);
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.standard-page-caption {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: var(--space-8);
+    line-height: var(--line-height-loose);
+    max-width: none;
+}
+
+.standard-page-title {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.standard-page-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+}
+
+.standard-page-meta-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.standard-page-meta-dates {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: var(--space-2) var(--space-6);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-align: left;
+}
+
+.card-meta-label {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.standard-page-meta-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    justify-content: center;
+}
+
+.standard-page-divider {
+    margin: var(--space-8) 0;
+}
+
+.standard-page-content {
+    max-width: 65ch;
+    margin: 0 auto;
+}
+
+.standard-page-content h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-4);
+}
+
+.standard-page-content h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+}
+
+.standard-page-content p {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-6);
+    max-width: 65ch;
+}
+
+.standard-page-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
+    border-top: var(--border-width-thin) solid var(--color-divider-accent);
+}
+
+/* ================================
    REDUCED MOTION
 ================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -762,31 +1008,70 @@ footer p {
 }
 
 /* ================================
-   MOBILE (max-width: 768px)
+   TABLET (max-width: 1023px) — single column collapse
 ================================ */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
+    .card-row--two {
+        grid-template-columns: 1fr;
+    }
+
+    .page-grid {
+        padding: 0 var(--space-6);
+    }
+
+    .standard-page {
+        padding: 0 var(--space-6);
+    }
+
+    .standard-page-title {
+        font-size: var(--font-size-3xl);
+    }
+
+    .card--profile {
+        position: static;
+    }
+}
+
+/* ================================
+   MOBILE (max-width: 767px) — tab bar, footer, padding
+================================ */
+@media (max-width: 767px) {
     h1 { font-size: var(--font-size-3xl); }
 
-    .container {
-        padding: 0 var(--space-4);
+    body {
+        padding-bottom: var(--space-20);
     }
 
     main {
         padding-top: var(--space-10);
     }
 
-    .home-grid {
-        grid-template-columns: 1fr;
+    .page-grid {
+        padding: 0 var(--space-4);
     }
 
-    .card--profile {
-        position: static;
+    .container {
+        padding: 0 var(--space-4);
     }
 
-    /* Bottom tab bar replaces desktop nav entirely on mobile */
-    .site-nav,
-    .nav-toggle,
-    .nav-links {
+    .standard-page {
+        padding: 0 var(--space-4);
+    }
+
+    .standard-page-banner {
+        aspect-ratio: 3 / 2;
+        border-radius: var(--border-radius-none);
+        margin-left: calc(-1 * var(--space-4));
+        margin-right: calc(-1 * var(--space-4));
+        width: calc(100% + var(--space-8));
+    }
+
+    .standard-page-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    /* Bottom tab bar replaces desktop nav on mobile */
+    header {
         display: none;
     }
 
@@ -801,12 +1086,8 @@ footer p {
         border-top: var(--border-width-thin) solid var(--color-border-default);
         justify-content: space-around;
         align-items: center;
-        padding: var(--space-2) var(--space-2);
+        padding: var(--space-2);
         z-index: 200;
-    }
-
-    body {
-        padding-bottom: var(--space-20);
     }
 
     footer {

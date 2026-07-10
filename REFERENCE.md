@@ -303,12 +303,38 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ## 6. Pages
 
+### Layout Behaviour
+
+**Desktop (≥1024px):**
+- `<body>` uses flexbox column layout (`display: flex; flex-direction: column; min-height: 100vh`). `<main>` has `flex: 1` so it fills all available vertical space, pinning footer to the page bottom.
+- Nav (`<header>`) is `position: sticky; top: 0; z-index: 100` — stays visible while scrolling.
+- Footer visible, pushed to page bottom by main's `flex: 1`.
+- Page scrolls normally (no fixed-height viewport scroll) — Option A scroll behaviour.
+- Card rows can be full-width or two-column depending on the `.card-row--two` modifier.
+
+**Tablet (768px–1023px):**
+- Same flexbox body layout as desktop.
+- Nav visible (sticky top), tab bar hidden.
+- Footer visible.
+- All `.card-row--two` collapse to single column.
+- Page padding reduces to `var(--space-6)`.
+
+**Mobile (below 768px):**
+- `footer` hidden via `display: none`.
+- Tab bar fixed to bottom. `body` has `padding-bottom: 80px` to prevent content overlap.
+- `<header>` (nav) hidden.
+- All card rows are single column.
+- Page padding reduces to `var(--space-4)`.
+- All card images use `aspect-ratio` not fixed height — ensures correct scaling at any width.
+
+---
+
 ### Home (index.html)
-**Purpose:** First impression. Dashboard layout — profile, featured work, recent thoughts.
-**Status:** Design locked (Draft 4) — ready to build
-**Layout:** Three column desktop (Profile sidebar left 280px, Featured Work centre 1fr, Thoughts right 300px)
+**Purpose:** First impression. Page-grid layout — profile, featured work, recent thoughts.
+**Status:** Built — IxDF block link pattern, page-grid structure
+**Layout:** Single-column page-grid. Cards in full-width and two-column rows.
 **Mobile:** Single column — Profile, Featured Work, Thoughts. Bottom tab bar navigation.
-**Content counts:** 3 Featured Work cards (built to expand), 3 Thoughts entries (1 large featured + 2 smaller recent)
+**Content counts:** 3 Featured Work cards (1 full width + 2 side-by-side), 3 Thoughts entries (1 full width + 2 side-by-side)
 
 ### Work (work.html)
 **Purpose:** Portfolio or professional work showcase — index of all projects.

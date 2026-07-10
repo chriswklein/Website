@@ -171,7 +171,7 @@ Tags communicate category or classification. They are always decorative — they
 --tag-font-size:        var(--font-size-sm);
 --tag-font-weight:      var(--font-weight-medium);
 --tag-letter-spacing:   var(--letter-spacing-wide);
---tag-radius:           var(--border-radius-full);
+--tag-radius:           var(--border-radius-sm);
 --tag-line-height:      var(--line-height-normal);
 
 /* Secondary variant overrides */

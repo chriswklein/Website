@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadComponent('footer-placeholder', 'footer.html');
     setActiveTabBar();
     initBackToTop();
+    initShareButtons();
 });
 
 function loadComponent(placeholderId, file, callback) {
@@ -79,6 +80,35 @@ document.addEventListener('keydown', (event) => {
         document.activeElement.blur();
     }
 });
+
+// Share button — copies current page URL to clipboard, shows toast confirmation
+function initShareButtons() {
+    const buttons = document.querySelectorAll('.share-btn');
+    const toast = document.querySelector('.toast');
+    if (!buttons.length) return;
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const originalLabel = button.getAttribute('aria-label');
+                button.setAttribute('aria-label', 'Link copied!');
+
+                if (toast) {
+                    toast.classList.add('toast--visible');
+                }
+
+                setTimeout(() => {
+                    button.setAttribute('aria-label', originalLabel);
+                    if (toast) {
+                        toast.classList.remove('toast--visible');
+                    }
+                }, 2000);
+            }).catch(() => {
+                // Clipboard write failed silently — no fallback needed
+            });
+        });
+    });
+}
 
 // Back to Top button
 function initBackToTop() {

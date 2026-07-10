@@ -16,10 +16,10 @@
     <main id="main-content">
         <h1 class="sr-only">Chris Klein — Home</h1>
 
-        <div class="container">
-            <div class="home-grid">
+        <div class="page-grid">
 
-                <!-- Left column: Profile card -->
+            <!-- Profile Card — full width -->
+            <div class="card-row card-row--full">
                 <article class="card card--profile">
                     <div class="card-image">
                         <img src="assets/images/C-Rex-by-Bob-Nelson-2017.png" alt="" aria-hidden="true" width="300" height="300" loading="lazy">
@@ -41,11 +41,14 @@
                         </div>
                     </div>
                 </article>
+            </div>
 
-                <!-- Centre column: Featured Work -->
-                <div>
-                    <h2 class="section-heading">Featured Work</h2>
+            <!-- Featured Work -->
+            <section aria-labelledby="featured-work-heading">
+                <h2 id="featured-work-heading" class="section-heading">Featured Work</h2>
 
+                <!-- First card — full width -->
+                <div class="card-row card-row--full">
                     <article class="card card--feature">
                         <a href="work.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-image" role="presentation"></div>
@@ -59,7 +62,10 @@
                             <a href="work.html" class="card-cta" aria-label="Card Heading One — view this project">View</a>
                         </div>
                     </article>
+                </div>
 
+                <!-- Second and third cards — side by side -->
+                <div class="card-row card-row--two">
                     <article class="card card--feature">
                         <a href="work.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-image" role="presentation"></div>
@@ -85,14 +91,19 @@
                             <a href="work.html" class="card-cta" aria-label="Card Heading Three — view this project">View</a>
                         </div>
                     </article>
-
-                    <p><a href="work.html">See more of my work</a></p>
                 </div>
 
-                <!-- Right column: Thoughts -->
-                <div>
-                    <h2 class="section-heading">Thoughts</h2>
+                <div class="section-footer">
+                    <a href="work.html" class="btn btn--ghost">See more of my work<span class="sr-only"> in the Work section</span></a>
+                </div>
+            </section>
 
+            <!-- Thoughts -->
+            <section aria-labelledby="thoughts-heading">
+                <h2 id="thoughts-heading" class="section-heading">Thoughts</h2>
+
+                <!-- First thought — full width -->
+                <div class="card-row card-row--full">
                     <article class="card card--thought">
                         <a href="thoughts.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-content">
@@ -106,7 +117,10 @@
                             <a href="thoughts.html" class="card-cta" aria-label="Featured Thought Title — read this thought">Read</a>
                         </div>
                     </article>
+                </div>
 
+                <!-- Second and third thoughts — side by side -->
+                <div class="card-row card-row--two">
                     <article class="card card--thought">
                         <a href="thoughts.html" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-content">
@@ -126,17 +140,20 @@
                             <a href="thoughts.html" class="card-cta" aria-label="Smaller Thought Title Two — read this thought">Read</a>
                         </div>
                     </article>
-
-                    <p><a href="thoughts.html">Read More Thoughts</a></p>
                 </div>
 
-            </div>
+                <div class="section-footer">
+                    <a href="thoughts.html" class="btn btn--ghost">Read more thoughts<span class="sr-only"> in the Thoughts section</span></a>
+                </div>
+            </section>
 
+            <!-- Back to Top -->
             <div class="back-to-top-row">
                 <button class="back-to-top" aria-label="Back to top">
                     <span>Back to Top</span>
                 </button>
             </div>
+
         </div>
     </main>
 
