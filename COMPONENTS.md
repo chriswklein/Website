@@ -683,12 +683,12 @@ The toast notification provides brief confirmation that an action was completed.
 
 ```
 [ .toast ]
-  [ icon ] [ "Link copied!" ]
+  [ icon ] [ "URL copied to clipboard!" ]
 ```
 
 - Container: `<div role="status" aria-live="polite" class="toast">`
 - Icon: `<i class="ti ti-check" aria-hidden="true"></i>`
-- Text: "Link copied!"
+- Text: "URL copied to clipboard!"
 
 ### States
 
@@ -990,13 +990,13 @@ Inherits from Button component tokens plus:
 
 1. User clicks `.share-btn`
 2. `navigator.clipboard.writeText(window.location.href)` copies the URL
-3. Toast notification appears: "Link copied!"
+3. Toast notification appears: "URL copied to clipboard!"
 4. Toast auto-dismisses after 2000ms
 
 ### Accessibility
 
 - `aria-label="Copy link to clipboard"` — more descriptive than "Share" alone
-- After successful copy: `aria-label` temporarily updates to "Link copied!" for 2 seconds, then reverts
+- After successful copy: `aria-label` temporarily updates to "URL copied to clipboard!" for 2 seconds, then reverts
 - Toast uses `aria-live="polite"` to announce to screen readers
 
 ### Responsive Behaviour

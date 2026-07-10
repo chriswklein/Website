@@ -91,7 +91,7 @@ function initShareButtons() {
         button.addEventListener('click', () => {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 const originalLabel = button.getAttribute('aria-label');
-                button.setAttribute('aria-label', 'Link copied!');
+                button.setAttribute('aria-label', 'URL copied to clipboard!');
 
                 if (toast) {
                     toast.classList.add('toast--visible');
