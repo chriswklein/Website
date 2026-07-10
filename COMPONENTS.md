@@ -41,6 +41,7 @@ Rules for Claude Code:
 11. Code Block
 12. Back to Top Button
 13. Share Button
+14. Standard Page Template
 
 ---
 
@@ -1002,6 +1003,83 @@ Inherits from Button component tokens plus:
 ### Responsive Behaviour
 
 Same at all breakpoints.
+
+---
+
+## 14. Standard Page Template
+
+**CSS Class:** `.standard-page`
+**HTML File:** `standard-page.html`
+**Used for:** Individual Work entries and Thoughts entries (blog posts, project writeups)
+
+### Design Intent
+The standard page template provides a consistent reading experience for all long-form content. It is single column, centred, and optimised for sustained reading. The metadata block identifies authorship and allows sharing. The Previous / Next navigation at the bottom keeps users moving through content.
+
+### Anatomy
+
+```
+[ nav.breadcrumb ]
+[ .standard-page-banner — 3:1 ratio, full width ]
+[ p.standard-page-caption ]
+[ h1.standard-page-title — centre aligned ]
+[ .standard-page-meta ]
+  [ .standard-page-meta-author ]
+  [ .standard-page-meta-dates ]
+  [ .standard-page-meta-tags ]
+  [ button.share-btn ]
+[ hr.standard-page-divider — max-width 65ch, centred ]
+[ .standard-page-content ]
+  [ h2 headings, h3 subheadings, p body text ]
+  [ blockquote, code blocks as needed ]
+[ hr.standard-page-divider — max-width 65ch, centred ]
+[ nav.standard-page-nav ]
+  [ a.standard-page-nav-prev.btn.btn--ghost — ← Previous + title ]
+  [ a.standard-page-nav-next.btn.btn--ghost — Next + title → ]
+[ .back-to-top-row > button.back-to-top ]
+```
+
+### Notes
+
+- **Bottom tags and share button removed.** Tags and share are in the top metadata only — not repeated at the bottom.
+- **Gold divider** (`hr.standard-page-divider`) is constrained to `max-width: 65ch` and centred, matching the content width. It appears both above and below the content.
+- **Previous / Next navigation** uses `.btn.btn--ghost` with direction label (`Previous` / `Next`) and article title stacked vertically inside `.standard-page-nav-label`. Arrow characters (`←` / `→`) are `aria-hidden="true"`.
+- Navigation stacks to single column at mobile (≤767px).
+
+### Previous / Next Navigation Anatomy
+
+```html
+<nav class="standard-page-nav" aria-label="Article navigation">
+    <a href="{prev-url}" class="standard-page-nav-prev btn btn--ghost">
+        <span aria-hidden="true">←</span>
+        <span class="standard-page-nav-label">
+            <span class="standard-page-nav-direction">Previous</span>
+            <span class="standard-page-nav-title">{Previous Article Title}</span>
+        </span>
+    </a>
+    <a href="{next-url}" class="standard-page-nav-next btn btn--ghost">
+        <span class="standard-page-nav-label">
+            <span class="standard-page-nav-direction">Next</span>
+            <span class="standard-page-nav-title">{Next Article Title}</span>
+        </span>
+        <span aria-hidden="true">→</span>
+    </a>
+</nav>
+```
+
+### Accessibility
+
+- `<nav aria-label="Article navigation">` distinguishes this nav from the main site nav and breadcrumb
+- Arrow characters are `aria-hidden="true"` — direction labels carry the semantic meaning
+- Each link has a descriptive visible label (direction + title)
+- Toast notification on share uses `aria-live="polite"` and temporary `aria-label` update on the button
+
+### Responsive Behaviour
+
+| Breakpoint | Layout |
+|---|---|
+| Desktop (≥1024px) | Two-column nav, Previous left, Next right |
+| Tablet (768–1023px) | Two-column nav (collapses if titles are long) |
+| Mobile (<768px) | Single column, full-width buttons stacked |
 
 ---
 

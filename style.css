@@ -568,6 +568,14 @@ pre code {
     gap: var(--space-3);
 }
 
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
 /* Block link — covers full card for mouse users, hidden from AT and keyboard */
 .card-block-link {
     position: absolute;
@@ -644,9 +652,11 @@ pre code {
 }
 
 .card--profile .card-image {
-    aspect-ratio: auto;
-    border-radius: var(--card-radius) var(--card-radius) 0 0;
-    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: var(--border-radius-md);
 }
 
 .card--profile .card-image img {
@@ -949,7 +959,11 @@ footer p {
 }
 
 .standard-page-divider {
-    margin: var(--space-8) 0;
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
 }
 
 .standard-page-content {
@@ -983,14 +997,42 @@ footer p {
     max-width: 65ch;
 }
 
-.standard-page-bottom {
+.standard-page-nav {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    margin-top: var(--space-10);
-    padding-top: var(--space-8);
-    border-top: var(--border-width-thin) solid var(--color-divider-accent);
+    justify-content: space-between;
+    gap: var(--space-4);
+    max-width: 65ch;
+    margin: 0 auto;
+    margin-bottom: var(--space-10);
+}
+
+.standard-page-nav-prev {
+    text-align: left;
+}
+
+.standard-page-nav-next {
+    text-align: right;
+    margin-left: auto;
+}
+
+.standard-page-nav-label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.standard-page-nav-direction {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-widest);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+}
+
+.standard-page-nav-title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
 }
 
 /* ================================
@@ -1068,6 +1110,15 @@ footer p {
 
     .standard-page-title {
         font-size: var(--font-size-2xl);
+    }
+
+    .standard-page-nav {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    .standard-page-nav-next {
+        margin-left: 0;
     }
 
     /* Bottom tab bar replaces desktop nav on mobile */
