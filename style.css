@@ -644,10 +644,7 @@ pre code {
     --card-profile-name-weight:     var(--font-weight-bold);
     --card-profile-caption-size:    var(--font-size-xs);
     --card-profile-caption-color:   var(--color-text-secondary);
-    --card-profile-sticky-top:      80px;
 
-    position: sticky;
-    top: var(--card-profile-sticky-top);
     overflow: visible;
 }
 
@@ -1036,6 +1033,130 @@ footer p {
 }
 
 /* ================================
+   DESKTOP (min-width: 1024px) — Profile card wide layout
+================================ */
+@media (min-width: 1024px) {
+    .card--profile {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+    }
+
+    .card--profile .card-image {
+        width: auto;
+        min-width: unset;
+        max-width: unset;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6);
+        gap: var(--space-1);
+        margin: 0;
+        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+        background-color: var(--color-background-surface);
+    }
+
+    .card--profile .card-image img {
+        width: 300px;
+        height: 300px;
+        flex-shrink: 0;
+        object-fit: cover;
+        border-radius: var(--border-radius-lg);
+        display: block;
+    }
+
+    .card--profile .card-image-caption {
+        width: 300px;
+        max-width: 300px;
+        height: 14px;
+        font-size: 10px;
+        line-height: 14px;
+        font-style: italic;
+        font-weight: var(--font-weight-regular);
+        color: var(--color-text-secondary);
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0;
+        margin: 0;
+        align-self: stretch;
+    }
+
+    .card--profile .card-content {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--space-4);
+    }
+}
+
+/* ================================
+   TABLET RANGE (768px–1023px) — Profile card wide layout (narrower image column)
+================================ */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .card--profile {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+    }
+
+    .card--profile .card-image {
+        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
+        height: auto;
+        aspect-ratio: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-4);
+        gap: var(--space-1);
+        margin: 0;
+        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+        background-color: var(--color-background-surface);
+    }
+
+    .card--profile .card-image img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: var(--border-radius-md);
+        display: block;
+    }
+
+    .card--profile .card-image-caption {
+        font-size: var(--font-size-xs);
+        font-style: italic;
+        color: var(--color-text-secondary);
+        text-align: center;
+        line-height: var(--line-height-loose);
+        padding: 0;
+        margin: 0;
+    }
+
+    .card--profile .card-content {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--space-3);
+    }
+}
+
+/* ================================
    REDUCED MOTION
 ================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -1119,6 +1240,11 @@ footer p {
 
     .standard-page-nav-next {
         margin-left: 0;
+    }
+
+    .card--profile .card-image {
+        background-color: transparent;
+        padding-top: var(--space-4);
     }
 
     /* Bottom tab bar replaces desktop nav on mobile */

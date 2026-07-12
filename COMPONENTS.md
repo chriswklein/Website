@@ -424,8 +424,11 @@ The Profile variant does not use the block link / CTA pattern. It has multiple a
 
 #### Responsive Behaviour
 
-- Desktop: sticky, left column, `280px` width enforced by `.home-grid`
-- Mobile: static, full width, appears first in source order
+| Breakpoint | Layout | Image Column | Content Column |
+|---|---|---|---|
+| Desktop 1024px+ | Two column — Auto left, Fill right | 348px auto width, full height, object-fit cover | Fills remaining space, 24px padding, flex column |
+| Tablet 768px–1023px | Two column — Auto left, Fill right | 220px auto width, full height, object-fit cover | Fills remaining space, 20px padding, flex column |
+| Mobile below 768px | Single column stacked | Max 300px, centred, 16px top padding | Full width below image |
 
 ---
 
