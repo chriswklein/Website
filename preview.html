@@ -133,9 +133,9 @@
         .s-acc-pink-text { background-color: var(--color-accent-pink-text); }
 
         /* Component token swatches */
-        .s-tag-primary    { background-color: var(--color-tag-primary); }
-        .s-tag-secondary  { background-color: var(--color-tag-secondary); }
-        .s-tag-text       { background-color: var(--color-tag-text); border: var(--border-width-thin) solid var(--color-border-default); }
+        .s-tag-border      { background-color: var(--color-accent-gold); }
+        .s-tag-border-hover { background-color: var(--color-accent-gold-text); }
+        .s-tag-bg-hover    { background-color: var(--color-background-base); border: var(--border-width-thin) solid var(--color-border-strong); }
         .s-link           { background-color: var(--color-link); }
         .s-link-hover     { background-color: var(--color-link-hover); }
         .s-divider        { background-color: var(--color-divider-accent); }
@@ -677,19 +677,19 @@
                     <h3>Component Tokens</h3>
                     <div class="swatch-grid">
                         <div class="swatch">
-                            <div class="swatch-box s-tag-primary"></div>
-                            <p class="swatch-name">--color-tag-primary</p>
-                            <p class="swatch-hex">→ accent-gold</p>
+                            <div class="swatch-box s-tag-border"></div>
+                            <p class="swatch-name">--tag-border</p>
+                            <p class="swatch-hex">Tag border default · #BA8200</p>
                         </div>
                         <div class="swatch">
-                            <div class="swatch-box s-tag-secondary"></div>
-                            <p class="swatch-name">--color-tag-secondary</p>
-                            <p class="swatch-hex">→ accent-pink</p>
+                            <div class="swatch-box s-tag-border-hover"></div>
+                            <p class="swatch-name">--tag-border-hover</p>
+                            <p class="swatch-hex">Tag border hover · #E5A000</p>
                         </div>
                         <div class="swatch">
-                            <div class="swatch-box s-tag-text"></div>
-                            <p class="swatch-name">--color-tag-text</p>
-                            <p class="swatch-hex">→ text-primary</p>
+                            <div class="swatch-box s-tag-bg-hover"></div>
+                            <p class="swatch-name">--tag-bg-hover</p>
+                            <p class="swatch-hex">Tag background hover · #111111</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-link"></div>
@@ -1037,15 +1037,15 @@
             ================================ -->
             <section class="preview-section" aria-labelledby="s8-heading">
                 <h2 id="s8-heading">Section 8 — Tag Component</h2>
-                <p class="preview-section-desc">Two variants: Primary (gold, .tag) and Secondary (pink, .tag--secondary). Pill shape via --border-radius-full. Static display — not interactive in this version.</p>
+                <p class="preview-section-desc">Single variant. Gold outlined style — transparent background, gold border and text. On hover border and text brighten to light gold, background fills with page base colour. Tags are interactive links navigating to archive.html filtered by tag slug.</p>
 
                 <div class="tag-row">
-                    <span class="tag" aria-hidden="true">User Experience</span>
-                    <span class="tag tag--secondary" aria-hidden="true">Quality Assurance</span>
-                    <span class="tag" aria-hidden="true">Design</span>
-                    <span class="tag tag--secondary" aria-hidden="true">Reflection</span>
-                    <span class="tag" aria-hidden="true">Accessibility</span>
-                    <span class="tag tag--secondary" aria-hidden="true">Career</span>
+                    <a href="#" class="tag">User Experience</a>
+                    <a href="#" class="tag">Quality Assurance</a>
+                    <a href="#" class="tag">Design</a>
+                    <a href="#" class="tag">Reflection</a>
+                    <a href="#" class="tag">Accessibility</a>
+                    <a href="#" class="tag">Career</a>
                 </div>
             </section>
 
@@ -1062,10 +1062,10 @@
                         <div class="card-image" role="presentation"></div>
                         <div class="card-content">
                             <h3><a href="#" class="card-link">Work Card Title<span class="sr-only"> — view this project</span></a></h3>
-                            <p>
-                                <span class="tag" aria-hidden="true">User Experience</span>
-                                <span class="tag tag--secondary" aria-hidden="true">Design</span>
-                            </p>
+                            <div class="card-tags">
+                                <a href="#" class="tag">User Experience</a>
+                                <a href="#" class="tag">Design</a>
+                            </div>
                             <p>A short description of the project and the problem it solved.</p>
                             <button class="card-cta" type="button" inert>Read about this piece of work</button>
                         </div>
@@ -1077,10 +1077,10 @@
                         <div class="card-content">
                             <h3><a href="#" class="card-link">Featured Thought Title<span class="sr-only"> — read this thought</span></a></h3>
                             <p>A short summary of the featured thought, enough to draw someone in.</p>
-                            <p>
-                                <span class="tag" aria-hidden="true">Reflection</span>
-                                <span class="tag tag--secondary" aria-hidden="true">Career</span>
-                            </p>
+                            <div class="card-tags">
+                                <a href="#" class="tag">Reflection</a>
+                                <a href="#" class="tag">Career</a>
+                            </div>
                             <p>Published June 20, 2026 · Christopher Klein</p>
                             <button class="card-cta" type="button" inert>Read this thought</button>
                         </div>
@@ -1093,7 +1093,7 @@
                             <div class="card-image" role="presentation"></div>
                             <div class="card-content">
                                 <h3><a href="#" class="card-link">Compact Thought<span class="sr-only"> — read this thought</span></a></h3>
-                                <p><span class="tag" aria-hidden="true">Design</span></p>
+                                <div class="card-tags"><a href="#" class="tag">Design</a></div>
                                 <p>Published June 14, 2026 · Christopher Klein</p>
                                 <button class="card-cta" type="button" inert>Read this thought</button>
                             </div>

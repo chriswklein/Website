@@ -43,9 +43,6 @@
     --color-accent-pink-text: #FF60BB;
 
     /* ---- Colour: Semantic — Components ---- */
-    --color-tag-primary: var(--color-accent-gold);
-    --color-tag-secondary: var(--color-accent-pink);
-    --color-tag-text: var(--color-text-primary);
     --color-link: var(--color-accent-gold-text);
     --color-link-hover: var(--color-accent-gold);
     --color-divider-accent: var(--color-accent-gold);
@@ -318,45 +315,34 @@ pre code {
    TAGS
 ================================ */
 .tag {
-    --tag-bg-hover:           color-mix(in srgb, var(--color-tag-primary) 80%, black);
-    --tag-secondary-bg-hover: color-mix(in srgb, var(--color-tag-secondary) 80%, black);
-
-    display: inline-block;
-    background-color: var(--color-tag-primary);
-    color: var(--color-tag-text);
-    border-radius: var(--border-radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    line-height: var(--line-height-normal);
     letter-spacing: var(--letter-spacing-wide);
-    padding: var(--space-1) var(--space-3);
-    transition: background-color var(--duration-fast) var(--ease-out);
+    line-height: var(--line-height-normal);
+    border-radius: var(--border-radius-lg);
+    border: var(--border-width-thin) solid var(--color-accent-gold);
+    background: transparent;
+    color: var(--color-accent-gold);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
 }
 
 .tag:hover {
-    background-color: var(--tag-bg-hover);
+    background-color: var(--color-background-base);
+    border-color: var(--color-accent-gold-text);
+    color: var(--color-accent-gold-text);
 }
 
-.tag--secondary {
-    background-color: var(--color-tag-secondary);
-}
-
-.tag--secondary:hover {
-    background-color: var(--tag-secondary-bg-hover);
-}
-
-/* Tag hover — Feature and Thought cards: block-link intercepts pointer events so .tag:hover never
-   fires inside these cards. Use card:hover to trigger tag colour change when the card is hovered. */
-.card--feature:hover .tag,
-.card--thought:hover .tag {
-    background-color: color-mix(in srgb, var(--color-tag-primary) 80%, black);
-    transition: background-color var(--duration-fast) var(--ease-out);
-}
-
-.card--feature:hover .tag--secondary,
-.card--thought:hover .tag--secondary {
-    background-color: color-mix(in srgb, var(--color-tag-secondary) 80%, black);
-    transition: background-color var(--duration-fast) var(--ease-out);
+.tag:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
 }
 
 /* ================================
@@ -578,6 +564,8 @@ pre code {
 }
 
 .card-tags {
+    position: relative;
+    z-index: 3;
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);

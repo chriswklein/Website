@@ -141,43 +141,40 @@ Disabled: add `disabled` attribute on `<button>`. Add `aria-disabled="true"` and
 
 **Figma Component Name:** `Tag`
 **CSS Class:** `.tag`
-**HTML Element:** `<span class="tag">`
+**HTML Element:** `<a href="archive.html?tag={slug}" class="tag">`
 
 ### Design Intent
-Tags communicate category or classification. They are always decorative — they support the content but are not required to understand it. Screen readers can skip them when `aria-hidden="true"` is applied.
+Tags are interactive navigation links. Clicking a tag navigates to `archive.html?tag={slug}` — a filtered view of all Work and Thoughts entries matching that tag. The slug is the tag label converted to lowercase with spaces replaced by hyphens.
+
+Tags sit above `.card-block-link` via `.card-tags { position: relative; z-index: 3 }`. Inside clickable cards, individual tag clicks are independent of the card click — a tag click navigates to the archive, a card click navigates to the entry.
 
 ### When to Use
 - Categorising Work entries and Thoughts entries
 - Displaying skill labels in the Profile card
 
 ### When NOT to Use
-- As interactive filters (that is a different component — Tag Filter, not yet built)
-- As status indicators (use a different pattern)
+- As non-interactive labels — tags are always links in this system
 
 ### Variants
 
-| Variant | Class | Background | Usage |
-|---|---|---|---|
-| Primary | `.tag` | `--color-tag-primary` (gold) | Main category, discipline, primary label |
-| Secondary | `.tag--secondary` | `--color-tag-secondary` (pink) | Secondary category, sub-label |
+Single variant only — `.tag`. No `.tag--secondary`.
 
 ### Component Tokens
 
 ```css
---tag-bg:               var(--color-tag-primary);
---tag-bg-hover:         color-mix(in srgb, var(--color-tag-primary) 80%, black);
---tag-text:             var(--color-tag-text);
+--tag-border:           var(--color-accent-gold);
+--tag-border-hover:     var(--color-accent-gold-text);
+--tag-text:             var(--color-accent-gold);
+--tag-text-hover:       var(--color-accent-gold-text);
+--tag-bg:               transparent;
+--tag-bg-hover:         var(--color-background-base);
 --tag-padding-x:        var(--space-3);
 --tag-padding-y:        var(--space-1);
 --tag-font-size:        var(--font-size-sm);
 --tag-font-weight:      var(--font-weight-medium);
 --tag-letter-spacing:   var(--letter-spacing-wide);
---tag-radius:           var(--border-radius-sm);
---tag-line-height:      var(--line-height-normal);
-
-/* Secondary variant overrides */
---tag-secondary-bg:       var(--color-tag-secondary);
---tag-secondary-bg-hover: color-mix(in srgb, var(--color-tag-secondary) 80%, black);
+--tag-radius:           var(--border-radius-lg);
+--tag-transition:       var(--duration-fast) var(--ease-out);
 ```
 
 ### Anatomy
@@ -186,22 +183,24 @@ Tags communicate category or classification. They are always decorative — they
 [ Label text ]
 ```
 
-- Container: `<span class="tag">` or `<span class="tag tag--secondary">`
+- Container: `<a href="archive.html?tag={slug}" class="tag">{Label}</a>`
 - No icons inside tags
-- No interactive states — tags are not clickable in this version
+- Slug format: tag label converted to lowercase with hyphens — "User Experience" → `user-experience`
 
 ### States
 
-| State | Background | Notes |
-|---|---|---|
-| Default | `--tag-bg` | — |
-| Hover | `--tag-bg-hover` | Decorative — tags are not interactive, but hover is styled for visual polish |
+| State | Background | Border | Text |
+|---|---|---|---|
+| Default | `transparent` | `--color-accent-gold` | `--color-accent-gold` |
+| Hover | `--color-background-base` | `--color-accent-gold-text` | `--color-accent-gold-text` |
+| Focus | `transparent` | `--color-accent-gold` | `--color-accent-gold` + focus ring |
 
 ### Accessibility
 
-- Decorative tags: `aria-hidden="true"` — screen reader skips entirely
-- Meaningful tags (when the category is required context): `aria-label="Category: {label}"`
-- Default for this site: `aria-hidden="true"` on all tags — heading text carries the content meaning
+- Tags are interactive links — no `aria-hidden`
+- Screen reader announces: "{Tag label}. Link."
+- Keyboard: Tab to focus, Enter to navigate to archive
+- Focus ring: `2px solid var(--color-interactive-focus)`, offset `3px`
 
 ### Responsive Behaviour
 
@@ -238,20 +237,6 @@ z-index stack (card has position: relative):
   .card-block-link     z-index: var(--card-block-link-z) ← intercepts mouse clicks on card body
   card content         z-index: auto                     ← visible but not pointer-interactive
 ```
-
-> **Important — Child Element Hover Behaviour**
-> Because `.card-block-link` sits above card content in the z-index stacking context, pointer events on child elements inside Feature and Thought cards are intercepted by the block link. Any hover styles targeting child elements directly — for example `.card--feature .tag:hover` — will never fire because the hit-test never reaches the child.
->
-> **Always use ancestor hover selectors for hover styles inside clickable cards:**
-> ```css
-> /* Correct — card enters hover state via the block link */
-> .card--feature:hover .tag { }
->
-> /* Wrong — tag never receives pointer events */
-> .card--feature .tag:hover { }
-> ```
->
-> This does not affect Profile cards which have no block link — child elements in `.card--profile` receive pointer events directly and can use standard `:hover` selectors.
 
 ### Component Tokens
 
@@ -1115,11 +1100,12 @@ Quick reference mapping every component token to its semantic source.
 | `--card-image-bg` | `--color-background-subtle` | `#2A2A2A` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
-| `--tag-bg` | `--color-tag-primary` → `--color-accent-gold` | `#BA8200` |
-| `--tag-bg-hover` | `color-mix(in srgb, --color-tag-primary 80%, black)` | ~`#945E00` |
-| `--tag-secondary-bg` | `--color-tag-secondary` → `--color-accent-pink` | `#A9407C` |
-| `--tag-secondary-bg-hover` | `color-mix(in srgb, --color-tag-secondary 80%, black)` | ~`#873363` |
-| `--tag-text` | `--color-tag-text` → `--color-text-primary` | `#F5F5F5` |
+| `--tag-border` | `--color-accent-gold` | `#BA8200` |
+| `--tag-border-hover` | `--color-accent-gold-text` | `#E5A000` |
+| `--tag-text` | `--color-accent-gold` | `#BA8200` |
+| `--tag-text-hover` | `--color-accent-gold-text` | `#E5A000` |
+| `--tag-bg` | `transparent` | `transparent` |
+| `--tag-bg-hover` | `--color-background-base` | `#111111` |
 | `--nav-bg` | `--color-background-base` | `#111111` |
 | `--nav-link-color` | `--color-text-secondary` | `#AAAAAA` |
 | `--nav-link-active` | `--color-text-primary` | `#F5F5F5` |

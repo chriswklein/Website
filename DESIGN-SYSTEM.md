@@ -99,9 +99,9 @@ Pink is the secondary accent. Used for secondary tags and blockquote borders.
 
 | CSS Variable | References | Usage |
 |---|---|---|
-| `--color-tag-primary` | `--color-accent-gold` | Primary tag background |
-| `--color-tag-secondary` | `--color-accent-pink` | Secondary tag background |
-| `--color-tag-text` | `--color-text-primary` | Text on all tags — always white |
+| `--tag-border` | `--color-accent-gold` | Tag default border and text colour |
+| `--tag-border-hover` | `--color-accent-gold-text` | Tag hover border and text colour |
+| `--tag-bg-hover` | `--color-background-base` | Tag hover background |
 | `--color-link` | `--color-accent-gold-text` | Hyperlink default colour |
 | `--color-link-hover` | `--color-accent-gold` | Hyperlink hover colour |
 | `--color-divider-accent` | `--color-accent-gold` | hr and section dividers site-wide |
