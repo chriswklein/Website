@@ -462,13 +462,13 @@ The desktop nav is the persistent wayfinding element. Logo/name is centred above
 ### Anatomy
 
 ```
-[ .nav-logo "Chris Klein" centred ]
+[ .nav-logo "Christopher Klein" centred ]
 [ .nav-links centred below logo ]
   [ a Home ] [ a Work ] [ a Thoughts ] [ a About ]
 ```
 
 - Container: `<nav class="site-nav" aria-label="Main navigation">`
-- Logo: `<a href="index.html" class="nav-logo">Chris Klein</a>` — centred, `--nav-logo-size`, `--nav-logo-weight`
+- Logo: `<a href="index.html" class="nav-logo">Christopher Klein</a>` — centred, `--nav-logo-size`, `--nav-logo-weight`
 - Links wrapper: `<ul class="nav-links" role="list">` — centred below logo
 - Each link: `<li><a href="{page}.html">{Label}</a></li>`
 - Active link: `aria-current="page"` set dynamically via `script.js` after nav injection
