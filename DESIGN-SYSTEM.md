@@ -573,59 +573,148 @@ CDN link required in every page `<head>`:
 
 ## 11. Images
 
-### 11.1 Format
+### 11.1 Format Standards
 
 | Format | Use Case |
 |---|---|
 | WebP | All photographs and complex images — primary format |
-| JPG | Fallback for browsers without WebP support |
-| SVG | Icons, illustrations, logos — infinitely scalable |
-| PNG | Transparent graphics where SVG isn't suitable |
+| PNG | Export from Figma only — convert to WebP before adding to project |
+| SVG | Icons, illustrations, logos |
+| JPG | Fallback for browsers without WebP support only |
 
-Never use GIF — use short MP4 video instead for animation.
+Figma does not export WebP natively. Export as PNG from Figma, then convert using Squoosh (squoosh.app) at 80% quality before saving to the project.
 
-### 11.2 Aspect Ratios
+### 11.2 Size Standards
 
-| Ratio | Pixels at 320px wide | Usage |
+**Profile and Portrait:**
+
+| Use Case | Ratio | Display Size | Export Size | Max File Size |
+|---|---|---|---|---|
+| About page photo | 4:5 | 400×500px | 800×1000px | 200kb |
+| Profile card illustration | 1:1 | 300×300px | 600×600px | 150kb |
+
+**Card Images:**
+
+| Use Case | Ratio | Display Size | Export Size | Max File Size |
+|---|---|---|---|---|
+| Feature card thumbnail | 16:9 | 640×360px | 1280×720px | 150kb |
+| Feature card hero (full width) | 16:9 | 1200×675px | 1200×675px | 200kb |
+
+**Standard Page Images:**
+
+| Use Case | Ratio | Display Size | Export Size | Max File Size |
+|---|---|---|---|---|
+| Banner image | 3:1 | 1200×400px | 1200×400px | 200kb |
+| Inline content image | 16:9 | 800×450px | 800×450px | 150kb |
+| Inline content image portrait | 4:5 | 600×750px | 600×750px | 150kb |
+
+**Open Graph:**
+
+| Use Case | Ratio | Size | Max File Size |
+|---|---|---|---|
+| OG image all pages | 1.91:1 | 1200×630px | 200kb |
+
+### 11.3 Folder Structure
+
+```
+assets/
+├── images/
+│   ├── profile/
+│   │   └── christopher-klein.webp
+│   ├── work/
+│   │   └── {work-entry-slug}/
+│   │       ├── {slug}-banner.webp
+│   │       └── {slug}-thumbnail.webp
+│   ├── thoughts/
+│   │   └── {post-slug}/
+│   │       ├── {slug}-banner.webp
+│   │       └── {slug}-inline-01.webp
+│   └── og/
+│       ├── og-home.webp
+│       ├── og-work.webp
+│       ├── og-thoughts.webp
+│       └── og-about.webp
+└── icons/
+    └── (future self-hosted Tabler Icons)
+```
+
+### 11.4 Naming Conventions
+
+All lowercase. Hyphens between words. No underscores, no spaces. Suffix indicates image role.
+
+Pattern: `{subject}-{role}.webp` or `{subject}-{role}-{variant}.webp`
+
+Examples:
+
+| File | What It Is |
+|---|---|
+| `christopher-klein.webp` | About page portrait |
+| `star-engine-banner.webp` | Work entry banner |
+| `star-engine-thumbnail.webp` | Work entry card thumbnail |
+| `this-website-inline-01.webp` | First inline image in an entry |
+| `og-home.webp` | Open Graph image for Home page |
+
+Exception: Illustration files credited to a specific artist retain the artist's original naming convention as attribution. Example: `C-Rex-by-Bob-Nelson-2017.png`.
+
+### 11.5 Srcset Strategy
+
+For images appearing at different sizes across breakpoints, export two versions:
+
+| Version | Suffix | When Served |
 |---|---|---|
-| 16:9 | `320 × 180px` | Work and Thoughts card thumbnails |
-| 3:2 | `320 × 213px` | Editorial photography |
-| 1:1 | `320 × 320px` | Profile images, square grids |
-| 3:1 | `1200 × 400px` | Article and project header banners |
-| 21:9 | `1200 × 514px` | Full-width hero banners |
+| Standard | `-800.webp` | Desktop and tablet |
+| Small | `-400.webp` | Mobile |
 
-### 11.3 Required Attributes
-
-Every `<img>` tag must have all of these:
-
+HTML pattern:
 ```html
-<img
-    src="image.webp"
-    srcset="image-400.webp 400w, image-800.webp 800w, image-1200.webp 1200w"
-    sizes="(max-width: 768px) 100vw, 50vw"
-    alt="Descriptive alt text"
-    loading="lazy"
-    width="800"
-    height="450"
->
+<img src="image-800.webp"
+     srcset="image-400.webp 400w, image-800.webp 800w"
+     sizes="(max-width: 767px) 400px, 800px"
+     alt="Description"
+     width="800"
+     height="450"
+     loading="lazy">
 ```
 
-Decorative images:
-```html
-<img src="decoration.webp" alt="" aria-hidden="true" width="300" height="300">
+Small profile and illustration images that don't change significantly across breakpoints use a single size — no srcset needed.
+
+### 11.6 Figma to WebP Workflow
+
+```
+Figma frame (crop and position image)
+  → Export as PNG at 1×
+    → Squoosh (squoosh.app)
+      → Select WebP, quality 80%
+      → Resize if needed
+      → Confirm under file size limit
+      → Download
+        → Save to correct assets/images/ subfolder
+          → Update img src in HTML
 ```
 
-### 11.4 Performance Budget
+### 11.7 Required img Attributes
+
+Every `<img>` tag must have:
+```html
+<img src="image.webp"
+     alt="Descriptive alt text"
+     width="800"
+     height="450"
+     loading="lazy">
+```
+
+Decorative images: `alt=""` and `aria-hidden="true"`
+
+### 11.8 Performance Budget
 
 | Image Type | Max File Size |
 |---|---|
 | Hero / banner | 200kb |
-| Card thumbnail | 100kb |
+| Card thumbnail | 150kb |
+| Profile / portrait | 200kb |
 | Any single image | 500kb |
 
-Compression tool: Squoosh (free, browser-based, converts to WebP).
-
-### 11.5 CSS Base Rule
+### 11.9 CSS Base Rule
 
 This must be present in `style.css` and applies to all images:
 

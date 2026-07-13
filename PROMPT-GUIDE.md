@@ -86,7 +86,18 @@ Report what changed in each file. If nothing changed in a file, say so explicitl
 
 ---
 
-## Rule 7 — Commit Messages
+## Rule 7 — Server Verification
+
+Do not launch a local server to verify changes unless the task involves:
+- JavaScript behaviour — toast notifications, scroll events, clipboard API, tab bar active state
+- Cross-component interactions — nav injection, footer injection via fetch()
+- First build of a new page
+
+For CSS fixes, token changes, HTML content updates, and documentation — skip server verification. State what changed and what to check. The developer verifies visually via Live Server.
+
+---
+
+## Rule 8 — Commit Messages
 
 When asked to commit changes, use lowercase descriptive messages matching the project standard:
 

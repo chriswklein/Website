@@ -1032,6 +1032,172 @@ footer p {
 }
 
 /* ================================
+   ABOUT PAGE
+================================ */
+.about-hero {
+    text-align: center;
+    padding: var(--space-12) 0 var(--space-8);
+    max-width: 65ch;
+    margin: 0 auto;
+}
+
+.about-hero-title {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+}
+
+.about-hero-subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    max-width: none;
+}
+
+.about-bio {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-10);
+    align-items: start;
+    margin-bottom: var(--space-10);
+}
+
+.about-bio-image img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+    display: block;
+}
+
+.about-bio-content h2 {
+    margin-bottom: var(--space-4);
+}
+
+.about-bio-content p {
+    max-width: none;
+    margin-bottom: var(--space-4);
+    color: var(--color-text-secondary);
+}
+
+.about-section {
+    max-width: 65ch;
+    margin: 0 auto var(--space-12);
+}
+
+.about-section h2 {
+    margin-bottom: var(--space-6);
+    text-align: center;
+}
+
+.about-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.about-history {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.about-history-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-bottom: var(--space-6);
+    border-bottom: var(--border-width-thin) solid var(--color-border-default);
+}
+
+.about-history-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.about-history-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+}
+
+.about-history-role {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.about-history-period {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+.about-history-company {
+    font-size: var(--font-size-sm);
+    color: var(--color-accent-gold-text);
+}
+
+.about-recommendations {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.about-recommendation cite {
+    display: block;
+    margin-top: var(--space-3);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-style: normal;
+}
+
+.about-contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+/* About page responsive */
+@media (max-width: 1023px) {
+    .about-bio {
+        grid-template-columns: 220px 1fr;
+        gap: var(--space-8);
+    }
+
+    .about-hero-title {
+        font-size: var(--font-size-3xl);
+    }
+}
+
+@media (max-width: 767px) {
+    .about-bio {
+        grid-template-columns: 1fr;
+    }
+
+    .about-bio-image img {
+        max-width: 280px;
+        margin: 0 auto;
+    }
+
+    .about-hero-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    .about-history-meta {
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+}
+
+/* ================================
    DESKTOP (min-width: 1024px) — Profile card wide layout
 ================================ */
 @media (min-width: 1024px) {
