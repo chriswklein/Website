@@ -239,6 +239,20 @@ z-index stack (card has position: relative):
   card content         z-index: auto                     ← visible but not pointer-interactive
 ```
 
+> **Important — Child Element Hover Behaviour**
+> Because `.card-block-link` sits above card content in the z-index stacking context, pointer events on child elements inside Feature and Thought cards are intercepted by the block link. Any hover styles targeting child elements directly — for example `.card--feature .tag:hover` — will never fire because the hit-test never reaches the child.
+>
+> **Always use ancestor hover selectors for hover styles inside clickable cards:**
+> ```css
+> /* Correct — card enters hover state via the block link */
+> .card--feature:hover .tag { }
+>
+> /* Wrong — tag never receives pointer events */
+> .card--feature .tag:hover { }
+> ```
+>
+> This does not affect Profile cards which have no block link — child elements in `.card--profile` receive pointer events directly and can use standard `:hover` selectors.
+
 ### Component Tokens
 
 ```css
