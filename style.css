@@ -345,13 +345,18 @@ pre code {
     background-color: var(--tag-secondary-bg-hover);
 }
 
-/* Tag hover inside cards (declared explicitly for specificity, even where block-link intercepts pointer events) */
-.card .tag:hover {
-    background-color: var(--tag-bg-hover);
+/* Tag hover — Feature and Thought cards: block-link intercepts pointer events so .tag:hover never
+   fires inside these cards. Use card:hover to trigger tag colour change when the card is hovered. */
+.card--feature:hover .tag,
+.card--thought:hover .tag {
+    background-color: color-mix(in srgb, var(--color-tag-primary) 80%, black);
+    transition: background-color var(--duration-fast) var(--ease-out);
 }
 
-.card .tag--secondary:hover {
-    background-color: var(--tag-secondary-bg-hover);
+.card--feature:hover .tag--secondary,
+.card--thought:hover .tag--secondary {
+    background-color: color-mix(in srgb, var(--color-tag-secondary) 80%, black);
+    transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 /* ================================
@@ -566,6 +571,10 @@ pre code {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
+}
+
+.card p {
+    max-width: none;
 }
 
 .card-tags {
@@ -965,7 +974,9 @@ footer p {
 
 .standard-page-content {
     max-width: 65ch;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
 }
 
 .standard-page-content h2 {
