@@ -773,7 +773,8 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 
 **Figma Component Name:** `Divider`
 **CSS Class:** `hr` (native element, no custom class needed)
-**HTML Element:** `<hr>`
+**HTML Element:** `<!-- Dot divider -->
+<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>`
 
 ### Design Intent
 Dividers separate major sections of content. Gold accent colour is used site-wide for all dividers — not grey. This is an intentional design decision that gives the site a warm, distinctive feel.
@@ -789,14 +790,49 @@ Dividers separate major sections of content. Gold accent colour is used site-wid
 ### Usage
 
 ```html
-<hr>
+<!-- Dot divider -->
+<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 ```
 
 No additional classes or attributes needed. Styled globally via the `hr` element selector.
 
 ### Accessibility
 
-`<hr>` has an implicit `role="separator"` — screen readers announce it as a thematic break between content sections. No additional ARIA needed.
+`<!-- Dot divider -->
+<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>` has an implicit `role="separator"` — screen readers announce it as a thematic break between content sections. No additional ARIA needed.
+
+---
+
+## 12b. Divider — Dots
+
+**Figma Component Name:** `Divider/Dots`
+**CSS Class:** `.divider--dots`
+**HTML Element:** `<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>`
+
+### Design Intent
+A subtle section separator using three 4px circles in dark gold. Used when a full-width line would be too heavy — lighter content breaks, end of card sections, between biography paragraphs.
+
+### Component Tokens
+
+```css
+--divider-dots-size:    4px
+--divider-dots-gap:     12px
+--divider-dots-color:   var(--color-accent-gold)
+--divider-dots-margin:  var(--space-8) auto
+```
+
+### Anatomy
+
+Three dots generated via `::before`, `<span>`, and `::after` pseudo-elements. No additional child elements needed beyond the single `<span>`.
+
+### States
+
+Static — no interaction states.
+
+### Accessibility
+
+- `role="separator"` — announces as a thematic break
+- `aria-hidden="true"` — the dots are decorative; screen readers announce the role only
 
 ---
 
