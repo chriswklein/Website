@@ -30,6 +30,8 @@ Rules for Claude Code:
 
 1. Button
 2. Tag
+2b. Tag-Chip
+2c. Filter Drawer
 3. Card
 4. Navigation — Desktop
 5. Navigation — Mobile Tab Bar
@@ -162,19 +164,20 @@ Single variant only — `.tag`. No `.tag--secondary`.
 ### Component Tokens
 
 ```css
---tag-border:           var(--color-accent-gold);
---tag-border-hover:     var(--color-accent-gold-text);
---tag-text:             var(--color-accent-gold);
---tag-text-hover:       var(--color-accent-gold-text);
---tag-bg:               transparent;
---tag-bg-hover:         var(--color-background-base);
---tag-padding-x:        var(--space-3);
---tag-padding-y:        var(--space-1);
---tag-font-size:        var(--font-size-sm);
---tag-font-weight:      var(--font-weight-medium);
---tag-letter-spacing:   var(--letter-spacing-wide);
---tag-radius:           var(--border-radius-lg);
---tag-transition:       var(--duration-fast) var(--ease-out);
+--tag-border:                var(--color-accent-gold);
+--tag-border-hover:          var(--color-accent-gold);
+--tag-text:                  var(--color-accent-gold);
+--tag-text-hover:            var(--color-accent-gold);
+--tag-bg:                    transparent;
+--tag-bg-hover:              var(--color-background-subtle);
+--tag-padding-x:             var(--space-3);
+--tag-padding-y:             var(--space-1);
+--tag-font-size:             var(--font-size-sm);
+--tag-font-weight:           var(--font-weight-regular);
+--tag-font-weight-hover:     var(--font-weight-bold);
+--tag-letter-spacing:        var(--letter-spacing-wide);
+--tag-radius:                var(--border-radius-lg);
+--tag-transition:            var(--duration-fast) var(--ease-out);
 ```
 
 ### Anatomy
@@ -189,11 +192,11 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 ### States
 
-| State | Background | Border | Text |
-|---|---|---|---|
-| Default | `transparent` | `--color-accent-gold` | `--color-accent-gold` |
-| Hover | `--color-background-base` | `--color-accent-gold-text` | `--color-accent-gold-text` |
-| Focus | `transparent` | `--color-accent-gold` | `--color-accent-gold` + focus ring |
+| State | Background | Border | Text | Font-Weight |
+|---|---|---|---|---|
+| Default | `transparent` | `--color-accent-gold` | `--color-accent-gold` | `regular` |
+| Hover | `--color-background-subtle` | `--color-accent-gold` | `--color-accent-gold` | `bold` |
+| Focus | `transparent` | `--color-accent-gold` | `--color-accent-gold` + focus ring | `regular` |
 
 ### Accessibility
 
@@ -207,6 +210,208 @@ Single variant only — `.tag`. No `.tag--secondary`.
 - Same size at all breakpoints
 - Tags wrap to new line when they exceed container width — never truncate
 - Gap between tags: `var(--space-2)`
+
+---
+
+## 2b. Tag-Chip
+
+**Figma Component Name:** `Tag-Chip`
+**CSS Class:** `.tag-chip`
+**HTML Element:** `<button class="tag-chip" type="button" data-filter="{slug}" aria-pressed="false">`
+
+### Design Intent
+Tag-Chips are interactive filter controls used in the Archive Header and Filter Drawer. Unlike Tag links (which navigate to a new page), Tag-Chips toggle filter state in place with no page reload. They follow a 4-state model: Default, Hover, Active (filter applied), and Dim (available while another filter is active).
+
+### When to Use
+- Inside `.archive-inline-filters` on desktop
+- Inside `.filter-drawer-body` on tablet/mobile (Filter Drawer)
+
+### When NOT to Use
+- As navigation links — use `.tag` instead
+- As non-interactive labels
+
+### Variants
+
+| Modifier | Purpose |
+|---|---|
+| (none) | Default — filter not applied |
+| `.tag-chip--active` | Filter is currently applied |
+| `.tag-chip--dim` | Available, but another filter is active |
+
+### Component Tokens
+
+```css
+/* Default */
+--chip-border:             var(--border-width-thin) solid var(--color-accent-gold);
+--chip-bg:                 transparent;
+--chip-text:               var(--color-accent-gold);
+--chip-font-weight:        var(--font-weight-regular);
+
+/* Hover */
+--chip-bg-hover:           var(--color-background-subtle);
+--chip-font-weight-hover:  var(--font-weight-bold);
+
+/* Active */
+--chip-border-active:      var(--border-width-medium) solid var(--color-accent-gold-text);
+--chip-bg-active:          var(--color-background-surface);
+--chip-text-active:        var(--color-accent-gold-text);
+--chip-font-weight-active: var(--font-weight-bold);
+
+/* Dim */
+--chip-border-dim:         var(--border-width-thin) solid var(--color-border-strong);
+--chip-bg-dim:             var(--color-background-subtle);
+--chip-text-dim:           var(--color-text-disabled);
+```
+
+### Anatomy
+
+```
+[ Label text ]        ← default / hover / dim
+[ Label text  × ]     ← active (× is .tag-chip-x, aria-hidden)
+```
+
+- Container: `<button class="tag-chip" type="button" data-filter="{slug}" aria-pressed="false">`
+- X indicator (active only): `<span class="tag-chip-x" aria-hidden="true">×</span>` inside button
+- `data-filter`: slug matching `[data-tags]` attribute on archive items
+- `aria-pressed`: `"true"` when active, `"false"` otherwise — managed by `initArchiveFilter()`
+
+### States
+
+| State | Background | Border | Text | Font-Weight |
+|---|---|---|---|---|
+| Default | `transparent` | `thin` + `--color-accent-gold` | `--color-accent-gold` | `regular` |
+| Hover | `--color-background-subtle` | `thin` + `--color-accent-gold` | `--color-accent-gold` | `bold` |
+| Active | `--color-background-surface` | `medium` + `--color-accent-gold-text` | `--color-accent-gold-text` | `bold` |
+| Dim | `--color-background-subtle` | `thin` + `--color-border-strong` | `--color-text-disabled` | `regular` |
+
+### Accessibility
+
+- `type="button"` prevents form submission
+- `aria-pressed` managed by JS — `"true"` when active, `"false"` otherwise
+- When active: `aria-label="Remove {Label} filter"` set by JS to describe the removal action
+- `.tag-chip-x`: `aria-hidden="true"` — decorative; the button's accessible label covers it
+- Focus ring: `2px solid var(--color-interactive-focus)`, offset `3px`
+- Screen reader (default): "{Label}. Button."
+- Screen reader (active): "Remove {Label} filter. Button."
+
+### Responsive Behaviour
+
+- On desktop: appears in `.archive-inline-filters` (inline in archive header)
+- On tablet/mobile: appears in `.filter-drawer-body` (inside Filter Drawer)
+- State syncs between both locations via shared `activeFilters` set in `initArchiveFilter()`
+
+### JavaScript API
+
+Chips are wired by `initArchiveFilter()` in `script.js`. Each chip must have `data-filter` matching the slugs in `[data-tags]` on archive items.
+
+Default chip:
+```html
+<button class="tag-chip" type="button" data-filter="quality-assurance" aria-pressed="false">
+    Quality Assurance
+</button>
+```
+
+Active state (set by JS, not authored manually):
+```html
+<button class="tag-chip tag-chip--active" type="button" data-filter="quality-assurance"
+        aria-pressed="true" aria-label="Remove Quality Assurance filter">
+    Quality Assurance
+    <span class="tag-chip-x" aria-hidden="true">×</span>
+</button>
+```
+
+---
+
+## 2c. Filter Drawer
+
+**CSS Classes:** `.filter-drawer`, `.filter-drawer-trigger`, `.archive-inline-filters`, `.archive-header`, `.archive-header-row`
+**JS Functions:** `initFilterDrawer()`, `initArchiveFilter()`, `trapFocus()` in `script.js`
+
+### Design Intent
+On desktop, tag-chip filters display inline in the archive header. On tablet and mobile, a "Filters" button replaces the inline chips and opens a bottom-sheet drawer. Both the inline chips and the drawer chips share the same JS filter state — toggling a chip in either location updates both.
+
+### When to Use
+- On any page with filterable archive content
+
+### HTML Structure
+
+```html
+<!-- Archive header — always visible -->
+<div class="archive-header">
+    <div class="archive-header-row">
+        <input type="search" class="archive-search-input" id="archive-search"
+               placeholder="Search…" aria-label="Search posts">
+
+        <!-- Desktop chips (hidden on tablet/mobile via CSS) -->
+        <div class="archive-inline-filters">
+            <button class="tag-chip" type="button" data-filter="quality-assurance" aria-pressed="false">Quality Assurance</button>
+        </div>
+
+        <!-- Mobile/tablet trigger (hidden on desktop via CSS) -->
+        <button class="filter-drawer-trigger" type="button"
+                aria-expanded="false"
+                aria-controls="filter-drawer"
+                aria-haspopup="dialog">
+            Filters
+        </button>
+    </div>
+</div>
+
+<!-- Filter drawer — placed outside archive-header; starts hidden -->
+<div class="filter-drawer" id="filter-drawer"
+     role="dialog" aria-modal="true" aria-label="Filter posts"
+     hidden>
+    <div class="filter-drawer-body">
+        <button class="tag-chip" type="button" data-filter="quality-assurance" aria-pressed="false">Quality Assurance</button>
+    </div>
+    <div class="filter-drawer-footer">
+        <button class="filter-drawer-close" type="button">Collapse Filter</button>
+    </div>
+</div>
+```
+
+### Archive Item Markup
+
+Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable` heading:
+
+```html
+<article class="card" data-tags="quality-assurance,user-experience">
+    <div class="card-content">
+        <h2 data-searchable>Post Title</h2>
+    </div>
+</article>
+```
+
+### Behaviour
+
+| Trigger | Result |
+|---|---|
+| Click "Filters" | Drawer slides up; focus moves to first chip |
+| Click "Collapse Filter" | Drawer slides down; focus returns to "Filters" button |
+| Escape key | Same as "Collapse Filter" |
+| Tab / Shift+Tab | Focus trapped inside open drawer |
+| Click chip | Toggles filter; active/dim states update across both inline and drawer chips |
+| Type in search | Debounced 250ms; filters by `data-searchable` text |
+
+### Accessibility
+
+- Trigger: `aria-expanded` updated by JS; `aria-controls="filter-drawer"`; `aria-haspopup="dialog"`
+- Drawer: `role="dialog"` + `aria-modal="true"` + `aria-label="Filter posts"`
+- Focus trap: `trapFocus()` utility active while drawer is open
+- Return focus: trigger receives focus on close
+- Keyboard: Escape closes from any position inside drawer
+
+### Responsive Behaviour
+
+| Breakpoint | Inline chips | Drawer trigger | Drawer |
+|---|---|---|---|
+| Desktop (`≥ 1024px`) | Visible | Hidden | `display: none` via CSS |
+| Tablet/Mobile (`< 1024px`) | Hidden | Visible | Opens on trigger click |
+
+### Dependencies
+
+- `trapFocus()` — reusable utility in `script.js` (also used by future Search Overlay)
+- `.tag-chip` — See `## 2b. Tag-Chip`
 
 ---
 

@@ -474,6 +474,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - Full-width overlay, results grouped by Tags then Posts
 - Implementation: Fuse.js client-side fuzzy search
 - Requires: `aria-live="polite"`, focus trapping
+- Focus trapping: reuse `trapFocus()` utility in script.js (implemented for Filter Drawer)
 - Status: Logged — build when Thoughts content exists
 
 ### Tag and Author Filtering
@@ -489,6 +490,13 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - Footer section on each standard page showing related work or posts
 - Keeps users browsing the site
 - Status: Logged — post launch
+
+### Vertical Action Rail
+- A fixed vertical sidebar of icon-only action buttons (e.g. share, bookmark, react)
+- Sits adjacent to long-form content on standard pages (Thoughts posts)
+- Desktop only — collapses or hides on tablet/mobile
+- Similar pattern to Medium / Substack article sidebars
+- Status: Backlog — design not started
 
 ---
 
