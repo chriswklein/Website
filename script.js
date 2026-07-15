@@ -1,10 +1,10 @@
 // Inject shared components, then wire up behaviour that depends on them
 document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('nav-placeholder', 'nav.html', () => {
+    loadComponent('nav-placeholder', '/nav.html', () => {
         initNav();
         setActiveNavLink();
     });
-    loadComponent('footer-placeholder', 'footer.html');
+    loadComponent('footer-placeholder', '/footer.html');
     setActiveTabBar();
     initBackToTop();
     initShareButtons();
@@ -49,10 +49,11 @@ function initNav() {
 
 // Set aria-current="page" on the injected desktop nav link matching the current page
 function setActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPath = window.location.pathname + window.location.search;
+    const normalizedPath = currentPath === '/' ? '/index.html' : currentPath;
 
     document.querySelectorAll('.nav-links a').forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
+        if (link.getAttribute('href') === normalizedPath) {
             link.setAttribute('aria-current', 'page');
         } else {
             link.removeAttribute('aria-current');
@@ -62,10 +63,11 @@ function setActiveNavLink() {
 
 // Set aria-current="page" on the static tab bar item matching the current page
 function setActiveTabBar() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPath = window.location.pathname + window.location.search;
+    const normalizedPath = currentPath === '/' ? '/index.html' : currentPath;
 
     document.querySelectorAll('.tab-bar-item').forEach(item => {
-        if (item.getAttribute('href') === currentPage) {
+        if (item.getAttribute('href') === normalizedPath) {
             item.setAttribute('aria-current', 'page');
         } else {
             item.removeAttribute('aria-current');
