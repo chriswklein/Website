@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive — Christopher Klein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="nav-placeholder"></div>
+
+    <!-- Archive filter header — full width, not sticky; scrolls away with page -->
+    <div class="archive-sticky-header" id="archive-sticky-header">
+        <div class="container">
+
+            <!-- Title row — count has moved to main content area -->
+            <div class="archive-title-row">
+                <h1 class="archive-title" id="archive-title">Archive</h1>
+            </div>
+
+            <!-- Search · Reset · Sort toggle · Filters trigger (tablet/mobile) -->
+            <div class="archive-controls-row">
+                <label for="archive-search" class="sr-only">Search entries</label>
+                <input type="search" class="archive-search-input" id="archive-search"
+                       placeholder="Search or use filters" autocomplete="off">
+                <button class="archive-reset-btn btn btn--ghost" type="button">Reset</button>
+                <button class="archive-sort-toggle" type="button">Latest ↑</button>
+                <!-- Tablet/mobile only — hidden on desktop via CSS -->
+                <button class="filter-drawer-trigger" type="button"
+                        aria-expanded="false"
+                        aria-controls="filter-drawer"
+                        aria-haspopup="dialog">
+                    Filters
+                </button>
+            </div>
+
+            <!-- Primary type chips: Work / Thoughts -->
+            <div class="archive-primary-chips" role="group" aria-label="Filter by type">
+                <button class="tag-chip" type="button"
+                        data-filter-type="work" data-label="Work"
+                        aria-pressed="false">Work</button>
+                <button class="tag-chip" type="button"
+                        data-filter-type="thoughts" data-label="Thoughts"
+                        aria-pressed="false">Thoughts</button>
+            </div>
+
+            <!-- Active secondary filters row — collapses to zero height when empty (CSS class approach) -->
+            <div class="archive-active-chips" id="archive-active-chips"></div>
+
+            <!-- Desktop secondary tag chips — populated by JS, hidden on tablet/mobile -->
+            <div class="archive-inline-filters" id="archive-secondary-chips"
+                 aria-label="Filter by tag"></div>
+
+        </div>
+    </div>
+
+    <!-- Sentinel watched by IntersectionObserver — when this leaves viewport, show action-rail-trigger -->
+    <div id="archive-header-sentinel" aria-hidden="true"></div>
+
+    <!-- Floating trigger — appears when archive header has scrolled away; opens Filter Drawer on all breakpoints -->
+    <button class="action-rail-trigger" type="button"
+            aria-controls="filter-drawer"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-label="Open filters">
+        Filters
+        <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
+    </button>
+
+    <!-- Filter drawer — all breakpoints via action-rail-trigger; tablet/mobile via filter-drawer-trigger -->
+    <div class="filter-drawer" id="filter-drawer"
+         role="dialog" aria-modal="true" aria-label="Search and filter"
+         hidden>
+        <div class="filter-drawer-body">
+
+            <!-- Full controls — mirrors header so nothing is lost when header scrolls away -->
+            <div class="filter-drawer-controls">
+                <label for="drawer-search" class="sr-only">Search entries</label>
+                <input type="search" class="archive-search-input" id="drawer-search"
+                       placeholder="Search or use filters" autocomplete="off">
+                <div class="filter-drawer-actions">
+                    <button class="archive-reset-btn btn btn--ghost" type="button">Reset</button>
+                    <button class="archive-sort-toggle" type="button">Latest ↑</button>
+                </div>
+            </div>
+
+            <!-- Primary type chips -->
+            <div class="filter-drawer-primary-chips" role="group" aria-label="Filter by type">
+                <button class="tag-chip" type="button"
+                        data-filter-type="work" data-label="Work"
+                        aria-pressed="false">Work</button>
+                <button class="tag-chip" type="button"
+                        data-filter-type="thoughts" data-label="Thoughts"
+                        aria-pressed="false">Thoughts</button>
+            </div>
+
+            <!-- Secondary tag chips populated by initArchive() -->
+            <div id="filter-drawer-chips"></div>
+
+        </div>
+        <div class="filter-drawer-footer">
+            <button class="filter-drawer-close" type="button">Collapse Filter</button>
+        </div>
+    </div>
+
+    <main id="main-content">
+        <div class="container">
+
+            <!-- Entry count replaces the dot divider; aria-live for assistive tech -->
+            <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+
+            <!-- Cards populated by initArchive() -->
+            <div class="archive-results" id="archive-results"></div>
+
+            <hr>
+
+            <div class="archive-load-more-row">
+                <button class="archive-load-more-btn btn btn--ghost" type="button"
+                        aria-label="Load more archive entries" hidden>
+                    Load More
+                </button>
+            </div>
+
+            <div class="back-to-top-row">
+                <button class="back-to-top" aria-label="Back to top">
+                    <span>Back to Top</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <div role="status" aria-live="polite" class="toast">URL copied to clipboard!</div>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="/index.html" class="tab-bar-item">
+            <span>Home</span>
+        </a>
+        <a href="/archive.html?type=work" class="tab-bar-item">
+            <span>Work</span>
+        </a>
+        <a href="/archive.html?type=thoughts" class="tab-bar-item">
+            <span>Thoughts</span>
+        </a>
+        <a href="/about.html" class="tab-bar-item">
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="footer-placeholder"></div>
+    <script src="/script.js"></script>
+</body>
+</html>

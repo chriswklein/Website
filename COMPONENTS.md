@@ -492,6 +492,7 @@ z-index stack (card has position: relative):
   [ .card-tags ]
     [ .tag ] [ .tag--secondary ]
   [ p description ]
+  [ p.card-meta — {date} · {author} ]
   [ a.card-cta ]
 ```
 
@@ -505,6 +506,7 @@ z-index stack (card has position: relative):
             <span class="tag" aria-hidden="true">{Tag}</span>
         </div>
         <p>{Description}</p>
+        <p class="card-meta">{date} · {author}</p>
         <a href="{url}" class="card-cta" aria-label="{Title} — view this project">View</a>
     </div>
 </article>

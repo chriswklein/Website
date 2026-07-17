@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Engine — Work — Christopher Klein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="nav-placeholder"></div>
+
+    <main id="main-content">
+        <div class="standard-page">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="breadcrumb">
+                <ol class="breadcrumb-list">
+                    <li class="breadcrumb-item">
+                        <a href="/archive.html?type=work">Work</a>
+                        <span aria-hidden="true" class="breadcrumb-separator">›</span>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/archive.html?type=work">March 2024</a>
+                        <span aria-hidden="true" class="breadcrumb-separator">›</span>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span aria-current="page">Star Engine</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Banner Image -->
+            <div class="standard-page-banner" role="img" aria-hidden="true"></div>
+            <p class="standard-page-caption">The Star Engine editor interface — tool panels, viewport, and property inspector side by side.</p>
+
+            <!-- Title -->
+            <h1 class="standard-page-title">Star Engine</h1>
+
+            <!-- Metadata — Role / Timeline / Tools -->
+            <div class="standard-page-meta">
+                <div class="standard-page-meta-item">
+                    <span class="card-meta-label">Role</span>
+                    <span>UX Designer / Senior QA Analyst</span>
+                </div>
+                <div class="standard-page-meta-item">
+                    <span class="card-meta-label">Timeline</span>
+                    <span>2019 – 2024</span>
+                </div>
+                <div class="standard-page-meta-item">
+                    <span class="card-meta-label">Tools</span>
+                    <span>Star Engine, JIRA, Confluence</span>
+                </div>
+                <div class="standard-page-meta-tags">
+                    <a href="/archive.html?tag=user-experience" class="tag">User Experience</a>
+                    <a href="/archive.html?tag=tools" class="tag">Tools</a>
+                    <a href="/archive.html?tag=quality-assurance" class="tag">Quality Assurance</a>
+                </div>
+                <button class="share-btn btn btn--ghost"
+                        aria-label="Copy link to clipboard">
+                    Share
+                </button>
+            </div>
+
+            <!-- Body Content -->
+            <div class="standard-page-content">
+                <h2 id="overview">Overview</h2>
+                <p>While working at Cloud Imperium Games, I joined the Core Technology Group to support the development of Star Engine — the in-house game engine that powers Star Citizen. My role spanned both quality assurance and user experience, focused specifically on the tooling that internal developers and artists depended on every day.</p>
+
+                <h2 id="the-problem">The Problem</h2>
+                <p>Developer tools at a studio of CIG's scale accumulate significant friction over time. The teams building Star Citizen were encountering daily workflow bottlenecks in the engine editor — but those pain points were rarely surfaced to the people who could fix them. There was no structured channel for developers to communicate tooling frustrations, and issues were either silently worked around or lost entirely.</p>
+                <p>The result was a growing gap between the tools the team had and the tools the team needed. Productivity suffered. Morale around tooling suffered. And the QA team had no reliable way to prioritise tooling bugs against gameplay bugs.</p>
+
+                <h2 id="process">Process</h2>
+                <p>I designed and implemented a structured feedback collection process that gave developers a direct line to the tooling team. The goal was to surface real friction — not just the loudest complaints — in a way that was actionable for engineering and measurable over time.</p>
+
+                <h3 id="research">Research</h3>
+                <p>I conducted one-on-one sessions with developers across disciplines — gameplay, tech art, animation, and systems — to document the most common friction points in their daily tool usage. The goal was not just a bug list but an understanding of the underlying patterns: which tools caused the most context switching, where documentation was missing, and which issues were reported repeatedly but never resolved.</p>
+
+                <h3 id="iteration">Iteration</h3>
+                <p>The feedback channel went through three iterations before landing on a format that was both easy to submit and useful to act on. Early attempts were too structured and saw low adoption — developers filled one field and left the rest blank. Later versions reduced required fields to a minimum and added quick-reaction options that could be completed in under a minute. Adoption increased significantly in the third version.</p>
+
+                <h2 id="outcome">Outcome</h2>
+                <p>The system produced a measurable reduction in duplicate bug reports for the same tooling issues, and improved the signal-to-noise ratio for the tooling team's backlog. Several pipeline improvements — including a reduction in editor crash frequency during asset saves — were shipped as a direct result of insights gathered through this process.</p>
+            </div>
+
+            <!-- Divider + Previous / Next navigation -->
+            <hr class="standard-page-divider">
+
+            <nav class="standard-page-nav" aria-label="Article navigation">
+                <a href="#" class="standard-page-nav-prev btn btn--ghost">
+                    <span aria-hidden="true">←</span>
+                    <span class="standard-page-nav-label">
+                        <span class="standard-page-nav-direction">Previous</span>
+                        <span class="standard-page-nav-title">Previous Work Title</span>
+                    </span>
+                </a>
+                <a href="#" class="standard-page-nav-next btn btn--ghost">
+                    <span class="standard-page-nav-label">
+                        <span class="standard-page-nav-direction">Next</span>
+                        <span class="standard-page-nav-title">Next Work Title</span>
+                    </span>
+                    <span aria-hidden="true">→</span>
+                </a>
+            </nav>
+
+            <!-- Back to Top -->
+            <div class="back-to-top-row">
+                <button class="back-to-top" aria-label="Back to top">
+                    <span>Back to Top</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast notification for share button -->
+    <div role="status" aria-live="polite" class="toast">URL copied to clipboard!</div>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="/index.html" class="tab-bar-item">
+            <span>Home</span>
+        </a>
+        <a href="/archive.html?type=work" class="tab-bar-item">
+            <span>Work</span>
+        </a>
+        <a href="/archive.html?type=thoughts" class="tab-bar-item">
+            <span>Thoughts</span>
+        </a>
+        <a href="/about.html" class="tab-bar-item">
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="footer-placeholder"></div>
+    <script src="/script.js"></script>
+</body>
+</html>

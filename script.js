@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initShareButtons();
     initFilterDrawer();
     initArchiveFilter();
+    initArchive();
 });
 
 function loadComponent(placeholderId, file, callback) {
@@ -167,25 +168,28 @@ function trapFocus(element) {
     return () => element.removeEventListener('keydown', handler);
 }
 
-// Filter drawer — tablet/mobile only. Desktop shows inline chips.
+// Filter drawer — all triggers via [aria-controls="filter-drawer"].
+// Works for .filter-drawer-trigger (header, tablet/mobile) and .action-rail-trigger (floating, all breakpoints).
 // Depends on: trapFocus()
 function initFilterDrawer() {
-    const trigger = document.querySelector('.filter-drawer-trigger');
     const drawer = document.getElementById('filter-drawer');
-    if (!trigger || !drawer) return;
+    if (!drawer) return;
 
     const closeBtn = drawer.querySelector('.filter-drawer-close');
+    const allTriggers = document.querySelectorAll('[aria-controls="filter-drawer"]');
     let removeTrapFocus = null;
+    let openerBtn = null;
 
-    function openDrawer() {
+    function openDrawer(opener) {
+        openerBtn = opener;
         drawer.removeAttribute('hidden');
         requestAnimationFrame(() => {
             drawer.classList.add('filter-drawer--open');
         });
-        trigger.setAttribute('aria-expanded', 'true');
+        allTriggers.forEach(t => t.setAttribute('aria-expanded', 'true'));
 
         const firstFocusable = drawer.querySelector(
-            'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
         );
         if (firstFocusable) {
             requestAnimationFrame(() => firstFocusable.focus());
@@ -197,7 +201,7 @@ function initFilterDrawer() {
 
     function closeDrawer() {
         drawer.classList.remove('filter-drawer--open');
-        trigger.setAttribute('aria-expanded', 'false');
+        allTriggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
 
         if (removeTrapFocus) {
             removeTrapFocus();
@@ -209,19 +213,18 @@ function initFilterDrawer() {
             drawer.setAttribute('hidden', '');
         }, { once: true });
 
-        trigger.focus();
+        if (openerBtn) openerBtn.focus();
     }
 
     function handleEscape(event) {
         if (event.key === 'Escape') closeDrawer();
     }
 
-    trigger.addEventListener('click', () => {
-        if (drawer.hidden) {
-            openDrawer();
-        } else {
-            closeDrawer();
-        }
+    allTriggers.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (drawer.hidden) openDrawer(btn);
+            else closeDrawer();
+        });
     });
 
     if (closeBtn) {
@@ -236,7 +239,7 @@ function initArchiveFilter() {
     const chipButtons = document.querySelectorAll('.tag-chip[data-filter]');
     const archiveItems = document.querySelectorAll('[data-tags]');
 
-    if (!searchInput && !chipButtons.length) return;
+    if (!chipButtons.length) return;
 
     // Cache each chip's original label before any X spans are injected
     chipButtons.forEach(btn => {
@@ -307,4 +310,356 @@ function initArchiveFilter() {
             applyFilters();
         });
     });
+}
+
+// Archive page — fetch manifest, build chips, filter, sort, paginate, sync URL
+function initArchive() {
+    const resultsEl        = document.getElementById('archive-results');
+    if (!resultsEl) return;
+
+    const titleEl          = document.getElementById('archive-title');
+    const countEl          = document.getElementById('archive-count');
+    const searchInputs     = document.querySelectorAll('.archive-search-input');
+    const railTrigger      = document.querySelector('.action-rail-trigger');
+    const primaryChips     = document.querySelectorAll('[data-filter-type]');
+    const activeChipsEl    = document.getElementById('archive-active-chips');
+    const inlineFiltersEl  = document.getElementById('archive-secondary-chips');
+    const drawerChipsEl    = document.getElementById('filter-drawer-chips');
+    const loadMoreBtn      = document.querySelector('.archive-load-more-btn');
+
+    // State
+    let allEntries         = [];
+    let activeType         = null;
+    const activeSecondary  = new Set();
+    let currentSort        = 'latest';
+    let currentQuery       = '';
+    let visibleCount       = 25;
+    let debounceTimer;
+
+    // Read initial URL params
+    const params = new URLSearchParams(window.location.search);
+    const typeParam = params.get('type');
+    const tagParam  = params.get('tag');
+    if (typeParam === 'work' || typeParam === 'thoughts') activeType = typeParam;
+    if (tagParam) activeSecondary.add(tagParam);
+
+    // Utilities
+    function slugify(str) {
+        return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    function formatDate(iso) {
+        const [y, m, d] = iso.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
+
+    function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Build secondary chips in both inline (desktop) and drawer (tablet/mobile)
+    function buildSecondaryChips(entries) {
+        const seen = new Set();
+        const tags = [];
+        entries.forEach(e => (e.tags || []).forEach(t => {
+            const slug = slugify(t);
+            if (!seen.has(slug)) { seen.add(slug); tags.push({ label: t, slug }); }
+        }));
+
+        [inlineFiltersEl, drawerChipsEl].filter(Boolean).forEach(container => {
+            container.innerHTML = '';
+            tags.forEach(({ label, slug }) => {
+                const btn = document.createElement('button');
+                btn.className = 'tag-chip';
+                btn.type = 'button';
+                btn.dataset.filterTag = slug;
+                btn.dataset.label = label;
+                btn.setAttribute('aria-pressed', 'false');
+                btn.textContent = label;
+                btn.addEventListener('click', () => {
+                    if (activeSecondary.has(slug)) {
+                        activeSecondary.delete(slug);
+                    } else {
+                        activeSecondary.add(slug);
+                    }
+                    visibleCount = 25;
+                    render();
+                });
+                container.appendChild(btn);
+            });
+        });
+    }
+
+    // Filter + sort the full entry list
+    function getFiltered() {
+        return allEntries
+            .filter(e => {
+                if (activeType && e.type !== activeType) return false;
+                if (activeSecondary.size) {
+                    const slugs = (e.tags || []).map(slugify);
+                    if (![...activeSecondary].some(s => slugs.includes(s))) return false;
+                }
+                if (currentQuery) {
+                    const text = [e.title, e.excerpt, ...(e.tags || [])].join(' ').toLowerCase();
+                    if (!text.includes(currentQuery)) return false;
+                }
+                return true;
+            })
+            .sort((a, b) => {
+                const da = new Date(a.date).getTime();
+                const db = new Date(b.date).getTime();
+                return currentSort === 'latest' ? db - da : da - db;
+            });
+    }
+
+    // Build a card article element from a manifest entry
+    function buildCard(entry) {
+        const article = document.createElement('article');
+        article.className = entry.type === 'work' ? 'card card--feature' : 'card card--thought';
+
+        const url        = entry.url || '#';
+        const date       = formatDate(entry.date);
+        const meta       = `${date} · ${escapeHTML(entry.author || '')}`;
+        const ctaText    = entry.type === 'work' ? 'View' : 'Read';
+        const ctaAction  = entry.type === 'work' ? 'view this project' : 'read this thought';
+        const ctaLabel   = `${escapeHTML(entry.title)} — ${ctaAction}`;
+        const tagSlugs   = (entry.tags || []).map(slugify).join(',');
+
+        const tagsHTML = (entry.tags || []).map(t =>
+            `<span class="tag" aria-hidden="true">${escapeHTML(t)}</span>`
+        ).join('');
+
+        const imageHTML = entry.type === 'work'
+            ? `<div class="card-image" role="presentation"></div>`
+            : '';
+
+        article.innerHTML = `
+            <a href="${escapeHTML(url)}" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
+            ${imageHTML}
+            <div class="card-content">
+                <h3 class="card-title" data-searchable>${escapeHTML(entry.title)}</h3>
+                <p>${escapeHTML(entry.excerpt || '')}</p>
+                <div class="card-tags">${tagsHTML}</div>
+                <p class="card-meta">${meta}</p>
+                <a href="${escapeHTML(url)}" class="card-cta"
+                   aria-label="${ctaLabel}">${ctaText}</a>
+            </div>`;
+
+        // Set background image via JS (not an inline HTML style attribute)
+        if (entry.type === 'work' && entry.image) {
+            const imgDiv = article.querySelector('.card-image');
+            if (imgDiv) imgDiv.style.backgroundImage = `url('${entry.image}')`;
+        }
+
+        return article;
+    }
+
+    // Update active secondary chips row (shown above secondary list)
+    function updateActiveChipsRow() {
+        if (!activeChipsEl) return;
+        activeChipsEl.innerHTML = '';
+        activeChipsEl.classList.toggle('is-active', activeSecondary.size > 0);
+        if (!activeSecondary.size) return;
+        activeSecondary.forEach(slug => {
+            const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
+            const label = sourceBtn ? sourceBtn.dataset.label : slug;
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip tag-chip--active';
+            btn.type = 'button';
+            btn.setAttribute('aria-pressed', 'true');
+            btn.setAttribute('aria-label', `Remove ${label} filter`);
+            const x = document.createElement('span');
+            x.className = 'tag-chip-x';
+            x.setAttribute('aria-hidden', 'true');
+            x.textContent = '×';
+            btn.textContent = label;
+            btn.appendChild(x);
+            btn.addEventListener('click', () => {
+                activeSecondary.delete(slug);
+                visibleCount = 25;
+                render();
+            });
+            activeChipsEl.appendChild(btn);
+        });
+    }
+
+    // Main render — updates all UI from current state
+    function render() {
+        const filtered = getFiltered();
+        const slice    = filtered.slice(0, visibleCount);
+
+        // Title
+        if (titleEl) {
+            if (activeType === 'work')         titleEl.textContent = 'Archive / Work';
+            else if (activeType === 'thoughts') titleEl.textContent = 'Archive / Thoughts';
+            else                                titleEl.textContent = 'Archive';
+        }
+
+        // Count (aria-live polite)
+        if (countEl) {
+            countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'Entry' : 'Entries'}`;
+        }
+
+        // Primary type chips
+        primaryChips.forEach(btn => {
+            const type     = btn.dataset.filterType;
+            const isActive = activeType === type;
+            const anyActive = activeType !== null;
+            btn.classList.toggle('tag-chip--active', isActive);
+            btn.classList.toggle('tag-chip--dim', !isActive && anyActive);
+            btn.setAttribute('aria-pressed', String(isActive));
+            const existingX = btn.querySelector('.tag-chip-x');
+            if (isActive && !existingX) {
+                const x = document.createElement('span');
+                x.className = 'tag-chip-x';
+                x.setAttribute('aria-hidden', 'true');
+                x.textContent = '×';
+                btn.appendChild(x);
+            } else if (!isActive && existingX) {
+                existingX.remove();
+            }
+            if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
+            else          btn.removeAttribute('aria-label');
+        });
+
+        // Sort toggle — update text to reflect current sort direction
+        document.querySelectorAll('.archive-sort-toggle').forEach(btn => {
+            btn.textContent = currentSort === 'latest' ? 'Latest ↑' : 'Earliest ↓';
+        });
+
+        // Update action-rail-trigger badge with active filter count
+        if (railTrigger) {
+            const badgeEl = railTrigger.querySelector('.action-rail-badge');
+            if (badgeEl) {
+                const filterCount = (activeType ? 1 : 0) + activeSecondary.size;
+                badgeEl.textContent = filterCount;
+                badgeEl.hidden = filterCount === 0;
+            }
+        }
+
+        // Secondary tag chips (inline + drawer)
+        document.querySelectorAll('[data-filter-tag]').forEach(btn => {
+            const slug     = btn.dataset.filterTag;
+            const isActive = activeSecondary.has(slug);
+            const anyActive = activeSecondary.size > 0;
+            btn.classList.toggle('tag-chip--active', isActive);
+            btn.classList.toggle('tag-chip--dim', !isActive && anyActive);
+            btn.setAttribute('aria-pressed', String(isActive));
+            const existingX = btn.querySelector('.tag-chip-x');
+            if (isActive && !existingX) {
+                const x = document.createElement('span');
+                x.className = 'tag-chip-x';
+                x.setAttribute('aria-hidden', 'true');
+                x.textContent = '×';
+                btn.appendChild(x);
+            } else if (!isActive && existingX) {
+                existingX.remove();
+            }
+            if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
+            else          btn.removeAttribute('aria-label');
+        });
+
+        updateActiveChipsRow();
+
+        // Results
+        resultsEl.innerHTML = '';
+        if (slice.length === 0) {
+            const msg = document.createElement('p');
+            msg.className = 'archive-empty';
+            msg.textContent = 'No entries match the current filters.';
+            resultsEl.appendChild(msg);
+        } else {
+            slice.forEach(e => resultsEl.appendChild(buildCard(e)));
+        }
+
+        // Load More
+        if (loadMoreBtn) loadMoreBtn.hidden = filtered.length <= visibleCount;
+    }
+
+    // Wire primary type chips (exclusive toggle — replace, not stack)
+    primaryChips.forEach(btn => {
+        btn.dataset.label = btn.textContent.trim();
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.filterType;
+            activeType = activeType === type ? null : type;
+            visibleCount = 25;
+            const url = new URL(window.location.href);
+            if (activeType) url.searchParams.set('type', activeType);
+            else            url.searchParams.delete('type');
+            window.history.replaceState({}, '', url.toString());
+            render();
+        });
+    });
+
+    // Wire sort toggles — single button flips between latest and earliest
+    document.querySelectorAll('.archive-sort-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentSort = currentSort === 'latest' ? 'earliest' : 'latest';
+            visibleCount = 25;
+            render();
+        });
+    });
+
+    // Wire search inputs (header + drawer), debounced 250ms, synced
+    searchInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                currentQuery = input.value.trim().toLowerCase();
+                searchInputs.forEach(other => {
+                    if (other !== input) other.value = input.value;
+                });
+                visibleCount = 25;
+                render();
+            }, 250);
+        });
+    });
+
+    // Wire reset buttons (header + drawer)
+    document.querySelectorAll('.archive-reset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            activeType = null;
+            activeSecondary.clear();
+            currentQuery = '';
+            currentSort = 'latest';
+            visibleCount = 25;
+            searchInputs.forEach(input => { input.value = ''; });
+            const url = new URL(window.location.href);
+            url.searchParams.delete('type');
+            window.history.replaceState({}, '', url.toString());
+            render();
+        });
+    });
+
+    // Wire Load More
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            visibleCount += 25;
+            render();
+        });
+    }
+
+    // IntersectionObserver — show action-rail-trigger when archive header has scrolled away
+    const sentinel = document.getElementById('archive-header-sentinel');
+    if (sentinel && railTrigger) {
+        const headerObserver = new IntersectionObserver(entries => {
+            const headerInView = entries[0].isIntersecting;
+            railTrigger.classList.toggle('action-rail-trigger--visible', !headerInView);
+        }, { threshold: 0 });
+        headerObserver.observe(sentinel);
+    }
+
+    // Fetch manifest and initialise
+    fetch('/data/archive-entries.json')
+        .then(r => r.json())
+        .then(entries => {
+            allEntries = entries;
+            buildSecondaryChips(entries);
+            render();
+        })
+        .catch(err => console.error('Error loading archive-entries.json:', err));
 }

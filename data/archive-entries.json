@@ -1,0 +1,26 @@
+[
+  {
+    "id": "star-engine",
+    "type": "work",
+    "author": "Christopher Klein",
+    "title": "Star Engine",
+    "excerpt": "At Cloud Imperium Games working within the Core Technology Group on the Editor and its tools, I created an avenue for developers to speak their minds so that my team and I could translate grievances into bug fixes and deliver improvements to their pipeline tools.",
+    "tags": ["User Experience", "Tools", "Quality Assurance"],
+    "date": "2024-03-01",
+    "url": "/work/star-engine.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
+    "id": "fidgets-and-widgets",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "Fidgets and Widgets",
+    "excerpt": "You like thing-a-ma-bobs? I've got 4. A look at the physical and digital objects that quietly occupy my hands and attention while I'm thinking.",
+    "tags": ["Tools", "Design"],
+    "date": "2026-06-20",
+    "url": "/thoughts/fidgets-and-widgets.html",
+    "image": "/assets/images/thoughts/fidgets-and-widgets/fidgets-and-widgets-banner.webp",
+    "imageAlt": "A small collection of everyday objects arranged on a wooden surface — a brass bolt, a pocket notebook, a stylus, and a desk timer"
+  }
+]
