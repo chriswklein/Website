@@ -12,6 +12,42 @@
     "imageAlt": ""
   },
   {
+    "id": "test-framework",
+    "type": "work",
+    "author": "Christopher Klein",
+    "title": "Test Framework",
+    "excerpt": "Building a lightweight manual test framework for a game studio's QA pipeline — structured test cases, triage criteria, and a shared vocabulary that reduced bug resolution time across three teams.",
+    "tags": ["Quality Assurance", "Process", "Tools"],
+    "date": "2025-01-15",
+    "url": "/work/test-framework.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
+    "id": "design-audit",
+    "type": "work",
+    "author": "Christopher Klein",
+    "title": "Design Audit",
+    "excerpt": "A systematic review of an enterprise product's interface — cataloguing inconsistencies, accessibility gaps, and friction points across 40+ screens to build a prioritised remediation backlog.",
+    "tags": ["User Experience", "Research", "Accessibility"],
+    "date": "2023-09-01",
+    "url": "/work/design-audit.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
+    "id": "onboarding-redesign",
+    "type": "work",
+    "author": "Christopher Klein",
+    "title": "Onboarding Redesign",
+    "excerpt": "Redesigning the first-run experience for an internal tool used by 200+ artists — from discovery research through prototype validation across five iterative test rounds.",
+    "tags": ["User Experience", "Prototyping", "Collaboration"],
+    "date": "2022-06-01",
+    "url": "/work/onboarding-redesign.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
     "id": "fidgets-and-widgets",
     "type": "thoughts",
     "author": "Christopher Klein",
@@ -22,5 +58,29 @@
     "url": "/thoughts/fidgets-and-widgets.html",
     "image": "/assets/images/thoughts/fidgets-and-widgets/fidgets-and-widgets-banner.webp",
     "imageAlt": "A small collection of everyday objects arranged on a wooden surface — a brass bolt, a pocket notebook, a stylus, and a desk timer"
+  },
+  {
+    "id": "on-asking-better-questions",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "On Asking Better Questions",
+    "excerpt": "A good question is harder to write than a good answer. Notes on how I think about framing questions — in user research, in writing, and in conversation — and why the framing almost always matters more than the answer.",
+    "tags": ["Research", "Writing", "Reflection"],
+    "date": "2026-04-10",
+    "url": "/thoughts/on-asking-better-questions.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
+    "id": "how-i-take-notes",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "How I Take Notes",
+    "excerpt": "Not a productivity guide. A description of what I actually do: the tools I use, the habits I've kept, and the ones I've abandoned. Mostly an exercise in noticing what works and not pretending it's a system.",
+    "tags": ["Tools", "Systems", "Writing"],
+    "date": "2025-11-05",
+    "url": "/thoughts/how-i-take-notes.html",
+    "image": "",
+    "imageAlt": ""
   }
 ]

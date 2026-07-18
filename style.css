@@ -1419,19 +1419,6 @@ footer p {
     border-color: var(--color-interactive-focus);
 }
 
-.archive-inline-filters {
-    display: none;
-    align-items: center;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-}
-
-@media (min-width: 1024px) {
-    .archive-inline-filters {
-        display: flex;
-    }
-}
-
 .filter-drawer-trigger {
     display: inline-flex;
     align-items: center;
@@ -1457,8 +1444,17 @@ footer p {
     outline-offset: 3px;
 }
 
+/* Desktop inline filters container — hidden on tablet/mobile;
+   visible on desktop only while header is uncondensed (sentinel in viewport) */
+.archive-inline-filters {
+    display: none;
+}
+
 @media (min-width: 1024px) {
-    .filter-drawer-trigger {
+    .archive-sticky-header:not(.is-condensed) .archive-inline-filters {
+        display: block;
+    }
+    .archive-sticky-header:not(.is-condensed) .filter-drawer-trigger {
         display: none;
     }
 }
@@ -1493,52 +1489,15 @@ footer p {
     gap: var(--space-0);
 }
 
-.filter-drawer-footer {
-    display: flex;
-    justify-content: center;
-    padding: var(--space-4);
-    border-top: var(--border-width-thin) solid var(--color-border-default);
-    flex-shrink: 0;
-}
-
-.filter-drawer-close {
-    padding: var(--space-2) var(--space-6);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: var(--letter-spacing-wide);
-    color: var(--color-text-primary);
-    background: transparent;
-    border: var(--border-width-thin) solid var(--color-border-default);
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: border-color var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
-}
-
-.filter-drawer-close:hover {
-    border-color: var(--color-border-strong);
-    color: var(--color-accent-gold);
-}
-
-.filter-drawer-close:focus-visible {
-    outline: var(--border-width-medium) solid var(--color-interactive-focus);
-    outline-offset: 3px;
-}
-
-/* Filter drawer — full controls section */
+/* Filter drawer — Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) */
 .filter-drawer-controls {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
     padding-bottom: var(--space-4);
     border-bottom: var(--border-width-thin) solid var(--color-border-default);
     margin-bottom: var(--space-4);
-}
-
-.filter-drawer-actions {
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
 }
 
 .filter-drawer-primary-chips {
@@ -1557,14 +1516,25 @@ footer p {
     align-content: flex-start;
 }
 
-/* Floating action rail trigger */
-.action-rail-trigger {
+/* Floating action rail group — fixed position container for trigger + clear button */
+.action-rail-group {
     position: fixed;
-    right: var(--space-6);
+    right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
     top: 50%;
     transform: translateY(-50%);
     z-index: 260;
     display: none;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.action-rail-group--visible {
+    display: flex;
+}
+
+/* Floating action rail trigger — visual styles; position inherited from group */
+.action-rail-trigger {
+    display: inline-flex;
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
@@ -1581,10 +1551,6 @@ footer p {
     box-shadow: var(--elevation-md);
     transition: border-color var(--duration-fast) var(--ease-out),
                 color var(--duration-fast) var(--ease-out);
-}
-
-.action-rail-trigger--visible {
-    display: inline-flex;
 }
 
 .action-rail-trigger:hover {
@@ -1612,10 +1578,20 @@ footer p {
     line-height: 1;
 }
 
-@media (min-width: 1024px) {
-    .filter-drawer {
-        display: none;
-    }
+/* Scrim — semi-transparent backdrop behind drawer */
+.archive-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 249;
+    background-color: var(--color-background-base);
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+    pointer-events: none;
+}
+
+.archive-scrim--open {
+    opacity: 0.7;
+    pointer-events: auto;
 }
 
 /* ================================
@@ -1639,11 +1615,19 @@ footer p {
     color: var(--color-text-primary);
 }
 
+/* Sort toggle (left) + entry count (right) — between archive header and results grid */
+.archive-sort-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+}
+
 .archive-count {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
     line-height: var(--line-height-normal);
-    padding: var(--space-4) 0 var(--space-2);
     max-width: none;
 }
 
@@ -1655,10 +1639,22 @@ footer p {
     margin-bottom: var(--space-4);
 }
 
-.archive-reset-btn {
+.archive-clear-btn {
     width: auto;
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.archive-clear-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Per-chip entry count badge — shown after chip label, aria-hidden */
+.chip-count {
+    font-size: var(--font-size-xs);
+    margin-left: var(--space-1);
+    opacity: 0.75;
 }
 
 .archive-sort-toggle {
@@ -1705,6 +1701,13 @@ footer p {
 
 .archive-active-chips.is-active {
     display: flex;
+}
+
+#archive-secondary-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-content: flex-start;
 }
 
 .archive-results {

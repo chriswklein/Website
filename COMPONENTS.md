@@ -324,11 +324,21 @@ Active state (set by JS, not authored manually):
 
 ## 2c. Filter Drawer
 
-**CSS Classes:** `.filter-drawer`, `.filter-drawer-trigger`, `.archive-inline-filters`, `.archive-header`, `.archive-header-row`
-**JS Functions:** `initFilterDrawer()`, `initArchiveFilter()`, `trapFocus()` in `script.js`
+**CSS Classes:** `.filter-drawer`, `.filter-drawer-trigger`, `.action-rail-group`, `.action-rail-trigger`, `.archive-scrim`, `.archive-inline-filters`, `.archive-sort-count-row`, `.chip-count`
+**JS Functions:** `initFilterDrawer()`, `initArchive()`, `trapFocus()` in `script.js`
 
 ### Design Intent
-On desktop, tag-chip filters display inline in the archive header. On tablet and mobile, a "Filters" button replaces the inline chips and opens a bottom-sheet drawer. Both the inline chips and the drawer chips share the same JS filter state — toggling a chip in either location updates both.
+Two distinct filter access modes exist, governed by a single IntersectionObserver on `#archive-header-sentinel`:
+
+**Desktop — header uncondensed (sentinel in viewport, top of page):** Row 1 of the header shows a Clear button (left) and search input (fills remaining width) — no sort toggle, no Filters trigger at this position. Below that, Row 2 shows primary type chips (Work, Thoughts) with entry-count badges; Row 3 shows secondary tag chips with entry-count badges.
+
+**Desktop — header condensed (sentinel left viewport, user scrolled):** The inline chips section is hidden. The floating action rail group (`.action-rail-group`) appears at the right viewport edge with the floating "Filters" trigger. The header has scrolled away, so the inline area is no longer in view regardless.
+
+**Tablet / Mobile — all scroll positions:** The `.archive-inline-filters` container is always hidden. The header row shows Clear + search + Filters trigger. The drawer is the exclusive filter mechanism at these breakpoints.
+
+**All breakpoints — between header and results:** A `.archive-sort-count-row` shows the sort toggle (left) and entry count (right), positioned between the archive header and the results grid. This row is visible at all breakpoints.
+
+The drawer is a unified bottom-sheet. Its first row mirrors the header controls: Clear (left), search input, Filters/Close trigger (right). Rows 2 and 3 show primary and secondary chips with count badges. Closing happens via the drawer's own trigger (labelled "Close" when open), the scrim, or Escape.
 
 ### When to Use
 - On any page with filterable archive content
@@ -336,39 +346,102 @@ On desktop, tag-chip filters display inline in the archive header. On tablet and
 ### HTML Structure
 
 ```html
-<!-- Archive header — always visible -->
-<div class="archive-header">
-    <div class="archive-header-row">
-        <input type="search" class="archive-search-input" id="archive-search"
-               placeholder="Search…" aria-label="Search posts">
+<!-- Archive header -->
+<div class="archive-sticky-header" id="archive-sticky-header">
+    <div class="container">
 
-        <!-- Desktop chips (hidden on tablet/mobile via CSS) -->
-        <div class="archive-inline-filters">
-            <button class="tag-chip" type="button" data-filter="quality-assurance" aria-pressed="false">Quality Assurance</button>
+        <!-- Controls row:
+             Desktop (uncondensed): Clear (left) + Search (fills width). Filters trigger hidden via CSS.
+             Mobile/tablet: Clear + Search + Filters trigger (always visible). -->
+        <div class="archive-controls-row">
+            <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
+            <label for="archive-search" class="sr-only">Search entries</label>
+            <input type="search" class="archive-search-input" id="archive-search"
+                   placeholder="Search or use filters" autocomplete="off">
+            <button class="filter-drawer-trigger" type="button"
+                    aria-expanded="false"
+                    aria-controls="filter-drawer"
+                    aria-haspopup="dialog">
+                <span class="trigger-label">Filters</span>
+                <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
+            </button>
         </div>
 
-        <!-- Mobile/tablet trigger (hidden on desktop via CSS) -->
-        <button class="filter-drawer-trigger" type="button"
-                aria-expanded="false"
-                aria-controls="filter-drawer"
-                aria-haspopup="dialog">
-            Filters
-        </button>
+        <!-- Inline chips — desktop only, uncondensed state only -->
+        <div class="archive-inline-filters" id="archive-inline-filters">
+            <div class="archive-primary-chips" role="group" aria-label="Filter by type">
+                <button class="tag-chip" type="button" data-filter-type="work" aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
+                <button class="tag-chip" type="button" data-filter-type="thoughts" aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+            </div>
+            <div class="archive-active-chips" id="archive-active-chips"></div>
+            <div id="archive-secondary-chips" aria-label="Filter by tag"></div>
+        </div>
+
     </div>
 </div>
 
-<!-- Filter drawer — placed outside archive-header; starts hidden -->
+<!-- Sentinel — IntersectionObserver fires when this leaves/re-enters viewport -->
+<div id="archive-header-sentinel" aria-hidden="true"></div>
+
+<!-- Floating action rail group — visible only when sentinel has left viewport -->
+<div class="action-rail-group" id="action-rail-group">
+    <button class="action-rail-trigger" type="button"
+            aria-controls="filter-drawer"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-label="Open filters">
+        <span class="trigger-label">Filters</span>
+        <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
+    </button>
+</div>
+
+<!-- Scrim — semi-transparent backdrop; click closes drawer -->
+<div class="archive-scrim" id="archive-scrim" aria-hidden="true" hidden></div>
+
+<!-- Filter drawer — unified bottom sheet; starts hidden -->
 <div class="filter-drawer" id="filter-drawer"
-     role="dialog" aria-modal="true" aria-label="Filter posts"
+     role="dialog" aria-modal="true" aria-label="Search and filter"
      hidden>
     <div class="filter-drawer-body">
-        <button class="tag-chip" type="button" data-filter="quality-assurance" aria-pressed="false">Quality Assurance</button>
-    </div>
-    <div class="filter-drawer-footer">
-        <button class="filter-drawer-close" type="button">Collapse Filter</button>
+
+        <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) -->
+        <div class="filter-drawer-controls">
+            <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
+            <label for="drawer-search" class="sr-only">Search entries</label>
+            <input type="search" class="archive-search-input" id="drawer-search"
+                   placeholder="Search or use filters" autocomplete="off">
+            <button class="filter-drawer-trigger" type="button"
+                    aria-expanded="false"
+                    aria-controls="filter-drawer"
+                    aria-haspopup="dialog">
+                <span class="trigger-label">Filters</span>
+            </button>
+        </div>
+
+        <!-- Row 2: Primary type chips with count badges -->
+        <div class="filter-drawer-primary-chips" role="group" aria-label="Filter by type">
+            <button class="tag-chip" type="button" data-filter-type="work" aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
+            <button class="tag-chip" type="button" data-filter-type="thoughts" aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+        </div>
+
+        <!-- Row 3: Secondary tag chips populated by initArchive() -->
+        <div id="filter-drawer-chips"></div>
+
     </div>
 </div>
+
+<!-- Sort toggle (left) + entry count (right) — between archive header and results grid -->
+<div class="archive-sort-count-row">
+    <button class="archive-sort-toggle" type="button">Latest ↑</button>
+    <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+</div>
 ```
+
+**Notes:**
+- The `.trigger-label` span isolates the dynamic text ("Filters" ↔ "Close") from the badge span so JS can update the label without disturbing other content.
+- `.archive-sticky-header` receives `.is-condensed` from the IntersectionObserver callback. CSS uses `:not(.is-condensed)` to show inline chips and hide the Filters trigger on desktop.
+- Both `.filter-drawer-trigger` (header) and `.action-rail-trigger` (floating) carry an `.action-rail-badge` span. Both badges are updated from the same `filterCount` in the same `render()` pass, ensuring badge parity at all times.
+- Chip-count badges (`.chip-count`) on each chip show how many entries match that filter given the current query and other active filters, updating on every render.
 
 ### Archive Item Markup
 
@@ -386,32 +459,58 @@ Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable
 
 | Trigger | Result |
 |---|---|
-| Click "Filters" | Drawer slides up; focus moves to first chip |
-| Click "Collapse Filter" | Drawer slides down; focus returns to "Filters" button |
-| Escape key | Same as "Collapse Filter" |
-| Tab / Shift+Tab | Focus trapped inside open drawer |
-| Click chip | Toggles filter; active/dim states update across both inline and drawer chips |
-| Type in search | Debounced 250ms; filters by `data-searchable` text |
+| Click "Filters" (header/rail trigger, closed) | Drawer slides up; scrim fades in; trigger label becomes "Close"; focus moves to first focusable element in drawer; all page content outside drawer becomes `inert` |
+| Click "Close" (any trigger, open) | Drawer slides down; scrim fades out; `inert` removed from page content; focus returns to the trigger that opened the drawer |
+| Click scrim | Same as clicking "Close" |
+| Escape key | Drawer closes; same cleanup as "Close" |
+| Tab / Shift+Tab with drawer open | Focus stays within drawer — browser enforces this via `inert` on all outside elements; `trapFocus()` provides belt-and-suspenders wrapping |
+| Click inline chip (desktop, uncondensed) | Toggles filter; state syncs across inline chips and drawer chips |
+| Click chip in drawer | Toggles filter; state syncs across drawer chips and inline chips |
+| Badge count | Updates simultaneously on `.filter-drawer-trigger` and `.action-rail-trigger` from same `filterCount` on each render pass |
+| Clear button (enabled) | Clears all active type and secondary tag filters; search text cleared; sort reset to Latest; button self-disables |
+| Clear button (disabled) | `disabled` attribute set when `filterCount === 0`; search text alone does not count as a filter |
+| Sort toggle | Toggles Latest ↑ / Earliest ↓; located in `.archive-sort-count-row` outside the header and drawer |
+| Chip count badge | Each chip shows entry count matching that filter within current query and other active filters; updates on every render |
+| Type in search | Debounced 250ms; filters by `data-searchable` text; updates chip counts |
 
 ### Accessibility
 
-- Trigger: `aria-expanded` updated by JS; `aria-controls="filter-drawer"`; `aria-haspopup="dialog"`
-- Drawer: `role="dialog"` + `aria-modal="true"` + `aria-label="Filter posts"`
-- Focus trap: `trapFocus()` utility active while drawer is open
-- Return focus: trigger receives focus on close
+- All trigger buttons: `aria-expanded` updated by JS; `aria-controls="filter-drawer"`; `aria-haspopup="dialog"`
+- `.action-rail-trigger`: `aria-label` updated dynamically ("Open filters" / "Close filters")
+- Clear button: `disabled` attribute toggled by JS — screen readers announce "dimmed" state; removed from tab order when disabled
+- Scrim: `aria-hidden="true"` — decorative; close affordance is the trigger button and Escape key
+- Drawer: `role="dialog"` + `aria-modal="true"` + `aria-label="Search and filter"`
+- Focus containment: `inert` applied to all page content outside the drawer while open (prevents Tab from reaching duplicate controls in header, main content, nav, or footer); `trapFocus()` wraps focus at drawer boundary as belt-and-suspenders
+- Return focus: whichever trigger opened the drawer receives focus on close; `inert` removed before focus return
+- Chip count badges: `.chip-count` spans are `aria-hidden="true"` — counts are supplementary; button labels carry the semantic meaning
 - Keyboard: Escape closes from any position inside drawer
 
 ### Responsive Behaviour
 
-| Breakpoint | Inline chips | Drawer trigger | Drawer |
-|---|---|---|---|
-| Desktop (`≥ 1024px`) | Visible | Hidden | `display: none` via CSS |
-| Tablet/Mobile (`< 1024px`) | Hidden | Visible | Opens on trigger click |
+| Context | Inline chips (`.archive-inline-filters`) | Header trigger (`.filter-drawer-trigger`) | Rail group (`.action-rail-group`) | Sort + count row | Drawer access |
+|---|---|---|---|---|---|
+| Desktop — uncondensed (top of page) | Visible (with chip counts) | Hidden | Hidden | Visible (always) | Not available — inline chips used |
+| Desktop — condensed (scrolled) | Hidden | Hidden (header scrolled away) | Visible | Visible (always) | Via rail trigger |
+| Tablet / Mobile — any scroll position | Hidden | Visible (with badge) | Hidden | Visible (always) | Via header trigger |
+
+The transition between "uncondensed" and "condensed" on desktop is governed by the IntersectionObserver on `#archive-header-sentinel`. While the filter drawer is open, `.is-condensed` state on `.archive-sticky-header` is locked — the observer skips state changes if `.filter-drawer--open` is present in the DOM. After the drawer closes, condensed state is re-evaluated on the user's next scroll action.
+
+### Z-Index Layering
+
+| Layer | z-index |
+|---|---|
+| Tab bar | 200 |
+| Scrim (`.archive-scrim`) | 249 |
+| Drawer (`.filter-drawer`) | 250 |
+| Rail group (`.action-rail-group`) | 260 |
+| Toast | 300 |
 
 ### Dependencies
 
-- `trapFocus()` — reusable utility in `script.js` (also used by future Search Overlay)
+- `trapFocus()` — reusable utility in `script.js`
 - `.tag-chip` — See `## 2b. Tag-Chip`
+- `IntersectionObserver` on `#archive-header-sentinel` — toggles `.action-rail-group--visible` on the rail group and `.is-condensed` on `.archive-sticky-header`; guarded against drawer-open state; scroll re-arm fires after drawer close
+- `inert` HTML attribute — applied to all page content outside the drawer on open; removed on close before focus return
 
 ---
 

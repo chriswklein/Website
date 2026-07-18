@@ -169,24 +169,58 @@ function trapFocus(element) {
 }
 
 // Filter drawer — all triggers via [aria-controls="filter-drawer"].
-// Works for .filter-drawer-trigger (header, tablet/mobile) and .action-rail-trigger (floating, all breakpoints).
+// Works for .filter-drawer-trigger (header, tablet/mobile), .action-rail-trigger (floating, all breakpoints),
+// and the internal close trigger inside the drawer itself.
 // Depends on: trapFocus()
 function initFilterDrawer() {
     const drawer = document.getElementById('filter-drawer');
     if (!drawer) return;
 
-    const closeBtn = drawer.querySelector('.filter-drawer-close');
+    const scrim = document.getElementById('archive-scrim');
     const allTriggers = document.querySelectorAll('[aria-controls="filter-drawer"]');
     let removeTrapFocus = null;
     let openerBtn = null;
 
+    // Elements to inert while the drawer is open — prevents focus leaking to duplicate controls
+    function getInertTargets() {
+        return [
+            document.getElementById('archive-sticky-header'),
+            document.getElementById('archive-header-sentinel'),
+            document.querySelector('.action-rail-group'),
+            document.getElementById('main-content'),
+            document.querySelector('.toast'),
+            document.querySelector('.tab-bar'),
+            document.getElementById('nav-placeholder'),
+            document.getElementById('footer-placeholder'),
+        ].filter(Boolean);
+    }
+
+    function updateTriggerLabels(isOpen) {
+        allTriggers.forEach(t => {
+            const labelSpan = t.querySelector('.trigger-label');
+            if (labelSpan) labelSpan.textContent = isOpen ? 'Close' : 'Filters';
+            if (t.classList.contains('action-rail-trigger')) {
+                t.setAttribute('aria-label', isOpen ? 'Close filters' : 'Open filters');
+            }
+        });
+    }
+
     function openDrawer(opener) {
         openerBtn = opener;
+        drawer.removeAttribute('inert');
         drawer.removeAttribute('hidden');
+        if (scrim) scrim.removeAttribute('hidden');
         requestAnimationFrame(() => {
             drawer.classList.add('filter-drawer--open');
+            if (scrim) scrim.classList.add('archive-scrim--open');
         });
         allTriggers.forEach(t => t.setAttribute('aria-expanded', 'true'));
+        updateTriggerLabels(true);
+
+        // Inert all page content outside the drawer — prevents Tab from reaching duplicate controls
+        getInertTargets().forEach(el => el.setAttribute('inert', ''));
+        const railGrp = document.querySelector('.action-rail-group');
+        if (railGrp) railGrp.classList.remove('action-rail-group--visible');
 
         const firstFocusable = drawer.querySelector(
             'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -200,8 +234,11 @@ function initFilterDrawer() {
     }
 
     function closeDrawer() {
+        drawer.setAttribute('inert', '');
         drawer.classList.remove('filter-drawer--open');
+        if (scrim) scrim.classList.remove('archive-scrim--open');
         allTriggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+        updateTriggerLabels(false);
 
         if (removeTrapFocus) {
             removeTrapFocus();
@@ -209,8 +246,26 @@ function initFilterDrawer() {
         }
         document.removeEventListener('keydown', handleEscape);
 
+        // Remove inert before returning focus so the opener can receive it
+        getInertTargets().forEach(el => el.removeAttribute('inert'));
+
         drawer.addEventListener('transitionend', () => {
             drawer.setAttribute('hidden', '');
+            if (scrim) scrim.setAttribute('hidden', '');
+            // Re-evaluate condensed state on next genuine scroll after drawer close
+            const header = document.getElementById('archive-sticky-header');
+            const sent   = document.getElementById('archive-header-sentinel');
+            if (header && sent) {
+                window.addEventListener('scroll', () => {
+                    const rect = sent.getBoundingClientRect();
+                    header.classList.toggle('is-condensed', rect.bottom <= 0);
+                }, { once: true, passive: true });
+            }
+            // Restore rail group visibility based on current scroll position
+            const railGrp = document.querySelector('.action-rail-group');
+            if (railGrp && sent) {
+                railGrp.classList.toggle('action-rail-group--visible', sent.getBoundingClientRect().bottom <= 0);
+            }
         }, { once: true });
 
         if (openerBtn) openerBtn.focus();
@@ -227,8 +282,8 @@ function initFilterDrawer() {
         });
     });
 
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeDrawer);
+    if (scrim) {
+        scrim.addEventListener('click', closeDrawer);
     }
 }
 
@@ -320,7 +375,7 @@ function initArchive() {
     const titleEl          = document.getElementById('archive-title');
     const countEl          = document.getElementById('archive-count');
     const searchInputs     = document.querySelectorAll('.archive-search-input');
-    const railTrigger      = document.querySelector('.action-rail-trigger');
+    const railGroup        = document.querySelector('.action-rail-group');
     const primaryChips     = document.querySelectorAll('[data-filter-type]');
     const activeChipsEl    = document.getElementById('archive-active-chips');
     const inlineFiltersEl  = document.getElementById('archive-secondary-chips');
@@ -380,6 +435,10 @@ function initArchive() {
                 btn.dataset.label = label;
                 btn.setAttribute('aria-pressed', 'false');
                 btn.textContent = label;
+                const countSpan = document.createElement('span');
+                countSpan.className = 'chip-count';
+                countSpan.setAttribute('aria-hidden', 'true');
+                btn.appendChild(countSpan);
                 btn.addEventListener('click', () => {
                     if (activeSecondary.has(slug)) {
                         activeSecondary.delete(slug);
@@ -487,6 +546,36 @@ function initArchive() {
         });
     }
 
+    // Entry count for a type chip given current secondary + query filters
+    function getChipCountForType(type) {
+        return allEntries.filter(e => {
+            if (e.type !== type) return false;
+            if (activeSecondary.size) {
+                const slugs = (e.tags || []).map(slugify);
+                if (![...activeSecondary].some(s => slugs.includes(s))) return false;
+            }
+            if (currentQuery) {
+                const text = [e.title, e.excerpt, ...(e.tags || [])].join(' ').toLowerCase();
+                if (!text.includes(currentQuery)) return false;
+            }
+            return true;
+        }).length;
+    }
+
+    // Entry count for a tag chip given current type + query filters
+    function getChipCountForTag(slug) {
+        return allEntries.filter(e => {
+            if (activeType && e.type !== activeType) return false;
+            const slugs = (e.tags || []).map(slugify);
+            if (!slugs.includes(slug)) return false;
+            if (currentQuery) {
+                const text = [e.title, e.excerpt, ...(e.tags || [])].join(' ').toLowerCase();
+                if (!text.includes(currentQuery)) return false;
+            }
+            return true;
+        }).length;
+    }
+
     // Main render — updates all UI from current state
     function render() {
         const filtered = getFiltered();
@@ -524,6 +613,8 @@ function initArchive() {
             }
             if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
             else          btn.removeAttribute('aria-label');
+            const typeCountEl = btn.querySelector('.chip-count');
+            if (typeCountEl) typeCountEl.textContent = ` ${getChipCountForType(btn.dataset.filterType)}`;
         });
 
         // Sort toggle — update text to reflect current sort direction
@@ -531,15 +622,17 @@ function initArchive() {
             btn.textContent = currentSort === 'latest' ? 'Latest ↑' : 'Earliest ↓';
         });
 
-        // Update action-rail-trigger badge with active filter count
-        if (railTrigger) {
-            const badgeEl = railTrigger.querySelector('.action-rail-badge');
-            if (badgeEl) {
-                const filterCount = (activeType ? 1 : 0) + activeSecondary.size;
-                badgeEl.textContent = filterCount;
-                badgeEl.hidden = filterCount === 0;
-            }
-        }
+        // Update all trigger badges (header trigger + floating rail trigger) from shared state
+        const filterCount = (activeType ? 1 : 0) + activeSecondary.size;
+        document.querySelectorAll('.action-rail-badge').forEach(badgeEl => {
+            badgeEl.textContent = filterCount;
+            badgeEl.hidden = filterCount === 0;
+        });
+
+        // Disable Clear buttons when no filters are active (search text alone does not count)
+        document.querySelectorAll('.archive-clear-btn').forEach(btn => {
+            btn.disabled = filterCount === 0;
+        });
 
         // Secondary tag chips (inline + drawer)
         document.querySelectorAll('[data-filter-tag]').forEach(btn => {
@@ -561,6 +654,8 @@ function initArchive() {
             }
             if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
             else          btn.removeAttribute('aria-label');
+            const tagCountEl = btn.querySelector('.chip-count');
+            if (tagCountEl) tagCountEl.textContent = ` ${getChipCountForTag(btn.dataset.filterTag)}`;
         });
 
         updateActiveChipsRow();
@@ -619,20 +714,22 @@ function initArchive() {
         });
     });
 
-    // Wire reset buttons (header + drawer)
-    document.querySelectorAll('.archive-reset-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            activeType = null;
-            activeSecondary.clear();
-            currentQuery = '';
-            currentSort = 'latest';
-            visibleCount = 25;
-            searchInputs.forEach(input => { input.value = ''; });
-            const url = new URL(window.location.href);
-            url.searchParams.delete('type');
-            window.history.replaceState({}, '', url.toString());
-            render();
-        });
+    function doReset() {
+        activeType = null;
+        activeSecondary.clear();
+        currentQuery = '';
+        currentSort = 'latest';
+        visibleCount = 25;
+        searchInputs.forEach(input => { input.value = ''; });
+        const url = new URL(window.location.href);
+        url.searchParams.delete('type');
+        window.history.replaceState({}, '', url.toString());
+        render();
+    }
+
+    // Wire clear buttons (header + drawer)
+    document.querySelectorAll('.archive-clear-btn').forEach(btn => {
+        btn.addEventListener('click', doReset);
     });
 
     // Wire Load More
@@ -643,12 +740,17 @@ function initArchive() {
         });
     }
 
-    // IntersectionObserver — show action-rail-trigger when archive header has scrolled away
+    // IntersectionObserver — show action-rail-group and condense header when sentinel leaves viewport
     const sentinel = document.getElementById('archive-header-sentinel');
-    if (sentinel && railTrigger) {
+    const archiveHeader = document.getElementById('archive-sticky-header');
+    if (sentinel && railGroup) {
         const headerObserver = new IntersectionObserver(entries => {
             const headerInView = entries[0].isIntersecting;
-            railTrigger.classList.toggle('action-rail-trigger--visible', !headerInView);
+            // Drawer-open guard: don't update rail visibility or condensed state while drawer is open
+            if (!document.querySelector('.filter-drawer--open')) {
+                railGroup.classList.toggle('action-rail-group--visible', !headerInView);
+                if (archiveHeader) archiveHeader.classList.toggle('is-condensed', !headerInView);
+            }
         }, { threshold: 0 });
         headerObserver.observe(sentinel);
     }

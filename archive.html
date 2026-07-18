@@ -13,105 +13,123 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="nav-placeholder"></div>
 
-    <!-- Archive filter header — full width, not sticky; scrolls away with page -->
+    <!-- Archive filter header — scrolls away with page -->
     <div class="archive-sticky-header" id="archive-sticky-header">
         <div class="container">
 
-            <!-- Title row — count has moved to main content area -->
+            <!-- Title row -->
             <div class="archive-title-row">
                 <h1 class="archive-title" id="archive-title">Archive</h1>
             </div>
 
-            <!-- Search · Reset · Sort toggle · Filters trigger (tablet/mobile) -->
+            <!-- Controls row:
+                 Desktop (uncondensed): Clear (left) + Search (fills width). No sort toggle, no Filters trigger.
+                 Mobile/tablet: Clear + Search + Filters trigger. Filters trigger hidden on desktop via CSS. -->
             <div class="archive-controls-row">
+                <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
                 <label for="archive-search" class="sr-only">Search entries</label>
                 <input type="search" class="archive-search-input" id="archive-search"
                        placeholder="Search or use filters" autocomplete="off">
-                <button class="archive-reset-btn btn btn--ghost" type="button">Reset</button>
-                <button class="archive-sort-toggle" type="button">Latest ↑</button>
-                <!-- Tablet/mobile only — hidden on desktop via CSS -->
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"
                         aria-haspopup="dialog">
-                    Filters
+                    <span class="trigger-label">Filters</span>
+                    <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
                 </button>
             </div>
 
-            <!-- Primary type chips: Work / Thoughts -->
-            <div class="archive-primary-chips" role="group" aria-label="Filter by type">
-                <button class="tag-chip" type="button"
-                        data-filter-type="work" data-label="Work"
-                        aria-pressed="false">Work</button>
-                <button class="tag-chip" type="button"
-                        data-filter-type="thoughts" data-label="Thoughts"
-                        aria-pressed="false">Thoughts</button>
+            <!-- Desktop inline filters — primary chips, active chips row, and secondary tags;
+                 visible only on desktop while header is uncondensed (top of page);
+                 hidden on tablet/mobile at every scroll position — those breakpoints use the drawer -->
+            <div class="archive-inline-filters" id="archive-inline-filters">
+
+                <!-- Primary type chips: Work / Thoughts -->
+                <div class="archive-primary-chips" role="group" aria-label="Filter by type">
+                    <button class="tag-chip" type="button"
+                            data-filter-type="work" data-label="Work"
+                            aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
+                    <button class="tag-chip" type="button"
+                            data-filter-type="thoughts" data-label="Thoughts"
+                            aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+                </div>
+
+                <!-- Active secondary filters row — collapses to zero height when empty -->
+                <div class="archive-active-chips" id="archive-active-chips"></div>
+
+                <!-- Secondary tag chips — populated by JS -->
+                <div id="archive-secondary-chips" aria-label="Filter by tag"></div>
+
             </div>
-
-            <!-- Active secondary filters row — collapses to zero height when empty (CSS class approach) -->
-            <div class="archive-active-chips" id="archive-active-chips"></div>
-
-            <!-- Desktop secondary tag chips — populated by JS, hidden on tablet/mobile -->
-            <div class="archive-inline-filters" id="archive-secondary-chips"
-                 aria-label="Filter by tag"></div>
 
         </div>
     </div>
 
-    <!-- Sentinel watched by IntersectionObserver — when this leaves viewport, show action-rail-trigger -->
+    <!-- Sentinel watched by IntersectionObserver — when this leaves viewport, show action-rail-group -->
     <div id="archive-header-sentinel" aria-hidden="true"></div>
 
-    <!-- Floating trigger — appears when archive header has scrolled away; opens Filter Drawer on all breakpoints -->
-    <button class="action-rail-trigger" type="button"
-            aria-controls="filter-drawer"
-            aria-haspopup="dialog"
-            aria-expanded="false"
-            aria-label="Open filters">
-        Filters
-        <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
-    </button>
+    <!-- Floating action rail group — fixed at right viewport edge; visible when header has condensed -->
+    <div class="action-rail-group" id="action-rail-group">
 
-    <!-- Filter drawer — all breakpoints via action-rail-trigger; tablet/mobile via filter-drawer-trigger -->
+        <!-- Filters trigger — opens Filter Drawer -->
+        <button class="action-rail-trigger" type="button"
+                aria-controls="filter-drawer"
+                aria-haspopup="dialog"
+                aria-expanded="false"
+                aria-label="Open filters">
+            <span class="trigger-label">Filters</span>
+            <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
+        </button>
+
+    </div>
+
+    <!-- Scrim — dims page content while drawer is open; clicking closes the drawer -->
+    <div class="archive-scrim" id="archive-scrim" aria-hidden="true" hidden></div>
+
+    <!-- Filter drawer — unified bottom sheet, available on all breakpoints -->
     <div class="filter-drawer" id="filter-drawer"
          role="dialog" aria-modal="true" aria-label="Search and filter"
-         hidden>
+         hidden inert>
         <div class="filter-drawer-body">
 
-            <!-- Full controls — mirrors header so nothing is lost when header scrolls away -->
+            <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) -->
             <div class="filter-drawer-controls">
+                <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
                 <label for="drawer-search" class="sr-only">Search entries</label>
                 <input type="search" class="archive-search-input" id="drawer-search"
                        placeholder="Search or use filters" autocomplete="off">
-                <div class="filter-drawer-actions">
-                    <button class="archive-reset-btn btn btn--ghost" type="button">Reset</button>
-                    <button class="archive-sort-toggle" type="button">Latest ↑</button>
-                </div>
+                <button class="filter-drawer-trigger" type="button"
+                        aria-expanded="false"
+                        aria-controls="filter-drawer"
+                        aria-haspopup="dialog">
+                    <span class="trigger-label">Filters</span>
+                </button>
             </div>
 
-            <!-- Primary type chips -->
+            <!-- Row 2: Primary type chips -->
             <div class="filter-drawer-primary-chips" role="group" aria-label="Filter by type">
                 <button class="tag-chip" type="button"
                         data-filter-type="work" data-label="Work"
-                        aria-pressed="false">Work</button>
+                        aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
                 <button class="tag-chip" type="button"
                         data-filter-type="thoughts" data-label="Thoughts"
-                        aria-pressed="false">Thoughts</button>
+                        aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
             </div>
 
-            <!-- Secondary tag chips populated by initArchive() -->
+            <!-- Row 3: Secondary tag chips populated by initArchive() -->
             <div id="filter-drawer-chips"></div>
 
-        </div>
-        <div class="filter-drawer-footer">
-            <button class="filter-drawer-close" type="button">Collapse Filter</button>
         </div>
     </div>
 
     <main id="main-content">
         <div class="container">
 
-            <!-- Entry count replaces the dot divider; aria-live for assistive tech -->
-            <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+            <!-- Sort toggle (left) and entry count (right) — between header and results grid -->
+            <div class="archive-sort-count-row">
+                <button class="archive-sort-toggle" type="button">Latest ↑</button>
+                <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+            </div>
 
             <!-- Cards populated by initArchive() -->
             <div class="archive-results" id="archive-results"></div>
