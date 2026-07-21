@@ -81,6 +81,8 @@ After completing all tasks, run these checks before reporting completion:
 - Grep for any inline styles introduced in HTML — none are permitted
 - Confirm no files outside the stated scope were modified
 - Confirm all CSS values reference CSS variables from `style.css`
+- When changing a link's destination, also check whether its aria-label or visible text still accurately describes the new destination — correct any stale or placeholder wording found rather than leaving it mismatched.
+- When a value referenced in existing markup (a tag, a slug, a label) doesn't yet exist in the data source, check whether it's already implied elsewhere in the codebase before deciding whether to add it, flag it, or ask — don't silently invent a different value or drop it.
 
 Report what changed in each file. If nothing changed in a file, say so explicitly.
 

@@ -486,10 +486,10 @@ function initArchive() {
         const ctaText    = entry.type === 'work' ? 'View' : 'Read';
         const ctaAction  = entry.type === 'work' ? 'view this project' : 'read this thought';
         const ctaLabel   = `${escapeHTML(entry.title)} — ${ctaAction}`;
-        const tagSlugs   = (entry.tags || []).map(slugify).join(',');
+        const tagSlugs = (entry.tags || []).map(slugify);
 
-        const tagsHTML = (entry.tags || []).map(t =>
-            `<span class="tag" aria-hidden="true">${escapeHTML(t)}</span>`
+        const tagsHTML = (entry.tags || []).map((t, i) =>
+            `<a href="/archive.html?tag=${tagSlugs[i]}" class="tag">${escapeHTML(t)}</a>`
         ).join('');
 
         const imageHTML = entry.type === 'work'

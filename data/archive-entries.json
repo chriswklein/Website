@@ -12,6 +12,30 @@
     "imageAlt": ""
   },
   {
+    "id": "this-website",
+    "type": "work",
+    "author": "Christopher Klein",
+    "title": "This Website",
+    "excerpt": "With Claude and Claude Code, I created this Website to rid myself of Squarespace, learn how to utilize AI, learn about web development, and implement Accessibility standards.",
+    "tags": ["User Experience", "Web Design"],
+    "date": "2026-07-01",
+    "url": "/work/this-website.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
+    "id": "put-a-bug-on-it",
+    "type": "work",
+    "author": "Christopher Klein",
+    "title": "Put a Bug on It",
+    "excerpt": "There are many issues with implementing an in-game bug reporter. At Intrepid Studios, I took time to figure out how to improve a Bug Reporter for a Live Service Title.",
+    "tags": ["Quality Assurance", "Tools"],
+    "date": "2024-05-01",
+    "url": "/work/put-a-bug-on-it.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
     "id": "test-framework",
     "type": "work",
     "author": "Christopher Klein",
@@ -58,6 +82,30 @@
     "url": "/thoughts/fidgets-and-widgets.html",
     "image": "/assets/images/thoughts/fidgets-and-widgets/fidgets-and-widgets-banner.webp",
     "imageAlt": "A small collection of everyday objects arranged on a wooden surface — a brass bolt, a pocket notebook, a stylus, and a desk timer"
+  },
+  {
+    "id": "physical-and-digital-media",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "Physical and Digital Media",
+    "excerpt": "Games exist simultaneously as physical objects and digital experiences — and the relationship between those two forms shapes how they're made, sold, preserved, and remembered.",
+    "tags": ["Game Development"],
+    "date": "2026-06-14",
+    "url": "/thoughts/physical-and-digital-media.html",
+    "image": "",
+    "imageAlt": ""
+  },
+  {
+    "id": "industrializing-the-industry",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "Industrializing the Industry",
+    "excerpt": "Game development has industrialized — studios have grown into large organisations with specialised disciplines, defined pipelines, and formal processes borrowed from manufacturing.",
+    "tags": ["Game Development"],
+    "date": "2026-06-08",
+    "url": "/thoughts/industrializing-the-industry.html",
+    "image": "",
+    "imageAlt": ""
   },
   {
     "id": "on-asking-better-questions",
