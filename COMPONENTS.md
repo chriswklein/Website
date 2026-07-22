@@ -164,10 +164,10 @@ Single variant only — `.tag`. No `.tag--secondary`.
 ### Component Tokens
 
 ```css
---tag-border:                var(--color-accent-gold);
---tag-border-hover:          var(--color-accent-gold);
---tag-text:                  var(--color-accent-gold);
---tag-text-hover:            var(--color-accent-gold);
+--tag-border:                var(--color-accent-primary);
+--tag-border-hover:          var(--color-accent-primary);
+--tag-text:                  var(--color-accent-primary);
+--tag-text-hover:            var(--color-accent-primary);
 --tag-bg:                    transparent;
 --tag-bg-hover:              var(--color-background-subtle);
 --tag-padding-x:             var(--space-3);
@@ -194,9 +194,9 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 | State | Background | Border | Text | Font-Weight |
 |---|---|---|---|---|
-| Default | `transparent` | `--color-accent-gold` | `--color-accent-gold` | `regular` |
-| Hover | `--color-background-subtle` | `--color-accent-gold` | `--color-accent-gold` | `bold` |
-| Focus | `transparent` | `--color-accent-gold` | `--color-accent-gold` + focus ring | `regular` |
+| Default | `transparent` | `--color-accent-primary` | `--color-accent-primary` | `regular` |
+| Hover | `--color-background-subtle` | `--color-accent-primary` | `--color-accent-primary` | `bold` |
+| Focus | `transparent` | `--color-accent-primary` | `--color-accent-primary` + focus ring | `regular` |
 
 ### Accessibility
 
@@ -242,9 +242,9 @@ Tag-Chips are interactive filter controls used in the Archive Header and Filter 
 
 ```css
 /* Default */
---chip-border:             var(--border-width-thin) solid var(--color-accent-gold);
+--chip-border:             var(--border-width-thin) solid var(--color-accent-primary);
 --chip-bg:                 transparent;
---chip-text:               var(--color-accent-gold);
+--chip-text:               var(--color-accent-primary);
 --chip-font-weight:        var(--font-weight-regular);
 
 /* Hover */
@@ -252,9 +252,9 @@ Tag-Chips are interactive filter controls used in the Archive Header and Filter 
 --chip-font-weight-hover:  var(--font-weight-bold);
 
 /* Active */
---chip-border-active:      var(--border-width-medium) solid var(--color-accent-gold-text);
+--chip-border-active:      var(--border-width-medium) solid var(--color-accent-primary-text);
 --chip-bg-active:          var(--color-background-surface);
---chip-text-active:        var(--color-accent-gold-text);
+--chip-text-active:        var(--color-accent-primary-text);
 --chip-font-weight-active: var(--font-weight-bold);
 
 /* Dim */
@@ -279,9 +279,9 @@ Tag-Chips are interactive filter controls used in the Archive Header and Filter 
 
 | State | Background | Border | Text | Font-Weight |
 |---|---|---|---|---|
-| Default | `transparent` | `thin` + `--color-accent-gold` | `--color-accent-gold` | `regular` |
-| Hover | `--color-background-subtle` | `thin` + `--color-accent-gold` | `--color-accent-gold` | `bold` |
-| Active | `--color-background-surface` | `medium` + `--color-accent-gold-text` | `--color-accent-gold-text` | `bold` |
+| Default | `transparent` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `regular` |
+| Hover | `--color-background-subtle` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `bold` |
+| Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `bold` |
 | Dim | `--color-background-subtle` | `thin` + `--color-border-strong` | `--color-text-disabled` | `regular` |
 
 ### Accessibility
@@ -357,7 +357,7 @@ The drawer is a unified bottom-sheet. Its first row mirrors the header controls:
             <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
             <label for="archive-search" class="sr-only">Search entries</label>
             <input type="search" class="archive-search-input" id="archive-search"
-                   placeholder="Search or use filters" autocomplete="off">
+                   placeholder="Search" autocomplete="off">
             <button class="filter-drawer-trigger" type="button"
                     aria-expanded="false"
                     aria-controls="filter-drawer"
@@ -409,7 +409,7 @@ The drawer is a unified bottom-sheet. Its first row mirrors the header controls:
             <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
             <label for="drawer-search" class="sr-only">Search entries</label>
             <input type="search" class="archive-search-input" id="drawer-search"
-                   placeholder="Search or use filters" autocomplete="off">
+                   placeholder="Search" autocomplete="off">
             <button class="filter-drawer-trigger" type="button"
                     aria-expanded="false"
                     aria-controls="filter-drawer"
@@ -589,7 +589,7 @@ z-index stack (card has position: relative):
 [ .card-content ]
   [ h3.card-title ]
   [ .card-tags ]
-    [ .tag ] [ .tag--secondary ]
+    [ .tag ]
   [ p description ]
   [ p.card-meta — {date} · {author} ]
   [ a.card-cta ]
@@ -635,7 +635,7 @@ z-index stack (card has position: relative):
   [ h3.card-title ]
   [ p summary ]
   [ .card-tags ]
-    [ .tag ] [ .tag--secondary ]
+    [ .tag ]
   [ p.card-meta — Published {date} · {author} ]
   [ a.card-cta ]
 ```
@@ -677,7 +677,7 @@ The Profile variant does not use the block link / CTA pattern. It has multiple a
 [ .card-content ]
   [ h2.card-profile-name ]
   [ .card-tags ]
-    [ .tag ] [ .tag--secondary ]
+    [ .tag ]
   [ p bio ]
   [ .card-profile-actions ]
     [ a.btn — LinkedIn ]
@@ -694,7 +694,7 @@ The Profile variant does not use the block link / CTA pattern. It has multiple a
         <h2 class="card-profile-name">{Name}</h2>
         <div class="card-tags">
             <span class="tag" aria-hidden="true">{Skill}</span>
-            <span class="tag tag--secondary" aria-hidden="true">{Skill}</span>
+            <span class="tag" aria-hidden="true">{Skill}</span>
         </div>
         <p>{Bio}</p>
         <div class="card-profile-actions">
@@ -975,7 +975,7 @@ The toast notification provides brief confirmation that an action was completed.
 
 ```css
 --toast-bg:                 var(--color-background-surface);
---toast-border:             var(--color-accent-gold);
+--toast-border:             var(--color-accent-primary);
 --toast-text:               var(--color-text-primary);
 --toast-radius:             var(--border-radius-md);
 --toast-padding-x:          var(--space-4);
@@ -1123,7 +1123,7 @@ A subtle section separator using three 4px circles in dark gold. Used when a ful
 ```css
 --divider-dots-size:    4px
 --divider-dots-gap:     12px
---divider-dots-color:   var(--color-accent-gold)
+--divider-dots-color:   var(--color-accent-primary)
 --divider-dots-margin:  var(--space-8) auto
 ```
 
@@ -1205,7 +1205,7 @@ Code blocks display technical content with clear visual distinction from body te
 --code-bg:              var(--color-code-bg);
 --code-border-color:    var(--color-code-border);
 --code-border-width:    var(--border-width-thick);
---code-text-color:      var(--color-accent-gold-text);
+--code-text-color:      var(--color-accent-primary-text);
 --code-font-family:     'Courier New', Courier, monospace;
 --code-font-size:       var(--font-size-sm);
 --code-padding-inline:  var(--space-2) var(--space-3);
@@ -1442,10 +1442,10 @@ Quick reference mapping every component token to its semantic source.
 | `--card-image-bg` | `--color-background-subtle` | `#2A2A2A` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
-| `--tag-border` | `--color-accent-gold` | `#BA8200` |
-| `--tag-border-hover` | `--color-accent-gold-text` | `#E5A000` |
-| `--tag-text` | `--color-accent-gold` | `#BA8200` |
-| `--tag-text-hover` | `--color-accent-gold-text` | `#E5A000` |
+| `--tag-border` | `--color-accent-primary` | `#BA8200` |
+| `--tag-border-hover` | `--color-accent-primary-text` | `#E5A000` |
+| `--tag-text` | `--color-accent-primary` | `#BA8200` |
+| `--tag-text-hover` | `--color-accent-primary-text` | `#E5A000` |
 | `--tag-bg` | `transparent` | `transparent` |
 | `--tag-bg-hover` | `--color-background-base` | `#111111` |
 | `--nav-bg` | `--color-background-base` | `#111111` |
@@ -1455,11 +1455,11 @@ Quick reference mapping every component token to its semantic source.
 | `--tab-bar-item-color` | `--color-text-secondary` | `#AAAAAA` |
 | `--tab-bar-item-active` | `--color-interactive-default` | `#F5F5F5` |
 | `--tooltip-bg` | `--color-tooltip-bg` → `--color-background-surface` | `#1A1A1A` |
-| `--tooltip-border` | `--color-tooltip-border` → `--color-accent-gold` | `#BA8200` |
-| `--toast-border` | `--color-accent-gold` | `#BA8200` |
-| `--blockquote-border-color` | `--color-quote-border` → `--color-accent-pink` | `#A9407C` |
-| `--code-border-color` | `--color-code-border` → `--color-accent-gold` | `#BA8200` |
-| `--divider-color` | `--color-divider-accent` → `--color-accent-gold` | `#BA8200` |
+| `--tooltip-border` | `--color-tooltip-border` → `--color-accent-primary` | `#BA8200` |
+| `--toast-border` | `--color-accent-primary` | `#BA8200` |
+| `--blockquote-border-color` | `--color-quote-border` → `--color-accent-quote` | `#A9407C` |
+| `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#BA8200` |
+| `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#BA8200` |
 
 ---
 

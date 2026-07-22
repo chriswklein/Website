@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Design System Preview</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +52,7 @@
 
         .preview-token {
             font-size: var(--font-size-xs);
-            color: var(--color-accent-gold-text);
+            color: var(--color-accent-primary-text);
             font-family: monospace;
             max-width: none;
         }
@@ -127,14 +128,14 @@
         .s-int-disabled { background-color: var(--color-interactive-disabled); }
 
         /* Accent swatches */
-        .s-acc-gold      { background-color: var(--color-accent-gold); }
-        .s-acc-gold-text { background-color: var(--color-accent-gold-text); }
-        .s-acc-pink      { background-color: var(--color-accent-pink); }
-        .s-acc-pink-text { background-color: var(--color-accent-pink-text); }
+        .s-acc-gold      { background-color: var(--color-accent-primary); }
+        .s-acc-gold-text { background-color: var(--color-accent-primary-text); }
+        .s-acc-pink      { background-color: var(--color-accent-quote); }
+        .s-acc-pink-text { background-color: var(--color-accent-quote-text); }
 
         /* Component token swatches */
-        .s-tag-border      { background-color: var(--color-accent-gold); }
-        .s-tag-border-hover { background-color: var(--color-accent-gold-text); }
+        .s-tag-border      { background-color: var(--color-accent-primary); }
+        .s-tag-border-hover { background-color: var(--color-accent-primary-text); }
         .s-tag-bg-hover    { background-color: var(--color-background-base); border: var(--border-width-thin) solid var(--color-border-strong); }
         .s-link           { background-color: var(--color-link); }
         .s-link-hover     { background-color: var(--color-link-hover); }
@@ -214,7 +215,7 @@
 
         .space-bar {
             height: var(--space-6);
-            background-color: var(--color-accent-gold);
+            background-color: var(--color-accent-primary);
             border-radius: var(--border-radius-sm);
             min-width: var(--border-width-thin);
         }
@@ -325,7 +326,7 @@
         .motion-box {
             width: var(--space-12);
             height: var(--space-12);
-            background-color: var(--color-accent-gold);
+            background-color: var(--color-accent-primary);
             position: absolute;
             left: 0;
             top: 0;
@@ -472,7 +473,7 @@
             gap: var(--space-2);
             padding: var(--space-2) var(--space-4);
             background-color: var(--color-background-surface);
-            border: var(--border-width-thin) solid var(--color-accent-gold);
+            border: var(--border-width-thin) solid var(--color-accent-primary);
             border-radius: var(--border-radius-md);
             color: var(--color-text-primary);
             font-size: var(--font-size-sm);
@@ -481,7 +482,7 @@
         }
 
         .preview-toast-icon {
-            color: var(--color-accent-gold);
+            color: var(--color-accent-primary);
             font-weight: var(--font-weight-bold);
         }
 
@@ -646,12 +647,12 @@
                     <div class="swatch-grid">
                         <div class="swatch">
                             <div class="swatch-box s-acc-gold"></div>
-                            <p class="swatch-name">--color-accent-gold</p>
+                            <p class="swatch-name">--color-accent-primary</p>
                             <p class="swatch-hex">#BA8200 · 5.2:1 ✅</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-acc-gold-text"></div>
-                            <p class="swatch-name">--color-accent-gold-text</p>
+                            <p class="swatch-name">--color-accent-primary-text</p>
                             <p class="swatch-hex">#E5A000 · 8.9:1 ✅</p>
                         </div>
                     </div>
@@ -662,12 +663,12 @@
                     <div class="swatch-grid">
                         <div class="swatch">
                             <div class="swatch-box s-acc-pink"></div>
-                            <p class="swatch-name">--color-accent-pink</p>
+                            <p class="swatch-name">--color-accent-quote</p>
                             <p class="swatch-hex">#A9407C · 4.6:1 ✅</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-acc-pink-text"></div>
-                            <p class="swatch-name">--color-accent-pink-text</p>
+                            <p class="swatch-name">--color-accent-quote-text</p>
                             <p class="swatch-hex">#FF60BB</p>
                         </div>
                     </div>

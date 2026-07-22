@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFilterDrawer();
     initArchiveFilter();
     initArchive();
+    // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
 });
 
 function loadComponent(placeholderId, file, callback) {
@@ -73,6 +74,36 @@ function setActiveTabBar() {
         } else {
             item.removeAttribute('aria-current');
         }
+    });
+}
+
+// Creates the floating rail button, wires theme toggle, persists to localStorage
+function initThemeToggle() {
+    const btn = document.createElement('button');
+    btn.id = 'theme-toggle';
+    btn.className = 'theme-toggle-rail';
+    btn.type = 'button';
+    btn.textContent = '◑';
+    document.body.appendChild(btn);
+    btn.classList.add('theme-toggle-rail--visible');
+
+    function syncButton() {
+        const isTeal = document.documentElement.getAttribute('data-theme') === 'teal';
+        btn.setAttribute('aria-label', isTeal ? 'Switch to gold theme' : 'Switch to teal theme');
+    }
+
+    syncButton();
+
+    btn.addEventListener('click', () => {
+        const isTeal = document.documentElement.getAttribute('data-theme') === 'teal';
+        if (isTeal) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.removeItem('theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'teal');
+            localStorage.setItem('theme', 'teal');
+        }
+        syncButton();
     });
 }
 
@@ -187,6 +218,7 @@ function initFilterDrawer() {
             document.getElementById('archive-sticky-header'),
             document.getElementById('archive-header-sentinel'),
             document.querySelector('.action-rail-group'),
+            document.getElementById('theme-toggle'),
             document.getElementById('main-content'),
             document.querySelector('.toast'),
             document.querySelector('.tab-bar'),
@@ -221,6 +253,8 @@ function initFilterDrawer() {
         getInertTargets().forEach(el => el.setAttribute('inert', ''));
         const railGrp = document.querySelector('.action-rail-group');
         if (railGrp) railGrp.classList.remove('action-rail-group--visible');
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) themeToggle.classList.remove('theme-toggle-rail--visible');
 
         const firstFocusable = drawer.querySelector(
             'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -266,6 +300,8 @@ function initFilterDrawer() {
             if (railGrp && sent) {
                 railGrp.classList.toggle('action-rail-group--visible', sent.getBoundingClientRect().bottom <= 0);
             }
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) themeToggle.classList.add('theme-toggle-rail--visible');
         }, { once: true });
 
         if (openerBtn) openerBtn.focus();

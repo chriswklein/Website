@@ -41,6 +41,8 @@ Raw colour values. Never apply these directly to elements. Always reference via 
 | `gold-light` | `#E5A000` | Light gold |
 | `pink-dark` | `#A9407C` | Deep pink/magenta |
 | `pink-light` | `#FF60BB` | Light pink |
+| `teal-dark` | `#00BAA5` | Dark teal |
+| `teal-light` | `#00E5CB` | Light teal |
 
 ### 1.2 Semantic Tokens — Background
 
@@ -83,8 +85,8 @@ Gold is the primary accent. Used for dividers, primary tags, links, code borders
 
 | CSS Variable | References | Contrast vs Base | Usage |
 |---|---|---|---|
-| `--color-accent-gold` | `gold-dark` `#BA8200` | ~5.2:1 ✅ | Primary tag fill, hr dividers, code block border |
-| `--color-accent-gold-text` | `gold-light` `#E5A000` | ~8.9:1 ✅ | Hyperlinks, tooltip text accents, text on dark |
+| `--color-accent-primary` | `gold-dark` `#BA8200` | ~5.2:1 ✅ | Primary tag fill, hr dividers, code block border |
+| `--color-accent-primary-text` | `gold-light` `#E5A000` | ~8.9:1 ✅ | Hyperlinks, tooltip text accents, text on dark |
 
 ### 1.7 Semantic Tokens — Accent (Pink)
 
@@ -92,24 +94,24 @@ Pink is the secondary accent. Used for secondary tags and blockquote borders.
 
 | CSS Variable | References | Contrast vs Base | Usage |
 |---|---|---|---|
-| `--color-accent-pink` | `pink-dark` `#A9407C` | ~4.6:1 ✅ | Secondary tag fill, blockquote left border |
-| `--color-accent-pink-text` | `pink-light` `#FF60BB` | — | Pink text on dark surfaces |
+| `--color-accent-quote` | `pink-dark` `#A9407C` | ~4.6:1 ✅ | Secondary tag fill, blockquote left border |
+| `--color-accent-quote-text` | `pink-light` `#FF60BB` | — | Pink text on dark surfaces |
 
 ### 1.8 Semantic Tokens — Components
 
 | CSS Variable | References | Usage |
 |---|---|---|
-| `--tag-border` | `--color-accent-gold` | Tag default border and text colour |
-| `--tag-border-hover` | `--color-accent-gold-text` | Tag hover border and text colour |
-| `--tag-bg-hover` | `--color-background-base` | Tag hover background |
-| `--color-link` | `--color-accent-gold-text` | Hyperlink default colour |
-| `--color-link-hover` | `--color-accent-gold` | Hyperlink hover colour |
-| `--color-divider-accent` | `--color-accent-gold` | hr and section dividers site-wide |
-| `--color-quote-border` | `--color-accent-pink` | Blockquote left border |
+| `--tag-border` | `--color-accent-primary` | Tag default border and text colour |
+| `--tag-border-hover` | `--color-accent-primary` | Tag hover border colour |
+| `--tag-bg-hover` | `--color-background-subtle` | Tag hover background |
+| `--color-link` | `--color-accent-primary-text` | Hyperlink default colour |
+| `--color-link-hover` | `--color-accent-primary` | Hyperlink hover colour |
+| `--color-divider-accent` | `--color-accent-primary` | hr and section dividers site-wide |
+| `--color-quote-border` | `--color-accent-quote` | Blockquote left border |
 | `--color-code-bg` | `--color-background-subtle` | Code and pre block background |
-| `--color-code-border` | `--color-accent-gold` | Code block left border |
+| `--color-code-border` | `--color-accent-primary` | Code block left border |
 | `--color-tooltip-bg` | `--color-background-surface` | Tooltip background |
-| `--color-tooltip-border` | `--color-accent-gold` | Tooltip border |
+| `--color-tooltip-border` | `--color-accent-primary` | Tooltip border |
 | `--color-tooltip-text` | `--color-text-primary` | Tooltip text |
 
 ### 1.9 Contrast Verification
@@ -122,12 +124,32 @@ All text pairings verified against WCAG AA (4.5:1 minimum for normal text, 3:1 f
 | `--color-text-secondary` on `--color-background-base` | `#AAAAAA` on `#111111` | ~7.5:1 | ✅ AA |
 | `--color-text-primary` on `--color-background-surface` | `#F5F5F5` on `#1A1A1A` | ~12:1 | ✅ AAA |
 | `--color-text-secondary` on `--color-background-surface` | `#AAAAAA` on `#1A1A1A` | ~6:1 | ✅ AA |
-| `--color-accent-gold` on `--color-background-base` | `#BA8200` on `#111111` | ~5.2:1 | ✅ AA |
-| `--color-accent-gold-text` on `--color-background-base` | `#E5A000` on `#111111` | ~8.9:1 | ✅ AAA |
-| `--color-accent-pink` on `--color-background-base` | `#A9407C` on `#111111` | ~4.6:1 | ✅ AA |
-| `--color-tag-text` on `--color-tag-primary` | `#F5F5F5` on `#BA8200` | ~3.1:1 | ✅ AA Large |
-| `--color-tag-text` on `--color-tag-secondary` | `#F5F5F5` on `#A9407C` | ~3.2:1 | ✅ AA Large |
+| `--color-accent-primary` on `--color-background-base` | `#BA8200` on `#111111` | ~5.2:1 | ✅ AA |
+| `--color-accent-primary-text` on `--color-background-base` | `#E5A000` on `#111111` | ~8.9:1 | ✅ AAA |
+| `--color-accent-quote` on `--color-background-base` | `#A9407C` on `#111111` | ~4.6:1 | ✅ AA |
+| `--color-accent-primary-text` on `--color-background-subtle` | `#E5A000` on `#2A2A2A` | ~6.4:1 | ✅ AA |
+| `--color-accent-primary-text` on `--color-background-surface` | `#E5A000` on `#1A1A1A` | ~7.8:1 | ✅ AAA |
 | `--color-interactive-focus` on `--color-background-base` | `#FFFFFF` on `#111111` | ~19:1 | ✅ AAA |
+
+### 1.10 Theme System
+
+One background theme (dark — fixed) with two accent colour variants selectable via `data-theme` on `<html>`:
+
+| Theme | `data-theme` value | `--color-accent-primary` | `--color-accent-primary-text` | Status |
+|---|---|---|---|---|
+| Teal | *(no attribute)* or `"teal"` | `teal-dark` `#00BAA5` | `teal-light` `#00E5CB` | **Live default** |
+| Gold | `"gold"` | `gold-dark` `#BA8200` | `gold-light` `#E5A000` | Dormant — preserved for future use |
+
+**Current state:** Teal is the site-wide default. The `:root` block defines `--color-accent-primary: #00BAA5` and `--color-accent-primary-text: #00E5CB`. The `[data-theme="teal"]` override block remains in place (its values match the default — harmless). A `[data-theme="gold"]` override block is defined but no UI currently activates it.
+
+The theme toggle button (`initThemeToggle()` in `script.js`) is dormant — the function remains in the codebase but its call is commented out pending a permanent home in the planned Vertical Action Rail. No toggle button is rendered on any page.
+
+All other tokens — backgrounds, greyscale, pink accent, borders — are unaffected by the theme system. Only `--color-accent-primary` and `--color-accent-primary-text` vary between themes.
+
+Teal contrast ratios verified: `#00BAA5` on `#111111` ≈ 7.7:1 ✅ AA · `#00E5CB` on `#111111` ≈ 11.8:1 ✅ AAA.
+Gold contrast ratios verified: `#BA8200` on `#111111` ≈ 5.2:1 ✅ AA · `#E5A000` on `#111111` ≈ 8.9:1 ✅ AAA.
+
+The flash-prevention `<script>` at the top of every page `<head>` still runs on every load. With no preference stored in `localStorage` (the toggle is disabled so nothing writes to it), it finds nothing and exits silently — the page renders with the teal `:root` default with no flash and no console error. If a user had previously toggled to gold and has `"theme": "gold"` in `localStorage`, the script would apply `data-theme="gold"` and gold would render correctly — the dormant infrastructure remains functional.
 
 ---
 

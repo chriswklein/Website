@@ -163,10 +163,10 @@ Nav and footer inject automatically via `script.js`.
 #### Accent Primitives
 | Token | Value | Notes |
 |---|---|---|
-| `--color-accent-gold` | #BA8200 | Primary tag fill, dividers, code border. Contrast on base: ~5.2:1 ✅ |
-| `--color-accent-gold-text` | #E5A000 | Gold text on dark, hyperlinks, tooltip border. Contrast on base: ~8.9:1 ✅ |
-| `--color-accent-pink` | #A9407C | Secondary tag fill, quote block border. Contrast on base: ~4.6:1 ✅ |
-| `--color-accent-pink-text` | #FF60BB | Pink text on dark, alt text contexts |
+| `--color-accent-primary` | #BA8200 | Primary tag fill, dividers, code border. Contrast on base: ~5.2:1 ✅ |
+| `--color-accent-primary-text` | #E5A000 | Gold text on dark, hyperlinks, tooltip border. Contrast on base: ~8.9:1 ✅ |
+| `--color-accent-quote` | #A9407C | Secondary tag fill, quote block border. Contrast on base: ~4.6:1 ✅ |
+| `--color-accent-quote-text` | #FF60BB | Pink text on dark, alt text contexts |
 
 #### Semantic Tokens (as CSS variables in style.css)
 | Token | Value | Contrast vs Base |
@@ -182,17 +182,14 @@ Nav and footer inject automatically via `script.js`.
 | `--color-interactive-default` | #F5F5F5 | ~15:1 ✅ |
 | `--color-interactive-hover` | #CCCCCC | — |
 | `--color-interactive-focus` | #FFFFFF | ~19:1 ✅ |
-| `--color-tag-primary` | var(--color-accent-gold) | Primary tag background |
-| `--color-tag-secondary` | var(--color-accent-pink) | Secondary tag background |
-| `--color-tag-text` | var(--color-text-primary) | Text on all tags |
-| `--color-link` | var(--color-accent-gold-text) | Hyperlink default |
-| `--color-link-hover` | var(--color-accent-gold) | Hyperlink hover |
-| `--color-divider-accent` | var(--color-accent-gold) | hr and section dividers |
-| `--color-quote-border` | var(--color-accent-pink) | Blockquote left border |
+| `--color-link` | var(--color-accent-primary-text) | Hyperlink default |
+| `--color-link-hover` | var(--color-accent-primary) | Hyperlink hover |
+| `--color-divider-accent` | var(--color-accent-primary) | hr and section dividers |
+| `--color-quote-border` | var(--color-accent-quote) | Blockquote left border |
 | `--color-code-bg` | var(--color-background-subtle) | Code and pre background |
-| `--color-code-border` | var(--color-accent-gold) | Code left border |
+| `--color-code-border` | var(--color-accent-primary) | Code left border |
 | `--color-tooltip-bg` | var(--color-background-surface) | Tooltip background |
-| `--color-tooltip-border` | var(--color-accent-gold) | Tooltip border |
+| `--color-tooltip-border` | var(--color-accent-primary) | Tooltip border |
 | `--color-tooltip-text` | var(--color-text-primary) | Tooltip text |
 
 All text pairings meet WCAG AA (4.5:1 minimum for normal text).
@@ -402,15 +399,14 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - Image: `background-image` CSS property — decorative, no alt needed
 - Block link pattern: `::after` pseudo-element on `.card-link` covers full card
 - CTA label: "Read about this piece of work" (Work), "Read this thought" (Thoughts)
-- Tags: `.tag` and `.tag--secondary` classes
+- Tags: `.tag` links (see Tag Component below)
 - Screen reader: heading link announces destination cleanly
 
 ### Tag Component
-- `.tag` — gold background `--color-tag-primary`, white text
-- `.tag--secondary` — pink background `--color-tag-secondary`, white text
-- Shape: pill (border-radius full)
-- Font: sm, medium weight, wide letter spacing
-- Always `aria-hidden="true"` if decorative, `aria-label="Category: X"` if meaningful
+- `.tag` — transparent background, `--color-accent-primary` border and text
+- Shape: rounded corners (border-radius lg)
+- Font: sm, regular weight, wide letter spacing
+- Tags are always interactive links — `<a href="/archive.html?tag={slug}" class="tag">`
 
 ### Tooltip Component
 - **Desktop only** — hidden on touch devices via `@media (hover: none)`
@@ -517,7 +513,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - No backend or server-side logic
 - No analytics (can be added post-launch)
 - No comments system on Thoughts/Blog
-- No dark/light mode toggle (dark is default and only theme)
+- No dark/light mode toggle — dark backgrounds are fixed across all themes; a gold/teal accent colour toggle exists via `data-theme` attribute on `<html>` and does not affect backgrounds or greyscale tokens
 - No staging branch (removed — not needed for solo project)
 
 ---
@@ -550,7 +546,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - `initNav()` called only after nav markup is in the DOM
 - `aria-current="page"` set on active nav link after injection
 - Tooltip Escape key dismiss handled globally
-- No inline JavaScript in HTML files
+- No inline JavaScript in HTML files — exception: a flash-prevention `<script>` in every page `<head>` reads `localStorage.getItem('theme')` and sets `data-theme` on `<html>` before CSS loads, preventing a visible accent colour flicker on load; external scripts run after HTML parsing and are too late to avoid it
 
 ### Git
 - All work on `dev` branch

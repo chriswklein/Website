@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive — Christopher Klein</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +30,7 @@
                 <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
                 <label for="archive-search" class="sr-only">Search entries</label>
                 <input type="search" class="archive-search-input" id="archive-search"
-                       placeholder="Search or use filters" autocomplete="off">
+                       placeholder="Search" autocomplete="off">
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"
@@ -97,7 +98,7 @@
                 <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
                 <label for="drawer-search" class="sr-only">Search entries</label>
                 <input type="search" class="archive-search-input" id="drawer-search"
-                       placeholder="Search or use filters" autocomplete="off">
+                       placeholder="Search" autocomplete="off">
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"
