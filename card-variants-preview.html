@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Variants Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* ================================
+           PREVIEW PAGE LAYOUT
+           Isolated dev/design reference — same role as preview.html.
+           Not linked from nav.html, footer.html, or any live page.
+           This page now shows a single final card candidate (both layouts
+           it switches between at different widths), not a gallery of
+           alternatives — the five earlier variants and two "v2" sections
+           have been removed along with their dedicated CSS.
+        ================================ */
+        .preview-main {
+            padding-bottom: var(--space-20);
+        }
+
+        .preview-subtitle {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-md);
+            margin-bottom: var(--space-6);
+            max-width: none;
+        }
+
+        .preview-note {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-3);
+            max-width: none;
+        }
+
+        .preview-note code {
+            font-size: var(--font-size-xs);
+        }
+
+        /* ================================
+           PREVIEW HARNESS — section/frame/label scaffolding
+        ================================ */
+        .card-variant-section {
+            margin-top: var(--space-16);
+            padding-top: var(--space-8);
+            border-top: var(--border-width-thin) solid var(--color-border-default);
+        }
+
+        .card-variant-section-desc {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+            margin-bottom: var(--space-6);
+            max-width: none;
+        }
+
+        .card-variant-width-group {
+            margin-top: var(--space-8);
+        }
+
+        .card-variant-width-heading {
+            display: flex;
+            align-items: baseline;
+            gap: var(--space-3);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-4);
+        }
+
+        .card-variant-width-summary {
+            font-size: var(--font-size-sm);
+            color: var(--color-accent-primary-text);
+            font-family: 'Courier New', Courier, monospace;
+            max-width: none;
+        }
+
+        .card-variant-frame {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+            overflow-x: auto;
+            padding: var(--space-6);
+            background-color: var(--color-background-subtle);
+            border-radius: var(--border-radius-md);
+        }
+
+        .card-variant-card-wrap {
+            flex-shrink: 0;
+        }
+
+        /* Fixed rendering width — see "Frame widths" note above the section
+           for why this value is hardcoded rather than token-derived. */
+        .cv-frame--mobile {
+            width: 375px;
+        }
+
+        /* .card-variant-frame has padding: var(--space-6) on all sides, so its
+           real content box is narrower than its own outer width. A wrap fixed
+           to the frame's outer width (1136px) would overflow that content box
+           and trigger the frame's overflow-x: auto scrollbar. width: 100% sizes
+           the wrap to the frame's actual available content width instead. */
+        .cv-frame--desktop {
+            width: 100%;
+        }
+
+        .card-variant-card-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: var(--space-3);
+            margin-bottom: var(--space-2);
+            /* Overrides the global p { max-width: 65ch } from style.css — that
+               rule was never intended for this label row, and was capping it
+               far narrower than the card it labels. */
+            max-width: none;
+        }
+
+        .card-variant-card-title {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+            font-weight: var(--font-weight-medium);
+            max-width: none;
+        }
+
+        .card-variant-height-badge {
+            font-size: var(--font-size-xs);
+            color: var(--color-accent-primary-text);
+            font-family: 'Courier New', Courier, monospace;
+            max-width: none;
+            white-space: nowrap;
+        }
+
+        /* ================================
+           FINAL CANDIDATE CARD
+           Background (--color-background-surface) and border
+           (--border-width-thin solid --color-border-default) come from the
+           real .card class, unmodified — reused as the foundation here.
+        ================================ */
+
+        /* Horizontal-layout constraint: card must never exceed the frame's
+           width, and the frame IS the site's real content column width
+           (.cv-frame--desktop) — this is the explicit backstop for that. */
+        .pv-card-final {
+            max-width: 100%;
+        }
+
+        .pv-card-final .card-content {
+            padding: var(--space-3) var(--space-6);
+        }
+
+        .pv-card-final .card-meta {
+            font-size: var(--font-size-base);
+        }
+
+        /* Lifts the CTA above .card-block-link (position: absolute; z-index: 1)
+           in the stacking order — without this, the invisible full-card overlay
+           intercepts hover/click meant for the button. Same fix pattern the
+           live .card-cta already uses via --card-cta-z (a custom property on
+           .card, inherited here since these cards use the real .card class),
+           scoped to this preview's .btn.btn--ghost reuse rather than touching
+           the shared .btn/.btn--ghost class itself. Applies to both layouts —
+           both share the same buildFinal() markup. */
+        .pv-card-final .btn.btn--ghost {
+            position: relative;
+            z-index: var(--card-cta-z);
+        }
+
+        /* 2-line clamp — full excerpt text stays in the DOM for AT, only the
+           visual display is capped. */
+        .pv-card-final-excerpt {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Vertical/stacked — below 768px only. Image on top, full width; the
+           live .card-image default (aspect-ratio: 16/9, no fixed height)
+           already satisfies this, so no image override is needed here. */
+        .pv-card-final--vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        /* Horizontal — 768px and above (desktop AND tablet, since .container's
+           padding doesn't shrink until below 768px, so the desktop content
+           column width applies at both). Image as a left column sized by the
+           new --card-image-column-width token, stretched via align-items:
+           stretch to match whatever height the content column reaches —
+           aspect-ratio: auto removes the fixed 16:9 constraint so it can
+           actually stretch instead of clipping/gapping. */
+        .pv-card-final--horizontal {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+
+        .pv-card-final--horizontal .card-image {
+            flex: 0 0 var(--card-image-column-width);
+            width: var(--card-image-column-width);
+            aspect-ratio: auto;
+        }
+
+        .pv-card-final--horizontal .card-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Hover — real :hover (mouse) and a forced .pv-card-final--hover-demo
+           class (static side-by-side display, since automated measurement and
+           screenshots can't trigger actual :hover) get identical treatment.
+           Only the outer .card gets a border — .card-image is flush against
+           the card's inner edge in both layouts, so it's already visually
+           wrapped by this same border with no separate rule needed on it. */
+        .pv-card-final:hover,
+        .pv-card-final--hover-demo {
+            border-color: var(--color-accent-primary-text);
+            box-shadow: 0 var(--space-1) 0 var(--color-accent-primary);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="preview-main">
+    <main id="main-content">
+        <div class="container">
+
+            <h1>Final Card Design</h1>
+            <p class="preview-subtitle">A single final card candidate, built against real entries pulled live from <code>data/archive-entries.json</code>. This page's job is now to validate one responsive design at both frame widths, not compare alternatives — the earlier five-variant gallery and both "v2" sections have been removed. Dev/design reference only — isolated the same way <code>preview.html</code> is: not linked from nav, footer, or any live page.</p>
+
+            <p class="preview-note"><strong>Investigation — confirmed before this change:</strong> <code>buildCard()</code> in <code>script.js</code> (the function that renders every live Archive/Home card) builds <code>.card-content</code> in the order <strong>Title → Excerpt → Tags → Meta → CTA</strong>. The reorder below (Title → Tags → Meta → Excerpt → CTA) is new and applies <em>only</em> within this preview page — <code>script.js</code> and the live <code>.card</code> markup are untouched. Also reconfirmed: the real <code>.card</code> border is <code>1px solid var(--color-border-default)</code> by default (grey on real <code>:hover</code>, via <code>--color-border-strong</code> — the teal hover here is new, preview-only); <code>.card-image</code> is a <code>&lt;div&gt;</code> with <code>background-size: cover</code>, not an <code>&lt;img&gt;</code>.</p>
+
+            <p class="preview-note"><strong>New token:</strong> <code>--card-image-column-width: 42%</code> was added to <code>:root</code> in <code>style.css</code> (a real site-wide token, not preview-only) and documented in <code>DESIGN-SYSTEM.md</code> §4.5. The horizontal layout below references it instead of a hardcoded percentage.</p>
+
+            <p class="preview-note"><strong>Responsive breakpoint:</strong> horizontal (image-left) layout applies at 768px and above — desktop <em>and</em> tablet, superseding the earlier 1024px decision. This holds because <code>.container</code>'s padding (what Archive cards actually render inside) doesn't shrink until below 768px — it's the same <code>--space-8</code> at both desktop and tablet widths — so the single desktop/tablet frame below (1136px) validly represents both ranges without needing a third frame. Vertical/stacked layout applies only below 768px (mobile).</p>
+
+            <p class="preview-note"><strong>Horizontal width constraint:</strong> the card must never exceed the site's real content column width. <code>.pv-card-final { max-width: 100% }</code> is the explicit backstop, but structurally this already can't happen — the card is a block element filling its wrap, and the desktop/tablet frame (<code>.cv-frame--desktop</code>) is itself <code>calc(var(--max-content) - (var(--space-8) * 2))</code> = 1136px, the same inner width <code>.container</code> gives real Archive cards today.</p>
+
+            <p class="preview-note"><strong>Frame widths:</strong> the mobile frame is a hardcoded <code>375px</code> (iPhone SE width, per the original spec — not a design token, flagged here as required by Rule 6). The desktop/tablet frame uses <code>calc(var(--max-content) - (var(--space-8) * 2))</code>, derived entirely from existing tokens.</p>
+
+            <p class="preview-note"><strong>Interaction:</strong> card CTAs and block-links keep their real <code>href</code> values (unmodified, for fidelity) but a page-local click guard below prevents navigation so you can measure without leaving this preview.</p>
+
+            <p class="preview-note"><strong>Entries:</strong> the same two real Work entries used throughout this page's history — Star Engine and Test Framework — shown in both Default and forced-Hover states (mouse <code>:hover</code> also works, but automated measurement and screenshots can't trigger it, hence the forced class).</p>
+
+            <p class="preview-note" id="cv-status">Loading entries from data/archive-entries.json…</p>
+
+            <!-- ================================
+                 FINAL CANDIDATE
+            ================================ -->
+            <section class="card-variant-section" aria-labelledby="cv-final-heading">
+                <h2 id="cv-final-heading">Final Candidate</h2>
+                <p class="card-variant-section-desc">Content order: Title → Tags → Meta (author/date) → Excerpt (2-line clamp, full text in DOM) → CTA (<code>.btn.btn--ghost</code>, unmodified). Padding <code>12px 24px</code> (<code>--space-3</code>/<code>--space-6</code>), 16px meta (<code>--font-size-base</code>). Image has no fixed height in either layout — <code>align-items: stretch</code> makes it match whatever height the content column reaches for its real text, verified against Star Engine's longer excerpt as well as Test Framework's shorter one.</p>
+
+                <div class="card-variant-width-group">
+                    <div class="card-variant-width-heading">
+                        <h3>Mobile — 375px · stacked, below 768px · Default + Hover</h3>
+                        <span class="card-variant-width-summary" id="cv-summary-final-mobile">measuring…</span>
+                    </div>
+                    <div class="card-variant-frame" data-frame data-summary-target="cv-summary-final-mobile" data-layout="vertical" data-width="mobile" data-width-class="cv-frame--mobile"></div>
+                </div>
+
+                <div class="card-variant-width-group">
+                    <div class="card-variant-width-heading">
+                        <h3>Desktop / Tablet — content column (1136px, 768px and above) · horizontal · Default + Hover</h3>
+                        <span class="card-variant-width-summary" id="cv-summary-final-desktop">measuring…</span>
+                    </div>
+                    <div class="card-variant-frame" data-frame data-summary-target="cv-summary-final-desktop" data-layout="horizontal" data-width="desktop" data-width-class="cv-frame--desktop"></div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Prevent accidental navigation away from this static comparison page —
+            // card CTAs and block-links below keep their real href values for markup
+            // fidelity, but clicking them here should never leave the preview.
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.card')) e.preventDefault();
+            });
+
+            var WORK_ENTRY_IDS = ['star-engine', 'test-framework'];
+
+            function escapeHTML(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            function slugify(str) {
+                return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            }
+
+            function formatDate(iso) {
+                var parts = iso.split('-').map(Number);
+                return new Date(parts[0], parts[1] - 1, parts[2]).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+            }
+
+            // New content order for this preview only — Title → Tags → Meta → Excerpt → CTA.
+            // Confirmed live order in script.js buildCard(): Title → Excerpt → Tags → Meta → CTA.
+            // CTA reuses .btn.btn--ghost verbatim instead of .card-cta. Work entries only,
+            // so CTA wording is always the "view this project" action.
+            function cardContentHTMLFinal(entry) {
+                var date = formatDate(entry.date);
+                var meta = date + ' · ' + escapeHTML(entry.author || '');
+                var ctaLabel = escapeHTML(entry.title) + ' — view this project';
+                var tagSlugs = (entry.tags || []).map(slugify);
+                var tagsHTML = (entry.tags || []).map(function (t, i) {
+                    return '<a href="/archive.html?tag=' + tagSlugs[i] + '" class="tag">' + escapeHTML(t) + '</a>';
+                }).join('');
+
+                return '' +
+                    '<h3 class="card-title" data-searchable>' + escapeHTML(entry.title) + '</h3>' +
+                    '<div class="card-tags">' + tagsHTML + '</div>' +
+                    '<p class="card-meta">' + meta + '</p>' +
+                    '<p class="pv-card-final-excerpt">' + escapeHTML(entry.excerpt || '') + '</p>' +
+                    '<a href="' + escapeHTML(entry.url || '#') + '" class="btn btn--ghost" aria-label="' + ctaLabel + '">View</a>';
+            }
+
+            function imageHTML(entry) {
+                if (entry.type !== 'work') return '';
+                return '<div class="card-image" role="presentation"></div>';
+            }
+
+            function blockLinkHTML(entry) {
+                return '<a href="' + escapeHTML(entry.url || '#') + '" class="card-block-link" aria-hidden="true" tabindex="-1"></a>';
+            }
+
+            function applyBackgroundImage(article, entry) {
+                if (entry.type === 'work' && entry.image) {
+                    var imgDiv = article.querySelector('.card-image');
+                    if (imgDiv) imgDiv.style.backgroundImage = "url('" + entry.image + "')";
+                }
+            }
+
+            // Final candidate — builds on real .card/.card--feature/.card-image so
+            // background and border match today's live values with zero override.
+            // layout: 'vertical' (mobile, stacked) or 'horizontal' (desktop/tablet, image left).
+            function buildFinal(entry, layout, hoverDemo) {
+                var article = document.createElement('article');
+                var classes = ['card', 'card--feature', 'pv-card-final', 'pv-card-final--' + layout];
+                if (hoverDemo) classes.push('pv-card-final--hover-demo');
+                article.className = classes.join(' ');
+                article.innerHTML = blockLinkHTML(entry) + imageHTML(entry) + '<div class="card-content">' + cardContentHTMLFinal(entry) + '</div>';
+                applyBackgroundImage(article, entry);
+                return article;
+            }
+
+            function renderFrames(entries) {
+                document.querySelectorAll('[data-frame]').forEach(function (frame) {
+                    var layout = frame.getAttribute('data-layout');
+                    var widthKey = frame.getAttribute('data-width');
+                    var widthClass = frame.getAttribute('data-width-class');
+
+                    entries.forEach(function (entry) {
+                        [false, true].forEach(function (hoverDemo) {
+                            var wrap = document.createElement('div');
+                            wrap.className = 'card-variant-card-wrap ' + widthClass;
+
+                            var stateLabel = hoverDemo ? 'Hover' : 'Default';
+                            var label = document.createElement('p');
+                            label.className = 'card-variant-card-label';
+                            label.innerHTML =
+                                '<span class="card-variant-card-title">' + escapeHTML(entry.title) + ' <span aria-hidden="true">·</span> ' + stateLabel + '</span>' +
+                                '<span class="card-variant-height-badge" data-measure="' + layout + '-' + widthKey + '-' + entry.id + '-' + (hoverDemo ? 'hover' : 'default') + '">measuring…</span>';
+
+                            wrap.appendChild(label);
+                            wrap.appendChild(buildFinal(entry, layout, hoverDemo));
+                            frame.appendChild(wrap);
+                        });
+                    });
+                });
+            }
+
+            function measureAll() {
+                document.querySelectorAll('[data-measure]').forEach(function (badge) {
+                    var wrap = badge.closest('.card-variant-card-wrap');
+                    var card = wrap.querySelector('.card');
+                    var h = Math.round(card.getBoundingClientRect().height);
+                    badge.textContent = h + 'px';
+                    badge.setAttribute('data-px', h);
+                });
+
+                document.querySelectorAll('[data-frame]').forEach(function (frame) {
+                    var badges = frame.querySelectorAll('[data-measure]');
+                    var heights = Array.prototype.map.call(badges, function (b) {
+                        return parseInt(b.getAttribute('data-px'), 10);
+                    });
+                    var min = Math.min.apply(null, heights);
+                    var max = Math.max.apply(null, heights);
+                    var summary = document.getElementById(frame.getAttribute('data-summary-target'));
+                    if (summary) {
+                        summary.textContent = (min === max)
+                            ? min + 'px'
+                            : min + '–' + max + 'px across ' + heights.length + ' sample entries';
+                    }
+                });
+            }
+
+            fetch('/data/archive-entries.json')
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var byId = {};
+                    data.forEach(function (e) { byId[e.id] = e; });
+                    var entries = WORK_ENTRY_IDS.map(function (id) { return byId[id]; }).filter(Boolean);
+
+                    var status = document.getElementById('cv-status');
+                    if (entries.length !== WORK_ENTRY_IDS.length) {
+                        status.textContent = 'Warning: ' + (WORK_ENTRY_IDS.length - entries.length) + ' expected entry id(s) not found in the manifest. Rendered ' + entries.length + ' of ' + WORK_ENTRY_IDS.length + '.';
+                    } else {
+                        status.textContent = 'Loaded ' + entries.length + ' entries from data/archive-entries.json.';
+                    }
+
+                    renderFrames(entries);
+
+                    // Wait for web fonts (Noto Sans affects line-wrap and therefore height)
+                    // and two animation frames (layout settle) before measuring.
+                    document.fonts.ready.then(function () {
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(measureAll);
+                        });
+                    });
+                })
+                .catch(function (err) {
+                    document.getElementById('cv-status').textContent = 'Error loading data/archive-entries.json: ' + err.message;
+                    console.error('Error loading archive-entries.json:', err);
+                });
+        }());
+    </script>
+</body>
+</html>

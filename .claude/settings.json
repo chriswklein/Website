@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(rg \"#[0-9a-fA-F]{3,6}\" style.css --include=\"*.css\" -o)",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "Bash(awk '/^:root \\\\{/{inroot=1} /^\\\\}/{if\\(inroot\\){inroot=0; next}} {if\\(!inroot\\) print NR\": \"$0}' style.css)",
+      "Bash(grep -iE \"#[0-9a-f]{3,8}|rgba?\\\\\\(\")",
+      "Bash(python -m http.server 8791)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8791/card-variants-preview.html)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8791/data/archive-entries.json)",
+      "Read(//tmp/**)",
+      "Bash(node \"C:\\\\Users\\\\Switch\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--GitHub-Website\\\\d7c5aff9-5983-484a-a000-3c3c6e4acdf0\\\\scratchpad\\\\measure.js\")",
+      "Bash(python -m http.server 8793)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8793/card-variants-preview.html)",
+      "Bash(pkill -f \"http.server 8793\")",
+      "Bash(rm -f \"C:\\\\Users\\\\Switch\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--GitHub-Website\\\\d7c5aff9-5983-484a-a000-3c3c6e4acdf0\\\\scratchpad\\\\measure_v2.js\" \"C:\\\\Users\\\\Switch\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--GitHub-Website\\\\d7c5aff9-5983-484a-a000-3c3c6e4acdf0\\\\scratchpad\\\\top_check.js\" \"C:\\\\Users\\\\Switch\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--GitHub-Website\\\\d7c5aff9-5983-484a-a000-3c3c6e4acdf0\\\\scratchpad\"/v2-*.png \"C:\\\\Users\\\\Switch\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--GitHub-Website\\\\d7c5aff9-5983-484a-a000-3c3c6e4acdf0\\\\scratchpad\\\\top-of-page.png\")",
+      "Bash(grep -inE \"#[0-9a-fA-F]{3,8}\" card-variants-preview.html)",
+      "Bash(python -m http.server 8802)",
+      "Bash(curl -s -o /dev/null -w \"index:%{http_code}\\\\n\" http://127.0.0.1:8802/index.html)",
+      "Bash(curl -s -o /dev/null -w \"archive:%{http_code}\\\\n\" http://127.0.0.1:8802/archive.html)"
     ]
   }
 }

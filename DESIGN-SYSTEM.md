@@ -151,6 +151,18 @@ Gold contrast ratios verified: `#BA8200` on `#111111` ≈ 5.2:1 ✅ AA · `#E5A0
 
 The flash-prevention `<script>` at the top of every page `<head>` still runs on every load. With no preference stored in `localStorage` (the toggle is disabled so nothing writes to it), it finds nothing and exits silently — the page renders with the teal `:root` default with no flash and no console error. If a user had previously toggled to gold and has `"theme": "gold"` in `localStorage`, the script would apply `data-theme="gold"` and gold would render correctly — the dormant infrastructure remains functional.
 
+### 1.11 Background Pattern
+
+A subtle dot texture layered beneath `--color-background-base` on `body`, site-wide. Theme-agnostic — does not reference `--color-accent-primary` or any other theme-swappable token, so it renders identically regardless of which theme (teal or dormant gold) is active.
+
+| CSS Variable | Value | Usage |
+|---|---|---|
+| `--pattern-dot-color` | `rgba(255, 255, 255, 0.05)` | Dot colour — fixed, not theme-dependent |
+| `--pattern-dot-size` | `1.5px` | Radius of each dot |
+| `--pattern-dot-spacing` | `var(--space-6)` | Grid spacing between dots (24px) |
+
+Applied via `background-image` (radial-gradient dots) layered on top of `background-color` on `body` — the existing base colour is preserved underneath. Since it sits behind opaque card, header, and drawer surfaces, the pattern is only visible in empty page margins and gaps.
+
 ---
 
 ## 2. Typography
@@ -406,6 +418,14 @@ Content centred using `.standard-page` (max-width 1200px, horizontal padding). B
 - Inactive item: `--color-text-secondary`
 - Min touch target per item: `44px`
 - Body padding-bottom on mobile: `80px` to prevent content overlap
+
+### 4.5 Component-Specific Layout Tokens
+
+Most component tokens (`--btn-*`, `--tag-*`, `--card-*`, etc.) are scoped locally inside their own component selector in `style.css` — see the Component Token Reference table in `COMPONENTS.md`. The token below is the exception: it's defined in the global `:root` block because it governs a layout ratio referenced across breakpoints, the same way `--max-content` is.
+
+| CSS Variable | Value | Usage |
+|---|---|---|
+| `--card-image-column-width` | `42%` | Width of the image column in a horizontal (image-left) card layout, as a percentage of total card width |
 
 ---
 

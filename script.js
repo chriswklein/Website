@@ -537,9 +537,9 @@ function initArchive() {
             ${imageHTML}
             <div class="card-content">
                 <h3 class="card-title" data-searchable>${escapeHTML(entry.title)}</h3>
-                <p>${escapeHTML(entry.excerpt || '')}</p>
                 <div class="card-tags">${tagsHTML}</div>
                 <p class="card-meta">${meta}</p>
+                <p class="card-excerpt">${escapeHTML(entry.excerpt || '')}</p>
                 <a href="${escapeHTML(url)}" class="card-cta"
                    aria-label="${ctaLabel}">${ctaText}</a>
             </div>`;

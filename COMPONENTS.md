@@ -547,12 +547,9 @@ z-index stack (card has position: relative):
 ```css
 --card-bg:              var(--color-background-surface);
 --card-border:          var(--color-border-default);
---card-border-hover:    var(--color-border-strong);
 --card-radius:          var(--border-radius-md);
---card-padding:         var(--space-6);
 --card-image-bg:        var(--color-background-subtle);
 --card-image-ratio:     16 / 9;
---card-gap:             var(--space-4);
 --card-transition:      var(--duration-base) var(--ease-out);
 --card-block-link-z:    1;
 --card-cta-z:           2;
@@ -566,13 +563,19 @@ z-index stack (card has position: relative):
 --card-cta-padding-y:   var(--btn-padding-y);
 ```
 
+`.card-content` padding is `var(--space-3) var(--space-6)` (12px top/bottom, 24px left/right) — set directly on `.card-content`, not via the `--card-padding` custom property (which still exists for `.card-image-caption`'s use in the Profile variant, unaffected by this).
+
+Feature-variant desktop/tablet horizontal layout uses `--card-image-column-width` (`42%`) — see §4.5 of `DESIGN-SYSTEM.md`, since it's a global `:root` token rather than scoped to `.card`.
+
 ### States
 
-| State | Card Border | Card Background | Transition |
-|---|---|---|---|
-| Default | `--card-border` | `--card-bg` | — |
-| Hover | `--card-border-hover` | `--card-bg` | `--card-transition` |
-| Focus (keyboard) | Focus ring on `.card-cta` | `--card-bg` | Focus ring appears |
+| State | Card Border | Card Background | Box Shadow | Transition |
+|---|---|---|---|---|
+| Default | `--card-border` | `--card-bg` | none | — |
+| Hover | `var(--color-accent-primary-text)` (teal) | `--card-bg` | `0 var(--space-1) 0 var(--color-accent-primary)` — solid, non-blurred | `--card-transition` |
+| Focus (keyboard) | Focus ring on `.card-cta` | `--card-bg` | none | Focus ring appears |
+
+Hover applies to the whole card — including the image column on Feature cards at tablet/desktop width. The image has no border of its own; it's flush against the card's inner edge, so it's already visually wrapped by the same border with no separate rule needed.
 
 ---
 
@@ -581,17 +584,19 @@ z-index stack (card has position: relative):
 **CSS Class:** `.card.card--feature`
 **Usage:** Work / portfolio cards
 
+Content order (both Feature and Thought): **Title → Tags → Meta → Excerpt → CTA**. This was reordered from the earlier Title → Excerpt → Tags → Meta → CTA — validated on `card-variants-preview.html`'s "Final Candidate" before being promoted into this live component.
+
 #### Anatomy
 
 ```
 [ .card-block-link — empty, aria-hidden, tabindex=-1 ]
-[ .card-image — 16:9 decorative background ]
+[ .card-image — 16:9 decorative background, no fixed height ]
 [ .card-content ]
   [ h3.card-title ]
   [ .card-tags ]
     [ .tag ]
-  [ p description ]
   [ p.card-meta — {date} · {author} ]
+  [ p.card-excerpt — 2-line clamp, full text in DOM ]
   [ a.card-cta ]
 ```
 
@@ -602,10 +607,10 @@ z-index stack (card has position: relative):
     <div class="card-content">
         <h3 class="card-title">{Title}</h3>
         <div class="card-tags">
-            <span class="tag" aria-hidden="true">{Tag}</span>
+            <a href="/archive.html?tag={slug}" class="tag">{Tag}</a>
         </div>
-        <p>{Description}</p>
         <p class="card-meta">{date} · {author}</p>
+        <p class="card-excerpt">{Description}</p>
         <a href="{url}" class="card-cta" aria-label="{Title} — view this project">View</a>
     </div>
 </article>
@@ -614,18 +619,30 @@ z-index stack (card has position: relative):
 #### Accessibility
 
 - `<article>` announces as a landmark to screen readers
-- `.card-block-link` is `aria-hidden="true"` and `tabindex="-1"` — skipped entirely by keyboard and AT
-- `.card-cta` is the sole focusable element — carries full `aria-label`
-- Screen reader output: "Article. View. Link." (with aria-label: "{Title} — view this project")
+- `.card-block-link` is `aria-hidden="true"` and `tabindex="-1"` — skipped entirely by keyboard and AT; it's a sibling of `.card-content`, never a wrapper around it
+- `.card-cta` is the sole focusable element (besides tags) — carries full `aria-label`
+- Tags are real `<a href="/archive.html?tag={slug}">` links — no `aria-hidden`, no `tabindex` override — independently focusable and clickable, verified via real Tab-key navigation and hit-testing
+- Screen reader output: "Article. {Title}, heading level 3. {Tag}, link. ... View, link." (CTA aria-label: "{Title} — view this project")
 - Image: CSS background — no alt text needed
-- Tags: `aria-hidden="true"`
+- `.card-excerpt` visually clamps to 2 lines (`-webkit-line-clamp: 2`) but the full text remains in the DOM and is exposed in the accessibility tree — confirmed via a real accessibility-tree snapshot, not just source inspection
+
+#### Responsive Behaviour
+
+| Breakpoint | Layout | Image | Content |
+|---|---|---|---|
+| Below 768px | Stacked (default block flow — no extra CSS needed) | Full width, `aspect-ratio: 16/9` | Below image |
+| 768px and above (tablet + desktop) | `display: flex; flex-direction: row` | Left column, `width: var(--card-image-column-width)` (42%), `aspect-ratio: auto` | `flex: 1`, right of image |
+
+The image has no fixed height at either breakpoint. At 768px+, `align-items: stretch` on `.card--feature` makes the image match whatever height `.card-content` naturally reaches for its real text — verified against both a long-excerpt and a short-excerpt real entry, image height matched content height exactly (0px difference) in both cases. The card itself never exceeds the page's existing content-column width, since it fills its parent grid cell (`.card-row`, `.container`), which is already `max-width`-capped.
 
 ---
 
 ### Variant: Thought (Card/Thought)
 
 **CSS Class:** `.card.card--thought`
-**Usage:** Blog / writing entries. No thumbnail image — content only.
+**Usage:** Blog / writing entries. No thumbnail image — content only, at every breakpoint.
+
+Same content order, padding, and hover treatment as Feature — see above. `.card--thought .card-image { display: none; }` remains as a safety net, but in practice no `.card-image` element is ever rendered for Thought entries (`buildCard()` only builds the image div when `entry.type === 'work'`), so the horizontal-layout media query (scoped to `.card--feature`) never applies here regardless of viewport width.
 
 #### Anatomy
 
@@ -633,10 +650,10 @@ z-index stack (card has position: relative):
 [ .card-block-link — empty, aria-hidden, tabindex=-1 ]
 [ .card-content ]
   [ h3.card-title ]
-  [ p summary ]
   [ .card-tags ]
     [ .tag ]
   [ p.card-meta — Published {date} · {author} ]
+  [ p.card-excerpt — 2-line clamp, full text in DOM ]
   [ a.card-cta ]
 ```
 
@@ -645,11 +662,11 @@ z-index stack (card has position: relative):
     <a href="{url}" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
     <div class="card-content">
         <h3 class="card-title">{Title}</h3>
-        <p>{Summary — max 3 lines}</p>
         <div class="card-tags">
-            <span class="tag" aria-hidden="true">{Tag}</span>
+            <a href="/archive.html?tag={slug}" class="tag">{Tag}</a>
         </div>
         <p class="card-meta">Published {date} · {author}</p>
+        <p class="card-excerpt">{Summary}</p>
         <a href="{url}" class="card-cta" aria-label="{Title} — read this thought">Read</a>
     </div>
 </article>
@@ -658,7 +675,8 @@ z-index stack (card has position: relative):
 #### Accessibility
 
 - `.card-cta` `aria-label` action: "read this thought"
-- Screen reader output: "Article. Read. Link." (with aria-label: "{Title} — read this thought")
+- Screen reader output: "Article. {Title}, heading level 3. ... Read, link." (with aria-label: "{Title} — read this thought")
+- Same tag/excerpt accessibility notes as Feature, above
 
 ---
 
@@ -1440,6 +1458,7 @@ Quick reference mapping every component token to its semantic source.
 | `--card-border` | `--color-border-default` | `#2A2A2A` |
 | `--card-radius` | `--border-radius-md` | `8px` |
 | `--card-image-bg` | `--color-background-subtle` | `#2A2A2A` |
+| `--card-image-column-width` | — (global `:root` token, see DESIGN-SYSTEM.md §4.5) | `42%` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
 | `--tag-border` | `--color-accent-primary` | `#BA8200` |
