@@ -44,3 +44,19 @@ Copy the appropriate template from `templates/`:
 - **Thought entry** → `templates/thought-entry-template.html`
 
 Replace all `{placeholder}` values before committing.
+
+---
+
+## Removing an Entry
+
+Steps to fully retire a Work or Thought entry, in order:
+
+1. **Delete the entry's HTML file** — `work/{slug}.html` or `thoughts/{slug}.html`.
+2. **Remove its manifest entry** from `data/archive-entries.json` — this is what drives `archive.html` and any JS-built card (`buildCard()` in `script.js`); once the entry is gone from here, it stops appearing in Archive and in its type/tag filter counts automatically.
+3. **Check and update `index.html` for any hand-written card referencing it.** Home's Featured Work / Featured Thoughts cards are static, hand-written HTML — they are **not** synced to the manifest. Deleting a manifest entry does nothing to a Home card that still links to it; if the removed entry was featured on Home, its card must be deleted from `index.html` by hand in the same pass, or the card is left pointing at a 404.
+4. **Confirm no other page hardlinks the deleted slug.** Grep the repo for the slug across `*.html`, `script.js`, and `data/*.json` — real cross-links between entries (e.g. a Previous/Next nav) are currently placeholder `href="#"` in every template, so this is normally a no-op, but confirm it rather than assume it as the site grows.
+5. **Orphaned tags need no manual cleanup.** Archive's tag filter chips are derived dynamically at runtime from whatever tags are still present across `allEntries` (`buildSecondaryChips()` in `script.js`) — there is no separate, hand-maintained tag list anywhere. If a tag's last remaining entry is deleted, that tag simply stops being generated as a chip on the next page load. Nothing to edit, nothing to remember to clean up later.
+
+**Going dormant instead of deleting:** if an entry should stay reachable via Archive but come off Home, skip steps 1 and 2 — leave the HTML file and manifest entry in place, and remove only its Home card in step 3. The entry remains fully live at its real URL and in Archive's results/filters; it just isn't featured.
+
+**Renaming a slug:** treat it as delete-and-recreate at the file level (old filename removed, new filename added) plus an in-place edit of the manifest entry's `id`, `title`, `url`, and any other changed fields — `url` must be updated to match the new filename or the manifest entry silently points at a now-missing file. Update the entry's own on-page `<title>`, breadcrumb current-page item, `<h1>`, and any hardcoded tag chips to match the new title/tags exactly, per the tag/slug consistency rule in the Writing Workflow section above. Update any Home card referencing the old slug the same way.
