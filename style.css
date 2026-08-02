@@ -1385,9 +1385,8 @@ footer p {
     .card--profile .card-image-caption {
         width: 300px;
         max-width: 300px;
-        height: 14px;
-        font-size: 10px;
-        line-height: 14px;
+        font-size: var(--font-size-xs);
+        line-height: var(--line-height-loose);
         font-style: italic;
         font-weight: var(--font-weight-regular);
         color: var(--color-text-secondary);
