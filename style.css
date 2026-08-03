@@ -478,6 +478,26 @@ pre code {
     display: none;
 }
 
+.tag-chip--collapsed {
+    display: none;
+}
+
+/* "+N more" / "Show less" toggle for desktop's secondary tag list — shares
+   .tag-chip's shape (padding, radius, font) but uses neutral border/text
+   tokens instead of the accent colour, so it reads as a UI control within
+   the tag row rather than another selectable filter. */
+.tag-chip-more {
+    border-color: var(--color-border-strong);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+
+.tag-chip-more:hover {
+    background-color: var(--color-background-subtle);
+    border-color: var(--color-border-strong);
+    color: var(--color-text-primary);
+}
+
 /* ================================
    BUTTON
 ================================ */
@@ -1598,11 +1618,23 @@ footer p {
 }
 
 .filter-drawer-body {
-    overflow-y: auto;
+    min-height: 0;
     padding: var(--space-4);
     display: flex;
     flex-direction: column;
     gap: var(--space-0);
+}
+
+/* Only this region scrolls — the controls row, primary chips, and active
+   chips row above it stay pinned regardless of secondary list length.
+   flex: 1 + min-height: 0 lets it consume whatever space the pinned
+   siblings don't need, within .filter-drawer's existing max-height: 70vh,
+   without hardcoding a second height value that would need to stay in sync. */
+.filter-drawer-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
 }
 
 /* Filter drawer — Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) */

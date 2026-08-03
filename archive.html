@@ -107,6 +107,7 @@
                         aria-controls="filter-drawer"
                         aria-haspopup="dialog">
                     <span class="trigger-label">Filters</span>
+                    <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
                 </button>
             </div>
 
@@ -120,8 +121,16 @@
                         aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
             </div>
 
-            <!-- Row 3: Secondary tag chips populated by initArchive() -->
-            <div id="filter-drawer-chips"></div>
+            <!-- Active secondary filters row — collapses to zero height when empty;
+                 keeps an active tag visible regardless of scroll position or the
+                 +N-more collapse state of the full list below -->
+            <div class="archive-active-chips" id="filter-drawer-active-chips"></div>
+
+            <!-- Row 3: Secondary tag chips (+ "+N more" toggle) — the only
+                 scrollable region in the drawer; everything above stays pinned -->
+            <div class="filter-drawer-scroll">
+                <div id="filter-drawer-chips"></div>
+            </div>
 
         </div>
     </div>

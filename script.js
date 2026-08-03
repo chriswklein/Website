@@ -352,8 +352,11 @@ function initArchive() {
     const railGroup        = document.querySelector('.action-rail-group');
     const primaryChips     = document.querySelectorAll('[data-filter-type]');
     const activeChipsEl    = document.getElementById('archive-active-chips');
+    const drawerActiveChipsEl = document.getElementById('filter-drawer-active-chips');
     const inlineFiltersEl  = document.getElementById('archive-secondary-chips');
     const drawerChipsEl    = document.getElementById('filter-drawer-chips');
+    const primaryChipsEl   = document.querySelector('.archive-primary-chips');
+    const drawerPrimaryChipsEl = document.querySelector('.filter-drawer-primary-chips');
     const loadMoreBtn      = document.querySelector('.archive-load-more-btn');
 
     // State
@@ -363,6 +366,7 @@ function initArchive() {
     let currentSort        = 'latest';
     let currentQuery       = '';
     let visibleCount       = 25;
+    let secondaryExpanded  = false; // desktop "+N more" disclosure — persists for the page load
     let debounceTimer;
 
     // Read initial URL params
@@ -428,6 +432,24 @@ function initArchive() {
                 });
                 container.appendChild(btn);
             });
+        });
+
+        // "Show More" / "Show Less" progressive disclosure toggle — appended
+        // after the Work/Thoughts chips in both the desktop inline primary
+        // row and the Filter Drawer's primary row (not inside the secondary
+        // tag containers it controls). Both toggles drive the same shared
+        // secondaryExpanded state, so expanding in one context is reflected
+        // in the other on next render().
+        [primaryChipsEl, drawerPrimaryChipsEl].filter(Boolean).forEach(container => {
+            const moreToggle = document.createElement('button');
+            moreToggle.type = 'button';
+            moreToggle.className = 'tag-chip tag-chip-more';
+            moreToggle.hidden = true;
+            moreToggle.addEventListener('click', () => {
+                secondaryExpanded = !secondaryExpanded;
+                render();
+            });
+            container.appendChild(moreToggle);
         });
     }
 
@@ -497,30 +519,30 @@ function initArchive() {
 
     // Update active secondary chips row (shown above secondary list)
     function updateActiveChipsRow() {
-        if (!activeChipsEl) return;
-        activeChipsEl.innerHTML = '';
-        activeChipsEl.classList.toggle('is-active', activeSecondary.size > 0);
-        if (!activeSecondary.size) return;
-        activeSecondary.forEach(slug => {
-            const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
-            const label = sourceBtn ? sourceBtn.dataset.label : slug;
-            const btn = document.createElement('button');
-            btn.className = 'tag-chip tag-chip--active';
-            btn.type = 'button';
-            btn.setAttribute('aria-pressed', 'true');
-            btn.setAttribute('aria-label', `Remove ${label} filter`);
-            const x = document.createElement('span');
-            x.className = 'tag-chip-x';
-            x.setAttribute('aria-hidden', 'true');
-            x.textContent = '×';
-            btn.textContent = label;
-            btn.appendChild(x);
-            btn.addEventListener('click', () => {
-                activeSecondary.delete(slug);
-                visibleCount = 25;
-                render();
+        [activeChipsEl, drawerActiveChipsEl].filter(Boolean).forEach(container => {
+            container.innerHTML = '';
+            container.classList.toggle('is-active', activeSecondary.size > 0);
+            activeSecondary.forEach(slug => {
+                const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
+                const label = sourceBtn ? sourceBtn.dataset.label : slug;
+                const btn = document.createElement('button');
+                btn.className = 'tag-chip tag-chip--active';
+                btn.type = 'button';
+                btn.setAttribute('aria-pressed', 'true');
+                btn.setAttribute('aria-label', `Remove ${label} filter`);
+                const x = document.createElement('span');
+                x.className = 'tag-chip-x';
+                x.setAttribute('aria-hidden', 'true');
+                x.textContent = '×';
+                btn.textContent = label;
+                btn.appendChild(x);
+                btn.addEventListener('click', () => {
+                    activeSecondary.delete(slug);
+                    visibleCount = 25;
+                    render();
+                });
+                container.appendChild(btn);
             });
-            activeChipsEl.appendChild(btn);
         });
     }
 
@@ -556,14 +578,16 @@ function initArchive() {
 
     // Shared class/aria/× state for a tag-chip button — single source of truth
     // for the primary-chip and secondary-chip render loops below.
-    // isDuplicateOfActiveRow: true for chips living in the desktop
-    // #archive-secondary-chips list, where an active tag is already shown
-    // separately in #archive-active-chips — that duplicate must render
-    // Dim, not Active, so only the true active-chips-row instance ever
-    // shows the Active state for a given slug. aria-pressed/×/aria-label
-    // stay driven by the real isActive value regardless of this distinction,
-    // since the underlying toggle state (and its removability) is unchanged —
-    // only the visual Active/Dim classing differs for the duplicate.
+    // isDuplicateOfActiveRow: true for chips living in the full secondary
+    // list (#archive-secondary-chips on desktop, #filter-drawer-chips in the
+    // Filter Drawer), where an active tag is already shown separately in its
+    // context's own active-chips row (#archive-active-chips /
+    // #filter-drawer-active-chips) — that duplicate must render Dim, not
+    // Active, so only the true active-chips-row instance ever shows the
+    // Active state for a given slug. aria-pressed/×/aria-label stay driven by
+    // the real isActive value regardless of this distinction, since the
+    // underlying toggle state (and its removability) is unchanged — only the
+    // visual Active/Dim classing differs for the duplicate.
     function applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow = false }) {
         const dimAsDuplicate = isDuplicateOfActiveRow && isActive;
         const showAsActive = isActive && !dimAsDuplicate;
@@ -637,12 +661,42 @@ function initArchive() {
             const slug     = btn.dataset.filterTag;
             const isActive = activeSecondary.has(slug);
             const anyActive = activeSecondary.size > 0;
-            const isDuplicateOfActiveRow = !!btn.closest('#archive-secondary-chips');
+            const isDuplicateOfActiveRow = !!btn.closest('#archive-secondary-chips, #filter-drawer-chips');
             applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow });
             const count = getChipCountForTag(slug);
             const tagCountEl = btn.querySelector('.chip-count');
             if (tagCountEl) tagCountEl.textContent = ` ${count}`;
             btn.classList.toggle('tag-chip--zero-count', count === 0);
+        });
+
+        // "Show More" / "Show Less" progressive disclosure — collapse the
+        // visible secondary tag list (already alphabetically sorted;
+        // zero-count tags already excluded above) to the first 10, in both
+        // the desktop inline list and the Filter Drawer. Both read/write the
+        // same shared secondaryExpanded state, so expand/collapse stays in
+        // sync between contexts — resizing between desktop and mobile
+        // mid-session doesn't reset it. The toggle button itself now lives in
+        // the primary chips row (not inside the container being measured
+        // here), so each secondary container is paired with the primary row
+        // that holds its toggle.
+        [
+            { secondary: inlineFiltersEl, toggleHost: primaryChipsEl },
+            { secondary: drawerChipsEl, toggleHost: drawerPrimaryChipsEl },
+        ].filter(pair => pair.secondary).forEach(({ secondary, toggleHost }) => {
+            const visibleTags = [...secondary.querySelectorAll('[data-filter-tag]')]
+                .filter(btn => !btn.classList.contains('tag-chip--zero-count'));
+            const overflowCount = visibleTags.length - 10;
+
+            visibleTags.forEach((btn, i) => {
+                btn.classList.toggle('tag-chip--collapsed', i >= 10 && !secondaryExpanded);
+            });
+
+            const moreToggle = toggleHost ? toggleHost.querySelector('.tag-chip-more') : null;
+            if (moreToggle) {
+                moreToggle.hidden = overflowCount <= 0;
+                moreToggle.textContent = secondaryExpanded ? 'Show Less' : 'Show More';
+                moreToggle.setAttribute('aria-expanded', String(secondaryExpanded));
+            }
         });
 
         updateActiveChipsRow();
