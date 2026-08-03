@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initBackToTop();
     initShareButtons();
     initFilterDrawer();
-    initArchiveFilter();
     initArchive();
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
 });
@@ -211,6 +210,23 @@ function initFilterDrawer() {
     const allTriggers = document.querySelectorAll('[aria-controls="filter-drawer"]');
     let removeTrapFocus = null;
     let openerBtn = null;
+    let savedScrollY = 0;
+
+    // Locks background scroll while the drawer is open — inert blocks click/
+    // focus/AT interaction on background content, but has no effect on
+    // document-level scroll, so touch-drag and wheel gestures over the scrim
+    // would otherwise still scroll the page underneath.
+    function lockBodyScroll() {
+        savedScrollY = window.scrollY;
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.classList.add('body-scroll-locked');
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('body-scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo(0, savedScrollY);
+    }
 
     // Elements to inert while the drawer is open — prevents focus leaking to duplicate controls
     function getInertTargets() {
@@ -239,6 +255,7 @@ function initFilterDrawer() {
 
     function openDrawer(opener) {
         openerBtn = opener;
+        lockBodyScroll();
         drawer.removeAttribute('inert');
         drawer.removeAttribute('hidden');
         if (scrim) scrim.removeAttribute('hidden');
@@ -268,6 +285,7 @@ function initFilterDrawer() {
     }
 
     function closeDrawer() {
+        unlockBodyScroll();
         drawer.setAttribute('inert', '');
         drawer.classList.remove('filter-drawer--open');
         if (scrim) scrim.classList.remove('archive-scrim--open');
@@ -323,86 +341,6 @@ function initFilterDrawer() {
     }
 }
 
-// Live archive filtering — shared between inline desktop chips and drawer chips.
-// Expects: .archive-search-input, .tag-chip[data-filter], [data-tags] items.
-function initArchiveFilter() {
-    const searchInput = document.querySelector('.archive-search-input');
-    const chipButtons = document.querySelectorAll('.tag-chip[data-filter]');
-    const archiveItems = document.querySelectorAll('[data-tags]');
-
-    if (!chipButtons.length) return;
-
-    // Cache each chip's original label before any X spans are injected
-    chipButtons.forEach(btn => {
-        btn.dataset.label = btn.textContent.trim();
-    });
-
-    const activeFilters = new Set();
-    let debounceTimer;
-
-    function applyFilters() {
-        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-
-        archiveItems.forEach(item => {
-            const tags = (item.dataset.tags || '').split(',').map(t => t.trim()).filter(Boolean);
-            const titleEl = item.querySelector('[data-searchable]');
-            const text = titleEl ? titleEl.textContent.toLowerCase() : '';
-
-            const matchesSearch = !query || text.includes(query);
-            const matchesTags = !activeFilters.size || [...activeFilters].some(f => tags.includes(f));
-
-            item.hidden = !(matchesSearch && matchesTags);
-        });
-
-        chipButtons.forEach(btn => {
-            const filter = btn.dataset.filter;
-            const isActive = activeFilters.has(filter);
-            const anyActive = activeFilters.size > 0;
-
-            btn.classList.toggle('tag-chip--active', isActive);
-            btn.classList.toggle('tag-chip--dim', !isActive && anyActive);
-            btn.setAttribute('aria-pressed', String(isActive));
-
-            // Inject or remove the × indicator
-            const existingX = btn.querySelector('.tag-chip-x');
-            if (isActive && !existingX) {
-                const x = document.createElement('span');
-                x.className = 'tag-chip-x';
-                x.setAttribute('aria-hidden', 'true');
-                x.textContent = '×';
-                btn.appendChild(x);
-            } else if (!isActive && existingX) {
-                existingX.remove();
-            }
-
-            if (isActive) {
-                btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
-            } else {
-                btn.removeAttribute('aria-label');
-            }
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(applyFilters, 250);
-        });
-    }
-
-    chipButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const filter = btn.dataset.filter;
-            if (activeFilters.has(filter)) {
-                activeFilters.delete(filter);
-            } else {
-                activeFilters.add(filter);
-            }
-            applyFilters();
-        });
-    });
-}
-
 // Archive page — fetch manifest, build chips, filter, sort, paginate, sync URL
 function initArchive() {
     const resultsEl        = document.getElementById('archive-results');
@@ -432,7 +370,9 @@ function initArchive() {
     const typeParam = params.get('type');
     const tagParam  = params.get('tag');
     if (typeParam === 'work' || typeParam === 'thoughts') activeType = typeParam;
-    if (tagParam) activeSecondary.add(tagParam);
+    // tagParam is validated against real tag data once the manifest is fetched
+    // (below) — adding it here, before allEntries exists, would let any stale
+    // or arbitrary URL value become a permanent zero-match filter.
 
     // Utilities
     function slugify(str) {
@@ -460,6 +400,8 @@ function initArchive() {
             const slug = slugify(t);
             if (!seen.has(slug)) { seen.add(slug); tags.push({ label: t, slug }); }
         }));
+
+        tags.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
 
         [inlineFiltersEl, drawerChipsEl].filter(Boolean).forEach(container => {
             container.innerHTML = '';
@@ -612,6 +554,40 @@ function initArchive() {
         }).length;
     }
 
+    // Shared class/aria/× state for a tag-chip button — single source of truth
+    // for the primary-chip and secondary-chip render loops below.
+    // isDuplicateOfActiveRow: true for chips living in the desktop
+    // #archive-secondary-chips list, where an active tag is already shown
+    // separately in #archive-active-chips — that duplicate must render
+    // Dim, not Active, so only the true active-chips-row instance ever
+    // shows the Active state for a given slug. aria-pressed/×/aria-label
+    // stay driven by the real isActive value regardless of this distinction,
+    // since the underlying toggle state (and its removability) is unchanged —
+    // only the visual Active/Dim classing differs for the duplicate.
+    function applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow = false }) {
+        const dimAsDuplicate = isDuplicateOfActiveRow && isActive;
+        const showAsActive = isActive && !dimAsDuplicate;
+        const showAsDim = dimAsDuplicate || (!isActive && anyActive);
+
+        btn.classList.toggle('tag-chip--active', showAsActive);
+        btn.classList.toggle('tag-chip--dim', showAsDim);
+        btn.setAttribute('aria-pressed', String(isActive));
+
+        const existingX = btn.querySelector('.tag-chip-x');
+        if (isActive && !existingX) {
+            const x = document.createElement('span');
+            x.className = 'tag-chip-x';
+            x.setAttribute('aria-hidden', 'true');
+            x.textContent = '×';
+            btn.appendChild(x);
+        } else if (!isActive && existingX) {
+            existingX.remove();
+        }
+
+        if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
+        else           btn.removeAttribute('aria-label');
+    }
+
     // Main render — updates all UI from current state
     function render() {
         const filtered = getFiltered();
@@ -634,23 +610,9 @@ function initArchive() {
             const type     = btn.dataset.filterType;
             const isActive = activeType === type;
             const anyActive = activeType !== null;
-            btn.classList.toggle('tag-chip--active', isActive);
-            btn.classList.toggle('tag-chip--dim', !isActive && anyActive);
-            btn.setAttribute('aria-pressed', String(isActive));
-            const existingX = btn.querySelector('.tag-chip-x');
-            if (isActive && !existingX) {
-                const x = document.createElement('span');
-                x.className = 'tag-chip-x';
-                x.setAttribute('aria-hidden', 'true');
-                x.textContent = '×';
-                btn.appendChild(x);
-            } else if (!isActive && existingX) {
-                existingX.remove();
-            }
-            if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
-            else          btn.removeAttribute('aria-label');
+            applyChipState(btn, { isActive, anyActive });
             const typeCountEl = btn.querySelector('.chip-count');
-            if (typeCountEl) typeCountEl.textContent = ` ${getChipCountForType(btn.dataset.filterType)}`;
+            if (typeCountEl) typeCountEl.textContent = ` ${getChipCountForType(type)}`;
         });
 
         // Sort toggle — update text to reflect current sort direction
@@ -675,23 +637,12 @@ function initArchive() {
             const slug     = btn.dataset.filterTag;
             const isActive = activeSecondary.has(slug);
             const anyActive = activeSecondary.size > 0;
-            btn.classList.toggle('tag-chip--active', isActive);
-            btn.classList.toggle('tag-chip--dim', !isActive && anyActive);
-            btn.setAttribute('aria-pressed', String(isActive));
-            const existingX = btn.querySelector('.tag-chip-x');
-            if (isActive && !existingX) {
-                const x = document.createElement('span');
-                x.className = 'tag-chip-x';
-                x.setAttribute('aria-hidden', 'true');
-                x.textContent = '×';
-                btn.appendChild(x);
-            } else if (!isActive && existingX) {
-                existingX.remove();
-            }
-            if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
-            else          btn.removeAttribute('aria-label');
+            const isDuplicateOfActiveRow = !!btn.closest('#archive-secondary-chips');
+            applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow });
+            const count = getChipCountForTag(slug);
             const tagCountEl = btn.querySelector('.chip-count');
-            if (tagCountEl) tagCountEl.textContent = ` ${getChipCountForTag(btn.dataset.filterTag)}`;
+            if (tagCountEl) tagCountEl.textContent = ` ${count}`;
+            btn.classList.toggle('tag-chip--zero-count', count === 0);
         });
 
         updateActiveChipsRow();
@@ -796,6 +747,17 @@ function initArchive() {
         .then(r => r.json())
         .then(entries => {
             allEntries = entries;
+
+            // Validate the ?tag= URL param now that real tag data exists —
+            // an unrecognised slug (stale/renamed tag, typo, hand-edited URL)
+            // is treated as if no tag param was given, rather than silently
+            // becoming a permanent zero-match filter with a phantom active chip.
+            if (tagParam) {
+                const validTagSlugs = new Set();
+                entries.forEach(e => (e.tags || []).forEach(t => validTagSlugs.add(slugify(t))));
+                if (validTagSlugs.has(tagParam)) activeSecondary.add(tagParam);
+            }
+
             buildSecondaryChips(entries);
             render();
         })

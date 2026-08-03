@@ -474,6 +474,10 @@ pre code {
     font-weight: var(--font-weight-regular);
 }
 
+.tag-chip--zero-count {
+    display: none;
+}
+
 /* ================================
    BUTTON
 ================================ */
@@ -1510,6 +1514,7 @@ footer p {
 .archive-search-input {
     flex: 1;
     min-width: 160px;
+    min-height: var(--touch-target-minimum);
     padding: var(--space-2) var(--space-4);
     font-size: var(--font-size-sm);
     color: var(--color-text-primary);
@@ -1532,6 +1537,7 @@ footer p {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    min-height: var(--touch-target-minimum);
     padding: var(--space-2) var(--space-4);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
@@ -1702,6 +1708,17 @@ footer p {
 .archive-scrim--open {
     opacity: 0.7;
     pointer-events: auto;
+}
+
+/* Body scroll lock — applied to <body> while the Filter Drawer is open.
+   Uses position: fixed rather than overflow: hidden, which is known to leak
+   scroll on iOS Safari. `top` is set inline via JS to the negative of the
+   saved scroll offset — that value is inherently dynamic per open, so it
+   can't live in this static rule. */
+.body-scroll-locked {
+    position: fixed;
+    left: 0;
+    right: 0;
 }
 
 /* ================================

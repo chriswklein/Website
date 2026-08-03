@@ -217,10 +217,12 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 **Figma Component Name:** `Tag-Chip`
 **CSS Class:** `.tag-chip`
-**HTML Element:** `<button class="tag-chip" type="button" data-filter="{slug}" aria-pressed="false">`
+**HTML Element:** `<button class="tag-chip" type="button" data-filter-tag="{slug}" aria-pressed="false">` (secondary tag chips) or `data-filter-type="{work|thoughts}"` (primary type chips)
 
 ### Design Intent
 Tag-Chips are interactive filter controls used in the Archive Header and Filter Drawer. Unlike Tag links (which navigate to a new page), Tag-Chips toggle filter state in place with no page reload. They follow a 4-state model: Default, Hover, Active (filter applied), and Dim (available while another filter is active).
+
+On desktop, an active secondary tag renders twice: once in `#archive-active-chips` (the sole Active-styled instance, with its own × remove control) and once as its duplicate inside the full `#archive-secondary-chips` list. That duplicate renders Dim, not Active — Active styling is reserved for the `#archive-active-chips` instance only, so the same filter never appears "on" twice. The duplicate remains fully clickable (clicking it removes the filter, same as its `#archive-active-chips` counterpart) — only the visual state differs; `aria-pressed` and `aria-label` still reflect the real toggle state on both instances. This distinction does not apply on tablet/mobile — the Filter Drawer has no separate active-chips row, so an active tag there has only one instance and renders Active normally.
 
 ### When to Use
 - Inside `.archive-inline-filters` on desktop
@@ -270,10 +272,10 @@ Tag-Chips are interactive filter controls used in the Archive Header and Filter 
 [ Label text  × ]     ← active (× is .tag-chip-x, aria-hidden)
 ```
 
-- Container: `<button class="tag-chip" type="button" data-filter="{slug}" aria-pressed="false">`
+- Container: `<button class="tag-chip" type="button" data-filter-tag="{slug}" aria-pressed="false">`
 - X indicator (active only): `<span class="tag-chip-x" aria-hidden="true">×</span>` inside button
-- `data-filter`: slug matching `[data-tags]` attribute on archive items
-- `aria-pressed`: `"true"` when active, `"false"` otherwise — managed by `initArchiveFilter()`
+- `data-filter-tag`: slug matching the tag slugs derived from `data/archive-entries.json` entries (secondary chips); `data-filter-type`: `"work"` or `"thoughts"` (primary chips)
+- `aria-pressed`: `"true"` when active, `"false"` otherwise — managed by the shared `applyChipState()` helper inside `initArchive()`
 
 ### States
 
@@ -298,25 +300,33 @@ Tag-Chips are interactive filter controls used in the Archive Header and Filter 
 
 - On desktop: appears in `.archive-inline-filters` (inline in archive header)
 - On tablet/mobile: appears in `.filter-drawer-body` (inside Filter Drawer)
-- State syncs between both locations via shared `activeFilters` set in `initArchiveFilter()`
+- State syncs between both locations via the shared `activeSecondary` set (secondary tags) and `activeType` value (primary type) in `initArchive()`
 
 ### JavaScript API
 
-Chips are wired by `initArchiveFilter()` in `script.js`. Each chip must have `data-filter` matching the slugs in `[data-tags]` on archive items.
+Chips are built and wired by `initArchive()` in `script.js`. Secondary chips carry `data-filter-tag="{slug}"`; primary chips carry `data-filter-type="work"` or `data-filter-type="thoughts"`. On every `render()` pass, each chip's classes/`aria-pressed`/`aria-label`/× indicator are computed by the shared `applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow })` helper — the single source of truth for chip state, used for both the primary-chip loop and the secondary-chip loop (`isDuplicateOfActiveRow` is only ever `true` for chips inside `#archive-secondary-chips`; see Design Intent above).
 
 Default chip:
 ```html
-<button class="tag-chip" type="button" data-filter="quality-assurance" aria-pressed="false">
+<button class="tag-chip" type="button" data-filter-tag="quality-assurance" aria-pressed="false">
     Quality Assurance
 </button>
 ```
 
 Active state (set by JS, not authored manually):
 ```html
-<button class="tag-chip tag-chip--active" type="button" data-filter="quality-assurance"
+<button class="tag-chip tag-chip--active" type="button" data-filter-tag="quality-assurance"
         aria-pressed="true" aria-label="Remove Quality Assurance filter">
     Quality Assurance
     <span class="tag-chip-x" aria-hidden="true">×</span>
+</button>
+```
+
+Dim duplicate state (desktop `#archive-secondary-chips` only, when this tag is active but already shown in `#archive-active-chips`):
+```html
+<button class="tag-chip tag-chip--dim" type="button" data-filter-tag="quality-assurance"
+        aria-pressed="true" aria-label="Remove Quality Assurance filter">
+    Quality Assurance
 </button>
 ```
 
