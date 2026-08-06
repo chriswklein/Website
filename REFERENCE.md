@@ -556,7 +556,47 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ---
 
-## 12. Designer to Engineer Handoff Standards
+## 12. Accessibility
+
+Accessibility is a stated project pillar (see Core Principles, §1), not a post-launch checklist. This section tracks that commitment as ongoing work — implemented items are verified against the real site, not assumed from intent; planned items are named honestly as gaps rather than left undocumented.
+
+### Currently Implemented
+
+**Keyboard & Focus**
+- Skip-to-content link, first child of `<body>` on every page
+- Full Tab-order support across nav, cards, tags, buttons, and the Filter Drawer
+- Visible focus outlines site-wide (`:focus-visible`, 2px solid white, 3px offset)
+- Focus trap inside the open Filter Drawer (`trapFocus()`)
+- Background content excluded from Tab order via `inert` while the drawer is open, and the drawer's own content excluded via `inert` while closed — both directions handled, not just one
+- Escape closes the drawer, with focus returned to whichever trigger opened it
+- The invisible full-card click overlay (`.card-block-link`) is correctly hidden from keyboard users (`aria-hidden="true"`, `tabindex="-1"`) — mouse convenience never creates a redundant or confusing tab stop
+
+**Screen Reader & Semantic**
+- Real NVDA testing conducted during development — not automated-only
+- Meaningful `aria-label`s on state-changing controls (filter chips, Clear, Share, Back to Top, drawer triggers)
+- `aria-expanded` / `aria-pressed` reflect live state, updated on every relevant interaction
+- Heading and excerpt exposure verified against a real accessibility-tree snapshot, not assumed from markup alone
+- Line-clamped card excerpts retain their full text in the DOM — the visual clamp never removes content from screen readers
+
+**Visual & Contrast**
+- Every colour pairing verified with real WCAG contrast math, not eyeballed (see DESIGN-SYSTEM.md §1.9)
+- Tag/Chip states are differentiated by stroke width and font weight, not colour alone, per WCAG 1.4.1 (Default: thin border/regular weight; Active: medium border/bold weight; Dim: thin border/regular weight + muted text)
+- The teal theme's contrast was verified before it went live as the default (not just the original gold theme)
+- The background dot texture is kept low-opacity specifically so it never interferes with text contrast
+
+**Motion**
+- `prefers-reduced-motion` is respected for the Filter Drawer's open/close animation and all other transitions site-wide
+
+### Planned / Backlog
+
+- **Font-size tokens:** convert `px` to `rem` so type respects the user's browser/OS font-size preference — distinct from browser zoom, which already works correctly today. Scoped as its own dedicated phase, not bundled into unrelated work.
+- **Tag link "visited" state:** tag links (`<a href="/archive.html?tag={slug}">`) currently announce as "visited" indefinitely in screen readers once clicked, which isn't meaningful here since they're filter controls, not content links. Needs an explicit `aria-label` override.
+- **A real WAVE + Lighthouse accessibility baseline audit** — deliberately held until real content replaces the remaining placeholder text and images, so the audit measures the actual site rather than placeholder artifacts.
+- **Accessibility options** as a planned future slot in the Vertical Action Rail (alongside language/translation) — not yet scoped in detail.
+
+---
+
+## 13. Designer to Engineer Handoff Standards
 
 For reference when working with engineers or handing off to Claude Code:
 
@@ -586,7 +626,7 @@ For reference when working with engineers or handing off to Claude Code:
 
 ---
 
-## 13. Session Handoff Notes
+## 14. Session Handoff Notes
 
 **2026-06-24**
 - Base HTML, CSS, and JS set up and live on Netlify

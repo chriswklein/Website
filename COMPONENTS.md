@@ -334,13 +334,13 @@ Dim duplicate state (desktop `#archive-secondary-chips` only, when this tag is a
 
 ## 2c. Filter Drawer
 
-**CSS Classes:** `.filter-drawer`, `.filter-drawer-trigger`, `.action-rail-group`, `.action-rail-trigger`, `.archive-scrim`, `.archive-inline-filters`, `.archive-sort-count-row`, `.chip-count`
+**CSS Classes:** `.filter-drawer`, `.filter-drawer-body`, `.filter-drawer-scroll`, `.filter-drawer-trigger`, `.action-rail-group`, `.action-rail-trigger`, `.archive-scrim`, `.archive-inline-filters`, `.archive-active-chips`, `.tag-chip-more`, `.tag-chip--collapsed`, `.body-scroll-locked`, `.archive-sort-count-row`, `.chip-count`
 **JS Functions:** `initFilterDrawer()`, `initArchive()`, `trapFocus()` in `script.js`
 
 ### Design Intent
 Two distinct filter access modes exist, governed by a single IntersectionObserver on `#archive-header-sentinel`:
 
-**Desktop — header uncondensed (sentinel in viewport, top of page):** Row 1 of the header shows a Clear button (left) and search input (fills remaining width) — no sort toggle, no Filters trigger at this position. Below that, Row 2 shows primary type chips (Work, Thoughts) with entry-count badges; Row 3 shows secondary tag chips with entry-count badges.
+**Desktop — header uncondensed (sentinel in viewport, top of page):** Row 1 of the header shows a Clear button (left) and search input (fills remaining width) — no sort toggle, no Filters trigger at this position. Below that, Row 2 shows primary type chips (Work, Thoughts) with entry-count badges and the "Show More" / "Show Less" disclosure toggle; Row 3 shows the active-tags row (`#archive-active-chips`); Row 4 shows the secondary tag list with entry-count badges.
 
 **Desktop — header condensed (sentinel left viewport, user scrolled):** The inline chips section is hidden. The floating action rail group (`.action-rail-group`) appears at the right viewport edge with the floating "Filters" trigger. The header has scrolled away, so the inline area is no longer in view regardless.
 
@@ -348,7 +348,11 @@ Two distinct filter access modes exist, governed by a single IntersectionObserve
 
 **All breakpoints — between header and results:** A `.archive-sort-count-row` shows the sort toggle (left) and entry count (right), positioned between the archive header and the results grid. This row is visible at all breakpoints.
 
-The drawer is a unified bottom-sheet. Its first row mirrors the header controls: Clear (left), search input, Filters/Close trigger (right). Rows 2 and 3 show primary and secondary chips with count badges. Closing happens via the drawer's own trigger (labelled "Close" when open), the scrim, or Escape.
+The drawer is a unified bottom-sheet with four stacked rows: Clear/Search/Close controls, primary type chips (with the disclosure toggle), an active-tags row, and the secondary tag list. Only the secondary tag list scrolls — everything above it (controls, primary chips, active-tags row) is pinned in place via a dedicated `.filter-drawer-scroll` wrapper (`flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable`) around `#filter-drawer-chips` alone, inside `.filter-drawer-body` (which no longer scrolls itself). `scrollbar-gutter: stable` reserves space for the scrollbar whether or not it's currently needed, so expanding the secondary list to a scrollable length never shifts the drawer's width. Closing happens via the drawer's own trigger (labelled "Close" when open), the scrim, or Escape — all three restore the background scroll position saved on open (see Background Scroll Lock, below).
+
+**Active-tags row (both contexts):** an always-visible row — `#archive-active-chips` on desktop, `#filter-drawer-active-chips` in the drawer — shows every currently-active secondary tag with its own × remove control, populated by the shared `updateActiveChipsRow()` function (writes to both containers on every `render()` pass, regardless of which is currently visible on screen). Its purpose is to guarantee an active tag stays reachable even if its duplicate in the full secondary list is currently collapsed by "Show More"/"Show Less" or scrolled elsewhere. The duplicate entry for that same tag inside the full secondary list renders Dim, not Active, via `applyChipState()`'s `isDuplicateOfActiveRow` logic (see `## 2b. Tag-Chip`) — this applies identically on desktop (`#archive-secondary-chips`) and in the drawer (`#filter-drawer-chips`).
+
+**"Show More" / "Show Less" disclosure (both contexts):** the secondary tag list shows only the first 10 tags (already alphabetically sorted, zero-count tags already excluded) by default. A toggle button (`.tag-chip-more`) appears — as the last child of the primary chips row, not inside the secondary tag containers it controls — whenever more than 10 tags remain after zero-count filtering. Clicking it flips one shared `secondaryExpanded` state and re-renders; both the desktop and drawer toggles read/write that same state, so expanding on one and resizing to the other breakpoint shows the same expanded/collapsed state, not an independent reset. Collapsed tags get `.tag-chip--collapsed` (`display: none`).
 
 ### When to Use
 - On any page with filterable archive content
@@ -377,11 +381,14 @@ The drawer is a unified bottom-sheet. Its first row mirrors the header controls:
             </button>
         </div>
 
-        <!-- Inline chips — desktop only, uncondensed state only -->
+        <!-- Inline chips — desktop only, uncondensed state only.
+             Primary chips + "Show More"/"Show Less" toggle, active-tags row,
+             then the full secondary tag list, populated by initArchive(). -->
         <div class="archive-inline-filters" id="archive-inline-filters">
             <div class="archive-primary-chips" role="group" aria-label="Filter by type">
                 <button class="tag-chip" type="button" data-filter-type="work" aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
                 <button class="tag-chip" type="button" data-filter-type="thoughts" aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+                <!-- .tag-chip-more toggle appended here by buildSecondaryChips() -->
             </div>
             <div class="archive-active-chips" id="archive-active-chips"></div>
             <div id="archive-secondary-chips" aria-label="Filter by tag"></div>
@@ -411,10 +418,11 @@ The drawer is a unified bottom-sheet. Its first row mirrors the header controls:
 <!-- Filter drawer — unified bottom sheet; starts hidden -->
 <div class="filter-drawer" id="filter-drawer"
      role="dialog" aria-modal="true" aria-label="Search and filter"
-     hidden>
+     hidden inert>
     <div class="filter-drawer-body">
 
-        <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) -->
+        <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right).
+             Pinned — outside the scrollable region below. -->
         <div class="filter-drawer-controls">
             <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
             <label for="drawer-search" class="sr-only">Search entries</label>
@@ -425,17 +433,28 @@ The drawer is a unified bottom-sheet. Its first row mirrors the header controls:
                     aria-controls="filter-drawer"
                     aria-haspopup="dialog">
                 <span class="trigger-label">Filters</span>
+                <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
             </button>
         </div>
 
-        <!-- Row 2: Primary type chips with count badges -->
+        <!-- Row 2: Primary type chips with count badges. Pinned.
+             .tag-chip-more toggle appended here, not in #filter-drawer-chips. -->
         <div class="filter-drawer-primary-chips" role="group" aria-label="Filter by type">
             <button class="tag-chip" type="button" data-filter-type="work" aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
             <button class="tag-chip" type="button" data-filter-type="thoughts" aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+            <!-- .tag-chip-more toggle appended here by buildSecondaryChips() -->
         </div>
 
-        <!-- Row 3: Secondary tag chips populated by initArchive() -->
-        <div id="filter-drawer-chips"></div>
+        <!-- Row 3: Active secondary tags — always visible, populated by the
+             same updateActiveChipsRow() that populates #archive-active-chips.
+             Pinned. -->
+        <div class="archive-active-chips" id="filter-drawer-active-chips"></div>
+
+        <!-- Row 4: the only scrollable region in the drawer — secondary tag
+             list (+ its zero-count/collapsed state), populated by initArchive() -->
+        <div class="filter-drawer-scroll">
+            <div id="filter-drawer-chips"></div>
+        </div>
 
     </div>
 </div>
@@ -450,8 +469,64 @@ The drawer is a unified bottom-sheet. Its first row mirrors the header controls:
 **Notes:**
 - The `.trigger-label` span isolates the dynamic text ("Filters" ↔ "Close") from the badge span so JS can update the label without disturbing other content.
 - `.archive-sticky-header` receives `.is-condensed` from the IntersectionObserver callback. CSS uses `:not(.is-condensed)` to show inline chips and hide the Filters trigger on desktop.
-- Both `.filter-drawer-trigger` (header) and `.action-rail-trigger` (floating) carry an `.action-rail-badge` span. Both badges are updated from the same `filterCount` in the same `render()` pass, ensuring badge parity at all times.
+- **All three** trigger buttons — the header's inline `.filter-drawer-trigger`, the floating `.action-rail-trigger`, and the drawer's own internal `.filter-drawer-trigger` (Row 1 above) — carry an `.action-rail-badge` span. All three are updated from the same `filterCount` in the same `render()` pass (a single unscoped `document.querySelectorAll('.action-rail-badge')`), keeping all three in sync at all times — this previously missed the drawer's own internal trigger, which had no badge markup at all until it was added to match the other two.
 - Chip-count badges (`.chip-count`) on each chip show how many entries match that filter given the current query and other active filters, updating on every render.
+- `#filter-drawer-active-chips` reuses the exact `.archive-active-chips` class desktop uses — same `display: none` default / `.is-active { display: flex }` toggle, no separate styling needed.
+
+### Background Scroll Lock
+
+While the drawer is open, `<body>` is locked using the `position: fixed` body-lock technique (not `overflow: hidden`, which is known to leak scroll on iOS Safari):
+
+- **On open** (`lockBodyScroll()` in `initFilterDrawer()`): saves `window.scrollY`, sets `document.body.style.top = -{savedScrollY}px` inline, and adds `.body-scroll-locked` (`position: fixed; left: 0; right: 0;` — defined in style.css, `top` is the one value that must be set inline since it's dynamic per open).
+- **On close** (`unlockBodyScroll()`, called at the top of `closeDrawer()`): removes `.body-scroll-locked`, clears the inline `top`, and calls `window.scrollTo(0, savedScrollY)` to restore the exact pre-open position.
+- All three close paths (drawer's own Close trigger, scrim click, Escape) call the same `closeDrawer()`, so all three restore scroll identically — there is only one close code path, not three separate ones to keep in sync.
+- `inert` (already applied to background content) has no effect on document-level scroll — it's a hit-testing/focus concept, not a scroll concept — so this lock is a separate, necessary mechanism, not redundant with `inert`.
+
+### Archive Item Markup
+
+Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable` heading:
+
+```html
+<article class="card" data-tags="quality-assurance,user-experience">
+    <div class="card-content">
+        <h2 data-searchable>Post Title</h2>
+    </div>
+</article>
+```
+
+### Behaviour
+
+| Trigger | Result |
+|---|---|
+| Click "Filters" (header/rail/drawer-internal trigger, closed) | Drawer slides up; scrim fades in; trigger label becomes "Close"; background scroll locked (position saved); focus moves to first focusable element in drawer; all page content outside drawer becomes `inert` |
+| Click "Close" (any trigger, open) | Drawer slides down; scrim fades out; background scroll unlocked and restored to the saved position; `inert` removed from page content; focus returns to the trigger that opened the drawer |
+| Click scrim | Same as clicking "Close" |
+| Escape key | Drawer closes; same cleanup as "Close" |
+| Tab / Shift+Tab with drawer open | Focus stays within drawer — browser enforces this via `inert` on all outside elements; `trapFocus()` provides belt-and-suspenders wrapping |
+| Touch-drag or wheel over the scrim while open | No effect — background scroll is locked, not just visually blocked |
+| Scroll within the secondary tag list | Only `.filter-drawer-scroll` (`#filter-drawer-chips`'s wrapper) moves; controls row, primary chips, and active-tags row stay pinned on screen |
+| Click inline chip (desktop, uncondensed) | Toggles filter; state syncs across inline chips and drawer chips |
+| Click chip in drawer | Toggles filter; state syncs across drawer chips and inline chips |
+| Click "Show More" / "Show Less" | Toggles the shared `secondaryExpanded` state; re-renders both desktop and drawer secondary lists to match, whichever is currently visible |
+| Badge count | Updates simultaneously on all three triggers (header, floating rail, drawer-internal) from the same `filterCount` on each render pass |
+| Clear button (enabled) | Clears all active type and secondary tag filters; search text cleared; sort reset to Latest; button self-disables |
+| Clear button (disabled) | `disabled` attribute set when `filterCount === 0`; search text alone does not count as a filter |
+| Sort toggle | Toggles Latest ↑ / Earliest ↓; located in `.archive-sort-count-row` outside the header and drawer |
+| Chip count badge | Each chip shows entry count matching that filter within current query and other active filters; updates on every render |
+| Type in search | Debounced 250ms; filters by `data-searchable` text; updates chip counts |
+
+### Accessibility
+
+- All trigger buttons: `aria-expanded` updated by JS; `aria-controls="filter-drawer"`; `aria-haspopup="dialog"`
+- `.action-rail-trigger`: `aria-label` updated dynamically ("Open filters" / "Close filters")
+- `.tag-chip-more`: `aria-expanded` reflects `secondaryExpanded`, updated on every render regardless of the button's own DOM position relative to the list it controls
+- Clear button: `disabled` attribute toggled by JS — screen readers announce "dimmed" state; removed from tab order when disabled
+- Scrim: `aria-hidden="true"` — decorative; close affordance is the trigger button and Escape key
+- Drawer: `role="dialog"` + `aria-modal="true"` + `aria-label="Search and filter"`
+- Focus containment: `inert` applied to all page content outside the drawer while open (prevents Tab from reaching duplicate controls in header, main content, nav, or footer); `trapFocus()` wraps focus at drawer boundary as belt-and-suspenders
+- Return focus: whichever trigger opened the drawer receives focus on close; `inert` removed before focus return
+- Chip count badges: `.chip-count` spans are `aria-hidden="true"` — counts are supplementary; button labels carry the semantic meaning
+- Keyboard: Escape closes from any position inside drawer
 
 ### Archive Item Markup
 
@@ -518,7 +593,10 @@ The transition between "uncondensed" and "condensed" on desktop is governed by t
 ### Dependencies
 
 - `trapFocus()` — reusable utility in `script.js`
+- `lockBodyScroll()` / `unlockBodyScroll()` — closures inside `initFilterDrawer()`; see Background Scroll Lock, above
 - `.tag-chip` — See `## 2b. Tag-Chip`
+- `applyChipState()` — shared chip class/aria state helper in `initArchive()`; see `## 2b. Tag-Chip`
+- `updateActiveChipsRow()` — populates both `#archive-active-chips` and `#filter-drawer-active-chips` from the same `activeSecondary` set
 - `IntersectionObserver` on `#archive-header-sentinel` — toggles `.action-rail-group--visible` on the rail group and `.is-condensed` on `.archive-sticky-header`; guarded against drawer-open state; scroll re-arm fires after drawer close
 - `inert` HTML attribute — applied to all page content outside the drawer on open; removed on close before focus return
 
