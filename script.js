@@ -489,7 +489,7 @@ function initArchive() {
         const tagSlugs = (entry.tags || []).map(slugify);
 
         const tagsHTML = (entry.tags || []).map((t, i) =>
-            `<a href="/archive.html?tag=${tagSlugs[i]}" class="tag">${escapeHTML(t)}</a>`
+            `<a href="/archive.html?tag=${tagSlugs[i]}" class="tag" aria-label="Filter by ${escapeHTML(t)}">${escapeHTML(t)}</a>`
         ).join('');
 
         const imageHTML = entry.type === 'work'
