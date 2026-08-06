@@ -10,7 +10,7 @@ Content is drafted outside the codebase, in Google Docs, using Docs' actual Head
 
 A reusable Doc structure template exists (`content-writing-template.md`, kept outside the repo) covering: slug, title, tags, date, and — for Work entries — role/timeline/tools, plus Overview/section/Outcome structure. For Thought entries: Overview/chapter/subsection structure with an optional pull quote.
 
-Once a Doc is finished, hand the content to Claude Code with a prompt referencing this document (`NEW-ENTRY-PROCESS.md`) and the finished text. Claude Code populates the appropriate template, applies the heading ID slugification rule, creates the manifest entry, and runs the pre-commit verification checklist — this is the mechanical transfer step and should not be done by hand.
+Once a Doc is finished, hand the content to Claude Code with a prompt referencing this document (`md/NEW-ENTRY-PROCESS.md`) and the finished text. Claude Code populates the appropriate template, applies the heading ID slugification rule, creates the manifest entry, and runs the pre-commit verification checklist — this is the mechanical transfer step and should not be done by hand.
 
 Before handoff, manually verify:
 - Every tag matches an existing tag in `data/archive-entries.json` exactly (spelling and casing)

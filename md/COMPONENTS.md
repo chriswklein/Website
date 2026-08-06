@@ -22,7 +22,7 @@ Rules for Claude Code:
 - Use component tokens, not semantic tokens, in component CSS
 - All states must be implemented — not just default
 - Figma component name and CSS class name must match exactly
-- Never invent values — if a value is not in this document or DESIGN-SYSTEM.md, raise it as a question before proceeding
+- Never invent values — if a value is not in this document or md/DESIGN-SYSTEM.md, raise it as a question before proceeding
 
 ---
 
@@ -653,7 +653,7 @@ z-index stack (card has position: relative):
 
 `.card-content` padding is `var(--space-3) var(--space-6)` (12px top/bottom, 24px left/right) — set directly on `.card-content`, not via the `--card-padding` custom property (which still exists for `.card-image-caption`'s use in the Profile variant, unaffected by this).
 
-Feature-variant desktop/tablet horizontal layout uses `--card-image-column-width` (`42%`) — see §4.5 of `DESIGN-SYSTEM.md`, since it's a global `:root` token rather than scoped to `.card`.
+Feature-variant desktop/tablet horizontal layout uses `--card-image-column-width` (`42%`) — see §4.5 of `md/DESIGN-SYSTEM.md`, since it's a global `:root` token rather than scoped to `.card`.
 
 ### States
 
@@ -1546,7 +1546,7 @@ Quick reference mapping every component token to its semantic source.
 | `--card-border` | `--color-border-default` | `#2A2A2A` |
 | `--card-radius` | `--border-radius-md` | `8px` |
 | `--card-image-bg` | `--color-background-subtle` | `#2A2A2A` |
-| `--card-image-column-width` | — (global `:root` token, see DESIGN-SYSTEM.md §4.5) | `42%` |
+| `--card-image-column-width` | — (global `:root` token, see md/DESIGN-SYSTEM.md §4.5) | `42%` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
 | `--tag-border` | `--color-accent-primary` | `#BA8200` |

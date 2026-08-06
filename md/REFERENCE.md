@@ -73,7 +73,7 @@ my-website/
 │   └── icons/          — SVG icons if needed beyond Tabler
 ├── tokens/
 │   └── design-system.json — Design tokens in Tokens Studio format (reference only)
-├── REFERENCE.md        — This document
+├── md/                  — Governance docs: REFERENCE.md (this document), DESIGN-SYSTEM.md, COMPONENTS.md, PROMPT-GUIDE.md, NEW-ENTRY-PROCESS.md
 └── .gitignore          — Node template, covers OS files and .env
 ```
 
@@ -579,7 +579,7 @@ Accessibility is a stated project pillar (see Core Principles, §1), not a post-
 - Line-clamped card excerpts retain their full text in the DOM — the visual clamp never removes content from screen readers
 
 **Visual & Contrast**
-- Every colour pairing verified with real WCAG contrast math, not eyeballed (see DESIGN-SYSTEM.md §1.9)
+- Every colour pairing verified with real WCAG contrast math, not eyeballed (see md/DESIGN-SYSTEM.md §1.9)
 - Tag/Chip states are differentiated by stroke width and font weight, not colour alone, per WCAG 1.4.1 (Default: thin border/regular weight; Active: medium border/bold weight; Dim: thin border/regular weight + muted text)
 - The teal theme's contrast was verified before it went live as the default (not just the original gold theme)
 - The background dot texture is kept low-opacity specifically so it never interferes with text contrast
@@ -667,3 +667,8 @@ Visual review pending — gaps between Figma design and implementation to be ass
 Next: Full visual review, fix list, precision Claude Code fix prompt
 Figma layer naming to be aligned with CSS class names before next build session
 Figma MCP connection via Claude Code to be explored for tighter design-to-code fidelity
+
+**2026-08-06**
+- The five governance docs — REFERENCE.md, DESIGN-SYSTEM.md, COMPONENTS.md, PROMPT-GUIDE.md, NEW-ENTRY-PROCESS.md — moved from the project root into a new `md/` folder. README.md stays at the root.
+- None of the five were ever fetched, linked, or referenced by any live page or script (confirmed by repo-wide grep before the move) — the move has no effect on the live site.
+- All cross-references between these five files were updated in place to the `md/{filename}` form. Future sessions and prompts should reference them as `md/REFERENCE.md`, `md/DESIGN-SYSTEM.md`, `md/COMPONENTS.md`, `md/PROMPT-GUIDE.md`, `md/NEW-ENTRY-PROCESS.md` — not the old root-level paths.

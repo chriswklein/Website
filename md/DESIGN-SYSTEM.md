@@ -421,7 +421,7 @@ Content centred using `.standard-page` (max-width 1200px, horizontal padding). B
 
 ### 4.5 Component-Specific Layout Tokens
 
-Most component tokens (`--btn-*`, `--tag-*`, `--card-*`, etc.) are scoped locally inside their own component selector in `style.css` — see the Component Token Reference table in `COMPONENTS.md`. The token below is the exception: it's defined in the global `:root` block because it governs a layout ratio referenced across breakpoints, the same way `--max-content` is.
+Most component tokens (`--btn-*`, `--tag-*`, `--card-*`, etc.) are scoped locally inside their own component selector in `style.css` — see the Component Token Reference table in `md/COMPONENTS.md`. The token below is the exception: it's defined in the global `:root` block because it governs a layout ratio referenced across breakpoints, the same way `--max-content` is.
 
 | CSS Variable | Value | Usage |
 |---|---|---|
@@ -775,7 +775,7 @@ img {
 Before writing any code, verify:
 
 - [ ] This document has been read in full
-- [ ] `REFERENCE.md` has been read in full
+- [ ] `md/REFERENCE.md` has been read in full
 - [ ] All colour values reference CSS variables — no hex codes in component CSS
 - [ ] All spacing values reference CSS variables — no arbitrary pixel values
 - [ ] All font sizes reference CSS variables

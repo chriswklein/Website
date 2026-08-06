@@ -7,7 +7,7 @@
 
 ## Rule 1 — Always Read First
 
-`REFERENCE.md` is required reading for every session without exception. It contains project decisions, coding standards, branching strategy, and session handoff notes that apply to all tasks.
+`md/REFERENCE.md` is required reading for every session without exception. It contains project decisions, coding standards, branching strategy, and session handoff notes that apply to all tasks.
 
 ---
 
@@ -15,7 +15,7 @@
 
 Use this table to determine which additional documents and tools to load before starting any task. Load only what is listed for the task type. Do not load additional resources speculatively.
 
-| Task Type | REFERENCE.md | DESIGN-SYSTEM.md | COMPONENTS.md | style.css | Figma MCP |
+| Task Type | md/REFERENCE.md | md/DESIGN-SYSTEM.md | md/COMPONENTS.md | style.css | Figma MCP |
 |---|---|---|---|---|---|
 | CSS bug fix | ✅ Required | ❌ Skip | ❌ Skip | ✅ Required | ❌ Skip |
 | Spacing or typography fix | ✅ Required | ✅ Required | ❌ Skip | ✅ Required | ❌ Skip |
@@ -115,13 +115,13 @@ Never use generic messages like "update styles" or "fix bugs".
 
 ## Quick Reference — Most Common Task Types
 
-**CSS bug fix** → Read: `REFERENCE.md`, `style.css` only
+**CSS bug fix** → Read: `md/REFERENCE.md`, `style.css` only
 
-**New component** → Read: all three docs + `style.css` + connect Figma
+**New component** → Read: all three docs (in `md/`) + `style.css` + connect Figma
 
-**Accessibility fix** → Read: all three docs + `style.css`, no Figma
+**Accessibility fix** → Read: all three docs (in `md/`) + `style.css`, no Figma
 
-**Content update** → Read: `REFERENCE.md` only
+**Content update** → Read: `md/REFERENCE.md` only
 
-**Documentation update** → Read: `REFERENCE.md` + relevant docs only
+**Documentation update** → Read: `md/REFERENCE.md` + relevant docs only
 
