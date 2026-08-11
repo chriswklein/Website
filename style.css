@@ -477,24 +477,10 @@ pre code {
     display: none;
 }
 
+/* Hides tags outside the current page of the Filter Drawer's paginated
+   secondary tag list (mobile/tablet) — see .filter-drawer-secondary-page. */
 .tag-chip--collapsed {
     display: none;
-}
-
-/* "+N more" / "Show less" toggle for desktop's secondary tag list — shares
-   .tag-chip's shape (padding, radius, font) but uses neutral border/text
-   tokens instead of the accent colour, so it reads as a UI control within
-   the tag row rather than another selectable filter. */
-.tag-chip-more {
-    border-color: var(--color-border-strong);
-    color: var(--color-text-secondary);
-    font-weight: var(--font-weight-medium);
-}
-
-.tag-chip-more:hover {
-    background-color: var(--color-background-subtle);
-    border-color: var(--color-border-strong);
-    color: var(--color-text-primary);
 }
 
 /* ================================
@@ -1735,29 +1721,125 @@ footer p {
     gap: var(--space-0);
 }
 
-/* Only this region scrolls — the controls row, primary chips, and active
-   chips row above it stay pinned regardless of secondary list length.
-   flex: 1 + min-height: 0 lets it consume whatever space the pinned
-   siblings don't need, within .filter-drawer's existing max-height: 70vh,
-   without hardcoding a second height value that would need to stay in sync.
+/* Holds the current page of secondary tags (6 per page, paginated via
+   initArchive() — desktop's separate "More Filters" list stays unbounded).
+   No longer scrollable (was overflow-y: auto pre-pagination) — with a fixed
+   page size the content no longer grows unbounded, so the old scroll
+   container and its focus-ring clip-clearance padding/negative-margin
+   trick are both gone: nothing here clips anymore (confirmed — neither this
+   element nor any ancestor up to .filter-drawer sets a non-visible
+   overflow), so rings need no special-casing.
 
-   padding gives focused chips' 2px/3px-offset focus ring (REFERENCE.md's
-   spec — 5px total clearance needed) room to render before hitting this
-   container's clip boundary; overflow-y: auto here also computes
-   overflow-x to auto per spec (can't have one auto and one visible), so
-   chips at either end of a wrapped row need the same horizontal clearance
-   as the top row needs vertically. The matching left/right negative margin
-   cancels the resulting inward shift so chips still start flush with the
-   primary chips row above — clip boundary moves out, visual position
-   doesn't. */
-.filter-drawer-scroll {
+   min-height: 109px is a measured, not arbitrary, value — 3 rows of
+   .tag-chip content (31px: --space-1 padding × 2 + --font-size-sm ×
+   --line-height-normal + border-width-thin × 2) plus 2 row gaps
+   (--space-2 = 8px each). 3 rows is the worst realistic case at 390px
+   (DESIGN-SYSTEM.md's mobile reference width) — verified by rendering 6
+   chips using the site's actual longest tag labels (Quality Assurance,
+   Game Development, User Experience, Web Development, Software Tools)
+   combined on one page; every combination tested wraps to at most 3 rows
+   at that width. Keeps the drawer's height stable across pages regardless
+   of which specific tags/label lengths land on a given page. */
+.filter-drawer-secondary-page {
     flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
+    min-height: 109px;
+}
+
+/* Prev/Next + page dots for the Filter Drawer's paginated secondary tags.
+   Dots sit on their own row below Previous/Next (not sharing one row via
+   justify-content: space-between) — with up to 10 pages possible from the
+   current tag count, and more as the manifest grows, dots need room to
+   wrap without ever competing with the buttons for horizontal space or
+   push them past the viewport edge. */
+.filter-drawer-page-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+/* Without this, the display: flex above (an author rule) beats the UA
+   stylesheet's [hidden] { display: none } default, so the hidden attribute
+   set in JS for the single-page state wouldn't actually hide anything. */
+.filter-drawer-page-nav[hidden] {
+    display: none;
+}
+
+.filter-drawer-page-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: var(--space-2);
+}
+
+/* flex: 1 (not flex-shrink: 0 sized-to-content) so Previous and Next split
+   .filter-drawer-page-buttons evenly and always match widths, regardless
+   of their label lengths differing ("Previous" vs "Next"). */
+.filter-drawer-page-btn {
+    flex: 1;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: inherit;
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-text-primary);
+    background-color: var(--color-background-subtle);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    min-height: var(--touch-target-minimum);
+    white-space: nowrap;
+    text-align: center;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.filter-drawer-page-btn:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.filter-drawer-page-btn:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+.filter-drawer-page-dots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+/* Visual dot stays small (8px, 10px active) via content-box sizing +
+   background-clip — the padding around it is an invisible, larger hit area
+   without inflating the dot's own appearance. aria-current drives a size
+   *and* colour change together, so current-page state never relies on
+   colour alone (REFERENCE.md's accessibility standard). */
+.filter-drawer-page-dot {
+    display: inline-flex;
+    box-sizing: content-box;
+    width: 8px;
+    height: 8px;
     padding: var(--space-2);
-    margin-left: calc(-1 * var(--space-2));
-    margin-right: calc(-1 * var(--space-2));
+    border: none;
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-border-strong);
+    background-clip: content-box;
+    cursor: pointer;
+}
+
+.filter-drawer-page-dot[aria-current="true"] {
+    width: 10px;
+    height: 10px;
+    background-color: var(--color-accent-primary-text);
+}
+
+.filter-drawer-page-dot:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
 }
 
 /* Filter drawer — Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) */
@@ -2200,7 +2282,8 @@ footer p {
        reaches this rule, and tablet keeps the drawer's normal expanded view. */
     .filter-drawer--search-focused .filter-drawer-primary-chips,
     .filter-drawer--search-focused #filter-drawer-active-chips,
-    .filter-drawer--search-focused .filter-drawer-scroll {
+    .filter-drawer--search-focused .filter-drawer-secondary-page,
+    .filter-drawer--search-focused .filter-drawer-page-nav {
         display: none;
     }
 

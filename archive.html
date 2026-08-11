@@ -140,11 +140,25 @@
                  +N-more collapse state of the full list below -->
             <div class="archive-active-chips" id="filter-drawer-active-chips"></div>
 
-            <!-- Row 3: Secondary tag chips (+ "+N more" toggle) — the only
-                 scrollable region in the drawer; everything above stays pinned -->
-            <div class="filter-drawer-scroll">
+            <!-- Row 3: Secondary tag chips, paginated 6 per page (mobile/
+                 tablet drawer only — desktop's "More Filters" list stays a
+                 single unbounded list, unaffected). Fixed min-height on the
+                 page container keeps the drawer's size stable across pages
+                 with different tag counts/label lengths, populated by
+                 initArchive(). -->
+            <div class="filter-drawer-secondary-page">
                 <div id="filter-drawer-chips"></div>
             </div>
+            <div class="filter-drawer-page-nav" id="filter-drawer-page-nav" hidden>
+                <div class="filter-drawer-page-buttons">
+                    <button type="button" class="filter-drawer-page-btn filter-drawer-page-prev"
+                            aria-label="Previous page of tags">Previous</button>
+                    <button type="button" class="filter-drawer-page-btn filter-drawer-page-next"
+                            aria-label="Next page of tags">Next</button>
+                </div>
+                <div class="filter-drawer-page-dots" id="filter-drawer-page-dots"></div>
+            </div>
+            <p class="sr-only" id="filter-drawer-page-status" aria-live="polite"></p>
 
         </div>
     </div>

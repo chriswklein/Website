@@ -373,6 +373,12 @@ function initArchive(filterDrawer) {
     const primaryChipsEl   = document.querySelector('.archive-primary-chips');
     const drawerPrimaryChipsEl = document.querySelector('.filter-drawer-primary-chips');
     const loadMoreBtn      = document.querySelector('.archive-load-more-btn');
+    const pageNavEl        = document.getElementById('filter-drawer-page-nav');
+    const pageDotsEl       = document.getElementById('filter-drawer-page-dots');
+    const pagePrevBtn      = document.querySelector('.filter-drawer-page-prev');
+    const pageNextBtn      = document.querySelector('.filter-drawer-page-next');
+    const pageStatusEl     = document.getElementById('filter-drawer-page-status');
+    const SECONDARY_PAGE_SIZE = 6;
 
     // State
     let allEntries         = [];
@@ -381,9 +387,20 @@ function initArchive(filterDrawer) {
     let currentSort        = 'latest';
     let currentQuery       = '';
     let visibleCount       = 25;
-    let secondaryExpanded  = false; // Filter Drawer "+N more" disclosure (mobile/tablet) — persists for the page load
+    let secondaryPage      = 0; // Filter Drawer paginated secondary tags (mobile/tablet), 0-indexed
     let moreFiltersOpen    = false; // desktop secondary tag row — hidden by default, revealed via "More Filters"
     let debounceTimer;
+
+    // Current page count for the drawer's secondary tag pagination, derived
+    // from the actual (already zero-count-filtered) visible tag count —
+    // recomputed on demand rather than cached, since active filters change
+    // which tags are non-zero-count from one render to the next.
+    function getDrawerSecondaryPageCount() {
+        if (!drawerChipsEl) return 1;
+        const visibleCount = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')]
+            .filter(btn => !btn.classList.contains('tag-chip--zero-count')).length;
+        return Math.max(1, Math.ceil(visibleCount / SECONDARY_PAGE_SIZE));
+    }
 
     // Read initial URL params
     const params = new URLSearchParams(window.location.search);
@@ -450,21 +467,10 @@ function initArchive(filterDrawer) {
             });
         });
 
-        // Filter Drawer (mobile/tablet) "Show More" / "Show Less" progressive
-        // disclosure toggle — appended after the Work/Thoughts chips in the
-        // drawer's primary row (not inside the secondary tag container it
-        // controls). Unaffected by the desktop More Filters toggle below.
-        if (drawerPrimaryChipsEl) {
-            const moreToggle = document.createElement('button');
-            moreToggle.type = 'button';
-            moreToggle.className = 'tag-chip tag-chip-more';
-            moreToggle.hidden = true;
-            moreToggle.addEventListener('click', () => {
-                secondaryExpanded = !secondaryExpanded;
-                render();
-            });
-            drawerPrimaryChipsEl.appendChild(moreToggle);
-        }
+        // Filter Drawer (mobile/tablet) secondary tags are paginated instead
+        // of the old "Show More" disclosure — see the pagination block in
+        // render() and the Previous/Next/dots wiring below. Unaffected by
+        // the desktop More Filters toggle below.
 
         // Desktop "More Filters" / "Less Filters" toggle — appended after the
         // Work/Thoughts chips in the desktop inline primary row. Reveals or
@@ -709,25 +715,53 @@ function initArchive(filterDrawer) {
             btn.classList.toggle('tag-chip--zero-count', count === 0);
         });
 
-        // Filter Drawer (mobile/tablet) "Show More" / "Show Less" progressive
-        // disclosure — collapses the visible secondary tag list (already
-        // alphabetically sorted; zero-count tags already excluded above) to
-        // the first 10. Unaffected by the desktop More Filters toggle below —
-        // this is the pre-existing drawer behaviour, untouched.
+        // Filter Drawer (mobile/tablet) secondary tags — paginated 6 per
+        // page (already alphabetically sorted; zero-count tags already
+        // excluded above). Desktop's separate More Filters list is
+        // unaffected — handled entirely below, untouched.
         if (drawerChipsEl) {
             const visibleTags = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')]
                 .filter(btn => !btn.classList.contains('tag-chip--zero-count'));
-            const overflowCount = visibleTags.length - 10;
+            const pageCount = getDrawerSecondaryPageCount();
+            if (secondaryPage >= pageCount) secondaryPage = pageCount - 1;
+            if (secondaryPage < 0) secondaryPage = 0;
+            const pageStart = secondaryPage * SECONDARY_PAGE_SIZE;
+            const pageEnd = pageStart + SECONDARY_PAGE_SIZE;
 
             visibleTags.forEach((btn, i) => {
-                btn.classList.toggle('tag-chip--collapsed', i >= 10 && !secondaryExpanded);
+                btn.classList.toggle('tag-chip--collapsed', i < pageStart || i >= pageEnd);
             });
 
-            const moreToggle = drawerPrimaryChipsEl ? drawerPrimaryChipsEl.querySelector('.tag-chip-more') : null;
-            if (moreToggle) {
-                moreToggle.hidden = overflowCount <= 0;
-                moreToggle.textContent = secondaryExpanded ? 'Show Less' : 'Show More';
-                moreToggle.setAttribute('aria-expanded', String(secondaryExpanded));
+            if (pageNavEl) pageNavEl.hidden = pageCount <= 1;
+
+            if (pageDotsEl) {
+                // Rebuild only when the page count actually changes — avoids
+                // destroying/recreating dot buttons (and any focus on them)
+                // every render for no reason.
+                if (pageDotsEl.children.length !== pageCount) {
+                    pageDotsEl.innerHTML = '';
+                    for (let p = 0; p < pageCount; p++) {
+                        const dot = document.createElement('button');
+                        dot.type = 'button';
+                        dot.className = 'filter-drawer-page-dot';
+                        dot.setAttribute('aria-label', `Page ${p + 1}`);
+                        dot.addEventListener('click', () => {
+                            secondaryPage = p;
+                            render();
+                        });
+                        pageDotsEl.appendChild(dot);
+                    }
+                }
+                [...pageDotsEl.children].forEach((dot, p) => {
+                    dot.setAttribute('aria-current', String(p === secondaryPage));
+                });
+            }
+
+            // Empty (not "Page 1 of 1") when there's nothing to paginate —
+            // an aria-live region announcing pagination that doesn't exist
+            // reads as noise to screen reader users.
+            if (pageStatusEl) {
+                pageStatusEl.textContent = pageCount > 1 ? `Page ${secondaryPage + 1} of ${pageCount}` : '';
             }
         }
 
@@ -790,6 +824,24 @@ function initArchive(filterDrawer) {
             render();
         });
     });
+
+    // Wire Filter Drawer secondary-tag pagination Previous/Next — cycles at
+    // both ends (Previous on page 1 wraps to the last page, Next on the
+    // last page wraps to page 1).
+    if (pagePrevBtn) {
+        pagePrevBtn.addEventListener('click', () => {
+            const pageCount = getDrawerSecondaryPageCount();
+            secondaryPage = (secondaryPage - 1 + pageCount) % pageCount;
+            render();
+        });
+    }
+    if (pageNextBtn) {
+        pageNextBtn.addEventListener('click', () => {
+            const pageCount = getDrawerSecondaryPageCount();
+            secondaryPage = (secondaryPage + 1) % pageCount;
+            render();
+        });
+    }
 
     // Shows/hides a search input's own inline Clear (X) button — visible only
     // while the field is both focused AND has text. Purely a display concern,
@@ -895,6 +947,7 @@ function initArchive(filterDrawer) {
         currentQuery = '';
         currentSort = 'latest';
         visibleCount = 25;
+        secondaryPage = 0;
         searchInputs.forEach(input => {
             input.value = '';
             updateSearchClearVisibility(input);
@@ -950,16 +1003,24 @@ function initArchive(filterDrawer) {
                 if (validTagSlugs.has(tagParam)) {
                     activeSecondary.add(tagParam);
                     arrivedViaValidTag = true;
-                    // Filter Drawer (mobile/tablet) arrival state — arriving via a
-                    // topic tag link keeps the drawer closed (see below), but
-                    // pre-expands its secondary tag row so that when the user
-                    // does open it manually, the active tag is shown in full
-                    // context immediately — no extra "Show More" tap needed.
-                    secondaryExpanded = true;
                 }
             }
 
             buildSecondaryChips(entries);
+
+            // Filter Drawer (mobile/tablet) arrival state — arriving via a
+            // topic tag link keeps the drawer closed (see below), but lands
+            // its secondary-tag pagination on whichever page contains the
+            // active tag, computed from its position in the same
+            // alphabetically sorted list buildSecondaryChips() just
+            // rendered — so opening the drawer manually shows the active
+            // tag immediately, no Next-clicking required.
+            if (arrivedViaValidTag && drawerChipsEl) {
+                const allSecondaryBtns = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')];
+                const idx = allSecondaryBtns.findIndex(btn => btn.dataset.filterTag === tagParam);
+                if (idx !== -1) secondaryPage = Math.floor(idx / SECONDARY_PAGE_SIZE);
+            }
+
             render();
 
             // Filter Drawer (mobile/tablet) arrival state — desktop's inline
