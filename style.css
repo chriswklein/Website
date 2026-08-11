@@ -1585,26 +1585,79 @@ footer p {
     flex-wrap: wrap;
 }
 
-.archive-search-input {
+/* Wraps the search input plus its inline Clear (X) and Enter buttons as one
+   bordered field — the input itself becomes borderless/transparent so the
+   three controls read as a single unit. */
+.archive-search-wrap {
+    display: flex;
+    align-items: center;
     flex: 1;
     min-width: 160px;
-    min-height: var(--touch-target-minimum);
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-primary);
+    /* +2px (the wrap's own top+bottom border) so the stretched
+       .archive-search-btn children still measure a full 44px tall, not
+       44px minus the border their box-sizing: border-box parent consumes. */
+    min-height: calc(var(--touch-target-minimum) + var(--border-width-thin) * 2);
     background-color: var(--color-background-subtle);
     border: var(--border-width-thin) solid var(--color-border-default);
     border-radius: var(--border-radius-sm);
-    outline: none;
     transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.archive-search-wrap:focus-within {
+    border-color: var(--color-interactive-focus);
+}
+
+.archive-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    background-color: transparent;
+    border: none;
+    outline: none;
 }
 
 .archive-search-input::placeholder {
     color: var(--color-text-secondary);
 }
 
-.archive-search-input:focus {
-    border-color: var(--color-interactive-focus);
+/* Suppress the native WebKit search-cancel icon — replaced by our own
+   labelled .archive-search-clear button so behaviour (text-only clear,
+   focus retained) is consistent and accessible across browsers. */
+.archive-search-input::-webkit-search-cancel-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
+.archive-search-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    min-width: var(--touch-target-minimum);
+    padding: 0 var(--space-3);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    border-left: var(--border-width-thin) solid var(--color-border-default);
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+}
+
+.archive-search-btn:hover {
+    color: var(--color-text-primary);
+    border-left-color: var(--color-border-strong);
+}
+
+.archive-search-clear[hidden] {
+    display: none;
 }
 
 .filter-drawer-trigger,
@@ -2074,8 +2127,21 @@ footer p {
         display: none;
     }
 
-    .archive-search-input {
+    .archive-search-wrap {
         min-width: var(--space-20);
+    }
+
+    /* Auto-collapse on search focus — a separate mechanism from the sticky
+       header's scroll-driven .is-condensed state; this targets the Filter
+       Drawer's own internal rows only, triggered purely by focus/blur on
+       either search input instance (see initArchive() in script.js), never
+       by scroll position. Hides everything below Row 1 (Clear/Search/Close)
+       so the virtual keyboard has maximum room. Mobile only — desktop never
+       reaches this rule, and tablet keeps the drawer's normal expanded view. */
+    .filter-drawer--search-focused .filter-drawer-primary-chips,
+    .filter-drawer--search-focused #filter-drawer-active-chips,
+    .filter-drawer--search-focused .filter-drawer-scroll {
+        display: none;
     }
 
     .action-rail-group {

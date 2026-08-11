@@ -31,9 +31,15 @@
                  Mobile/tablet: Clear + Search + Filters trigger. Filters trigger hidden on desktop via CSS. -->
             <div class="archive-controls-row">
                 <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
-                <label for="archive-search" class="sr-only">Search entries</label>
-                <input type="search" class="archive-search-input" id="archive-search"
-                       placeholder="Search" autocomplete="off" inputmode="search">
+                <div class="archive-search-wrap">
+                    <label for="archive-search" class="sr-only">Search entries</label>
+                    <input type="search" class="archive-search-input" id="archive-search"
+                           placeholder="Search" autocomplete="off" inputmode="search">
+                    <button type="button" class="archive-search-btn archive-search-clear"
+                            aria-label="Clear search text" hidden>
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"
@@ -101,9 +107,15 @@
             <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) -->
             <div class="filter-drawer-controls">
                 <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
-                <label for="drawer-search" class="sr-only">Search entries</label>
-                <input type="search" class="archive-search-input" id="drawer-search"
-                       placeholder="Search" autocomplete="off" inputmode="search">
+                <div class="archive-search-wrap">
+                    <label for="drawer-search" class="sr-only">Search entries</label>
+                    <input type="search" class="archive-search-input" id="drawer-search"
+                           placeholder="Search" autocomplete="off" inputmode="search">
+                    <button type="button" class="archive-search-btn archive-search-clear"
+                            aria-label="Clear search text" hidden>
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"

@@ -778,20 +778,103 @@ function initArchive(filterDrawer) {
         });
     });
 
+    // Shows/hides a search input's own inline Clear (X) button — visible only
+    // while the field is both focused AND has text. Purely a display concern,
+    // no filter state involved. Called from the input's own input/focus/blur
+    // listeners so all three events funnel through this one check.
+    function updateSearchClearVisibility(input) {
+        const wrap = input.closest('.archive-search-wrap');
+        const clearBtn = wrap ? wrap.querySelector('.archive-search-clear') : null;
+        if (clearBtn) clearBtn.hidden = !(document.activeElement === input && input.value.length > 0);
+    }
+
     // Wire search inputs (header + drawer), debounced 250ms, synced
     searchInputs.forEach(input => {
         input.addEventListener('input', () => {
+            updateSearchClearVisibility(input);
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
                 currentQuery = input.value.trim().toLowerCase();
                 searchInputs.forEach(other => {
-                    if (other !== input) other.value = input.value;
+                    if (other !== input) {
+                        other.value = input.value;
+                        updateSearchClearVisibility(other);
+                    }
                 });
                 visibleCount = 25;
                 render();
             }, 250);
         });
+
+        // Enter/Return dismisses the keyboard only — live search already
+        // updates as the user types, so this doesn't submit or filter again.
+        // No visible button triggers this anymore — the virtual keyboard's
+        // own Return/Search key and the physical Enter key are the only
+        // affordances, and both already fire this same 'keydown' listener.
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                input.blur();
+            }
+        });
+
+        // X button visibility depends on focus as well as text — update on
+        // both, in addition to the 'input' listener above, so all three
+        // events funnel through the same updateSearchClearVisibility() check.
+        input.addEventListener('focus', () => updateSearchClearVisibility(input));
+        input.addEventListener('blur', () => updateSearchClearVisibility(input));
     });
+
+    // Wire inline Clear (X) buttons — clears this field's text only (both
+    // instances stay synced), leaves activeType/activeSecondary untouched,
+    // and keeps focus in the field so the user can immediately retype. This
+    // is distinct from .archive-clear-btn, which resets everything.
+    document.querySelectorAll('.archive-search-clear').forEach(btn => {
+        const input = btn.closest('.archive-search-wrap')?.querySelector('.archive-search-input');
+        if (!input) return;
+
+        // Without this, mousedown on the button blurs the input first (the
+        // browser's default focus-shift behaviour), which hides this button
+        // via updateSearchClearVisibility() before 'click' ever fires — so
+        // the click silently never registers. Prevent the default mousedown
+        // action so the input never loses focus in the first place.
+        btn.addEventListener('mousedown', (e) => e.preventDefault());
+
+        btn.addEventListener('click', () => {
+            input.value = '';
+            currentQuery = '';
+            searchInputs.forEach(other => {
+                if (other !== input) {
+                    other.value = '';
+                    updateSearchClearVisibility(other);
+                }
+            });
+            updateSearchClearVisibility(input);
+            visibleCount = 25;
+            clearTimeout(debounceTimer);
+            render();
+            input.focus();
+        });
+    });
+
+    // Auto-collapse the Filter Drawer's chip rows on search focus — mobile
+    // only (max-width: 767px, matching style.css's mobile breakpoint).
+    // Deliberately independent of the sticky header's scroll-driven
+    // .is-condensed state (a different element, a different trigger) — this
+    // only toggles .filter-drawer--search-focused on #filter-drawer itself.
+    const filterDrawerEl = document.getElementById('filter-drawer');
+    if (filterDrawerEl) {
+        searchInputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                if (window.matchMedia('(max-width: 767px)').matches) {
+                    filterDrawerEl.classList.add('filter-drawer--search-focused');
+                }
+            });
+            input.addEventListener('blur', () => {
+                filterDrawerEl.classList.remove('filter-drawer--search-focused');
+            });
+        });
+    }
 
     function doReset() {
         activeType = null;
@@ -799,7 +882,10 @@ function initArchive(filterDrawer) {
         currentQuery = '';
         currentSort = 'latest';
         visibleCount = 25;
-        searchInputs.forEach(input => { input.value = ''; });
+        searchInputs.forEach(input => {
+            input.value = '';
+            updateSearchClearVisibility(input);
+        });
         const url = new URL(window.location.href);
         url.searchParams.delete('type');
         window.history.replaceState({}, '', url.toString());
