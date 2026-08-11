@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setActiveTabBar();
     initBackToTop();
     initShareButtons();
-    initFilterDrawer();
-    initArchive();
+    const filterDrawer = initFilterDrawer();
+    initArchive(filterDrawer);
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
 });
 
@@ -339,10 +339,12 @@ function initFilterDrawer() {
     if (scrim) {
         scrim.addEventListener('click', closeDrawer);
     }
+
+    return { openDrawer, closeDrawer };
 }
 
 // Archive page — fetch manifest, build chips, filter, sort, paginate, sync URL
-function initArchive() {
+function initArchive(filterDrawer) {
     const resultsEl        = document.getElementById('archive-results');
     if (!resultsEl) return;
 
@@ -366,7 +368,8 @@ function initArchive() {
     let currentSort        = 'latest';
     let currentQuery       = '';
     let visibleCount       = 25;
-    let secondaryExpanded  = false; // desktop "+N more" disclosure — persists for the page load
+    let secondaryExpanded  = false; // Filter Drawer "+N more" disclosure (mobile/tablet) — persists for the page load
+    let moreFiltersOpen    = false; // desktop secondary tag row — hidden by default, revealed via "More Filters"
     let debounceTimer;
 
     // Read initial URL params
@@ -434,13 +437,11 @@ function initArchive() {
             });
         });
 
-        // "Show More" / "Show Less" progressive disclosure toggle — appended
-        // after the Work/Thoughts chips in both the desktop inline primary
-        // row and the Filter Drawer's primary row (not inside the secondary
-        // tag containers it controls). Both toggles drive the same shared
-        // secondaryExpanded state, so expanding in one context is reflected
-        // in the other on next render().
-        [primaryChipsEl, drawerPrimaryChipsEl].filter(Boolean).forEach(container => {
+        // Filter Drawer (mobile/tablet) "Show More" / "Show Less" progressive
+        // disclosure toggle — appended after the Work/Thoughts chips in the
+        // drawer's primary row (not inside the secondary tag container it
+        // controls). Unaffected by the desktop More Filters toggle below.
+        if (drawerPrimaryChipsEl) {
             const moreToggle = document.createElement('button');
             moreToggle.type = 'button';
             moreToggle.className = 'tag-chip tag-chip-more';
@@ -449,8 +450,29 @@ function initArchive() {
                 secondaryExpanded = !secondaryExpanded;
                 render();
             });
-            container.appendChild(moreToggle);
-        });
+            drawerPrimaryChipsEl.appendChild(moreToggle);
+        }
+
+        // Desktop "More Filters" / "Less Filters" toggle — appended after the
+        // Work/Thoughts chips in the desktop inline primary row. Reveals or
+        // hides the entire secondary tag row (#archive-secondary-chips) as a
+        // block; reuses the existing "Filters" trigger's button styling
+        // (.filter-drawer-trigger) via a shared CSS selector, not a new
+        // aria-controls="filter-drawer" trigger, so it never opens the drawer.
+        if (primaryChipsEl) {
+            const moreFiltersToggle = document.createElement('button');
+            moreFiltersToggle.type = 'button';
+            moreFiltersToggle.className = 'more-filters-toggle';
+            moreFiltersToggle.hidden = true;
+            moreFiltersToggle.setAttribute('aria-expanded', 'false');
+            moreFiltersToggle.setAttribute('aria-controls', 'archive-secondary-chips');
+            moreFiltersToggle.textContent = 'More Filters';
+            moreFiltersToggle.addEventListener('click', () => {
+                moreFiltersOpen = !moreFiltersOpen;
+                render();
+            });
+            primaryChipsEl.appendChild(moreFiltersToggle);
+        }
     }
 
     // Filter + sort the full entry list
@@ -624,9 +646,14 @@ function initArchive() {
             else                                titleEl.textContent = 'Archive';
         }
 
-        // Count (aria-live polite)
+        // Count (aria-live polite) — "All" when the filtered set equals the
+        // full unfiltered entry list (covers the 0-active-filters case, and
+        // correctly falls back to the real number if search text narrows
+        // results even with 0 chip filters active).
         if (countEl) {
-            countEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'Entry' : 'Entries'}`;
+            const displayCount = filtered.length === allEntries.length ? 'All' : filtered.length;
+            const entriesWord  = filtered.length === 1 ? 'Entry' : 'Entries';
+            countEl.innerHTML = `Showing <span class="archive-count-value">${displayCount}</span> ${entriesWord}`;
         }
 
         // Primary type chips
@@ -669,21 +696,13 @@ function initArchive() {
             btn.classList.toggle('tag-chip--zero-count', count === 0);
         });
 
-        // "Show More" / "Show Less" progressive disclosure — collapse the
-        // visible secondary tag list (already alphabetically sorted;
-        // zero-count tags already excluded above) to the first 10, in both
-        // the desktop inline list and the Filter Drawer. Both read/write the
-        // same shared secondaryExpanded state, so expand/collapse stays in
-        // sync between contexts — resizing between desktop and mobile
-        // mid-session doesn't reset it. The toggle button itself now lives in
-        // the primary chips row (not inside the container being measured
-        // here), so each secondary container is paired with the primary row
-        // that holds its toggle.
-        [
-            { secondary: inlineFiltersEl, toggleHost: primaryChipsEl },
-            { secondary: drawerChipsEl, toggleHost: drawerPrimaryChipsEl },
-        ].filter(pair => pair.secondary).forEach(({ secondary, toggleHost }) => {
-            const visibleTags = [...secondary.querySelectorAll('[data-filter-tag]')]
+        // Filter Drawer (mobile/tablet) "Show More" / "Show Less" progressive
+        // disclosure — collapses the visible secondary tag list (already
+        // alphabetically sorted; zero-count tags already excluded above) to
+        // the first 10. Unaffected by the desktop More Filters toggle below —
+        // this is the pre-existing drawer behaviour, untouched.
+        if (drawerChipsEl) {
+            const visibleTags = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')]
                 .filter(btn => !btn.classList.contains('tag-chip--zero-count'));
             const overflowCount = visibleTags.length - 10;
 
@@ -691,13 +710,32 @@ function initArchive() {
                 btn.classList.toggle('tag-chip--collapsed', i >= 10 && !secondaryExpanded);
             });
 
-            const moreToggle = toggleHost ? toggleHost.querySelector('.tag-chip-more') : null;
+            const moreToggle = drawerPrimaryChipsEl ? drawerPrimaryChipsEl.querySelector('.tag-chip-more') : null;
             if (moreToggle) {
                 moreToggle.hidden = overflowCount <= 0;
                 moreToggle.textContent = secondaryExpanded ? 'Show Less' : 'Show More';
                 moreToggle.setAttribute('aria-expanded', String(secondaryExpanded));
             }
-        });
+        }
+
+        // Desktop "More Filters" / "Less Filters" — the entire secondary tag
+        // row is hidden by default (on load and on every fresh navigation,
+        // since moreFiltersOpen always starts false) and revealed as one
+        // block, rather than the drawer's first-10-then-overflow disclosure.
+        // A currently-active secondary tag (e.g. from a ?tag= URL param)
+        // still shows in #archive-active-chips regardless of this state —
+        // that row is separate from #archive-secondary-chips.
+        if (inlineFiltersEl) {
+            const hasSecondaryTags = !!inlineFiltersEl.querySelector('[data-filter-tag]:not(.tag-chip--zero-count)');
+            inlineFiltersEl.hidden = !moreFiltersOpen;
+
+            const moreFiltersToggle = primaryChipsEl ? primaryChipsEl.querySelector('.more-filters-toggle') : null;
+            if (moreFiltersToggle) {
+                moreFiltersToggle.hidden = !hasSecondaryTags;
+                moreFiltersToggle.textContent = moreFiltersOpen ? 'Less Filters' : 'More Filters';
+                moreFiltersToggle.setAttribute('aria-expanded', String(moreFiltersOpen));
+            }
+        }
 
         updateActiveChipsRow();
 
@@ -806,14 +844,36 @@ function initArchive() {
             // an unrecognised slug (stale/renamed tag, typo, hand-edited URL)
             // is treated as if no tag param was given, rather than silently
             // becoming a permanent zero-match filter with a phantom active chip.
+            let arrivedViaValidTag = false;
             if (tagParam) {
                 const validTagSlugs = new Set();
                 entries.forEach(e => (e.tags || []).forEach(t => validTagSlugs.add(slugify(t))));
-                if (validTagSlugs.has(tagParam)) activeSecondary.add(tagParam);
+                if (validTagSlugs.has(tagParam)) {
+                    activeSecondary.add(tagParam);
+                    arrivedViaValidTag = true;
+                    // Filter Drawer (mobile/tablet) arrival state — arriving via a
+                    // topic tag link keeps the drawer closed (see below), but
+                    // pre-expands its secondary tag row so that when the user
+                    // does open it manually, the active tag is shown in full
+                    // context immediately — no extra "Show More" tap needed.
+                    secondaryExpanded = true;
+                }
             }
 
             buildSecondaryChips(entries);
             render();
+
+            // Filter Drawer (mobile/tablet) arrival state — desktop's inline
+            // filters have no open/closed concept, so this never applies there.
+            // Scenario 2 only: arrived via a "View more Work/Thoughts" style
+            // link (?type= present, no ?tag=) — open the drawer on arrival with
+            // that primary filter already active. Direct navigation (no params)
+            // and tag-link arrivals (Scenario 3, handled above) stay closed.
+            const isDrawerBreakpoint = !window.matchMedia('(min-width: 1024px)').matches;
+            if (isDrawerBreakpoint && filterDrawer && activeType && !arrivedViaValidTag) {
+                const opener = document.querySelector('[aria-controls="filter-drawer"]');
+                filterDrawer.openDrawer(opener);
+            }
         })
         .catch(err => console.error('Error loading archive-entries.json:', err));
 }

@@ -61,8 +61,10 @@
                 <!-- Active secondary filters row — collapses to zero height when empty -->
                 <div class="archive-active-chips" id="archive-active-chips"></div>
 
-                <!-- Secondary tag chips — populated by JS -->
-                <div id="archive-secondary-chips" aria-label="Filter by tag"></div>
+                <!-- Secondary tag chips — populated by JS; hidden by default,
+                     revealed via the "More Filters" toggle appended into
+                     .archive-primary-chips -->
+                <div id="archive-secondary-chips" aria-label="Filter by tag" hidden></div>
 
             </div>
 
@@ -138,10 +140,10 @@
     <main id="main-content">
         <div class="container">
 
-            <!-- Sort toggle (left) and entry count (right) — between header and results grid -->
+            <!-- Entry count (left) and sort toggle (right) — between header and results grid -->
             <div class="archive-sort-count-row">
-                <button class="archive-sort-toggle" type="button">Latest ↑</button>
                 <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+                <button class="archive-sort-toggle" type="button">Latest ↑</button>
             </div>
 
             <!-- Cards populated by initArchive() -->
