@@ -273,9 +273,15 @@ function initFilterDrawer() {
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) themeToggle.classList.remove('theme-toggle-rail--visible');
 
-        const firstFocusable = drawer.querySelector(
-            'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
+        // Clear (when enabled — e.g. arriving with a filter already active)
+        // is the natural first stop; otherwise land on the first primary chip
+        // rather than falling through to the search input, which would
+        // immediately trigger the search-focus auto-collapse and hide the
+        // very filter chips this dialog is meant to show on open.
+        const firstFocusable =
+            drawer.querySelector('.archive-clear-btn:not([disabled])') ||
+            drawer.querySelector('.filter-drawer-primary-chips button:not([disabled])') ||
+            drawer.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
         if (firstFocusable) {
             requestAnimationFrame(() => firstFocusable.focus());
         }
@@ -330,6 +336,13 @@ function initFilterDrawer() {
     }
 
     allTriggers.forEach(btn => {
+        // Same fix as the search field's X button: without this, mousedown
+        // on Close (while search is focused) blurs the input first, which
+        // re-expands the collapsed rows and shifts this fixed-bottom drawer's
+        // layout — moving the button out from under the cursor before
+        // mouseup/click land, so the first press silently misses it.
+        btn.addEventListener('mousedown', (e) => e.preventDefault());
+
         btn.addEventListener('click', () => {
             if (drawer.hidden) openDrawer(btn);
             else closeDrawer();

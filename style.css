@@ -1739,12 +1739,25 @@ footer p {
    chips row above it stay pinned regardless of secondary list length.
    flex: 1 + min-height: 0 lets it consume whatever space the pinned
    siblings don't need, within .filter-drawer's existing max-height: 70vh,
-   without hardcoding a second height value that would need to stay in sync. */
+   without hardcoding a second height value that would need to stay in sync.
+
+   padding gives focused chips' 2px/3px-offset focus ring (REFERENCE.md's
+   spec — 5px total clearance needed) room to render before hitting this
+   container's clip boundary; overflow-y: auto here also computes
+   overflow-x to auto per spec (can't have one auto and one visible), so
+   chips at either end of a wrapped row need the same horizontal clearance
+   as the top row needs vertically. The matching left/right negative margin
+   cancels the resulting inward shift so chips still start flush with the
+   primary chips row above — clip boundary moves out, visual position
+   doesn't. */
 .filter-drawer-scroll {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     scrollbar-gutter: stable;
+    padding: var(--space-2);
+    margin-left: calc(-1 * var(--space-2));
+    margin-right: calc(-1 * var(--space-2));
 }
 
 /* Filter drawer — Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) */
@@ -1866,22 +1879,44 @@ footer p {
 /* ================================
    ARCHIVE PAGE
 ================================ */
+/* No background/border at any breakpoint — blends into the page background,
+   no divider anywhere. padding-bottom is --space-2: the single source of
+   truth for the gap to the Showing/Latest row at every breakpoint (paired
+   with the archive-specific main override below, which removes the
+   sitewide nav-breathing-room padding that would otherwise stack with it). */
 .archive-sticky-header {
-    background-color: var(--color-background-surface);
-    border-bottom: var(--border-width-thin) solid var(--color-border-default);
-    padding: var(--space-6) 0;
+    padding: var(--space-6) 0 var(--space-2);
+}
+
+/* main's sitewide padding-top (breathing room below the nav, needed on
+   every other page) is redundant here at every breakpoint — this header
+   already fully owns the transition to page content via its own
+   padding/margin above, regardless of whether the nav is sticky (tablet/
+   desktop) or fixed (mobile, where the header also gets its own
+   margin-top for clearance). Scoped to this page only via the sibling
+   selector, not a sitewide change. */
+.archive-sticky-header ~ main {
+    padding-top: 0;
 }
 
 .archive-title-row {
-    margin-bottom: var(--space-4);
+    margin-bottom: 0;
 }
 
+/* "Archive" h1 stays in the DOM (one h1 per page, real heading for screen
+   readers/semantic structure) but is visually hidden at every breakpoint —
+   same technique as the .sr-only utility, applied here directly since the
+   title is never shown regardless of viewport width. */
 .archive-title {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-snug);
-    letter-spacing: var(--letter-spacing-normal);
-    color: var(--color-text-primary);
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 /* Entry count (left) + sort toggle (right) — between archive header and results grid */
@@ -1966,25 +2001,34 @@ footer p {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-bottom: var(--space-3);
 }
 
+/* margin-top (not -bottom on the row above) so this spacing only appears
+   when this row is actually visible — .archive-primary-chips is otherwise
+   the last visible row in .archive-inline-filters by default (no filters
+   active, secondary tags collapsed), and a trailing margin-bottom on it
+   would add dead space after it in that default state. */
 .archive-active-chips {
     display: none;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-bottom: var(--space-3);
+    margin-top: var(--space-3);
 }
 
 .archive-active-chips.is-active {
     display: flex;
 }
 
+/* margin-top for the same reason as .archive-active-chips above — this row
+   is hidden by default, so its spacing from whatever precedes it (primary
+   chips, or active chips if that's also visible) must live here, not as a
+   trailing margin-bottom on the row(s) before it. */
 #archive-secondary-chips {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
     align-content: flex-start;
+    margin-top: var(--space-3);
 }
 
 #archive-secondary-chips[hidden] {
@@ -2049,6 +2093,15 @@ footer p {
     .card--profile {
         position: static;
     }
+
+    /* Covers mobile + tablet (both ≤1023px) — .archive-inline-filters is
+       display:none at both, so this margin (meant to space the Controls row
+       from the visible chips section on desktop) is dead space here. Not
+       duplicated in the mobile-only block below — this is its single source
+       of truth. */
+    .archive-controls-row {
+        margin-bottom: 0;
+    }
 }
 
 /* ================================
@@ -2057,12 +2110,19 @@ footer p {
 @media (max-width: 767px) {
     h1 { font-size: var(--font-size-3xl); }
 
-    body {
-        padding-bottom: var(--space-20);
+    main {
+        padding-top: var(--space-20);
     }
 
-    main {
-        padding-top: var(--space-10);
+    /* .archive-sticky-header sits outside <main> (a sibling of #nav-placeholder,
+       not covered by main's padding-top above), so it needs its own clearance
+       from the fixed-top tab bar. margin- (not padding-) top so the gap shows
+       the page's base background, not the header's own surface colour.
+       No border-bottom here anymore — removed at every breakpoint, not just
+       backgroundless; padding-bottom is inherited from the base rule (single
+       source of truth, same value at every breakpoint). */
+    .archive-sticky-header {
+        margin-top: var(--space-20);
     }
 
     .page-grid {
@@ -2103,7 +2163,7 @@ footer p {
         padding-top: var(--space-4);
     }
 
-    /* Bottom tab bar replaces desktop nav on mobile */
+    /* Top tab bar replaces desktop nav on mobile */
     header {
         display: none;
     }
@@ -2111,12 +2171,12 @@ footer p {
     .tab-bar {
         display: flex;
         position: fixed;
-        bottom: 0;
+        top: 0;
         left: 0;
         width: 100%;
         height: 64px;
         background-color: var(--color-background-surface);
-        border-top: var(--border-width-thin) solid var(--color-border-default);
+        border-bottom: var(--border-width-thin) solid var(--color-border-default);
         justify-content: space-around;
         align-items: center;
         padding: var(--space-2);
