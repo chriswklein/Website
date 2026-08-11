@@ -62,16 +62,16 @@
     --font-family-base: 'Noto Sans', sans-serif;
 
     /* ---- Typography: Size ---- */
-    --font-size-xs: 12px;
-    --font-size-sm: 14px;
-    --font-size-base: 16px;
-    --font-size-md: 18px;
-    --font-size-lg: 20px;
-    --font-size-xl: 24px;
-    --font-size-2xl: 30px;
-    --font-size-3xl: 36px;
-    --font-size-4xl: 48px;
-    --font-size-5xl: 60px;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-md: 1.125rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 1.875rem;
+    --font-size-3xl: 2.25rem;
+    --font-size-4xl: 3rem;
+    --font-size-5xl: 3.75rem;
 
     /* ---- Typography: Weight ---- */
     --font-weight-regular: 400;
@@ -174,7 +174,6 @@
    BASE STYLES
 ================================ */
 html {
-    font-size: 16px;
     scroll-behavior: smooth;
 }
 

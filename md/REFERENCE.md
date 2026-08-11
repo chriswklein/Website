@@ -111,15 +111,16 @@ Nav and footer inject automatically via `script.js`.
 
 | Token | Size | Usage |
 |---|---|---|
-| `--font-size-xs` | 12px | Legal/fine print, tab bar labels |
-| `--font-size-sm` | 14px | Captions, labels, metadata, tags |
-| `--font-size-base` | 16px | Body text (browser default) |
-| `--font-size-md` | 18px | Large body, intro paragraphs |
-| `--font-size-lg` | 20px | H4 |
-| `--font-size-xl` | 24px | H3 |
-| `--font-size-2xl` | 30px | H2 |
-| `--font-size-3xl` | 36px | H1 mobile |
-| `--font-size-4xl` | 48px | H1 desktop |
+| `--font-size-xs` | 0.75rem | Legal/fine print, tab bar labels |
+| `--font-size-sm` | 0.875rem | Captions, labels, metadata, tags |
+| `--font-size-base` | 1rem | Body text (browser default) |
+| `--font-size-md` | 1.125rem | Large body, intro paragraphs |
+| `--font-size-lg` | 1.25rem | H4 |
+| `--font-size-xl` | 1.5rem | H3 |
+| `--font-size-2xl` | 1.875rem | H2 |
+| `--font-size-3xl` | 2.25rem | H1 mobile |
+| `--font-size-4xl` | 3rem | H1 desktop |
+| `--font-size-5xl` | 3.75rem | Display / hero headline desktop only |
 
 ### Font Weights
 
