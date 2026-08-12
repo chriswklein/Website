@@ -225,7 +225,18 @@ function initFilterDrawer() {
     function unlockBodyScroll() {
         document.body.classList.remove('body-scroll-locked');
         document.body.style.top = '';
-        window.scrollTo(0, savedScrollY);
+        // behavior: 'instant' — html has scroll-behavior: smooth sitewide
+        // (for the Back to Top button and anchor jumps), which window.scrollTo
+        // inherits by default. Confirmed via testing, not assumed: without
+        // an explicit override this restore animates over several hundred ms
+        // instead of jumping immediately, which is exactly backwards for a
+        // state restoration — the user should land back exactly where they
+        // were with no perceptible motion, not watch the page scroll past
+        // everything in between. This surfaced as a real, visible bug only
+        // on long scroll distances (the animation takes longer to finish, so
+        // a fixed-delay check samples it mid-flight); short distances looked
+        // fine only because the animation had time to complete unnoticed.
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
     }
 
     // Elements to inert while the drawer is open — prevents focus leaking to duplicate controls
@@ -307,28 +318,71 @@ function initFilterDrawer() {
         // Remove inert before returning focus so the opener can receive it
         getInertTargets().forEach(el => el.removeAttribute('inert'));
 
+        // Restore rail group visibility synchronously, BEFORE the
+        // openerBtn.focus() call below — not inside the transitionend
+        // callback, which fires later. openerBtn is frequently this same
+        // rail trigger now (the only opener on mobile/tablet).
+        // Always shown on mobile/tablet (the inline Clear/Search/Filters row
+        // is hidden there entirely, so this is the only way to reach
+        // filters, not just a scroll-triggered convenience). Desktop keeps
+        // the existing scroll-position-based behaviour, unchanged — read
+        // from the already-tracked .is-condensed class rather than a live
+        // sent.getBoundingClientRect() check: unlockBodyScroll() above just
+        // called window.scrollTo() to restore the pre-lock scroll position,
+        // and a geometry read this same tick can still reflect the pre-
+        // restore position (confirmed by testing — scrollY read back as 0
+        // immediately after scrollTo(0, 800)). .is-condensed doesn't have
+        // this race: the IntersectionObserver's drawer-open guard leaves it
+        // untouched for the drawer's entire open duration, so it still
+        // accurately reflects the scroll state the drawer opened in.
+        //
+        // visibility is a discrete-animatable property: switching it to
+        // "visible" only takes effect once the browser commits to starting
+        // the transition, which — confirmed by testing, not assumed — does
+        // NOT reliably happen within a single requestAnimationFrame under
+        // real page load (this element's transition competes with the
+        // drawer's own simultaneous close transition). A still-hidden
+        // element silently refuses .focus(), leaving focus stuck wherever
+        // it was until the drawer's hidden attribute lands later and force-
+        // blurs it to <body>. Fix: disable the transition just for this one
+        // change so it applies instantly and deterministically, then
+        // restore it immediately after via a forced reflow — same
+        // instant-then-re-enable technique used whenever a transitioned
+        // property needs to change without animating.
+        const sent = document.getElementById('archive-header-sentinel');
+        const railGrp = document.querySelector('.action-rail-group');
+        if (railGrp && sent) {
+            const isMobileTablet = !window.matchMedia('(min-width: 1024px)').matches;
+            const header = document.getElementById('archive-sticky-header');
+            const shouldShowRail = isMobileTablet || (header && header.classList.contains('is-condensed'));
+            railGrp.classList.add('action-rail-group--instant');
+            railGrp.classList.toggle('action-rail-group--visible', shouldShowRail);
+            void railGrp.offsetHeight; // force the instant change to commit before re-enabling the transition
+            railGrp.classList.remove('action-rail-group--instant');
+        }
+
         drawer.addEventListener('transitionend', () => {
             drawer.setAttribute('hidden', '');
             if (scrim) scrim.setAttribute('hidden', '');
             // Re-evaluate condensed state on next genuine scroll after drawer close
             const header = document.getElementById('archive-sticky-header');
-            const sent   = document.getElementById('archive-header-sentinel');
             if (header && sent) {
                 window.addEventListener('scroll', () => {
                     const rect = sent.getBoundingClientRect();
                     header.classList.toggle('is-condensed', rect.bottom <= 0);
                 }, { once: true, passive: true });
             }
-            // Restore rail group visibility based on current scroll position
-            const railGrp = document.querySelector('.action-rail-group');
-            if (railGrp && sent) {
-                railGrp.classList.toggle('action-rail-group--visible', sent.getBoundingClientRect().bottom <= 0);
-            }
             const themeToggle = document.getElementById('theme-toggle');
             if (themeToggle) themeToggle.classList.add('theme-toggle-rail--visible');
         }, { once: true });
 
-        if (openerBtn) openerBtn.focus();
+        // preventScroll: true — focus() defaults to scrolling its target
+        // into view if the browser doesn't already consider it visible,
+        // which can fight with the scroll position unlockBodyScroll() just
+        // restored above. openerBtn is fixed-position (always on-screen
+        // regardless of scrollY), so no scroll-into-view is ever actually
+        // needed here.
+        if (openerBtn) openerBtn.focus({ preventScroll: true });
     }
 
     function handleEscape(event) {
@@ -971,7 +1025,11 @@ function initArchive(filterDrawer) {
         });
     }
 
-    // IntersectionObserver — show action-rail-group and condense header when sentinel leaves viewport
+    // IntersectionObserver — show action-rail-group and condense header when
+    // sentinel leaves viewport. Mobile/tablet: the inline Clear/Search/
+    // Filters row is hidden entirely there (no scroll-based condensing to
+    // react to), so the floating trigger stays visible unconditionally —
+    // only desktop keeps the original scroll-position-driven show/hide.
     const sentinel = document.getElementById('archive-header-sentinel');
     const archiveHeader = document.getElementById('archive-sticky-header');
     if (sentinel && railGroup) {
@@ -979,7 +1037,8 @@ function initArchive(filterDrawer) {
             const headerInView = entries[0].isIntersecting;
             // Drawer-open guard: don't update rail visibility or condensed state while drawer is open
             if (!document.querySelector('.filter-drawer--open')) {
-                railGroup.classList.toggle('action-rail-group--visible', !headerInView);
+                const isMobileTablet = !window.matchMedia('(min-width: 1024px)').matches;
+                railGroup.classList.toggle('action-rail-group--visible', isMobileTablet || !headerInView);
                 if (archiveHeader) archiveHeader.classList.toggle('is-condensed', !headerInView);
             }
         }, { threshold: 0 });
@@ -1031,7 +1090,13 @@ function initArchive(filterDrawer) {
             // and tag-link arrivals (Scenario 3, handled above) stay closed.
             const isDrawerBreakpoint = !window.matchMedia('(min-width: 1024px)').matches;
             if (isDrawerBreakpoint && filterDrawer && activeType && !arrivedViaValidTag) {
-                const opener = document.querySelector('[aria-controls="filter-drawer"]');
+                // The floating rail trigger is the only visible opener on
+                // mobile/tablet now (the inline .archive-controls-row
+                // trigger is hidden entirely there) — target it explicitly
+                // rather than the first generic [aria-controls="filter-drawer"]
+                // match, which would resolve to that hidden element and
+                // silently fail to receive focus back when the drawer closes.
+                const opener = document.querySelector('.action-rail-trigger');
                 filterDrawer.openDrawer(opener);
             }
         })

@@ -1015,6 +1015,19 @@ pre code {
 /* ================================
    NAVIGATION
 ================================ */
+/* Fixes position: sticky silently failing on <header> below — confirmed via
+   testing, not assumed. #nav-placeholder is a plain block div injected by
+   script.js's fetch(); as a flex item of body (display: flex; flex-direction:
+   column), it collapses to header's own height (~65px), leaving header's
+   sticky positioning zero room to move within its own snugly-fitted parent —
+   the classic "sticky doesn't work because its containing block is exactly
+   its own size" gotcha. display: contents removes the wrapper from the box
+   model entirely so header becomes body's real flex item, with the full
+   remaining space available to stick within. */
+#nav-placeholder {
+    display: contents;
+}
+
 header {
     position: sticky;
     top: 0;
@@ -1869,20 +1882,41 @@ footer p {
     align-content: flex-start;
 }
 
-/* Floating action rail group — fixed position container for trigger + clear button */
+/* Floating action rail group — fixed position container for trigger + clear
+   button. Same show/hide pattern as .back-to-top (opacity/visibility, not
+   display) so the appearance/disappearance can transition smoothly — the
+   sitewide prefers-reduced-motion rule (bottom of file) already shortens
+   this transition-duration to near-instant when that's set, same as every
+   other transition on the site. */
 .action-rail-group {
     position: fixed;
     right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
     top: 50%;
     transform: translateY(-50%);
     z-index: 260;
-    display: none;
+    display: flex;
     align-items: center;
     gap: var(--space-2);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out),
+                visibility var(--duration-base) var(--ease-out);
 }
 
 .action-rail-group--visible {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Applied briefly by closeDrawer() (script.js) so a visibility change can
+   commit instantly instead of waiting on the transition above — needed
+   because focus is returned to this same element immediately afterward,
+   and visibility: hidden elements silently refuse .focus() until the
+   browser has actually committed the "now visible" state. */
+.action-rail-group--instant {
+    transition: none;
 }
 
 /* Floating action rail trigger — visual styles; position inherited from group */
@@ -1962,21 +1996,27 @@ footer p {
    ARCHIVE PAGE
 ================================ */
 /* No background/border at any breakpoint — blends into the page background,
-   no divider anywhere. padding-bottom is --space-2: the single source of
-   truth for the gap to the Showing/Latest row at every breakpoint (paired
-   with the archive-specific main override below, which removes the
-   sitewide nav-breathing-room padding that would otherwise stack with it). */
+   no divider anywhere. padding-bottom is --space-2: the source of truth for
+   the gap between the visible inline chips and the Showing/Latest row on
+   desktop. On mobile/tablet this padding is zeroed out entirely (see
+   max-width: 1023px below) — .archive-controls-row is hidden there and the
+   header has no visible content left, so it collapses to zero height
+   rather than showing empty padding-driven space. */
 .archive-sticky-header {
     padding: var(--space-6) 0 var(--space-2);
 }
 
-/* main's sitewide padding-top (breathing room below the nav, needed on
-   every other page) is redundant here at every breakpoint — this header
-   already fully owns the transition to page content via its own
-   padding/margin above, regardless of whether the nav is sticky (tablet/
-   desktop) or fixed (mobile, where the header also gets its own
-   margin-top for clearance). Scoped to this page only via the sibling
-   selector, not a sitewide change. */
+/* All breakpoints — main's sitewide padding-top (breathing room below the
+   nav) is redundant on this page everywhere, not just desktop. On desktop
+   the header's own padding/chips content owns that transition instead. On
+   mobile/tablet, .archive-results' own padding-top (140px mobile, 76px
+   tablet — see max-width: 1023px below) already fully accounts for
+   whatever clearance isn't already free from document flow. Stacking
+   main's generic padding-top on top of that produced 80px/97px of pure
+   dead space above the first result card. Previously scoped to
+   min-width: 1024px only, back when mobile/tablet still relied on main's
+   padding-top for nav clearance; no longer true now that .archive-results
+   owns that clearance directly. */
 .archive-sticky-header ~ main {
     padding-top: 0;
 }
@@ -2176,13 +2216,100 @@ footer p {
         position: static;
     }
 
-    /* Covers mobile + tablet (both ≤1023px) — .archive-inline-filters is
-       display:none at both, so this margin (meant to space the Controls row
-       from the visible chips section on desktop) is dead space here. Not
-       duplicated in the mobile-only block below — this is its single source
-       of truth. */
+    /* Covers mobile + tablet (both ≤1023px). The inline Clear/Search/
+       Filters row is hidden entirely at these widths now — the floating
+       action-rail trigger (always visible here, see script.js) is the only
+       way to reach filters — so this occupies no space in the layout at
+       all, not just a reduced margin. margin-bottom: 0 is kept alongside
+       display: none for when a future change might re-show the row; either
+       alone would already be enough today. */
     .archive-controls-row {
+        display: none;
         margin-bottom: 0;
+    }
+
+    /* With .archive-controls-row hidden and .archive-inline-filters already
+       display: none at these widths, the header has no visible content left
+       (the h1 remains sr-only-equivalent, contributing zero flow height) —
+       zero its own padding too so it collapses to zero height rather than
+       showing empty padding-driven space. */
+    .archive-sticky-header {
+        padding: 0;
+    }
+
+    /* position: fixed, not sticky — the row must be locked in place from
+       the very first frame with no in-flow scroll-along period, which
+       sticky can't do (it stays in normal flow and only locks once
+       scrolled to its threshold). top: 64px matches the fixed tab bar's
+       (mobile) / sticky header's (tablet) own height, confirmed by
+       font-loaded measurement, not assumed — both are 64px, so one value
+       covers this shared mobile+tablet block. left/right/max-width/margin
+       replicate .container's own centering, since a fixed element no
+       longer inherits it from being .container's in-flow child; padding
+       matches .container's own horizontal padding (var(--space-8) here,
+       overridden to var(--space-4) at max-width: 767px below) so the row's
+       content lines up with the results grid beneath it. Opaque background
+       (the same token body's own background uses, not a new one) so result
+       cards don't visually bleed through as they scroll beneath it; a
+       small explicit z-index keeps it reliably above those cards without
+       approaching the nav's (200) or the floating action-rail group's
+       (260) layers. */
+    .archive-sort-count-row {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        max-width: var(--max-content);
+        margin: 0 auto;
+        padding: var(--space-4) var(--space-8);
+        z-index: 10;
+        background-color: var(--color-background-base);
+    }
+
+    /* Row is removed from document flow by position: fixed above, so the
+       results grid needs its own clearance added back — sized to (nav
+       height + row's own rendered height), both confirmed by font-loaded
+       measurement: 64px + 76px = 140px. Tablet's own override below uses
+       just the row's 76px, not nav+row — header stays in normal document
+       flow there (position: sticky, not fixed), so its height is already
+       accounted for by flow alone; adding it again here would double-count
+       it. */
+    .archive-results {
+        padding-top: 140px;
+    }
+}
+
+/* Tablet uses the sticky <header> (not the fixed tab bar mobile gets below).
+   header previously had no explicit height or box-sizing: border-box, so
+   its rendered height was derived from flex/font-metric distribution
+   instead of a fixed value — confirmed via DevTools Computed panel to
+   render as a fractional 64.6667px with a 0.666667px border-bottom, not
+   the clean 64px/1px assumed elsewhere. Giving header an explicit height
+   fixes this at the source: box-sizing: border-box (already the sitewide
+   default, redeclared here for clarity) absorbs the border-bottom inside
+   the 64px box instead of adding on top of it, so header's rendered
+   height becomes a fixed, predictable 64px under all conditions — no
+   longer sensitive to font metrics or flex distribution, and no longer
+   drifting under DPR/zoom scaling since there's no fractional math left
+   to be affected. 64px matches the mobile tab bar exactly, so
+   .archive-sort-count-row no longer needs a tablet-specific top override
+   below — the shared max-width: 1023px block's top: 64px now applies
+   correctly to both. */
+@media (min-width: 768px) and (max-width: 1023px) {
+    header {
+        height: 64px;
+        box-sizing: border-box;
+    }
+
+    /* Row height only (76px), NOT nav+row like mobile's 140px. header is
+       position: sticky here (not fixed like the mobile tab bar), so it
+       stays in normal document flow — its own 64px rendered height already
+       pushes main down for free. Adding the nav's height again on top of
+       that would double-count it, leaving a gap above the first card even
+       with main's padding-top zeroed. Confirmed via measurement, not
+       assumed. */
+    .archive-results {
+        padding-top: 76px;
     }
 }
 
@@ -2196,16 +2323,12 @@ footer p {
         padding-top: var(--space-20);
     }
 
-    /* .archive-sticky-header sits outside <main> (a sibling of #nav-placeholder,
-       not covered by main's padding-top above), so it needs its own clearance
-       from the fixed-top tab bar. margin- (not padding-) top so the gap shows
-       the page's base background, not the header's own surface colour.
-       No border-bottom here anymore — removed at every breakpoint, not just
-       backgroundless; padding-bottom is inherited from the base rule (single
-       source of truth, same value at every breakpoint). */
-    .archive-sticky-header {
-        margin-top: var(--space-20);
-    }
+    /* .archive-sticky-header no longer needs its own margin-top for fixed-nav
+       clearance — it has no visible content on mobile now (Clear/Search/
+       Filters row hidden, see max-width: 1023px above), so that job goes
+       back to main's own padding-top (restored to normal on mobile/tablet,
+       see the min-width: 1024px-scoped override above) — same as every
+       other page. */
 
     .page-grid {
         padding: 0 var(--space-4);
@@ -2213,6 +2336,13 @@ footer p {
 
     .container {
         padding: 0 var(--space-4);
+    }
+
+    /* Matches .container's own reduced horizontal padding above — the
+       fixed row no longer inherits it as .container's in-flow child, so
+       its own padding must be kept in sync by hand at each breakpoint. */
+    .archive-sort-count-row {
+        padding: var(--space-4);
     }
 
     .standard-page {
