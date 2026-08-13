@@ -1611,7 +1611,18 @@ footer p {
     min-width: 0;
     height: 100%;
     padding: var(--space-2) var(--space-4);
-    font-size: var(--font-size-sm);
+    /* font-size-base (16px), not font-size-sm — iOS Safari auto-zooms the
+       whole page on focus for any input under 16px, and the zoom persists
+       after the keyboard closes. Unscoped (applies at every breakpoint,
+       not just the mobile media query) because iPad lands in this site's
+       tablet breakpoint, not mobile, but has the identical iOS zoom
+       behavior — scoping this to mobile-only CSS would leave it broken
+       there. Already the documented WCAG-minimum token (md/DESIGN-SYSTEM.md
+       §Type Scale), not a one-off value. Renders slightly larger than the
+       neighbouring Clear button / Filters trigger (both font-size-sm,
+       14px) as a result — accepted as the correct trade-off, not
+       silently overridden. */
+    font-size: var(--font-size-base);
     color: var(--color-text-primary);
     background-color: transparent;
     border: none;
