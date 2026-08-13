@@ -1399,6 +1399,20 @@ footer p {
     gap: var(--space-6);
 }
 
+/* Desktop only — two-column grid, mirroring .card-row--two's own pattern
+   (display: grid, grid-template-columns: 1fr 1fr) and reusing the same
+   var(--space-6) gap already set above rather than a separate value.
+   Mobile/tablet keep the flex-column default untouched. Grid's own
+   auto-placement handles an odd testimonial count gracefully with no
+   extra rule needed — a trailing odd item simply sits alone on its own
+   row instead of stretching or leaving a broken gap. */
+@media (min-width: 1024px) {
+    .about-recommendations {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 .about-recommendation cite {
     display: block;
     margin-top: var(--space-3);
