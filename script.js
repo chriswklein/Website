@@ -751,9 +751,12 @@ function initArchive(filterDrawer) {
             badgeEl.hidden = filterCount === 0;
         });
 
-        // Disable Clear buttons when no filters are active (search text alone does not count)
+        // Enable Clear buttons when either search text or a filter is active —
+        // disabled only when both are empty. Previously checked filterCount
+        // alone, so typing search text with no filter active left Clear
+        // wrongly disabled even though there was something to clear.
         document.querySelectorAll('.archive-clear-btn').forEach(btn => {
-            btn.disabled = filterCount === 0;
+            btn.disabled = filterCount === 0 && currentQuery.length === 0;
         });
 
         // Secondary tag chips (inline + drawer)

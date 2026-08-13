@@ -533,6 +533,16 @@ pre code {
 .btn[aria-disabled="true"] {
     color: var(--btn-text-disabled);
     cursor: not-allowed;
+    /* Disabled is non-interactive — it shouldn't show interactive hover
+       feedback at all, which is misleading on its own, but here it's also
+       a real contrast bug: confirmed via testing that :hover still matches
+       a disabled button, and --btn-bg-hover (--color-border-strong,
+       #666666) is the exact same value as --btn-text-disabled
+       (--color-text-disabled, #666666) — hovering a disabled button made
+       its text and background identical, 1:1 contrast, fully invisible.
+       pointer-events: none suppresses :hover matching entirely while
+       disabled, fixing both issues at once. */
+    pointer-events: none;
 }
 
 .btn--ghost {
@@ -2087,10 +2097,15 @@ footer p {
     flex-shrink: 0;
 }
 
-.archive-clear-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
+/* No disabled rule of its own — .btn:disabled above already gives the
+   correct result (documented in md/COMPONENTS.md's Button spec: solid
+   background/border retained, only text dims to --color-text-disabled).
+   This button previously added its own opacity: 0.4 on top of that, which
+   faded the whole button — background included — toward the page's own
+   near-black backdrop, reading as a transparent/ghost button despite never
+   actually using a transparent background-color. Removed rather than
+   tuned to a different opacity value, since .btn:disabled's own approach
+   already reuses the sitewide convention correctly. */
 
 /* Per-chip entry count badge — hidden from display; the count is still
    computed and written into this span every render() (used elsewhere for
