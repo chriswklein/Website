@@ -1779,6 +1779,63 @@ footer p {
     min-height: 109px;
 }
 
+/* Active-secondary-tag collapsed state — see .filter-drawer--tags-active
+   below. Hidden outright (display: none, not just emptied) rather than
+   left as a zero-content flex item, so it stops competing for flex-grow
+   space against #filter-drawer-active-chips, which takes over the same
+   109px reserved slot in this state. */
+.filter-drawer--tags-active .filter-drawer-secondary-page {
+    display: none;
+}
+
+/* When one or more secondary tags are active, the grid + pagination below
+   are pure duplication of what this row already shows (each active tag
+   highlighted in the grid AND listed here) — so in that state this row
+   replaces the grid entirely instead of sitting above it, at EVERY
+   breakpoint. This same shared .filter-drawer is reachable at desktop
+   width too — scrolled into condensed state, via the floating rail
+   trigger (confirmed intentional elsewhere in this file/script.js) — so
+   desktop has the identical duplicate-display problem and needs the same
+   fix; only the height-bounding sub-rule below is mobile/tablet-specific.
+   margin-top: 0 (overriding .archive-active-chips' own var(--space-3)
+   below) removes the gap this row would otherwise have as a "pinned row
+   above the grid", now that it's taking the grid's old place instead.
+   Scoped to the drawer's own #filter-drawer-active-chips only (via the
+   ID, not the shared .archive-active-chips class) — desktop's SEPARATE
+   #archive-active-chips (above the always-visible, unpaginated inline
+   "More Filters" list) is a different element entirely and is untouched
+   by any of this, regardless of viewport. */
+.filter-drawer--tags-active #filter-drawer-active-chips {
+    margin-top: 0;
+    align-content: flex-start;
+    flex: 1;
+}
+
+/* Mobile/tablet only — reproduces .filter-drawer-secondary-page's exact
+   109px reserved footprint, so total drawer height is identical whether
+   that slot is filled by the tag grid or by this row (confirmed via
+   measurement; required so entering/exiting this state causes zero
+   visual shift in the bottom sheet's fixed-height layout). Unlike the
+   grid (naturally capped at 6 tags per page), simultaneously active tags
+   aren't bounded by pagination, so this can't rely on content happening
+   to fit — overflow-y: auto caps it hard at 109px regardless of how many
+   tags are active, same idea as .filter-drawer-scroll's own
+   internal-scroll pattern elsewhere in this component. scrollbar-gutter:
+   stable keeps a scrollbar appearing (many tags) from shifting chip
+   layout width versus a scrollbar-free render (few tags). Desktop is
+   explicitly excluded — its drawer usage sits in normal, unbounded page
+   flow (no fixed-height bottom sheet to reserve space within), so it
+   gets no height cap and no scroll here, matching desktop's own "More
+   Filters" list, which has never been height-bounded either. */
+@media (max-width: 1023px) {
+    .filter-drawer--tags-active #filter-drawer-active-chips {
+        min-height: 109px;
+        max-height: 109px;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+    }
+}
+
 /* Prev/Next + page dots for the Filter Drawer's paginated secondary tags.
    Dots sit on their own row below Previous/Next (not sharing one row via
    justify-content: space-between) — with up to 10 pages possible from the
@@ -1793,11 +1850,19 @@ footer p {
     margin-top: var(--space-4);
 }
 
-/* Without this, the display: flex above (an author rule) beats the UA
-   stylesheet's [hidden] { display: none } default, so the hidden attribute
-   set in JS for the single-page state wouldn't actually hide anything. */
+/* visibility: hidden, not display: none — a single-page state (e.g. a
+   primary filter narrowing the secondary tag pool to one page) hides this
+   row via the hidden attribute, but display: none would drop it out of
+   flow entirely, shrinking the whole drawer by this row's height (~78px,
+   confirmed via measurement) every time pagination isn't needed. That's
+   the real source of the drawer visibly resizing when a primary filter
+   narrows the tag pool — .filter-drawer-secondary-page's own min-height
+   (above) already holds correctly on its own; this row was the actual gap.
+   visibility: hidden keeps the box (and its height) in flow while still
+   correctly removing it from the tab order and the accessibility tree —
+   no separate aria-hidden/tabindex handling needed, unlike opacity alone. */
 .filter-drawer-page-nav[hidden] {
-    display: none;
+    visibility: hidden;
 }
 
 .filter-drawer-page-buttons {

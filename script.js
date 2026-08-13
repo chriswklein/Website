@@ -442,6 +442,15 @@ function initArchive(filterDrawer) {
     let currentQuery       = '';
     let visibleCount       = 25;
     let secondaryPage      = 0; // Filter Drawer paginated secondary tags (mobile/tablet), 0-indexed
+    // The grid page the user was on right before any secondary tag went
+    // active (see .filter-drawer--tags-active in style.css) — restored when
+    // the last active tag is cleared, so the grid reappears on the same
+    // page rather than resetting to page 1. wasSecondaryActive tracks the
+    // 0→N / N→0 transition itself, since that's the only moment this
+    // should be captured or restored (not on every render while one or
+    // more tags stay active).
+    let secondaryPageBeforeActive = 0;
+    let wasSecondaryActive = false;
     let moreFiltersOpen    = false; // desktop secondary tag row — hidden by default, revealed via "More Filters"
     let debounceTimer;
 
@@ -774,22 +783,59 @@ function initArchive(filterDrawer) {
 
         // Filter Drawer (mobile/tablet) secondary tags — paginated 6 per
         // page (already alphabetically sorted; zero-count tags already
-        // excluded above). Desktop's separate More Filters list is
-        // unaffected — handled entirely below, untouched.
+        // excluded above) — but ONLY at mobile/tablet width. This shared
+        // .filter-drawer is also reachable at desktop width, scrolled into
+        // condensed state, via the floating rail trigger (confirmed
+        // intentional — see the isMobileTablet/shouldShowRail logic
+        // elsewhere in this file), so pagination needs an explicit
+        // viewport check here rather than assuming desktop never reaches
+        // this code path. Desktop's SEPARATE inline "More Filters" list
+        // (#archive-secondary-chips, .archive-inline-filters) is a
+        // different, always-unpaginated container, handled entirely below
+        // — untouched by any of this.
         if (drawerChipsEl) {
+            const isDesktopWidth = window.matchMedia('(min-width: 1024px)').matches;
+            // One or more secondary tags active — collapse the grid +
+            // pagination in favour of #filter-drawer-active-chips alone
+            // (see .filter-drawer--tags-active in style.css), which already
+            // shows every active tag with its own working × removal; no
+            // second copy of that UI is built here. Capture secondaryPage
+            // exactly once on the 0→N transition (not on every render while
+            // active, which would keep overwriting it with pages the user
+            // never actually chose), and restore it once on the N→0
+            // transition, so clearing the last active tag returns the grid
+            // to the page the user was browsing before, not page 1.
+            const hasActiveSecondary = activeSecondary.size > 0;
+            if (hasActiveSecondary && !wasSecondaryActive) {
+                secondaryPageBeforeActive = secondaryPage;
+            } else if (!hasActiveSecondary && wasSecondaryActive) {
+                secondaryPage = secondaryPageBeforeActive;
+            }
+            wasSecondaryActive = hasActiveSecondary;
+            if (filterDrawerEl) filterDrawerEl.classList.toggle('filter-drawer--tags-active', hasActiveSecondary);
+
             const visibleTags = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')]
                 .filter(btn => !btn.classList.contains('tag-chip--zero-count'));
             const pageCount = getDrawerSecondaryPageCount();
             if (secondaryPage >= pageCount) secondaryPage = pageCount - 1;
             if (secondaryPage < 0) secondaryPage = 0;
-            const pageStart = secondaryPage * SECONDARY_PAGE_SIZE;
-            const pageEnd = pageStart + SECONDARY_PAGE_SIZE;
+            // Desktop shows the full, unbounded list — pageStart/pageEnd
+            // spanning the whole array means nothing gets marked collapsed.
+            const pageStart = isDesktopWidth ? 0 : secondaryPage * SECONDARY_PAGE_SIZE;
+            const pageEnd = isDesktopWidth ? visibleTags.length : pageStart + SECONDARY_PAGE_SIZE;
 
             visibleTags.forEach((btn, i) => {
                 btn.classList.toggle('tag-chip--collapsed', i < pageStart || i >= pageEnd);
             });
 
-            if (pageNavEl) pageNavEl.hidden = pageCount <= 1;
+            // Hidden at desktop width unconditionally — no pagination
+            // controls ever, matching desktop's unbounded list. At mobile/
+            // tablet, also hidden (space still reserved, see the [hidden]
+            // rule in style.css) whenever a tag is active — there's no grid
+            // to paginate through in that state regardless of the
+            // underlying pageCount, so Prev/Next/dots would be
+            // functionally pointless even if pageCount > 1.
+            if (pageNavEl) pageNavEl.hidden = isDesktopWidth || pageCount <= 1 || hasActiveSecondary;
 
             if (pageDotsEl) {
                 // Rebuild only when the page count actually changes — avoids
@@ -1005,6 +1051,11 @@ function initArchive(filterDrawer) {
         currentSort = 'latest';
         visibleCount = 25;
         secondaryPage = 0;
+        // Full reset, not a single-tag removal — land back on page 1 like
+        // secondaryPage above, not wherever the user was before their most
+        // recent tag went active.
+        secondaryPageBeforeActive = 0;
+        wasSecondaryActive = false;
         searchInputs.forEach(input => {
             input.value = '';
             updateSearchClearVisibility(input);
