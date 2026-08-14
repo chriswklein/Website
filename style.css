@@ -1806,7 +1806,25 @@ footer p {
     flex-direction: column;
     max-height: 70vh;
     background-color: var(--color-background-surface);
-    border-top: var(--border-width-thin) solid var(--color-border-default);
+    /* --color-border-strong, not --color-border-default — the drawer sits
+       on the exact same --color-background-surface token as cards, so a
+       card positioned directly behind the drawer's top edge left the
+       seam ambiguous once the scrim stopped dimming behind it (that
+       incidental contrast is gone now, see .archive-scrim below). A
+       stronger border plus the shadow below together read as one
+       "lifted" edge rather than competing signals. */
+    border-top: var(--border-width-thin) solid var(--color-border-strong);
+    /* Not a plain var(--elevation-md) reference — that token is
+       "0 4px 12px rgba(0,0,0,0.5)", a downward offset meant for
+       elements sitting on the page (md/DESIGN-SYSTEM.md §7). This
+       element is position: fixed; bottom: 0 — a downward shadow would
+       cast off the bottom of the viewport and never render. Vertical
+       offset flipped to negative so the shadow lands where the ambiguity
+       actually is, at the top edge; blur/spread/colour kept identical to
+       --elevation-md so it stays inside the existing token family
+       rather than inventing a new rgba value (same precedent as the
+       documented font-size-base override above .archive-search-input). */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
     transform: translateY(100%);
     transition: transform var(--duration-base) var(--ease-out);
 }
@@ -2119,7 +2137,10 @@ footer p {
     line-height: 1;
 }
 
-/* Scrim — semi-transparent backdrop behind drawer */
+/* Scrim — invisible hit-area behind drawer, not a visual dimming layer.
+   opacity stays 0 in both states so filtered results stay fully visible
+   behind the open drawer; pointer-events: auto on --open is what keeps
+   tap-outside-to-dismiss working, independent of opacity. */
 .archive-scrim {
     position: fixed;
     inset: 0;
@@ -2131,7 +2152,7 @@ footer p {
 }
 
 .archive-scrim--open {
-    opacity: 0.7;
+    opacity: 0;
     pointer-events: auto;
 }
 
