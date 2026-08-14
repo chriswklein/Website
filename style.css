@@ -1616,9 +1616,10 @@ footer p {
     align-items: center;
     flex: 1;
     min-width: 160px;
-    /* +2px (the wrap's own top+bottom border) so the stretched
-       .archive-search-btn children still measure a full 44px tall, not
-       44px minus the border their box-sizing: border-box parent consumes. */
+    /* The search input is itself an interactive control and should meet
+       the same 44px touch-target minimum as the X button it contains.
+       +2px accounts for the wrap's own top+bottom border under
+       box-sizing: border-box. */
     min-height: calc(var(--touch-target-minimum) + var(--border-width-thin) * 2);
     background-color: var(--color-background-subtle);
     border: var(--border-width-thin) solid var(--color-border-default);
@@ -1626,8 +1627,20 @@ footer p {
     transition: border-color var(--duration-fast) var(--ease-out);
 }
 
+/* Outline-based ring on the whole field, replacing a prior border-color
+   swap to white — that was flush against the wrap's own edge with no
+   offset, inconsistent with REFERENCE.md's documented site-wide focus
+   standard ("2px solid white, 3px offset"), which every other control
+   already implements via outline/outline-offset on :focus-visible. Kept
+   as :focus-within (not :focus-visible) since the ring needs to key off
+   either focusable descendant — the input or the X button — gaining
+   focus while living on this non-focusable wrapping element. Both
+   descendants' own outlines stay suppressed below specifically to avoid
+   a doubled/nested ring effect now that this element supplies one for
+   the whole field. */
 .archive-search-wrap:focus-within {
-    border-color: var(--color-interactive-focus);
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
 }
 
 .archive-search-input {
@@ -1650,6 +1663,10 @@ footer p {
     color: var(--color-text-primary);
     background-color: transparent;
     border: none;
+    /* Deliberate, not a missed a11y requirement — .archive-search-wrap's
+       own :focus-within rule above already supplies a ring for the whole
+       field; an unsuppressed outline here would draw a second, tighter
+       ring around just the input's own box at the same time. */
     outline: none;
 }
 
@@ -1669,25 +1686,62 @@ footer p {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    align-self: stretch;
+    /* Explicit 44x44px, not align-self: stretch — the visible glyph is
+       deliberately smaller than this (see .archive-search-clear below),
+       so a predictable square hit-area is needed to centre it in. */
+    width: var(--touch-target-minimum);
+    height: var(--touch-target-minimum);
     flex-shrink: 0;
-    min-width: var(--touch-target-minimum);
-    padding: 0 var(--space-3);
     font-family: inherit;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     background: transparent;
     border: none;
-    border-left: var(--border-width-thin) solid var(--color-border-default);
     cursor: pointer;
-    transition: color var(--duration-fast) var(--ease-out),
-                border-color var(--duration-fast) var(--ease-out);
 }
 
 .archive-search-btn:hover {
     color: var(--color-text-primary);
-    border-left-color: var(--color-border-strong);
+}
+
+/* No persistent background or border at rest — a plain glyph that blends
+   into the field until interacted with (replaces an earlier
+   background/border/radius treatment that made this button visible at
+   rest). The hover square is smaller than the 44x44px hit-area above it:
+   padding shrinks the box's content area to the glyph's own footprint,
+   and background-clip: content-box confines the hover fill to that
+   inner area only, leaving the padding as invisible hit-area — the same
+   technique .filter-drawer-page-dot uses to keep a control's visual size
+   independent of its touch-target size (md/DESIGN-SYSTEM.md §9.2). */
+.archive-search-clear {
+    padding: var(--space-2);
+    /* background-clip: content-box below means the radius actually
+       rendered at the content-box edge is reduced by the padding:
+       max(0, radius - 8px). --border-radius-lg (12px) nets to the ~4px
+       corner --border-radius-sm would have produced if this weren't
+       clipped — --border-radius-sm here rendered as 0, sharp corners. */
+    border-radius: var(--border-radius-lg);
+    background-color: transparent;
+    background-clip: content-box;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+/* --color-background-base (not --color-background-subtle) — the field
+   itself (.archive-search-wrap) is already --color-background-subtle, so
+   a hover fill of the same token painted with no visible contrast against
+   it. --color-background-base is the next step down the scale and reads
+   as a visible dark cutout against the lighter field. */
+.archive-search-clear:hover {
+    background-color: var(--color-background-base);
+}
+
+/* .archive-search-wrap:focus-within already supplies the field's ring —
+   suppressed here for the same reason as .archive-search-input's outline
+   above, to avoid a doubled ring when the X button itself is focused. */
+.archive-search-clear:focus-visible {
+    outline: none;
 }
 
 .archive-search-clear[hidden] {

@@ -946,14 +946,20 @@ function initArchive(filterDrawer) {
         });
     }
 
-    // Shows/hides a search input's own inline Clear (X) button — visible only
-    // while the field is both focused AND has text. Purely a display concern,
-    // no filter state involved. Called from the input's own input/focus/blur
-    // listeners so all three events funnel through this one check.
+    // Shows/hides a search input's own inline Clear (X) button — visible
+    // whenever the field has text, regardless of focus state. Purely a
+    // display concern, no filter state involved.
+    //
+    // Text-only (not focus-dependent) on purpose: an earlier focus-AND-text
+    // rule needed a blurRelatedTarget guard here plus a mousedown
+    // preventDefault on the button itself, both working around blur hiding
+    // the button (display: none) at the exact moment a mouse click or Tab
+    // press was landing on it. Neither workaround is needed now — blur no
+    // longer changes visibility while text remains, so the button never
+    // disappears out from under a click or a Tab press.
     function updateSearchClearVisibility(input) {
-        const wrap = input.closest('.archive-search-wrap');
-        const clearBtn = wrap ? wrap.querySelector('.archive-search-clear') : null;
-        if (clearBtn) clearBtn.hidden = !(document.activeElement === input && input.value.length > 0);
+        const clearBtn = input.closest('.archive-search-wrap')?.querySelector('.archive-search-clear');
+        if (clearBtn) clearBtn.hidden = !(input.value.length > 0);
     }
 
     // Wire search inputs (header + drawer), debounced 250ms, synced
@@ -985,12 +991,6 @@ function initArchive(filterDrawer) {
                 input.blur();
             }
         });
-
-        // X button visibility depends on focus as well as text — update on
-        // both, in addition to the 'input' listener above, so all three
-        // events funnel through the same updateSearchClearVisibility() check.
-        input.addEventListener('focus', () => updateSearchClearVisibility(input));
-        input.addEventListener('blur', () => updateSearchClearVisibility(input));
     });
 
     // Wire inline Clear (X) buttons — clears this field's text only (both
@@ -1000,13 +1000,6 @@ function initArchive(filterDrawer) {
     document.querySelectorAll('.archive-search-clear').forEach(btn => {
         const input = btn.closest('.archive-search-wrap')?.querySelector('.archive-search-input');
         if (!input) return;
-
-        // Without this, mousedown on the button blurs the input first (the
-        // browser's default focus-shift behaviour), which hides this button
-        // via updateSearchClearVisibility() before 'click' ever fires — so
-        // the click silently never registers. Prevent the default mousedown
-        // action so the input never loses focus in the first place.
-        btn.addEventListener('mousedown', (e) => e.preventDefault());
 
         btn.addEventListener('click', () => {
             input.value = '';
