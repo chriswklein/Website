@@ -1621,6 +1621,14 @@ footer p {
        +2px accounts for the wrap's own top+bottom border under
        box-sizing: border-box. */
     min-height: calc(var(--touch-target-minimum) + var(--border-width-thin) * 2);
+    /* Right-only — the X button (last flex child) previously sat flush
+       against this edge with zero gap. A persistent border was added to
+       .archive-search-clear below, and with no clearance here the two
+       border lines touched and merged into what read as one line. This
+       gives the X's own border room to read as visually distinct. The
+       input already has its own left-side padding, so no matching
+       padding-left is needed here. */
+    padding-right: var(--space-2);
     background-color: var(--color-background-subtle);
     border: var(--border-width-thin) solid var(--color-border-default);
     border-radius: var(--border-radius-sm);
@@ -1705,27 +1713,61 @@ footer p {
     color: var(--color-text-primary);
 }
 
-/* No persistent background or border at rest — a plain glyph that blends
-   into the field until interacted with (replaces an earlier
-   background/border/radius treatment that made this button visible at
-   rest). The hover square is smaller than the 44x44px hit-area above it:
-   padding shrinks the box's content area to the glyph's own footprint,
-   and background-clip: content-box confines the hover fill to that
-   inner area only, leaving the padding as invisible hit-area — the same
-   technique .filter-drawer-page-dot uses to keep a control's visual size
-   independent of its touch-target size (md/DESIGN-SYSTEM.md §9.2). */
+/* Border + hover fill live on ::before, not on this element directly.
+   Borders always draw at the full border-box edge and ignore
+   background-clip — putting a border straight on this 44x44 button (the
+   touch target) rendered as a 44px ring around a separate, smaller ~28px
+   hover-fill square nested inside it (that square was reached via
+   padding + background-clip: content-box, the same technique
+   .filter-drawer-page-dot uses to decouple visual size from touch-target
+   size — md/DESIGN-SYSTEM.md §9.2). Two visually distinct boxes for one
+   control, confirmed via screenshot. ::before is inset by the same
+   --space-2 this element used to use as clip-shrinking padding, landing
+   on the identical ~28px box the fill was already occupying — border and
+   fill now share that one box exactly, so they read as a single flush
+   stroke+fill. This element itself keeps no padding/border/background of
+   its own — it's purely the 44x44 touch target and click handler,
+   unchanged from before this fix. position: relative anchors ::before's
+   absolute inset to this element's own box, not some further-out
+   ancestor. */
 .archive-search-clear {
-    padding: var(--space-2);
-    /* background-clip: content-box below means the radius actually
-       rendered at the content-box edge is reduced by the padding:
-       max(0, radius - 8px). --border-radius-lg (12px) nets to the ~4px
-       corner --border-radius-sm would have produced if this weren't
-       clipped — --border-radius-sm here rendered as 0, sharp corners. */
-    border-radius: var(--border-radius-lg);
+    position: relative;
+    /* z-index: 0 (not left at the auto default) is what actually closes a
+       local stacking context here — position: relative alone doesn't.
+       Without it, ::before's z-index: -1 below would resolve against the
+       nearest ancestor that DOES establish one, which could be far
+       outside this button (none of .archive-search-wrap /
+       .archive-controls-row establish one either), risking ::before
+       painting behind unrelated page content instead of just behind
+       this button's own glyph. */
+    z-index: 0;
+}
+
+.archive-search-clear::before {
+    content: '';
+    position: absolute;
+    inset: var(--space-2);
+    /* Flex items are blockified (in-flow, non-inline-level) per spec, so
+       the real × <span> paints before positioned descendants regardless
+       of DOM order — without this, ::before (positioned, z-index:auto)
+       would paint on top of it, hiding the glyph under the hover fill.
+       Confirmed by screenshot, not assumed. z-index: -1 alone would
+       escape to the next ancestor's stacking context and could render
+       ::before behind the whole search field, since this element has no
+       stacking context of its own yet — z-index: 0 alongside
+       position: relative above closes one, scoping -1 safely to just
+       this button. */
+    z-index: -1;
+    /* Border radius applies directly to this ~28px box now, with no
+       content-box clipping to compensate for — --border-radius-sm (4px)
+       is the direct, uncompensated equivalent of the ~4px the old
+       --border-radius-lg-plus-clipping workaround was netting out to;
+       using --border-radius-lg here now (unclipped) would render a
+       visibly larger, uninstructed rounding. */
+    border-radius: var(--border-radius-sm);
+    border: var(--border-width-thin) solid var(--color-border-strong);
     background-color: transparent;
-    background-clip: content-box;
-    transition: background-color var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 /* --color-background-base (not --color-background-subtle) — the field
@@ -1733,7 +1775,7 @@ footer p {
    a hover fill of the same token painted with no visible contrast against
    it. --color-background-base is the next step down the scale and reads
    as a visible dark cutout against the lighter field. */
-.archive-search-clear:hover {
+.archive-search-clear:hover::before {
     background-color: var(--color-background-base);
 }
 
