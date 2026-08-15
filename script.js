@@ -621,9 +621,105 @@ function initArchive(filterDrawer) {
         return article;
     }
 
+    // Moves focus to a secondary tag's chip after it's deactivated via its
+    // × in the active-chips row, matched by its stable slug — not a
+    // captured DOM reference, since the render() this runs after just
+    // rebuilt this active-chips row from scratch (destroying the × button
+    // that was just clicked/activated) and may also have re-paginated the
+    // pool this chip lives in. Without this, no explicit focus target
+    // survives the deactivation, so focus silently falls to document.body
+    // — confirmed via real click AND real keyboard (Tab to the × button,
+    // Enter) testing, not assumed: document.activeElement reads as <body>
+    // immediately after, and the *next* Tab press lands on whichever chip
+    // happens to be first in DOM order on whatever page is showing —
+    // exactly the "different, unrelated tag" symptom reported.
+    //
+    // isDrawerPool: true for the paginated mobile/tablet drawer pool
+    // (#filter-drawer-chips), false for desktop's unbounded, unpaginated
+    // pool (#archive-secondary-chips) — desktop never paginates, so the
+    // page-jump step below is skipped there.
+    function focusDeactivatedSecondaryTag(slug, isDrawerPool) {
+        const poolEl = isDrawerPool ? drawerChipsEl : inlineFiltersEl;
+        if (!poolEl) return;
+
+        let chip = poolEl.querySelector(`[data-filter-tag="${slug}"]`);
+        if (!chip) return;
+
+        // Drawer only: secondaryPageBeforeActive (above) restores the page
+        // the user was on before the FIRST tag went active, not
+        // necessarily where THIS tag sits — with more than one tag cycled
+        // through active state those can diverge. If the restored page
+        // doesn't actually show this tag, jump to its real page using the
+        // same alphabetical-index math the initial ?tag= URL arrival uses
+        // (see fetch().then() below), then re-render before focusing, so
+        // the focus call fires once that page is actually showing.
+        if (isDrawerPool && chip.classList.contains('tag-chip--collapsed')) {
+            const visibleTags = [...poolEl.querySelectorAll('[data-filter-tag]')]
+                .filter(b => !b.classList.contains('tag-chip--zero-count'));
+            const idx = visibleTags.indexOf(chip);
+            if (idx !== -1) {
+                secondaryPage = Math.floor(idx / SECONDARY_PAGE_SIZE);
+                render();
+                chip = poolEl.querySelector(`[data-filter-tag="${slug}"]`);
+            }
+        }
+
+        if (chip && chip.offsetParent !== null) {
+            chip.focus();
+            return;
+        }
+
+        // Chip still isn't visible — reachable two ways, confirmed by
+        // testing, not assumed: (1) it became zero-count-hidden as a side
+        // effect of the changed filter state (its own count doesn't
+        // depend on activeSecondary, but it can already have been 0 while
+        // active if activeType/currentQuery excluded it — the
+        // active-chips row shows it regardless of zero-count, unlike the
+        // main pool); (2) on desktop specifically, "More Filters" can be
+        // closed (#archive-secondary-chips stays [hidden] independently
+        // of #archive-active-chips's own visibility) whenever the tag was
+        // activated via a ?tag= URL rather than by opening that list —
+        // confirmed reachable via a live ?tag= arrival + deactivate test.
+        if (activeSecondary.size > 0) {
+            // Other tags are still active — on the drawer this keeps the
+            // pool/pagination hidden (.filter-drawer--tags-active); on
+            // desktop the pool may or may not be open, so either way the
+            // active-chips row itself (always visible whenever any tag is
+            // active — it doesn't depend on moreFiltersOpen) is the
+            // reachable, contextually relevant fallback.
+            const activeRow = isDrawerPool ? drawerActiveChipsEl : activeChipsEl;
+            const firstActive = activeRow ? activeRow.querySelector('.tag-chip') : null;
+            if (firstActive) { firstActive.focus(); return; }
+        } else if (!isDrawerPool && inlineFiltersEl && inlineFiltersEl.hidden) {
+            // This was the last active tag, and desktop's "More Filters"
+            // pool is closed — no chip in it is reachable at all. The
+            // toggle that reveals it is the real, always-visible, most
+            // relevant target.
+            const moreToggle = primaryChipsEl ? primaryChipsEl.querySelector('.more-filters-toggle') : null;
+            if (moreToggle) { moreToggle.focus(); return; }
+        } else {
+            // This was the last active tag and the pool is visible again
+            // (drawer: .filter-drawer--tags-active just came off; desktop:
+            // "More Filters" already open) — first visible chip on the
+            // now-current page.
+            const firstVisible = poolEl.querySelector('[data-filter-tag]:not(.tag-chip--collapsed):not(.tag-chip--zero-count)');
+            if (firstVisible) { firstVisible.focus(); return; }
+        }
+
+        // Last resort, drawer only — pagination Previous, gated on actual
+        // visibility: .filter-drawer-page-nav[hidden] uses
+        // visibility: hidden, not display: none, specifically to stay out
+        // of the tab order (see style.css) — a .focus() call on anything
+        // inside it while hidden is a silent no-op, confirmed, not assumed.
+        if (isDrawerPool && pageNavEl && !pageNavEl.hidden && pagePrevBtn) {
+            pagePrevBtn.focus();
+        }
+    }
+
     // Update active secondary chips row (shown above secondary list)
     function updateActiveChipsRow() {
         [activeChipsEl, drawerActiveChipsEl].filter(Boolean).forEach(container => {
+            const isDrawerPool = container === drawerActiveChipsEl;
             container.innerHTML = '';
             container.classList.toggle('is-active', activeSecondary.size > 0);
             activeSecondary.forEach(slug => {
@@ -644,6 +740,7 @@ function initArchive(filterDrawer) {
                     activeSecondary.delete(slug);
                     visibleCount = 25;
                     render();
+                    focusDeactivatedSecondaryTag(slug, isDrawerPool);
                 });
                 container.appendChild(btn);
             });
