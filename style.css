@@ -1331,6 +1331,27 @@ footer p {
     max-width: none;
 }
 
+/* Single pre-composited image (photo-real portrait + illustrated T-rex
+   side by side) — capped near its own native width (702px) so it's never
+   upscaled past source resolution; sitewide img{max-width:100%} handles
+   the responsive shrink below that on narrower viewports. */
+.about-profile-figure {
+    max-width: 700px;
+    margin: 0 auto var(--space-8);
+}
+
+.about-profile-figure img {
+    border-radius: var(--border-radius-md);
+}
+
+.about-profile-caption {
+    margin-top: var(--space-3);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-loose);
+    text-align: center;
+}
+
 .about-section {
     max-width: 65ch;
     margin: 0 auto var(--space-12);
@@ -1388,9 +1409,13 @@ footer p {
     white-space: nowrap;
 }
 
+/* Now a real <a> (employer link) — no colour override here on purpose,
+   so it picks up the sitewide a { color: var(--color-link); text-decoration:
+   underline; } default like every other link, instead of the old plain-text
+   teal styling. font-size-sm kept — matches the surrounding meta text
+   scale, not a link-colour concern. */
 .about-history-company {
     font-size: var(--font-size-sm);
-    color: var(--color-accent-primary-text);
 }
 
 .about-recommendations {
