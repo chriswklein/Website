@@ -1098,6 +1098,14 @@ function initArchive(filterDrawer) {
         const input = btn.closest('.archive-search-wrap')?.querySelector('.archive-search-input');
         if (!input) return;
 
+        // Same fix as the drawer's Close/Filters trigger (see initFilterDrawer):
+        // without this, mousedown here blurs the still-focused search input
+        // first, which (on mobile) collapses/re-expands the drawer's rows via
+        // .filter-drawer--search-focused and shifts this fixed-bottom drawer's
+        // layout — moving the button out from under the cursor before
+        // mouseup/click land, so the first press silently misses it.
+        btn.addEventListener('mousedown', (e) => e.preventDefault());
+
         btn.addEventListener('click', () => {
             input.value = '';
             currentQuery = '';
@@ -1149,6 +1157,12 @@ function initArchive(filterDrawer) {
         searchInputs.forEach(input => {
             input.value = '';
             updateSearchClearVisibility(input);
+            // Now that mousedown on Clear no longer blurs a focused search
+            // input as a side effect (see the mousedown listener below),
+            // blur explicitly so a full reset also restores the drawer's
+            // collapsed-on-search-focus rows to their normal expanded view,
+            // instead of leaving it stuck collapsed with nothing left to hide.
+            input.blur();
         });
         const url = new URL(window.location.href);
         url.searchParams.delete('type');
@@ -1158,6 +1172,12 @@ function initArchive(filterDrawer) {
 
     // Wire clear buttons (header + drawer)
     document.querySelectorAll('.archive-clear-btn').forEach(btn => {
+        // Same fix as the drawer's Close/Filters trigger and the inline
+        // search Clear (X) button above — prevents mousedown from blurring
+        // a focused search input and shifting this button out from under
+        // the cursor before the click lands (mobile drawer only, see
+        // .filter-drawer--search-focused above).
+        btn.addEventListener('mousedown', (e) => e.preventDefault());
         btn.addEventListener('click', doReset);
     });
 
@@ -1167,6 +1187,32 @@ function initArchive(filterDrawer) {
             visibleCount += 25;
             render();
         });
+    }
+
+    // Keep the fixed "Showing N Entries" row pinned to the visible screen
+    // while an on-screen keyboard is open (mobile/tablet, where this row is
+    // position: fixed — see .archive-sort-count-row in style.css). The
+    // body-scroll-lock above only blocks the *document's* own scroll; it
+    // can't stop the browser's native keyboard-avoidance behavior, which
+    // pans the visual viewport (what's actually on screen) independently of
+    // the layout viewport that position: fixed is anchored to — so a fixed
+    // element can visually drift out of place purely from focusing an
+    // input, with no scripted scroll involved. window.visualViewport
+    // reports that pan directly; re-applying it as a transform keeps the
+    // row's on-screen position matching the visual viewport instead of the
+    // (now misleading) layout viewport.
+    const sortCountRow = document.querySelector('.archive-sort-count-row');
+    if (sortCountRow && window.visualViewport) {
+        const repositionForKeyboard = () => {
+            if (!window.matchMedia('(max-width: 1023px)').matches) {
+                sortCountRow.style.transform = '';
+                return;
+            }
+            const offset = window.visualViewport.offsetTop;
+            sortCountRow.style.transform = offset ? `translateY(${offset}px)` : '';
+        };
+        window.visualViewport.addEventListener('resize', repositionForKeyboard);
+        window.visualViewport.addEventListener('scroll', repositionForKeyboard);
     }
 
     // IntersectionObserver — show action-rail-group and condense header when
