@@ -1895,6 +1895,12 @@ footer p {
        stronger border plus the shadow below together read as one
        "lifted" edge rather than competing signals. */
     border-top: var(--border-width-thin) solid var(--color-border-strong);
+    transform: translateY(100%);
+    transition: transform var(--duration-base) var(--ease-out);
+}
+
+.filter-drawer--open {
+    transform: translateY(0);
     /* Not a plain var(--elevation-md) reference — that token is
        "0 4px 12px rgba(0,0,0,0.5)", a downward offset meant for
        elements sitting on the page (md/DESIGN-SYSTEM.md §7). This
@@ -1904,14 +1910,20 @@ footer p {
        actually is, at the top edge; blur/spread/colour kept identical to
        --elevation-md so it stays inside the existing token family
        rather than inventing a new rgba value (same precedent as the
-       documented font-size-base override above .archive-search-input). */
+       documented font-size-base override above .archive-search-input).
+       Scoped to --open specifically (moved off the unconditional base
+       .filter-drawer rule) — at rest, translateY(100%) moves a
+       bottom: 0 fixed box down by exactly its own height, which always
+       lands the box's top edge (and this shadow's blur, which extends
+       above that edge) right at the viewport's bottom boundary,
+       regardless of the drawer's actual height. That put a faint but
+       real shadow sliver at the screen's bottom edge at all times,
+       closed or not, since position: fixed means scrolling never moves
+       it out of the way. Confirmed via the transform's own geometry, not
+       assumed — border-top above is a hairline at the exact box edge
+       with no blur to bleed past it, so it doesn't have this problem and
+       stays on the unconditional rule. */
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
-    transform: translateY(100%);
-    transition: transform var(--duration-base) var(--ease-out);
-}
-
-.filter-drawer--open {
-    transform: translateY(0);
 }
 
 .filter-drawer-body {
