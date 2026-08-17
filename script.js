@@ -1189,32 +1189,6 @@ function initArchive(filterDrawer) {
         });
     }
 
-    // Keep the fixed "Showing N Entries" row pinned to the visible screen
-    // while an on-screen keyboard is open (mobile/tablet, where this row is
-    // position: fixed — see .archive-sort-count-row in style.css). The
-    // body-scroll-lock above only blocks the *document's* own scroll; it
-    // can't stop the browser's native keyboard-avoidance behavior, which
-    // pans the visual viewport (what's actually on screen) independently of
-    // the layout viewport that position: fixed is anchored to — so a fixed
-    // element can visually drift out of place purely from focusing an
-    // input, with no scripted scroll involved. window.visualViewport
-    // reports that pan directly; re-applying it as a transform keeps the
-    // row's on-screen position matching the visual viewport instead of the
-    // (now misleading) layout viewport.
-    const sortCountRow = document.querySelector('.archive-sort-count-row');
-    if (sortCountRow && window.visualViewport) {
-        const repositionForKeyboard = () => {
-            if (!window.matchMedia('(max-width: 1023px)').matches) {
-                sortCountRow.style.transform = '';
-                return;
-            }
-            const offset = window.visualViewport.offsetTop;
-            sortCountRow.style.transform = offset ? `translateY(${offset}px)` : '';
-        };
-        window.visualViewport.addEventListener('resize', repositionForKeyboard);
-        window.visualViewport.addEventListener('scroll', repositionForKeyboard);
-    }
-
     // IntersectionObserver — show action-rail-group and condense header when
     // sentinel leaves viewport. Mobile/tablet: the inline Clear/Search/
     // Filters row is hidden entirely there (no scroll-based condensing to

@@ -519,10 +519,24 @@ pre code {
                 color var(--duration-fast) var(--ease-out);
 }
 
-.btn:hover {
-    background-color: var(--btn-bg-hover);
-    border-color: var(--btn-border-hover);
-    color: var(--btn-text-hover);
+/* hover: hover — scoped to genuine hover-capable pointers (mouse/trackpad).
+   Touch devices have no way to "un-hover": a tap latches :hover on the
+   tapped element and nothing ever fires to clear it (no mouse-leave event
+   exists on touch). On a disabled button that stale :hover collides with
+   .btn:disabled's text color below — both resolve to the same #666666
+   (--color-border-strong / --color-text-disabled), rendering the label
+   invisible. Confirmed via real-device testing (iPhone SE2): Clear's label
+   vanished after a successful clear, reproducing exactly this collision.
+   pointer-events: none on :disabled already stops *future* hover
+   hit-testing, but can't retroactively clear a :hover a tap already
+   latched before the button became disabled — this media query removes
+   the possibility at the source instead, for every .btn sitewide. */
+@media (hover: hover) {
+    .btn:hover {
+        background-color: var(--btn-bg-hover);
+        border-color: var(--btn-border-hover);
+        color: var(--btn-text-hover);
+    }
 }
 
 .btn:active {
