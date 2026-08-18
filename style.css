@@ -265,6 +265,11 @@ p {
     color: var(--color-text-primary);
 }
 
+ul, ol {
+    max-width: 65ch;
+    color: var(--color-text-primary);
+}
+
 /* ================================
    LINKS
 ================================ */
@@ -1391,6 +1396,25 @@ footer p {
     color: var(--color-text-primary);
     margin-bottom: var(--space-6);
     max-width: 65ch;
+}
+
+.standard-page-content ul,
+.standard-page-content ol {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+    list-style-position: outside;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-6);
+    max-width: 65ch;
+}
+
+.standard-page-content li {
+    margin-bottom: var(--space-2);
+}
+
+.standard-page-content li:last-child {
+    margin-bottom: 0;
 }
 
 .standard-page-nav {

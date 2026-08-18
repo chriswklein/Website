@@ -154,20 +154,130 @@
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h3 id="research">Research</h3>
-                <p>I conducted one-on-one sessions with developers across disciplines — gameplay, tech art, animation, and systems — to document the most common friction points in their daily tool usage. The goal was not just a bug list but an understanding of the underlying patterns: which tools caused the most context switching, where documentation was missing, and which issues were reported repeatedly but never resolved.</p>
+                <h3 id="an-old-toolbox">A dig through an old toolbox</h3>
+                <p>The Star Engine is - in my personal opinion - technically one of the most impressive game engines on the planet. The Editor Interface however - was notably archaic and crudely mapped due to untidy modification over the years; especially when compared to modern game engine interfaces like Unreal, Unity and Godot. I was hired to not only aim to improve the interface. While I never got to implement a new aesthetic to the Editor, we made progress on fundamentals by tackling many of the subtle nuances of the developer user experience within the interface.</p>
+
+                </p>Most any time a new hire came through the office - this engine was quite foreign to them compared to the aforementioned industry standard engines - and would need help acclimating. Acclimation to any new tool takes time for new users but also takes time away from veteran users who are pulled away from their work to explain the nuances of a workflow or specific tool to those new hires.</p>
+
+                </p>From duplicate toolbars, differing icon sizes, redundant or deprecated settings, and the ever present hindrance of text not scaling with different monitor resolutions - these were the long standing “deaths by a thousand cuts” issues which loomed over veteran and new developer workflows on the daily.</p>
+
+                </p>Luckily they hired a person who loves a good audit and documenting everything to help his team! It was foundational to many quality of life improvements we gained. So that is what I did.</p>
+
+                </p>All of the notes compiled from my meetings with developers over the years, my individual exploration, and my engineers legacy knowledge helped us to audit the disconnected parts of the editor and lead to overhauls of major and minor systems. Below are some examples of important growth moments for myself and the Editor team.</p>
+
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h3 id="iteration">Iteration</h3>
-                <p>The feedback channel went through three iterations before landing on a format that was both easy to submit and useful to act on. Early attempts were too structured and saw low adoption — developers filled one field and left the rest blank. Later versions reduced required fields to a minimum and added quick-reaction options that could be completed in under a minute. Adoption increased significantly in the third version.</p>
+                <h3 id="RASTAR">RASTAR BASE BUILDER</h3>
+                <p>Near the beginning of my joining of the Core Tech Group, I would be asked to join a prototyping team for a Base Building tool, referred to as RASTAR. It was meant to speed up the Level Design and Environments workflow for constructing spaces on planets throughout the Persistent Universe. I was responsible for both concept design and UI implementation using their internal tool called, Dataforge. This tool allows developers to create many of our in-game classes and game objects as well as our interfaces.</p>
+
+                </p>As much fun as I was having working on a base building tool - I became overwhelmed and it was weighing on me that I was assisting with implementation on this project as well as maintaining existing Editor Team duties. Of which were arguably more important and the primary reason I was hired in the first place. My implementation was also poor. I was creating new components by scratch and not utilizing component libraries established by the UI team.</p>
+
+                </p>And so I left the project after discussing my issues with my team lead and serves as a lesson for myself to know when to say ‘no’ to a project even if it’s interesting.</p>
+
+                </p>There was however some valuable data gained for the UI and Editor team:</p>
+
+                </p>Our Editor Viewport - which primarily acts as a 3D render window of the level a developer has loaded - was not really performant with the interface setup we had as well as some other UI interactions for the player controller.</p>
+
+                </p>During development, the UI team and I would notice even in sterile test levels - the UI when used would lose fps during specific interactions. I would report these issues and provide performance traces. We were able to find resolution scaling and specific mouse and keybinding behavior bugs and fix those to make the tool and other play-in-viewport experiences better for developers.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h2 id="outcome">Outcome</h2>
-                <p>The system produced a measurable reduction in duplicate bug reports for the same tooling issues, and improved the signal-to-noise ratio for the tooling team's backlog. Several pipeline improvements — including a reduction in editor crash frequency during asset saves — were shipped as a direct result of insights gathered through this process.</p>
+                <h3 id="Editor-Settings">EDITOR SETTINGS REFACTOR AND A NEW VIEWPORT VISUAL MANAGER</h3>
+                <p>As I was meeting with teams and auditing the editor - I would note different workflows as well as developer struggles with display settings with the Viewport. Below I note major issues and what we did to tackle these issues.</p>
+
+                </p>Major Issue 1: Settings</p>
+
+                </p>The Editor Settings were all over the place and I mean that very literally. From duplicate shortcuts with different labels to buttons that had no functionality at all.</p>
+
+                </p>Most developers also relied on json files full of debug commands they found over the years and would pass onto one another which would be read at editor launch to display specific debug visualizations for their workflow would appear in the Viewport.</p>
+
+                </p>These commands would also sometimes cause developers to skip crucial Editor Prompts which would have aided them and submit changes that broke builds or tanked performance.</p>
+
+                </p>Json files filled with commands being passed down to teams via lead legacy knowledge that was not archived in any documentation in confluence let alone in the Editor.</p>
+
+                </p>Major Issue 2: Performance</p>
+
+                </p>Our Single-player and Multiplayer Levels, and Tech Zoo’s are populated with hundreds, sometimes thousands of objects. Each object in the engine receives visual “helpers” which could be Toggled (Show/Hide).</p>
+
+                </p>The viewport will get cluttered easily and developers lose focus of what matters and as a result of drawing a bunch of endless helpers they could not control the visualization of and performance would drop.</p>
+
+                </p>What did we do?</p>
+
+                </p>Using my audit of the entire Editor Settings: from scaling, text, and viewport visualizer options - we verified every menu and sub-menu option and labeled them as functional, redundant, and compiled a list for refactoring.</p>
+
+                </p>We also assessed a variety of workflow json files and the commands within as we wanted to see the general commands used by most teams, as well as some more obscure commands which we could surface and support within the Editor Settings.</p>
+
+                </p>And finally we created a new searchable window which houses all Viewport Visualization options at the top of the viewport which runs parallel with our new Editor Settings Menu.</p>
+
+                </p>Results</p>
+
+                </p>This was a win for all developers, as they could easily find, filter, and manage what is currently displayed in their Viewport.</p>
+
+                </p>We increased FPS by refactoring the ways we rendered specific visualization helpers, and created methods to control render distance for the Viewport in General, as well as Helpers.</p>
+
+                </p>And because sharing is caring - we thought it useful for developers to be able to create and share “Presets” configuration json files with one another. </p>
+
+                </p>A user can create multiple visual environments, rather than a singular one they have to manage each time they need to change a workflow. </p>
+
+                </p>For Example: We have two developers from Cinematics. One needs to set up framing for different shots - and another needs to ensure framerates are consistent throughout. </p>
+
+                </p>Each developer can set cinematic presets, name them, share them, and the user can toggle between the two.</p>
+
+                <h3 id="Object-References">Object References</h3>
+                <p>At this point in time, the team's notoriety had grown and we received a message from the Single-player Level Design Team from our team's Technical Director. They actually had prepared a pitch for a tool, and had gathered a large chunk of the information and provided example screenshots and Levels for us to test with.</p>
+
+                </p>One of the most significant boondoggles a game developer can get into is data corruption. This can happen in a few ways from Bit rot, truncation, scheme mismatches, buffer overflows, maybe some race conditions or Asset errors. How each engine or an engine editor handles those situations is a hit or miss when it comes to providing enough detail to the user to understand what caused the issue to appear.</p>
+
+                </p>For this particular project story we were dealing with Broken / Missing References which were causing levels in the Singleplayer to crash immediately with Null Reference Exceptions.</p>
+
+                </p>Are you sure this is important? Yes or No</p>
+
+                </p>In the Editor, for like 10 odd years - when users pressed the Delete key or right clicked to Delete a selection of game objects - the Delete Modal - which commonly prompts a user with “Are you sure you want to Delete (Big Red Square)? - Yes / No” - did not inform the user that the Big Red Square contains a Reference to another game object.</p>
+
+                </p>It was one of those situations where we all sat back in our chairs and felt a mix of anxiety and comedic surprise.</p>
+                
+                </p>“How have we managed for this long?” and “Why are we laughing about this?” which ended with us all agreeing we need this prioritized.</p>
+                
+                </p>As we sat in disbelief that no developer or team prior took action on this prior - we got to work straight away on the design and implementing based on the specifications presented by the Single Player Team.</p>
+
+                </p>What did we do?</p>
+
+                <ul>
+                    <li>Developers we worked with had a very detailed breakdown of the problem and what they wanted in an interface as well as some core features.</li>
+                    <li>With my team, I surfaced the remainder of the user flows pertaining to the Delete interactions, making sure we have “safety checks” in key areas.</li>
+                    <li>We modified the existing modal and finally created a new window which would present itself if there any objects had references, and presented options for resolution.</li>
+                    <li>Users can select and modify the Objects in the pending list, make their change, and go on to their next task.</li>
+                </ul>
+
+                </p>As a result of this new window being implemented, our group of developers we worked with called it, “a godsend” and level decay decreased drastically once our tool branched into other streams.</p>
+
+                </p>This project, I do believe was successful in part for two reasons:</p>
+
+                <ul>
+                    <li>We had been successful with other projects during my time there, and were public about our desires to tackle problems for developers all over the globe.</li>
+                    <li>Because of this, the developers sought out the correct channels, and had a plan in motion already to tackle the issues they faced, which reduced the time it would usually take to implement.</li>
+                </ul>
+
+                </p>All in all, a very memorable project.</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+
+                <h3 id="Conclusion">Conclusion</h3>
+                <p>While I could go into some others like a new color picker, a content browser, and some layer management tools improvements - the above hold the most significance for me when it comes to my work during that time.</p>
+
+                </p>Thanks for reading!</p>
+
+
+
+
+
+
+
             </div>
 
             <!-- Divider + Footer -->
