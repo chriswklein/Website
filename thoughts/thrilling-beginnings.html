@@ -28,10 +28,6 @@
                         <span aria-hidden="true" class="breadcrumb-separator">›</span>
                     </li>
                     <li class="breadcrumb-item">
-                        <a href="/archive.html?type=thoughts">June 2026</a>
-                        <span aria-hidden="true" class="breadcrumb-separator">›</span>
-                    </li>
-                    <li class="breadcrumb-item">
                         <span aria-current="page">Thrilling Beginnings</span>
                     </li>
                 </ol>
@@ -44,25 +40,21 @@
             <!-- Title -->
             <h1 class="standard-page-title">Thrilling Beginnings</h1>
 
-            <!-- Metadata -->
-            <div class="standard-page-meta">
-                <div class="standard-page-meta-author">
-                    <span class="card-meta-label">Author</span>
-                    <span>Christopher Klein</span>
+            <!-- Tags -->
+            <div class="standard-page-details-tags">
+                <a href="/archive.html?tag=web-development" class="tag" aria-label="Filter by Web Development">Web Development</a>
+            </div>
+
+            <!-- Details -->
+            <div class="standard-page-details">
+                <div class="standard-page-details-row">
+                    <span class="standard-page-details-label">Published</span>
+                    <span class="standard-page-details-value"><time datetime="2026-06-20">June 20, 2026</time></span>
                 </div>
-                <div class="standard-page-meta-dates">
-                    <span class="card-meta-label">Published</span>
-                    <time datetime="2026-06-20">June 20, 2026</time>
-                    <span class="card-meta-label">Updated</span>
-                    <time datetime="2026-06-20">June 20, 2026</time>
+                <div class="standard-page-details-row">
+                    <span class="standard-page-details-label">Updated</span>
+                    <span class="standard-page-details-value"><time datetime="2026-06-20">June 20, 2026</time></span>
                 </div>
-                <div class="standard-page-meta-tags">
-                    <a href="/archive.html?tag=web-development" class="tag" aria-label="Filter by Web Development">Web Development</a>
-                </div>
-                <button class="share-btn btn btn--ghost"
-                        aria-label="Copy link to clipboard">
-                    Share
-                </button>
             </div>
 
             <!-- Body Content -->
@@ -87,25 +79,49 @@
                 </blockquote>
             </div>
 
-            <!-- Divider + Previous / Next navigation -->
+            <!-- Divider + Footer -->
             <hr class="standard-page-divider">
 
-            <nav class="standard-page-nav" aria-label="Article navigation">
-                <a href="#" class="standard-page-nav-prev btn btn--ghost">
-                    <span aria-hidden="true">←</span>
-                    <span class="standard-page-nav-label">
-                        <span class="standard-page-nav-direction">Previous</span>
-                        <span class="standard-page-nav-title">Previous Thought Title</span>
-                    </span>
-                </a>
-                <a href="#" class="standard-page-nav-next btn btn--ghost">
-                    <span class="standard-page-nav-label">
-                        <span class="standard-page-nav-direction">Next</span>
-                        <span class="standard-page-nav-title">Next Thought Title</span>
-                    </span>
-                    <span aria-hidden="true">→</span>
-                </a>
-            </nav>
+            <div class="standard-page-footer">
+                <div class="standard-page-footer-actions">
+                    <button class="share-btn btn btn--ghost" aria-label="Copy link to clipboard">Share</button>
+                    <a href="/archive.html?type=thoughts" class="btn btn--ghost">More Thoughts<span class="sr-only"> — view more entries in the Thoughts section</span></a>
+                </div>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <section aria-labelledby="contact-heading">
+                    <h2 id="contact-heading" class="section-heading">Want to work together? Contact me!</h2>
+                    <div class="contact-buttons">
+                        <a href="/assets/docs/Christopher-Klein-QA-UX-Resume.pdf"
+                           class="contact-icon-btn"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="Resume (opens in new tab)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                        </a>
+                        <a href="mailto:christopherwalterklein@gmail.com"
+                           class="contact-icon-btn"
+                           aria-label="Email">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                        </a>
+                        <a href="https://www.linkedin.com/in/crzdev/"
+                           class="contact-icon-btn"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="LinkedIn (opens in new tab)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+                                <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                        </a>
+                    </div>
+                </section>
+            </div>
 
             <!-- Back to Top -->
             <div class="back-to-top-row">

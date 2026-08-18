@@ -1157,8 +1157,14 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 ### Anatomy
 
 ```
-[ Work ] [ › ] [ Month/Year ] [ › ] [ Page Title ]
+[ Work ] [ › ] [ Page Title ]
 ```
+
+Two segments only (Primary Tag, current page) — the Month/Year segment
+formerly between them was removed 2026-08-17 (duplicated the Primary Tag's
+own destination and caused the title/caption overlap fixed in the same
+pass). The Primary Tag link already covers "browse this section" via
+`/archive.html?type={work|thoughts}`; no separate Archive crumb is added.
 
 - Wrapper: `<nav aria-label="Breadcrumb">`
 - List: `<ol class="breadcrumb-list">`
@@ -1172,7 +1178,7 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 - `aria-label="Breadcrumb"` on `<nav>` — distinguishes from main nav
 - `aria-current="page"` on the last item — current page is not a link
 - Separators: `aria-hidden="true"` — decorative only
-- Screen reader output: "Breadcrumb navigation. Work, link. Month/Year, link. Page Title, current page."
+- Screen reader output: "Breadcrumb navigation. Work, link. Page Title, current page."
 
 ### Responsive Behaviour
 
@@ -1459,77 +1465,166 @@ Same at all breakpoints.
 ## 14. Standard Page Template
 
 **CSS Class:** `.standard-page`
-**HTML File:** `standard-page.html`
+**HTML Files:** `templates/work-entry-template.html`, `templates/thought-entry-template.html` (two separate template files — see Template Consolidation note below)
 **Used for:** Individual Work entries and Thoughts entries (blog posts, project writeups)
 
 ### Design Intent
-The standard page template provides a consistent reading experience for all long-form content. It is single column, centred, and optimised for sustained reading. The metadata block identifies authorship and allows sharing. The Previous / Next navigation at the bottom keeps users moving through content.
+The standard page template provides a consistent reading experience for all long-form content. It is single column, centred, and optimised for sustained reading. Redesigned 2026-08-17: the header separated authorship from structured metadata (a left-aligned Project Details / Details card), the banner image became contained rather than full-bleed on mobile, and the footer was rebuilt around Share, a tag-driven "More Work" / "More Thoughts" link, and a reused contact section — replacing the old non-functional Previous / Next navigation entirely. Revised again 2026-08-19 against a visual review: the author row was removed outright, the Details card's tag pills and row text were brought back down to the site's existing shared scales (they'd drifted to Figma-derived sizes larger than the rest of the site), the footer's two action buttons were fixed to render at matching size, and the banner's max-width was capped to the same 65ch the text column beneath it already uses (it had been stretching to the full 1200px page ceiling instead).
 
 ### Anatomy
 
 ```
-[ nav.breadcrumb ]
-[ .standard-page-banner — 3:1 ratio, full width ]
+[ nav.breadcrumb — Primary Tag › Page Title, 2 segments ]
+[ .standard-page-banner — 3:1 ratio (3:2 mobile), max-width 65ch (matches the text column), contained within .standard-page at every breakpoint ]
 [ p.standard-page-caption ]
 [ h1.standard-page-title — centre aligned ]
-[ .standard-page-meta ]
-  [ .standard-page-meta-author ]
-  [ .standard-page-meta-dates ]
-  [ .standard-page-meta-tags ]
-  [ button.share-btn ]
+[ .standard-page-details — card ]
+  [ .standard-page-details-row — Employer / Role / Timeline / Tools (Work) or Published / Updated (Thoughts) ]
+    [ span.standard-page-details-label ]
+    [ span.standard-page-details-value ]
+  [ .standard-page-details-row.standard-page-details-row--tags ]
+    [ span.standard-page-details-label — "Tags" ]
+    [ .standard-page-details-tags > a.tag — same class/size as an Archive card tag, no modifier ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-content ]
   [ h2 headings, h3 subheadings, p body text ]
   [ blockquote, code blocks as needed ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
-[ nav.standard-page-nav ]
-  [ a.standard-page-nav-prev.btn.btn--ghost — ← Previous + title ]
-  [ a.standard-page-nav-next.btn.btn--ghost — Next + title → ]
+[ .standard-page-footer ]
+  [ .standard-page-footer-actions ]
+    [ button.share-btn.btn.btn--ghost ]
+    [ a.btn.btn--ghost — "More Work" (Work) or "More Thoughts" (Thoughts), tag-driven per template ]
+  [ div.divider--dots ]
+  [ section#contact-heading — "Want to work together? Contact me!", reused verbatim from about.html ]
 [ .back-to-top-row > button.back-to-top ]
 ```
 
-### Notes
+There is no author row (photo + name) — it was added in the 8/18 redesign
+and removed in the 8/19 revision as a deliberate simplification, not an
+oversight. Authorship for both entry types is Christopher Klein by default
+and isn't otherwise surfaced in this header.
 
-- **Bottom tags and share button removed.** Tags and share are in the top metadata only — not repeated at the bottom.
-- **Gold divider** (`hr.standard-page-divider`) is constrained to `max-width: 65ch` and centred, matching the content width. It appears both above and below the content.
-- **Previous / Next navigation** uses `.btn.btn--ghost` with direction label (`Previous` / `Next`) and article title stacked vertically inside `.standard-page-nav-label`. Arrow characters (`←` / `→`) are `aria-hidden="true"`.
-- Navigation stacks to single column at mobile (≤767px).
+### Template Consolidation — Flagged Follow-Up
 
-### Previous / Next Navigation Anatomy
+Work and Thoughts entries are NOT rendered from one shared runtime template —
+each entry is a hand-authored static HTML file (no build step, no
+client-side data-driven rendering for entry pages; contrast with
+archive.html, which fetches `data/archive-entries.json` and renders
+client-side). Two source templates exist:
+`templates/work-entry-template.html` and
+`templates/thought-entry-template.html`. Merging these into one true shared
+template would require introducing dynamic, JSON-driven rendering for
+standard pages — a materially bigger architectural change than a template
+redesign (this project deliberately has no build tools per md/REFERENCE.md
+§1/§2). Logged here as a candidate for a dedicated future session rather
+than folded into this redesign.
 
-```html
-<nav class="standard-page-nav" aria-label="Article navigation">
-    <a href="{prev-url}" class="standard-page-nav-prev btn btn--ghost">
-        <span aria-hidden="true">←</span>
-        <span class="standard-page-nav-label">
-            <span class="standard-page-nav-direction">Previous</span>
-            <span class="standard-page-nav-title">{Previous Article Title}</span>
-        </span>
-    </a>
-    <a href="{next-url}" class="standard-page-nav-next btn btn--ghost">
-        <span class="standard-page-nav-label">
-            <span class="standard-page-nav-direction">Next</span>
-            <span class="standard-page-nav-title">{Next Article Title}</span>
-        </span>
-        <span aria-hidden="true">→</span>
-    </a>
-</nav>
-```
+Within that constraint, the "dynamic, tag-driven" parts of this redesign
+(the breadcrumb's Primary Tag link and the footer's "More Work" / "More
+Thoughts" link) both use the identical `/archive.html?type={work|thoughts}`
+href pattern, one substitution point per template — not divergent
+hardcoded logic — so consolidating later stays a mechanical merge.
+
+**Migration status (2026-08-17):** the two templates plus `work/star-engine.html`
+and `thoughts/thrilling-beginnings.html` were migrated to this design.
+`work/this-website.html`, `thoughts/physical-and-digital-media.html`, and
+`thoughts/industrializing-the-industry.html` still use the previous
+`.standard-page-meta` / `.standard-page-nav` structure — the CSS for both
+generations coexists in style.css intentionally so those three pages keep
+rendering correctly. They need the same mechanical migration as a follow-up.
+
+### Project Details / Details Card
+
+**CSS Class:** `.standard-page-details`
+
+Left-aligned label/value rows in a card: `padding: var(--space-2)`,
+`gap: var(--space-2)`, `background-color: var(--color-background-surface)`,
+`border: var(--border-width-thin) solid var(--color-border-default)`,
+`border-radius: var(--border-radius-md)`. Figma referenced background
+`#141414`, which has no exact token match (between `--color-background-base`
+`#111111` and `--color-background-surface` `#1A1A1A`) — mapped to
+`--color-background-surface` for consistency with the Card component's own
+`--card-bg`, since this is functionally a card.
+
+Rows: Employer, Role, Timeline, Tools, Tags on Work entries; Published,
+Updated, Tags on Thoughts entries (the Work-specific field set from the
+Figma spec doesn't apply to Thoughts, which never had Employer/Role/
+Timeline/Tools — see Template Consolidation above). Employer/Role/Timeline/
+Tools/Published/Updated rows: `align-items: center`. Tags row:
+`align-items: flex-start` (wraps).
+
+Label/value columns use `flex: 1` / `flex: 2` (proportional, not a
+hardcoded pixel width) — Figma specified a ~210px label column, but no
+existing sitewide label/value pattern uses a fixed px width, so relative
+flex-grow ratios were used instead per Rule 6.
+
+**Revised 2026-08-19:** label and value text was reduced from the original
+Figma-derived Body-20 sizing (`--font-size-lg`, 20px) down to
+`--font-size-sm` (14px) + `--line-height-normal` — the same "card body copy"
+scale `.card-meta-label` / `.card-meta` already use for metadata elsewhere
+on the site (Archive/Home card date-author line). Label keeps
+`--font-weight-medium` (matching `.card-meta-label`); value stays
+`--font-weight-regular`. This also resolved a mobile overflow/wrap risk the
+larger Figma-derived sizing had at narrow widths.
+
+Tags use the plain, unmodified `.tag` component — same class, same
+computed size, as an Archive card or Filter Drawer tag. The 8/18 redesign
+introduced a `.tag--details` modifier (larger font, filled background) to
+match the original Figma spec; that modifier was removed 2026-08-19 so a
+tag pill looks identical whether it appears on an Archive card or in this
+Details card, per visual review. All interaction states (hover,
+focus-visible) are the sitewide `.tag` states, unchanged.
+
+Responsive: rows stack to a single column (`flex-direction: column`) at
+mobile (≤767px), matching the existing `.standard-page-nav` /
+`.about-history-meta` stacking pattern.
+
+### Footer
+
+**CSS Class:** `.standard-page-footer`
+
+Replaces the old non-functional Previous / Next navigation entirely. In
+order:
+
+1. **Share** — the existing `.share-btn` component (see `## 13. Share
+   Button`), relocated here unchanged. Same markup, same
+   `initShareButtons()` behaviour in script.js (selector-based, unaffected
+   by DOM relocation).
+2. **More Work / More Thoughts** — `<a class="btn btn--ghost"
+   href="/archive.html?type={work|thoughts}">`, tag-driven per template
+   (same href pattern the breadcrumb's Primary Tag link already uses, and
+   the same pattern Home's `.section-footer` "View more work" / "Read more
+   thoughts" links use).
+3. **Contact section** — `<section aria-labelledby="contact-heading">`
+   with `.section-heading`, `.contact-buttons`, `.contact-icon-btn` (Resume
+   / Email / LinkedIn) reused verbatim from about.html, no changes.
+
+A `.divider--dots` separates the actions row from the contact section,
+matching about.html's own use of the same divider between sections.
+
+**Revised 2026-08-19:** Share ("Share", 5 characters) and More Work/More
+Thoughts ("More Work" / "More Thoughts", 9–13 characters) rendered at
+visibly different widths — each `.btn` was sizing to its own text content.
+`.standard-page-footer-actions .btn` now sets `flex: 1` so both buttons
+split the row evenly, the same fix already used sitewide for the identical
+problem on `.filter-drawer-page-btn` (Previous/Next in the Filter Drawer —
+see `## 2c. Filter Drawer`).
 
 ### Accessibility
 
-- `<nav aria-label="Article navigation">` distinguishes this nav from the main site nav and breadcrumb
-- Arrow characters are `aria-hidden="true"` — direction labels carry the semantic meaning
-- Each link has a descriptive visible label (direction + title)
-- Toast notification on share uses `aria-live="polite"` and temporary `aria-label` update on the button
+- Details card tag links: same accessibility as `.tag` (real links, own
+  `aria-label`, independently focusable)
+- Toast notification on share uses `aria-live="polite"` and temporary
+  `aria-label` update on the button — unchanged by relocation
+- Contact section: `aria-labelledby="contact-heading"`, matching about.html
 
 ### Responsive Behaviour
 
 | Breakpoint | Layout |
 |---|---|
-| Desktop (≥1024px) | Two-column nav, Previous left, Next right |
-| Tablet (768–1023px) | Two-column nav (collapses if titles are long) |
-| Mobile (<768px) | Single column, full-width buttons stacked |
+| Desktop (≥1024px) | Banner capped to the same 65ch as the text column beneath it (no longer stretching to the page's 1200px ceiling); details rows label/value side by side; footer actions row side by side, matched width |
+| Tablet (768–1023px) | Same as desktop (65ch already exceeds this viewport width, so the banner change is a no-op here) |
+| Mobile (<768px) | Banner contained (no longer full-bleed) and already narrower than 65ch, so the change is a no-op here too; details rows stack to single column; footer actions stack full-width |
 
 ---
 

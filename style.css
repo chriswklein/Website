@@ -1173,6 +1173,13 @@ footer p {
     padding: 0 var(--space-8);
 }
 
+/* Reverted 2026-08-19 (round 2): round 1 capped this at max-width: 65ch to
+   line up with the text column beneath it. Reverted per direct review —
+   the banner is meant to span .standard-page's full width (up to
+   --max-content, 1200px), wider than the 65ch text column, same as before
+   round 1. Text column components (.standard-page-content,
+   .standard-page-divider, .standard-page-nav) keep their own 65ch cap
+   unchanged — only this banner reverts. */
 .standard-page-banner {
     width: 100%;
     aspect-ratio: 3 / 1;
@@ -1183,12 +1190,20 @@ footer p {
     margin-bottom: var(--space-4);
 }
 
+/* Revised 2026-08-19 (round 2): the 8/18 build used font-size-md (18px,
+   the Figma "Body-18" spec) here, which read too large next to the site's
+   established caption scale. Now uses DESIGN-SYSTEM.md §2.7's documented
+   "caption" assembled style (font-size-sm + font-weight-medium +
+   line-height-loose + letter-spacing-wide) — the sanctioned style for
+   "Image captions, timestamps, metadata" — instead of a one-off value. */
 .standard-page-caption {
     font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
     text-align: center;
     margin-bottom: var(--space-8);
     line-height: var(--line-height-loose);
+    letter-spacing: var(--letter-spacing-wide);
     max-width: none;
 }
 
@@ -1238,6 +1253,103 @@ footer p {
     flex-wrap: wrap;
     gap: var(--space-2);
     justify-content: center;
+}
+
+/* ================================
+   STANDARD PAGE — DETAILS CARD
+   Left-aligned label/value rows: Employer, Role, Timeline, Tools on Work
+   entries; Published, Updated on Thoughts entries. Row columns use
+   flex-grow ratios (1:2), not a hardcoded pixel width, to approximate the
+   Figma label-column proportion while staying fluid — no existing
+   sitewide label/value column pattern to reuse instead (see grep of
+   .standard-page-meta-dates / .about-history-meta, neither matches).
+   Tags moved out to their own standalone row above this card as of
+   revision round 3 (2026-08-19) — see .standard-page-details-tags below.
+================================ */
+.standard-page-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 65ch;
+    margin: 0 auto var(--space-8);
+    padding: var(--space-2);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-default);
+    border-radius: var(--border-radius-md);
+}
+
+.standard-page-details-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+/* font-size-sm + font-weight-medium — the same "card body copy" scale
+   .card-meta-label already uses for metadata labels elsewhere (Archive/
+   Home card date-author line, the pre-redesign standard-page-meta labels),
+   not the H3/Body-20-derived sizing from the original Figma spec. */
+.standard-page-details-label {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-secondary);
+}
+
+.standard-page-details-value {
+    flex: 2;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+}
+
+/* Revision round 3 (2026-08-19): relocated from a labelled row inside
+   .standard-page-details to a standalone, label-less row between the
+   title and the Details card. flex: 2 dropped — that sized it against a
+   sibling label column (flex: 1) inside .standard-page-details-row, which
+   no longer applies here. flex-wrap + gap are unchanged, reused as-is.
+   max-width: 65ch + centred margin match .standard-page-details' own
+   rendered width (the same 65ch cap .standard-page-content /
+   .standard-page-divider / .standard-page-nav already use), not the
+   wider banner/.standard-page width. */
+.standard-page-details-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    max-width: 65ch;
+    margin: 0 auto var(--space-6);
+}
+
+/* ================================
+   STANDARD PAGE — FOOTER
+   Share + More Work/Thoughts actions, then the "want to work together?"
+   contact section reused verbatim from about.html.
+================================ */
+.standard-page-footer {
+    max-width: 65ch;
+    margin: 0 auto;
+}
+
+.standard-page-footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+/* flex: 1 — same fix already documented on .filter-drawer-page-btn for the
+   identical problem (two ghost buttons of differing label length in one
+   row that must render at matching size): splits the row evenly instead
+   of each button sizing to its own text, which is what made Share (5
+   chars) and More Work/More Thoughts (9-13 chars) render at different
+   widths. align-self: stretch overrides .share-btn's own align-self:
+   center (still needed as-is for its other, column-layout usage on the
+   not-yet-migrated entries) so both buttons compute the same height too. */
+.standard-page-footer-actions .btn {
+    flex: 1;
+    align-self: stretch;
 }
 
 .standard-page-divider {
@@ -2622,12 +2734,12 @@ footer p {
         padding: 0 var(--space-4);
     }
 
+    /* Contained, not full-bleed — stays inside .standard-page's own
+       padding at every breakpoint like the rest of the page, matching the
+       site's existing fluid/responsive container convention rather than
+       the previous negative-margin viewport-edge treatment. */
     .standard-page-banner {
         aspect-ratio: 3 / 2;
-        border-radius: var(--border-radius-none);
-        margin-left: calc(-1 * var(--space-4));
-        margin-right: calc(-1 * var(--space-4));
-        width: calc(100% + var(--space-8));
     }
 
     .standard-page-title {
@@ -2641,6 +2753,20 @@ footer p {
 
     .standard-page-nav-next {
         margin-left: 0;
+    }
+
+    .standard-page-details-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-1);
+    }
+
+    .standard-page-footer-actions {
+        flex-direction: column;
+    }
+
+    .standard-page-footer-actions .btn {
+        width: 100%;
     }
 
     .card--profile .card-image {
