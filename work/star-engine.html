@@ -70,20 +70,101 @@
             <!-- Body Content -->
             <div class="standard-page-content">
                 <h2 id="overview">Overview</h2>
-                <p>While working at Cloud Imperium Games, I joined the Core Technology Group to support the development of Star Engine — the in-house game engine that powers Star Citizen. My role spanned both quality assurance and user experience, focused specifically on the tooling that internal developers and artists depended on every day.</p>
+                <p>In 2021, I transitioned from an embedded Senior QA to the sole UX Designer within the Core Technology Group (CTG) at Cloud Imperium Games. I was responsible for a few different initiatives within the CTG, however I was primarily focused on the Star Engine Editor - which is the software interface and tools that allow over 800+ developers globally to develop Star Citizen, a massive Singleplayer and MMO space game.
 
-                <h2 id="the-problem">The Problem</h2>
-                <p>Developer tools at a studio of CIG's scale accumulate significant friction over time. The teams building Star Citizen were encountering daily workflow bottlenecks in the engine editor — but those pain points were rarely surfaced to the people who could fix them. There was no structured channel for developers to communicate tooling frustrations, and issues were either silently worked around or lost entirely.</p>
-                <p>The result was a growing gap between the tools the team had and the tools the team needed. Productivity suffered. Morale around tooling suffered. And the QA team had no reliable way to prioritise tooling bugs against gameplay bugs.</p>
+                </p>Over the course of 3 years, I stood up user research foundations, documented technical issues and workflows, while also updating existing tools and crafting new ones to solve developer experiences. I used my voice to echo developer commentary when they encountered bugs or had frictions with their tools and I would then synthesize those issues into action points as best I could with my team to fit their specific needs while doing our best to afford general developers.</p>
 
-                <h2 id="process">Process</h2>
-                <p>I designed and implemented a structured feedback collection process that gave developers a direct line to the tooling team. The goal was to surface real friction — not just the loudest complaints — in a way that was actionable for engineering and measurable over time.</p>
+                </p>In 2023, my time - as well as a bunch more awesome people’s time - was cut short due the Los Angeles office shut down. I wasn't able to accomplish all of the things I wanted, but I am so happy to have established a UX practice where there was none and contributed some great tools with great people.</p>
+
+                </p>Looking back, I will note that I was one UX person within a Tech Group that needed at least two or more Senior UX devs on the team alongside me. That being said, I’m again grateful to have been given the opportunity and I give great thanks to my producers for being my rocks and my trusty Games User Research Book, my external mentor, and the folks in the Toolsmiths Discord channel.</p>
+
+                </p>On this page, I will not go into great detail about all of the individual projects, but rather condense my 3 years on the team, my struggles, team wins, and some specific project musings.</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h2 id="what-is-star-engine">What is the Star Engine</h2>
+                <p>The Star Engine is a game engine utilized by Cloud Imperium Games to create their two main games: “Squadron 42”, the Singleplayer title - and “Star Citizen: Persistent Universe” - their multiplayer title.
+
+                </p>If you’re interested in more ditty gritty detail, You can read more on this wiki or go to any of the Citizen Con Tech talks available on youtube.</p>
+
+                </p>I do also highly recommend you watch a video or play Star Citizen’s Persistent Universe for yourself to understand the scope of the engines capabilities and the near-seamless traversal from surface to planet via spaceship. It’s pretty cool</p>
+
+                </p>The Editor - which was my aforementioned primary focus - is a software interface wrapping the game engine allowing developers to manipulate the game's features, create levels, its lighting, cinematics, animations, among many of the other pipelines used to create games.
+                .</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h2 id="foundations">Foundations and UX Maturity</h2>
+                <p>Much of my early days were spent modifying my US Pacific Time sleep schedule to adapt to communicating with my new teammates across the pond in GMT.
+
+                </p>The locations under Cloud Imperium Games (CIG) at the time were LA, Austin and Montreal in North America, with a team in Frankfurt, Germany, and the home base for the largest developer population in Manchester, UK.</p>
+
+                </p>I was interviewing developers from all studios via Microsoft Teams and would be tasked weekly with meeting team leads and their associated members within the Core Technology Group.</p>
+
+                </p>Those meetings were not only used to meet and greet with developers I had never interacted with before - but also for about 30 minutes to a gracious 1 hour if a developer was chatty enough - I would gather information about the tools they used, their current deliverables, and the issues they faced as a team as it pertained to the Editor.</p>
+
+                </p>At the beginning I was doing my best to translate much of what I used for playtesting games, while working towards figuring out how to get from Level 2 UX Maturity - “Have a go” - to Level 4 Maturity - “Useful UX” according to the Games User Research Book. However, this wasn’t for games, this was for the tools that made games.</p>
+
+                </p>The best I could do at first, was to be present, listen, learn and document my observations and present them to my team. That’s what I did, and overtime it grew in a more formal process.
+                </p>
+
+                </p>My User Research Setup:</p>
+
+                <ul>
+                    <li>Meeting Invite and Acceptance via Outlook and a DM via Teams</li>
+                    <li>Meet and Greet to establish major talking points</li>
+                    <li>Screen Share and Record via OBS</li>
+                    <li>Transcribe using Otter</li>
+                    <li>Develop Surveys if I needed Quantitative Data</li>
+                    <li>Synthesize my notes into reports</li>
+                    <li>Chat with my team about the issues</li>
+                    <li>Make action points via Jira Tasks</li>
+                </ul>
+
+                </p>These meetings would lay the foundation of the Editor team's notoriety among the other studios, eventually garnering enough of an interest among developers to create a feedback loop that the Editor and the Core Tech team never had for our global developers.</p>
+
+                </p>Overtime, the Editor team implemented the following Feedback Loop:</p>
+                
+                <ul>
+                    <li>Interview and Survey Developers regularly, but not too much! People are busy!</li>
+                    <li>I audited the Help Menu, which was barren and had outdated reference documentation</li>
+                    <li>I created an Editor Confluence page to replace the outdated docs and served as a HUB</li>
+                    <li>We created a Teams chat channel for direct Editor Support</li>
+                    <li>We created a Patch Notes Archive and Published Patch Notes regularly</li>
+                    <li>We also created a Patch Notes modal that appeared on startup after updating to latest</li>
+                    <li>We put a link to Patch Notes within the Help Menu</li>
+                    <li>We added ‘information’ buttons to all major tools, which linked to documentation!</li>
+                </ul>
+
+                </p>Results:</p>
+                
+                <ul>
+                    <li>Developer engagement increased!</li>
+                    <li>Awareness increased!</li>
+                    <li>Reports of issues increased - which rarely ever happened before because developers never reported issues!</li>
+                    <li>Editor stability increased!</li>
+                    <li>We reduced New Developer On-Boarding Times!</li>
+                    <li>We increased tool fluency even among veteran developers!</li>
+                </ul>
+
+
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h3 id="research">Research</h3>
                 <p>I conducted one-on-one sessions with developers across disciplines — gameplay, tech art, animation, and systems — to document the most common friction points in their daily tool usage. The goal was not just a bug list but an understanding of the underlying patterns: which tools caused the most context switching, where documentation was missing, and which issues were reported repeatedly but never resolved.</p>
 
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
                 <h3 id="iteration">Iteration</h3>
                 <p>The feedback channel went through three iterations before landing on a format that was both easy to submit and useful to act on. Early attempts were too structured and saw low adoption — developers filled one field and left the rest blank. Later versions reduced required fields to a minimum and added quick-reaction options that could be completed in under a minute. Adoption increased significantly in the third version.</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="outcome">Outcome</h2>
                 <p>The system produced a measurable reduction in duplicate bug reports for the same tooling issues, and improved the signal-to-noise ratio for the tooling team's backlog. Several pipeline improvements — including a reduction in editor crash frequency during asset saves — were shipped as a direct result of insights gathered through this process.</p>
