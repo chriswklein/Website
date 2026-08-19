@@ -1017,17 +1017,13 @@
             ================================ -->
             <section class="preview-section" aria-labelledby="s10-heading">
                 <h2 id="s10-heading">Section 10 — In-body Images (Standard Page body content)</h2>
-                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content img</code> — full width, natural aspect ratio, <code>border-radius: var(--border-radius-md)</code>. Captioned images use <code>&lt;figure&gt;</code> + <code>&lt;figcaption class="standard-page-caption"&gt;</code> — the same caption class the page banner already uses, not a second caption style. Uncaptioned images are a bare <code>&lt;img&gt;</code>. Both require alt text and <code>loading="lazy"</code>. No lightbox/click-expand — that's a separate, not-yet-scoped feature.</p>
+                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content img</code> — full width, natural aspect ratio, <code>border-radius: var(--border-radius-md)</code>, nothing else: no background, border, padding, or shadow — not a card. Captioned images use <code>&lt;figure&gt;</code> + <code>&lt;figcaption class="standard-page-caption"&gt;</code> — the same caption class the page banner already uses, not a second caption style. Uncaptioned images are a bare <code>&lt;img&gt;</code>. Both require alt text and <code>loading="lazy"</code>. No lightbox/click-expand — that's a separate, not-yet-scoped feature. Shown unframed below (no demo box) — a real entry page has no wrapper around this either.</p>
 
-                <div class="ds-content-frame">
-                    <div class="standard-page-content">
-                        <figure>
-                            <div class="standard-page-banner" style="aspect-ratio: 16/9; margin-bottom: 0;" role="img" aria-hidden="true">
-                                <span class="ds-anatomy-banner-fill">Captioned image placeholder</span>
-                            </div>
-                            <figcaption class="standard-page-caption">Example figcaption, reusing .standard-page-caption verbatim.</figcaption>
-                        </figure>
-                    </div>
+                <div class="standard-page-content">
+                    <figure>
+                        <img src="/assets/images/entries/star-engine/StarEngine.png" alt="Example in-body image — the Star Engine editor interface." loading="lazy">
+                        <figcaption class="standard-page-caption">Example figcaption, reusing .standard-page-caption verbatim.</figcaption>
+                    </figure>
                 </div>
             </section>
 
