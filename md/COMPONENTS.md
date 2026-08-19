@@ -672,7 +672,7 @@ Hover applies to the whole card — including the image column on Feature cards 
 **CSS Class:** `.card.card--feature`
 **Usage:** Work / portfolio cards
 
-Content order (both Feature and Thought): **Title → Tags → Meta → Excerpt → CTA**. This was reordered from the earlier Title → Excerpt → Tags → Meta → CTA — validated on `card-variants-preview.html`'s "Final Candidate" before being promoted into this live component.
+Content order (both Feature and Thought): **Title → Tags → Meta → Excerpt → CTA**. This was reordered from the earlier Title → Excerpt → Tags → Meta → CTA — validated in a card-layout comparison scratch file (`card-variants-preview.html`, since removed) before being promoted into this live component. See design-system.html Section 14 for the current live markup.
 
 #### Anatomy
 
@@ -1488,7 +1488,10 @@ The standard page template provides a consistent reading experience for all long
 [ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-content ]
   [ h2 headings, h3 subheadings, p body text ]
-  [ blockquote, code blocks as needed ]
+  [ ul/ol lists, blockquote, code blocks as needed ]
+  [ figure > img + figcaption.standard-page-caption — captioned in-body image ]
+  [ img — bare, uncaptioned in-body image ]
+  [ table — 65ch reading column, scrolls via overflow-x on narrow viewports ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-footer ]
   [ .standard-page-footer-actions ]
@@ -1503,6 +1506,31 @@ There is no author row (photo + name) — it was added in the 8/18 redesign
 and removed in the 8/19 revision as a deliberate simplification, not an
 oversight. Authorship for both entry types is Christopher Klein by default
 and isn't otherwise surfaced in this header.
+
+**In-body images (2026-08-18):** `.standard-page-content img` (full width,
+natural aspect ratio, `border-radius: var(--border-radius-md)`,
+`margin-bottom: var(--space-6)`) styles any image dropped into body content,
+separate from the banner (which is a CSS background-image, not an `<img>`).
+Images needing a credit/caption use `<figure><img><figcaption
+class="standard-page-caption"></figcaption></figure>` — reusing the banner's
+existing caption class rather than a second caption style.
+`.standard-page-content figure` carries the block's `margin-bottom` instead
+of the inner `img` so a captioned figure doesn't double up spacing.
+Uncaptioned images are a bare `<img>` with no wrapper. All images require
+alt text (`alt=""` only for decorative images) and `loading="lazy"`, matching
+the convention already used on About's profile photo. No click/expand
+behaviour — that's a separate, not-yet-scoped lightbox feature.
+
+**In-body tables (2026-08-18):** `.standard-page-content table` caps at the
+same 65ch reading column as everything else in body content (a per-instance
+call to override if a specific table genuinely needs more columns) and
+scrolls horizontally (`overflow-x: auto` directly on the table, the same
+approach `pre` already uses for wide content, rather than an extra wrapper
+element) instead of trying to reflow columns on narrow viewports. `th` reuses
+`.card-meta-label`'s exact label treatment (size/weight/color) by value, not
+by selector reference. `td` matches body paragraph text. Row separators use
+the sitewide thin-border convention, with the last row's border removed the
+same way `.about-history-item:last-child` drops its own.
 
 ### Template Consolidation — Flagged Follow-Up
 

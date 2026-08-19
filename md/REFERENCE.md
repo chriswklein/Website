@@ -22,7 +22,7 @@ A personal website built with plain HTML, CSS, and JavaScript. The goal is full 
 
 | Layer | Tool | Notes |
 |---|---|---|
-| Design | Figma | HTML to Design extension for importing preview.html; Figma Variables set up manually |
+| Design | Figma | HTML to Design extension for importing design-system.html; Figma Variables set up manually |
 | Code Editor | VS Code | With Live Server extension for local preview |
 | Languages | HTML, CSS, JavaScript | Plain — no frameworks or preprocessors |
 | Version Control | GitHub | Public repository |
@@ -63,7 +63,7 @@ my-website/
 ├── work.html           — Work / Portfolio page
 ├── thoughts.html       — Thoughts / Blog page
 ├── about.html          — About page (also handles contact)
-├── preview.html        — Design system preview page (dev reference only)
+├── design-system.html  — Design system reference page (dev reference only)
 ├── nav.html            — Navigation component (partial)
 ├── footer.html         — Footer component (partial)
 ├── style.css           — All styles and design tokens as CSS variables

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design System Preview</title>
+    <title>Design System Reference</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,6 +15,12 @@
     <style>
         /* ================================
            PREVIEW PAGE LAYOUT
+           Dev/design reference only. Not linked from nav.html, footer.html,
+           or any live page. No script.js include on purpose — every example
+           below is static markup; interactive-looking controls (buttons,
+           links) use href="#" / are otherwise inert rather than wired to
+           real JS, since this page's job is to show real CSS classes
+           rendering with real markup, not to reproduce site behaviour.
         ================================ */
         .preview-main {
             padding-bottom: var(--space-20);
@@ -130,16 +136,20 @@
         .s-int-focus    { background-color: var(--color-interactive-focus);    }
         .s-int-disabled { background-color: var(--color-interactive-disabled); }
 
-        /* Accent swatches */
-        .s-acc-gold      { background-color: var(--color-accent-primary); }
-        .s-acc-gold-text { background-color: var(--color-accent-primary-text); }
+        /* Accent swatches — teal is the live default (data-theme unset or
+           "teal"); gold is a dormant, fully-defined but currently
+           unreachable [data-theme="gold"] override, per DESIGN-SYSTEM.md
+           §1.8 and style.css's :root/[data-theme] blocks. */
+        .s-acc-teal      { background-color: #00BAA5; }
+        .s-acc-teal-text { background-color: #00E5CB; }
+        .s-acc-gold      { background-color: #BA8200; }
+        .s-acc-gold-text { background-color: #E5A000; }
         .s-acc-pink      { background-color: var(--color-accent-quote); }
         .s-acc-pink-text { background-color: var(--color-accent-quote-text); }
 
-        /* Component token swatches */
-        .s-tag-border      { background-color: var(--color-accent-primary); }
-        .s-tag-border-hover { background-color: var(--color-accent-primary-text); }
-        .s-tag-bg-hover    { background-color: var(--color-background-base); border: var(--border-width-thin) solid var(--color-border-strong); }
+        /* Semantic component tokens that alias the accent tokens above —
+           real custom properties defined in style.css :root (not the same
+           as a component's own scoped tokens, e.g. .card's --card-bg). */
         .s-link           { background-color: var(--color-link); }
         .s-link-hover     { background-color: var(--color-link-hover); }
         .s-divider        { background-color: var(--color-divider-accent); }
@@ -383,7 +393,7 @@
         }
 
         /* ================================
-           SECTION 8 — TAGS
+           SECTION 8 — TAGS & TAG-CHIPS
         ================================ */
         .tag-row {
             display: flex;
@@ -393,17 +403,40 @@
         }
 
         /* ================================
-           SECTION 9 — CARD COMPONENTS
+           SECTIONS 9–11 — LISTS / IMAGES / TABLES
+           Real .standard-page-content-scoped rules only take effect inside
+           that class, so every example in these sections is wrapped in an
+           actual .standard-page-content div — not a preview-only stand-in.
+           This frame is presentational only (background/border), scoped
+           narrowly to avoid colliding with .standard-page-content itself.
+        ================================ */
+        .ds-content-frame {
+            padding: var(--space-6);
+            background-color: var(--color-background-surface);
+            border: var(--border-width-thin) solid var(--color-border-default);
+            border-radius: var(--border-radius-md);
+        }
+
+        .ds-content-frame .standard-page-content {
+            max-width: none;
+        }
+
+        .ds-content-frame :is(h2, h3, p, ul, ol, table) {
+            max-width: none;
+        }
+
+        /* ================================
+           SECTION 14 — CARD COMPONENTS
         ================================ */
         .preview-card-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: var(--space-6);
             align-items: start;
         }
 
         /* ================================
-           SECTION 10 — NAVIGATION
+           SECTION 15 — NAVIGATION
         ================================ */
         .preview-nav-frame {
             background-color: var(--color-background-base);
@@ -414,7 +447,7 @@
         }
 
         /* ================================
-           SECTION 11 — TAB BAR
+           SECTION 16 — TAB BAR
         ================================ */
         .preview-tab-bar-frame {
             display: flex;
@@ -428,7 +461,7 @@
         }
 
         /* ================================
-           SECTION 12 — TOOLTIP
+           SECTION 17 — TOOLTIP
         ================================ */
         .preview-tooltip-stack {
             display: inline-flex;
@@ -468,9 +501,15 @@
         }
 
         /* ================================
-           SECTION 13 — TOAST
+           SECTION 18 — TOAST
+           Real .toast is position: fixed (bottom, viewport-centred) and only
+           becomes visible via JS adding .toast--visible on Share click. A
+           fixed element pinned mid-scroll would be disruptive inside this
+           long reference page, so this is a static, inline replica of the
+           same visual values (not the .toast class itself) — see the note
+           in the section body.
         ================================ */
-        .preview-toast {
+        .ds-toast-static {
             display: inline-flex;
             align-items: center;
             gap: var(--space-2);
@@ -484,45 +523,33 @@
             box-shadow: var(--elevation-md);
         }
 
-        .preview-toast-icon {
+        .ds-toast-icon {
             color: var(--color-accent-primary);
             font-weight: var(--font-weight-bold);
         }
 
         /* ================================
-           SECTION 14 — BREADCRUMB
+           SECTION 20 — STANDARD PAGE ANATOMY
         ================================ */
-        .preview-breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-            list-style: none;
+        .ds-anatomy-frame {
+            background-color: var(--color-background-base);
+            border: var(--border-width-thin) solid var(--color-border-default);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-8);
+        }
+
+        .ds-anatomy-frame .standard-page {
             padding: 0;
         }
 
-        .preview-breadcrumb li {
+        .ds-anatomy-banner-fill {
             display: flex;
             align-items: center;
-            gap: var(--space-2);
-        }
-
-        .preview-breadcrumb a {
-            font-size: var(--font-size-sm);
-            color: var(--color-text-secondary);
-        }
-
-        .preview-breadcrumb a:hover {
-            color: var(--color-text-primary);
-        }
-
-        .preview-breadcrumb-sep {
-            font-size: var(--font-size-xs);
+            justify-content: center;
+            width: 100%;
+            height: 100%;
             color: var(--color-text-disabled);
-        }
-
-        .preview-breadcrumb-current {
             font-size: var(--font-size-sm);
-            color: var(--color-text-primary);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -536,15 +563,15 @@
     <main id="main-content">
         <div class="container">
 
-            <h1>Design System Preview</h1>
-            <p class="preview-subtitle">Every atom and component from DESIGN-SYSTEM.md and COMPONENTS.md. All values resolve from CSS variables in style.css — no hardcoded values anywhere. Last updated 2026-07-05.</p>
+            <h1>Design System Reference</h1>
+            <p class="preview-subtitle">Every atom and component currently live in style.css, rendered with real classes and (where practical) real markup — not restated values. Dev/design reference only: not linked from nav, footer, or any live page. Renamed and rebuilt from the earlier preview.html on 2026-08-18; card-variants-preview.html (a since-resolved card-layout comparison scratch file) was removed the same session — its "final candidate" layout is what Section 14 and the live .card--feature CSS both already show. Last rebuilt 2026-08-18.</p>
 
             <!-- ================================
                  SECTION 1 — COLOUR TOKENS
             ================================ -->
             <section class="preview-section" aria-labelledby="s1-heading">
                 <h2 id="s1-heading">Section 1 — Colour Tokens</h2>
-                <p class="preview-section-desc">Semantic colour tokens from DESIGN-SYSTEM.md sections 1.2–1.8. Background tokens shown as filled squares. Text tokens shown as the token name written in that colour. Border tokens shown as outlined squares.</p>
+                <p class="preview-section-desc">Semantic colour tokens from DESIGN-SYSTEM.md sections 1.2–1.8 and style.css's <code>:root</code> block. Background tokens shown as filled squares. Text tokens shown as the token name written in that colour. Border tokens shown as outlined squares.</p>
 
                 <div class="preview-subsection">
                     <h3>Background</h3>
@@ -573,17 +600,17 @@
                         <div class="swatch">
                             <div class="swatch-text-box s-text-primary">--color-text-primary</div>
                             <p class="swatch-name">--color-text-primary</p>
-                            <p class="swatch-hex">#F5F5F5 · 15:1 ✅</p>
+                            <p class="swatch-hex">#F5F5F5</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-text-box s-text-secondary">--color-text-secondary</div>
                             <p class="swatch-name">--color-text-secondary</p>
-                            <p class="swatch-hex">#AAAAAA · 7.5:1 ✅</p>
+                            <p class="swatch-hex">#AAAAAA</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-text-box s-text-tertiary">--color-text-tertiary</div>
                             <p class="swatch-name">--color-text-tertiary</p>
-                            <p class="swatch-hex">#888888 · 4.6:1 ✅</p>
+                            <p class="swatch-hex">#888888</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-text-box s-text-disabled">--color-text-disabled</div>
@@ -635,7 +662,7 @@
                         <div class="swatch">
                             <div class="swatch-box s-int-focus"></div>
                             <p class="swatch-name">--color-interactive-focus</p>
-                            <p class="swatch-hex">#FFFFFF · 19:1 ✅</p>
+                            <p class="swatch-hex">#FFFFFF</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-int-disabled"></div>
@@ -646,28 +673,47 @@
                 </div>
 
                 <div class="preview-subsection">
-                    <h3>Accent — Gold</h3>
+                    <h3>Accent — Teal (live default)</h3>
+                    <p class="preview-section-desc">style.css's <code>:root</code> defines <code>--color-accent-primary</code> / <code>--color-accent-primary-text</code> as teal directly — this is the site's live default with no <code>data-theme</code> attribute required. <code>[data-theme="teal"]</code> also exists and matches (harmless, redundant).</p>
+                    <div class="swatch-grid">
+                        <div class="swatch">
+                            <div class="swatch-box s-acc-teal"></div>
+                            <p class="swatch-name">--color-accent-primary</p>
+                            <p class="swatch-hex">#00BAA5</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-acc-teal-text"></div>
+                            <p class="swatch-name">--color-accent-primary-text</p>
+                            <p class="swatch-hex">#00E5CB</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="preview-subsection">
+                    <h3>Accent — Gold (dormant)</h3>
+                    <p class="preview-section-desc">A fully-defined <code>[data-theme="gold"]</code> override block exists in style.css but no UI currently sets that attribute — preserved for a future theme toggle, not reachable on the live site today.</p>
                     <div class="swatch-grid">
                         <div class="swatch">
                             <div class="swatch-box s-acc-gold"></div>
-                            <p class="swatch-name">--color-accent-primary</p>
-                            <p class="swatch-hex">#BA8200 · 5.2:1 ✅</p>
+                            <p class="swatch-name">--color-accent-primary (gold theme)</p>
+                            <p class="swatch-hex">#BA8200</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-acc-gold-text"></div>
-                            <p class="swatch-name">--color-accent-primary-text</p>
-                            <p class="swatch-hex">#E5A000 · 8.9:1 ✅</p>
+                            <p class="swatch-name">--color-accent-primary-text (gold theme)</p>
+                            <p class="swatch-hex">#E5A000</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="preview-subsection">
                     <h3>Accent — Pink</h3>
+                    <p class="preview-section-desc">Theme-independent — unaffected by the teal/gold toggle.</p>
                     <div class="swatch-grid">
                         <div class="swatch">
                             <div class="swatch-box s-acc-pink"></div>
                             <p class="swatch-name">--color-accent-quote</p>
-                            <p class="swatch-hex">#A9407C · 4.6:1 ✅</p>
+                            <p class="swatch-hex">#A9407C</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-acc-pink-text"></div>
@@ -678,42 +724,28 @@
                 </div>
 
                 <div class="preview-subsection">
-                    <h3>Component Tokens</h3>
+                    <h3>Semantic Component Tokens</h3>
+                    <p class="preview-section-desc">Real custom properties in style.css's <code>:root</code> that alias the tokens above — swap when the active accent theme changes, no component CSS edits needed.</p>
                     <div class="swatch-grid">
-                        <div class="swatch">
-                            <div class="swatch-box s-tag-border"></div>
-                            <p class="swatch-name">--tag-border</p>
-                            <p class="swatch-hex">Tag border default · #BA8200</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-box s-tag-border-hover"></div>
-                            <p class="swatch-name">--tag-border-hover</p>
-                            <p class="swatch-hex">Tag border hover · #E5A000</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-box s-tag-bg-hover"></div>
-                            <p class="swatch-name">--tag-bg-hover</p>
-                            <p class="swatch-hex">Tag background hover · #111111</p>
-                        </div>
                         <div class="swatch">
                             <div class="swatch-box s-link"></div>
                             <p class="swatch-name">--color-link</p>
-                            <p class="swatch-hex">→ accent-gold-text</p>
+                            <p class="swatch-hex">→ accent-primary-text</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-link-hover"></div>
                             <p class="swatch-name">--color-link-hover</p>
-                            <p class="swatch-hex">→ accent-gold</p>
+                            <p class="swatch-hex">→ accent-primary</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-divider"></div>
                             <p class="swatch-name">--color-divider-accent</p>
-                            <p class="swatch-hex">→ accent-gold</p>
+                            <p class="swatch-hex">→ accent-primary</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-quote-border"></div>
                             <p class="swatch-name">--color-quote-border</p>
-                            <p class="swatch-hex">→ accent-pink</p>
+                            <p class="swatch-hex">→ accent-quote</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-code-bg"></div>
@@ -723,7 +755,7 @@
                         <div class="swatch">
                             <div class="swatch-box s-code-border"></div>
                             <p class="swatch-name">--color-code-border</p>
-                            <p class="swatch-hex">→ accent-gold</p>
+                            <p class="swatch-hex">→ accent-primary</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-tooltip-bg"></div>
@@ -733,7 +765,7 @@
                         <div class="swatch">
                             <div class="swatch-box s-tooltip-border"></div>
                             <p class="swatch-name">--color-tooltip-border</p>
-                            <p class="swatch-hex">→ accent-gold</p>
+                            <p class="swatch-hex">→ accent-primary</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-tooltip-text"></div>
@@ -741,6 +773,7 @@
                             <p class="swatch-hex">→ text-primary</p>
                         </div>
                     </div>
+                    <p class="preview-section-desc"><code>.tag</code> / <code>.tag-chip</code> border and text reuse <code>--color-accent-primary</code> / <code>--color-accent-primary-text</code> directly — there is no separate <code>--tag-border</code>-style named token in style.css for them, unlike the aliases above.</p>
                 </div>
             </section>
 
@@ -833,62 +866,20 @@
                 <p class="preview-section-desc">Base-4 scale. Every spacing value references one of these tokens. Bar width equals the token value. Bar height is fixed at --space-6 (24px).</p>
 
                 <div class="space-rows">
-                    <div class="space-row">
-                        <p class="space-meta">--space-0<br>0px</p>
-                        <div class="space-bar sp-0"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-1<br>4px</p>
-                        <div class="space-bar sp-1"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-2<br>8px</p>
-                        <div class="space-bar sp-2"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-3<br>12px</p>
-                        <div class="space-bar sp-3"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-4<br>16px</p>
-                        <div class="space-bar sp-4"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-5<br>20px</p>
-                        <div class="space-bar sp-5"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-6<br>24px</p>
-                        <div class="space-bar sp-6"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-8<br>32px</p>
-                        <div class="space-bar sp-8"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-10<br>40px</p>
-                        <div class="space-bar sp-10"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-12<br>48px</p>
-                        <div class="space-bar sp-12"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-16<br>64px</p>
-                        <div class="space-bar sp-16"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-20<br>80px</p>
-                        <div class="space-bar sp-20"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-24<br>96px</p>
-                        <div class="space-bar sp-24"></div>
-                    </div>
-                    <div class="space-row">
-                        <p class="space-meta">--space-32<br>128px</p>
-                        <div class="space-bar sp-32"></div>
-                    </div>
+                    <div class="space-row"><p class="space-meta">--space-0<br>0px</p><div class="space-bar sp-0"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-1<br>4px</p><div class="space-bar sp-1"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-2<br>8px</p><div class="space-bar sp-2"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-3<br>12px</p><div class="space-bar sp-3"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-4<br>16px</p><div class="space-bar sp-4"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-5<br>20px</p><div class="space-bar sp-5"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-6<br>24px</p><div class="space-bar sp-6"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-8<br>32px</p><div class="space-bar sp-8"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-10<br>40px</p><div class="space-bar sp-10"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-12<br>48px</p><div class="space-bar sp-12"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-16<br>64px</p><div class="space-bar sp-16"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-20<br>80px</p><div class="space-bar sp-20"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-24<br>96px</p><div class="space-bar sp-24"></div></div>
+                    <div class="space-row"><p class="space-meta">--space-32<br>128px</p><div class="space-bar sp-32"></div></div>
                 </div>
             </section>
 
@@ -900,31 +891,11 @@
                 <p class="preview-section-desc">Five border radius tokens. None = sharp editorial. Full = pill shape for tags and badges.</p>
 
                 <div class="radius-row">
-                    <div class="radius-item">
-                        <div class="radius-box r-none"></div>
-                        <p class="preview-label">--border-radius-none</p>
-                        <p class="preview-token">0px</p>
-                    </div>
-                    <div class="radius-item">
-                        <div class="radius-box r-sm"></div>
-                        <p class="preview-label">--border-radius-sm</p>
-                        <p class="preview-token">4px</p>
-                    </div>
-                    <div class="radius-item">
-                        <div class="radius-box r-md"></div>
-                        <p class="preview-label">--border-radius-md</p>
-                        <p class="preview-token">8px</p>
-                    </div>
-                    <div class="radius-item">
-                        <div class="radius-box r-lg"></div>
-                        <p class="preview-label">--border-radius-lg</p>
-                        <p class="preview-token">12px</p>
-                    </div>
-                    <div class="radius-item">
-                        <div class="radius-box r-full"></div>
-                        <p class="preview-label">--border-radius-full</p>
-                        <p class="preview-token">9999px</p>
-                    </div>
+                    <div class="radius-item"><div class="radius-box r-none"></div><p class="preview-label">--border-radius-none</p><p class="preview-token">0px</p></div>
+                    <div class="radius-item"><div class="radius-box r-sm"></div><p class="preview-label">--border-radius-sm</p><p class="preview-token">4px</p></div>
+                    <div class="radius-item"><div class="radius-box r-md"></div><p class="preview-label">--border-radius-md</p><p class="preview-token">8px</p></div>
+                    <div class="radius-item"><div class="radius-box r-lg"></div><p class="preview-label">--border-radius-lg</p><p class="preview-token">12px</p></div>
+                    <div class="radius-item"><div class="radius-box r-full"></div><p class="preview-label">--border-radius-full</p><p class="preview-token">9999px</p></div>
                 </div>
             </section>
 
@@ -936,26 +907,10 @@
                 <p class="preview-section-desc">Four elevation tokens using diffuse dark shadows. Used sparingly on dark backgrounds. Best seen against the dark subtle background below.</p>
 
                 <div class="elevation-row">
-                    <div class="elevation-item">
-                        <div class="elevation-box el-sm"></div>
-                        <p class="preview-label">--elevation-sm</p>
-                        <p class="preview-token">0 1px 3px</p>
-                    </div>
-                    <div class="elevation-item">
-                        <div class="elevation-box el-md"></div>
-                        <p class="preview-label">--elevation-md</p>
-                        <p class="preview-token">0 4px 12px</p>
-                    </div>
-                    <div class="elevation-item">
-                        <div class="elevation-box el-lg"></div>
-                        <p class="preview-label">--elevation-lg</p>
-                        <p class="preview-token">0 8px 24px</p>
-                    </div>
-                    <div class="elevation-item">
-                        <div class="elevation-box el-xl"></div>
-                        <p class="preview-label">--elevation-xl</p>
-                        <p class="preview-token">0 16px 48px</p>
-                    </div>
+                    <div class="elevation-item"><div class="elevation-box el-sm"></div><p class="preview-label">--elevation-sm</p><p class="preview-token">0 1px 3px</p></div>
+                    <div class="elevation-item"><div class="elevation-box el-md"></div><p class="preview-label">--elevation-md</p><p class="preview-token">0 4px 12px</p></div>
+                    <div class="elevation-item"><div class="elevation-box el-lg"></div><p class="preview-label">--elevation-lg</p><p class="preview-token">0 8px 24px</p></div>
+                    <div class="elevation-item"><div class="elevation-box el-xl"></div><p class="preview-label">--elevation-xl</p><p class="preview-token">0 16px 48px</p></div>
                 </div>
             </section>
 
@@ -964,44 +919,14 @@
             ================================ -->
             <section class="preview-section" aria-labelledby="s6-heading">
                 <h2 id="s6-heading">Section 6 — Motion</h2>
-                <p class="preview-section-desc">Five duration tokens. Hover each track to see the gold block slide across at that speed. Instant has no visible transition. prefers-reduced-motion disables all.</p>
+                <p class="preview-section-desc">Five duration tokens. Hover each track to see the block slide across at that speed. Instant has no visible transition. prefers-reduced-motion disables all.</p>
 
                 <div class="motion-row">
-                    <div class="motion-item">
-                        <div class="motion-track dur-instant" aria-label="Hover to preview instant transition">
-                            <div class="motion-box"></div>
-                        </div>
-                        <p class="preview-label">--duration-instant</p>
-                        <p class="preview-token">0ms</p>
-                    </div>
-                    <div class="motion-item">
-                        <div class="motion-track dur-fast" aria-label="Hover to preview fast transition">
-                            <div class="motion-box"></div>
-                        </div>
-                        <p class="preview-label">--duration-fast</p>
-                        <p class="preview-token">100ms</p>
-                    </div>
-                    <div class="motion-item">
-                        <div class="motion-track dur-base" aria-label="Hover to preview base transition">
-                            <div class="motion-box"></div>
-                        </div>
-                        <p class="preview-label">--duration-base</p>
-                        <p class="preview-token">200ms</p>
-                    </div>
-                    <div class="motion-item">
-                        <div class="motion-track dur-slow" aria-label="Hover to preview slow transition">
-                            <div class="motion-box"></div>
-                        </div>
-                        <p class="preview-label">--duration-slow</p>
-                        <p class="preview-token">350ms</p>
-                    </div>
-                    <div class="motion-item">
-                        <div class="motion-track dur-slower" aria-label="Hover to preview slower transition">
-                            <div class="motion-box"></div>
-                        </div>
-                        <p class="preview-label">--duration-slower</p>
-                        <p class="preview-token">500ms</p>
-                    </div>
+                    <div class="motion-item"><div class="motion-track dur-instant" aria-label="Hover to preview instant transition"><div class="motion-box"></div></div><p class="preview-label">--duration-instant</p><p class="preview-token">0ms</p></div>
+                    <div class="motion-item"><div class="motion-track dur-fast" aria-label="Hover to preview fast transition"><div class="motion-box"></div></div><p class="preview-label">--duration-fast</p><p class="preview-token">100ms</p></div>
+                    <div class="motion-item"><div class="motion-track dur-base" aria-label="Hover to preview base transition"><div class="motion-box"></div></div><p class="preview-label">--duration-base</p><p class="preview-token">200ms</p></div>
+                    <div class="motion-item"><div class="motion-track dur-slow" aria-label="Hover to preview slow transition"><div class="motion-box"></div></div><p class="preview-label">--duration-slow</p><p class="preview-token">350ms</p></div>
+                    <div class="motion-item"><div class="motion-track dur-slower" aria-label="Hover to preview slower transition"><div class="motion-box"></div></div><p class="preview-label">--duration-slower</p><p class="preview-token">500ms</p></div>
                 </div>
             </section>
 
@@ -1037,11 +962,11 @@
             </section>
 
             <!-- ================================
-                 SECTION 8 — TAG COMPONENT
+                 SECTION 8 — TAG & TAG-CHIP COMPONENTS
             ================================ -->
             <section class="preview-section" aria-labelledby="s8-heading">
-                <h2 id="s8-heading">Section 8 — Tag Component</h2>
-                <p class="preview-section-desc">Single variant. Gold outlined style — transparent background, gold border and text. On hover border and text brighten to light gold, background fills with page base colour. Tags are interactive links navigating to archive.html filtered by tag slug.</p>
+                <h2 id="s8-heading">Section 8 — Tag & Tag-Chip Components</h2>
+                <p class="preview-section-desc"><code>.tag</code> — teal outlined style (the live default accent; see Section 1), transparent background. On hover, border and text brighten to the lighter teal and background fills with the page base colour. Tags are links navigating to archive.html filtered by tag slug.</p>
 
                 <div class="tag-row">
                     <a href="#" class="tag">User Experience</a>
@@ -1051,67 +976,181 @@
                     <a href="#" class="tag">Accessibility</a>
                     <a href="#" class="tag">Career</a>
                 </div>
-            </section>
 
-            <!-- ================================
-                 SECTION 9 — CARD COMPONENTS
-            ================================ -->
-            <section class="preview-section" aria-labelledby="s9-heading">
-                <h2 id="s9-heading">Section 9 — Card Components</h2>
-                <p class="preview-section-desc">Three card variants side by side. All use --card-image-bg for the image placeholder. The block link pattern (::after) makes the full card clickable.</p>
-
-                <div class="preview-card-grid">
-                    <!-- Card/Work -->
-                    <article class="card">
-                        <div class="card-image" role="presentation"></div>
-                        <div class="card-content">
-                            <h3><a href="#" class="card-link">Work Card Title<span class="sr-only"> — view this project</span></a></h3>
-                            <div class="card-tags">
-                                <a href="#" class="tag">User Experience</a>
-                                <a href="#" class="tag">Design</a>
-                            </div>
-                            <p>A short description of the project and the problem it solved.</p>
-                            <button class="card-cta" type="button" inert>Read about this piece of work</button>
-                        </div>
-                    </article>
-
-                    <!-- Card/Thought/Featured -->
-                    <article class="card card--thought card--featured">
-                        <div class="card-image" role="presentation"></div>
-                        <div class="card-content">
-                            <h3><a href="#" class="card-link">Featured Thought Title<span class="sr-only"> — read this thought</span></a></h3>
-                            <p>A short summary of the featured thought, enough to draw someone in.</p>
-                            <div class="card-tags">
-                                <a href="#" class="tag">Reflection</a>
-                                <a href="#" class="tag">Career</a>
-                            </div>
-                            <p>Published June 20, 2026 · Christopher Klein</p>
-                            <button class="card-cta" type="button" inert>Read this thought</button>
-                        </div>
-                    </article>
-
-                    <!-- Card/Thought/Compact -->
-                    <div>
-                        <p class="preview-label">Compact variant — 80px thumbnail grid</p>
-                        <article class="card card--thought card--compact">
-                            <div class="card-image" role="presentation"></div>
-                            <div class="card-content">
-                                <h3><a href="#" class="card-link">Compact Thought<span class="sr-only"> — read this thought</span></a></h3>
-                                <div class="card-tags"><a href="#" class="tag">Design</a></div>
-                                <p>Published June 14, 2026 · Christopher Klein</p>
-                                <button class="card-cta" type="button" inert>Read this thought</button>
-                            </div>
-                        </article>
+                <div class="preview-subsection">
+                    <p class="preview-section-desc"><code>.tag-chip</code> — the Filter Drawer / Archive inline filter's interactive equivalent: a <code>&lt;button&gt;</code> with <code>aria-pressed</code>, an <code>--active</code> state for a currently-applied filter, and a <code>--dim</code> state for chips de-emphasised by an active filter elsewhere. (<code>--zero-count</code> and <code>--collapsed</code> also exist but render <code>display: none</code> — no result count or pagination overflow — so they have nothing to show here.)</p>
+                    <div class="tag-row">
+                        <button class="tag-chip" type="button" aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
+                        <button class="tag-chip tag-chip--active" type="button" aria-pressed="true">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+                        <button class="tag-chip tag-chip--dim" type="button" aria-pressed="false">Career</button>
                     </div>
                 </div>
             </section>
 
             <!-- ================================
-                 SECTION 10 — NAVIGATION DESKTOP
+                 SECTION 9 — LISTS (Standard Page body content)
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s9-heading">
+                <h2 id="s9-heading">Section 9 — Lists (Standard Page body content)</h2>
+                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content ul/ol/li</code> — same font-size/line-height as body paragraphs, outside marker position, and the same <code>--space-6</code> block spacing paragraphs already use. No new class — plain <code>&lt;ul&gt;</code>/<code>&lt;ol&gt;</code> inside <code>.standard-page-content</code> picks this up automatically.</p>
+
+                <div class="ds-content-frame">
+                    <div class="standard-page-content">
+                        <p>An unordered list, reading identically to body text:</p>
+                        <ul>
+                            <li>First item in the list</li>
+                            <li>Second item, a little longer so the outside marker alignment on a wrapped line is visible when the column narrows on mobile</li>
+                            <li>Third and final item</li>
+                        </ul>
+                        <p>And an ordered list:</p>
+                        <ol>
+                            <li>Confirm the ground truth in style.css</li>
+                            <li>Reuse existing tokens, never invent new ones</li>
+                            <li>Verify before reporting</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 10 — IN-BODY IMAGES (Standard Page body content)
             ================================ -->
             <section class="preview-section" aria-labelledby="s10-heading">
-                <h2 id="s10-heading">Section 10 — Navigation Desktop</h2>
-                <p class="preview-section-desc">"Christopher Klein" centred, nav links centred below. Active link shown with aria-current="page" — underline and white text. Sticky in production via header element.</p>
+                <h2 id="s10-heading">Section 10 — In-body Images (Standard Page body content)</h2>
+                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content img</code> — full width, natural aspect ratio, <code>border-radius: var(--border-radius-md)</code>. Captioned images use <code>&lt;figure&gt;</code> + <code>&lt;figcaption class="standard-page-caption"&gt;</code> — the same caption class the page banner already uses, not a second caption style. Uncaptioned images are a bare <code>&lt;img&gt;</code>. Both require alt text and <code>loading="lazy"</code>. No lightbox/click-expand — that's a separate, not-yet-scoped feature.</p>
+
+                <div class="ds-content-frame">
+                    <div class="standard-page-content">
+                        <figure>
+                            <div class="standard-page-banner" style="aspect-ratio: 16/9; margin-bottom: 0;" role="img" aria-hidden="true">
+                                <span class="ds-anatomy-banner-fill">Captioned image placeholder</span>
+                            </div>
+                            <figcaption class="standard-page-caption">Example figcaption, reusing .standard-page-caption verbatim.</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 11 — TABLES (Standard Page body content)
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s11-heading">
+                <h2 id="s11-heading">Section 11 — Tables (Standard Page body content)</h2>
+                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content table/th/td</code> — capped at the same 65ch reading column as everything else in body content (override per-instance if a table genuinely needs more room), scrolling horizontally rather than reflowing on narrow viewports. <code>th</code> reuses the same label treatment as <code>.card-meta-label</code>, by value not by selector.</p>
+
+                <div class="ds-content-frame">
+                    <div class="standard-page-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Token</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Used for</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>--space-6</td>
+                                    <td>24px</td>
+                                    <td>Block spacing, standard indent</td>
+                                </tr>
+                                <tr>
+                                    <td>--space-2</td>
+                                    <td>8px</td>
+                                    <td>List item / chip spacing</td>
+                                </tr>
+                                <tr>
+                                    <td>--border-radius-md</td>
+                                    <td>8px</td>
+                                    <td>Banner, images, cards</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 12 — BLOCKQUOTE
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s12-heading">
+                <h2 id="s12-heading">Section 12 — Blockquote</h2>
+                <p class="preview-section-desc">Left border only. 4px solid --color-quote-border (pink). Background uses --color-background-surface. Border radius on right side only. Body text italic, cite in secondary colour.</p>
+
+                <blockquote>
+                    <p>Accessibility is not a feature. It is a foundation. Build it in from the start, and everything else becomes easier.</p>
+                    <cite>— Christopher Klein</cite>
+                </blockquote>
+            </section>
+
+            <!-- ================================
+                 SECTION 13 — CODE BLOCK
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s13-heading">
+                <h2 id="s13-heading">Section 13 — Code Block</h2>
+                <p class="preview-section-desc">Background uses --color-code-bg (background-subtle). Left border uses --color-code-border (accent-primary). Monospace font. Inline code and block pre/code both styled.</p>
+
+                <p>Use <code>aria-current="page"</code> on the active nav link after injection to mark the current page for screen readers.</p>
+
+                <pre><code>/* Set aria-current on the matching nav link */
+function setActiveNavLink() {
+    const page = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.toggleAttribute('aria-current',
+            link.getAttribute('href') === page
+        );
+    });
+}</code></pre>
+            </section>
+
+            <!-- ================================
+                 SECTION 14 — CARD COMPONENTS
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s14-heading">
+                <h2 id="s14-heading">Section 14 — Card Components</h2>
+                <p class="preview-section-desc">The two card variants actually built by <code>script.js</code>'s <code>buildCard()</code> today — Feature (Work entries, with image) and Thought (no image). Markup order matches the live function exactly: block-link → image (Feature only) → title → tags → meta → excerpt → CTA. <code>.card--profile</code> is intentionally excluded — it's fully dead sitewide, a flagged cleanup item, not a variant to resurrect here.</p>
+
+                <div class="preview-card-grid">
+                    <!-- Card/Feature — real .card--feature markup, Work entry -->
+                    <article class="card card--feature">
+                        <a href="#" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
+                        <div class="card-image" role="presentation"></div>
+                        <div class="card-content">
+                            <h3 class="card-title" data-searchable>Star Engine</h3>
+                            <div class="card-tags">
+                                <a href="#" class="tag">User Experience</a>
+                                <a href="#" class="tag">Software Tools</a>
+                            </div>
+                            <p class="card-meta">June 20, 2026 · Christopher Klein</p>
+                            <p class="card-excerpt">A short description of the project and the problem it solved, clamped to two lines with the full text kept in the DOM for screen readers.</p>
+                            <a href="#" class="card-cta" aria-label="Star Engine — view this project">View</a>
+                        </div>
+                    </article>
+
+                    <!-- Card/Thought — real .card--thought markup, no image -->
+                    <article class="card card--thought">
+                        <a href="#" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
+                        <div class="card-content">
+                            <h3 class="card-title" data-searchable>A Thought Title</h3>
+                            <div class="card-tags">
+                                <a href="#" class="tag">Reflection</a>
+                                <a href="#" class="tag">Career</a>
+                            </div>
+                            <p class="card-meta">June 14, 2026 · Christopher Klein</p>
+                            <p class="card-excerpt">A short summary of the thought, enough to draw someone in before they click through to read the rest.</p>
+                            <a href="#" class="card-cta" aria-label="A Thought Title — read this thought">Read</a>
+                        </div>
+                    </article>
+                </div>
+                <p class="preview-section-desc" style="margin-top: var(--space-4);">At 768px and above, <code>.card--feature</code> switches to a horizontal layout — image as a left column at <code>--card-image-column-width</code> (42%), stretched to match the content column's height. Resize this page to see it engage on the card above.</p>
+            </section>
+
+            <!-- ================================
+                 SECTION 15 — NAVIGATION DESKTOP
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s15-heading">
+                <h2 id="s15-heading">Section 15 — Navigation Desktop</h2>
+                <p class="preview-section-desc">"Christopher Klein" centred, nav links centred below. Active link shown with aria-current="page" — underline and white text. Sticky in production via the header element (not reproduced here, to avoid pinning this frame mid-scroll).</p>
 
                 <div class="preview-nav-frame">
                     <nav class="site-nav" aria-label="Main navigation (preview)">
@@ -1128,31 +1167,25 @@
             </section>
 
             <!-- ================================
-                 SECTION 11 — TAB BAR
+                 SECTION 16 — TAB BAR
             ================================ -->
-            <section class="preview-section" aria-labelledby="s11-heading">
-                <h2 id="s11-heading">Section 11 — Tab Bar</h2>
-                <p class="preview-section-desc">Mobile navigation. Text-only (icons deferred — self-hosted Tabler Icons pending). Fixed to bottom in production. Active item shown in --color-interactive-default via aria-current="page".</p>
+            <section class="preview-section" aria-labelledby="s16-heading">
+                <h2 id="s16-heading">Section 16 — Tab Bar</h2>
+                <p class="preview-section-desc">Mobile navigation. Text-only (icons deferred — self-hosted Tabler Icons pending). Fixed to bottom in production; shown here in a static frame rather than the real <code>.tab-bar</code> class, which is <code>display: none</code> above mobile widths. Active item shown in --color-interactive-default via aria-current="page".</p>
 
                 <div class="preview-tab-bar-frame">
-                    <a href="#" class="tab-bar-item" aria-current="page">
-                        <span>Home</span>
-                    </a>
-                    <a href="#" class="tab-bar-item">
-                        <span>Archive</span>
-                    </a>
-                    <a href="#" class="tab-bar-item">
-                        <span>About</span>
-                    </a>
+                    <a href="#" class="tab-bar-item" aria-current="page"><span>Home</span></a>
+                    <a href="#" class="tab-bar-item"><span>Archive</span></a>
+                    <a href="#" class="tab-bar-item"><span>About</span></a>
                 </div>
             </section>
 
             <!-- ================================
-                 SECTION 12 — TOOLTIP
+                 SECTION 17 — TOOLTIP
             ================================ -->
-            <section class="preview-section" aria-labelledby="s12-heading">
-                <h2 id="s12-heading">Section 12 — Tooltip</h2>
-                <p class="preview-section-desc">Desktop only — hidden on touch devices. Shown on hover and :focus-within. Escape key dismisses. role="tooltip" + aria-describedby required.</p>
+            <section class="preview-section" aria-labelledby="s17-heading">
+                <h2 id="s17-heading">Section 17 — Tooltip</h2>
+                <p class="preview-section-desc">Desktop only — hidden on touch devices via @media (hover: none). Shown on hover and :focus-within. role="tooltip" + aria-describedby required.</p>
 
                 <div class="preview-tooltip-stack">
                     <div class="preview-tooltip-box" role="tooltip" id="preview-tip">
@@ -1160,100 +1193,134 @@
                     </div>
                     <p class="preview-tooltip-arrow">▼ tooltip renders above trigger in production</p>
                     <span class="preview-tooltip-trigger" aria-describedby="preview-tip">
-                        Hover trigger element
+                        Static illustration above
                     </span>
                 </div>
 
                 <div class="preview-subsection">
-                    <p class="preview-label">Live demo — hover to trigger:</p>
+                    <p class="preview-label">Live demo — hover or focus to trigger the real .tooltip class:</p>
                     <span class="tooltip-wrapper">
-                        <span class="preview-tooltip-trigger">Hover me</span>
-                        <span role="tooltip" class="tooltip">Tooltip text via CSS hover. Escape key blurs trigger.</span>
+                        <span class="preview-tooltip-trigger" tabindex="0">Hover or focus me</span>
+                        <span role="tooltip" class="tooltip">Tooltip text via CSS :hover/:focus-within — the real .tooltip class.</span>
                     </span>
                 </div>
             </section>
 
             <!-- ================================
-                 SECTION 13 — TOAST NOTIFICATION
+                 SECTION 18 — TOAST NOTIFICATION
             ================================ -->
-            <section class="preview-section" aria-labelledby="s13-heading">
-                <h2 id="s13-heading">Section 13 — Toast Notification</h2>
-                <p class="preview-section-desc">Triggered by Share button. Auto-dismisses after 2000ms. role="status" + aria-live="polite" for screen reader announcement.</p>
+            <section class="preview-section" aria-labelledby="s18-heading">
+                <h2 id="s18-heading">Section 18 — Toast Notification</h2>
+                <p class="preview-section-desc">Triggered by the Share button (see Section 20's footer). Auto-dismisses after 2000ms. role="status" + aria-live="polite" for screen reader announcement. Real <code>.toast</code> is <code>position: fixed</code> to the viewport bottom — shown below as a static, inline replica of the same visual values so it doesn't pin itself over this page.</p>
 
-                <div role="status" aria-live="polite" class="preview-toast">
-                    <span class="preview-toast-icon">✓</span>
+                <div role="status" aria-live="polite" class="ds-toast-static">
+                    <span class="ds-toast-icon">✓</span>
                     <span>URL copied to clipboard!</span>
                 </div>
             </section>
 
             <!-- ================================
-                 SECTION 14 — BREADCRUMB
+                 SECTION 19 — BREADCRUMB
             ================================ -->
-            <section class="preview-section" aria-labelledby="s14-heading">
-                <h2 id="s14-heading">Section 14 — Breadcrumb</h2>
-                <p class="preview-section-desc">Used on all standard pages. Semantic ol with aria-label="Breadcrumb". Separators are aria-hidden. Current page item is not a link.</p>
+            <section class="preview-section" aria-labelledby="s19-heading">
+                <h2 id="s19-heading">Section 19 — Breadcrumb</h2>
+                <p class="preview-section-desc">Used on all standard pages. Real classes: nav.breadcrumb &gt; ol.breadcrumb-list &gt; li.breadcrumb-item, aria-label="Breadcrumb" on the nav. Separators are aria-hidden. Current page item is a plain span, not a link.</p>
 
-                <nav aria-label="Breadcrumb">
-                    <ol class="preview-breadcrumb">
-                        <li>
-                            <a href="#" class="preview-breadcrumb-link">Work</a>
-                            <span class="preview-breadcrumb-sep" aria-hidden="true">›</span>
+                <nav aria-label="Breadcrumb" class="breadcrumb">
+                    <ol class="breadcrumb-list">
+                        <li class="breadcrumb-item">
+                            <a href="#">Work</a>
+                            <span aria-hidden="true" class="breadcrumb-separator">›</span>
                         </li>
-                        <li>
-                            <a href="#" class="preview-breadcrumb-link">June 2026</a>
-                            <span class="preview-breadcrumb-sep" aria-hidden="true">›</span>
-                        </li>
-                        <li>
-                            <span class="preview-breadcrumb-current" aria-current="page">Project Title</span>
+                        <li class="breadcrumb-item">
+                            <span aria-current="page">Star Engine</span>
                         </li>
                     </ol>
                 </nav>
             </section>
 
             <!-- ================================
-                 SECTION 15 — DIVIDER
+                 SECTION 20 — STANDARD PAGE ANATOMY
             ================================ -->
-            <section class="preview-section" aria-labelledby="s15-heading">
-                <h2 id="s15-heading">Section 15 — Divider</h2>
-                <p class="preview-section-desc">1px solid --color-divider-accent (gold). Styled globally via hr element selector. Used as section separators site-wide.</p>
+            <section class="preview-section" aria-labelledby="s20-heading">
+                <h2 id="s20-heading">Section 20 — Standard Page Anatomy</h2>
+                <p class="preview-section-desc">The full Work/Thoughts entry template, assembled from real classes in the order they appear on a live entry (e.g. work/star-engine.html): breadcrumb → banner → caption → title → tags row → Details card → body content → divider → footer actions → back-to-top. There is no author row (photo + name) — removed in the 2026-08-19 revision as a deliberate simplification. The footer's "Want to work together?" contact section is reused verbatim from about.html and isn't duplicated here.</p>
+
+                <div class="ds-anatomy-frame">
+                    <div class="standard-page">
+                        <nav aria-label="Breadcrumb" class="breadcrumb">
+                            <ol class="breadcrumb-list">
+                                <li class="breadcrumb-item">
+                                    <a href="#">Work</a>
+                                    <span aria-hidden="true" class="breadcrumb-separator">›</span>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <span aria-current="page">Entry Title</span>
+                                </li>
+                            </ol>
+                        </nav>
+
+                        <div class="standard-page-banner" role="img" aria-hidden="true">
+                            <span class="ds-anatomy-banner-fill">Banner (CSS background-image, 3:1)</span>
+                        </div>
+                        <p class="standard-page-caption">Example banner caption, reusing .standard-page-caption.</p>
+
+                        <h1 class="standard-page-title">Entry Title</h1>
+
+                        <div class="standard-page-details-tags">
+                            <a href="#" class="tag">User Experience</a>
+                            <a href="#" class="tag">Software Tools</a>
+                        </div>
+
+                        <div class="standard-page-details">
+                            <div class="standard-page-details-row">
+                                <span class="standard-page-details-label">Employer</span>
+                                <span class="standard-page-details-value">Example Employer</span>
+                            </div>
+                            <div class="standard-page-details-row">
+                                <span class="standard-page-details-label">Role</span>
+                                <span class="standard-page-details-value">Example Role</span>
+                            </div>
+                        </div>
+
+                        <div class="standard-page-content">
+                            <h2>Overview</h2>
+                            <p>Body content lives here — headings, paragraphs, lists, tables, and images all follow the patterns shown in Sections 2 and 9–11.</p>
+                        </div>
+
+                        <hr class="standard-page-divider">
+
+                        <div class="standard-page-footer">
+                            <div class="standard-page-footer-actions">
+                                <button class="share-btn btn btn--ghost" type="button" aria-label="Copy link to clipboard">Share</button>
+                                <a href="#" class="btn btn--ghost">More Work<span class="sr-only"> — view more entries in the Work section</span></a>
+                            </div>
+                        </div>
+
+                        <div class="back-to-top-row">
+                            <button class="back-to-top back-to-top--visible" type="button" aria-label="Back to top">↑ Back to top</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 21 — DIVIDER
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s21-heading">
+                <h2 id="s21-heading">Section 21 — Divider</h2>
+                <p class="preview-section-desc">1px solid --color-divider-accent (accent-primary). Styled globally via the hr element selector. Used as section separators site-wide. A second, dot-shaped divider (.divider--dots) is used inside .standard-page-content between body sections.</p>
 
                 <p>Content above the divider — body text before a section break.</p>
-                <!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+                <hr>
                 <p>Content below the divider — body text after the thematic break.</p>
-            </section>
 
-            <!-- ================================
-                 SECTION 16 — BLOCKQUOTE
-            ================================ -->
-            <section class="preview-section" aria-labelledby="s16-heading">
-                <h2 id="s16-heading">Section 16 — Blockquote</h2>
-                <p class="preview-section-desc">Option A — left border only. 4px solid --color-quote-border (pink). Background uses --color-background-surface. Border radius on right side only. Body text italic, cite in secondary colour.</p>
-
-                <blockquote>
-                    <p>Accessibility is not a feature. It is a foundation. Build it in from the start, and everything else becomes easier.</p>
-                    <cite>— Christopher Klein</cite>
-                </blockquote>
-            </section>
-
-            <!-- ================================
-                 SECTION 17 — CODE BLOCK
-            ================================ -->
-            <section class="preview-section" aria-labelledby="s17-heading">
-                <h2 id="s17-heading">Section 17 — Code Block</h2>
-                <p class="preview-section-desc">Background uses --color-code-bg (background-subtle). Left border uses --color-code-border (gold). Monospace font. Inline code and block pre/code both styled.</p>
-
-                <p>Use <code>aria-current="page"</code> on the active nav link after injection to mark the current page for screen readers.</p>
-
-                <pre><code>/* Set aria-current on the matching nav link */
-function setActiveNavLink() {
-    const page = location.pathname.split('/').pop() || 'index.html';
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.toggleAttribute('aria-current',
-            link.getAttribute('href') === page
-        );
-    });
-}</code></pre>
+                <div class="preview-subsection">
+                    <p class="preview-label">Dot divider (.divider--dots):</p>
+                    <p>Content above the dot divider.</p>
+                    <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+                    <p>Content below the dot divider.</p>
+                </div>
             </section>
 
         </div>
