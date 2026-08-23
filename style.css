@@ -2284,6 +2284,57 @@ footer p {
 }
 
 /* ================================
+   DESKTOP (min-width: 1024px) — Filter Drawer becomes an anchored panel
+================================ */
+/* Reuses every internal drawer class as-is (controls row, primary chips,
+   active-chips row, secondary chip pagination) — only the outer
+   .filter-drawer box's position, dimensions, motion and elevation change
+   here; no new colour values anywhere in this block (Rule 3a/Rule 6).
+   Anchor: bottom-right corner is pinned to .action-rail-group's own resting
+   position — same `right` formula reused verbatim, and `bottom` derived
+   from the same --touch-target-minimum the trigger's own height is built
+   from (top: 50%, height == --touch-target-minimum, so its bottom edge
+   sits at 50vh - (--touch-target-minimum / 2) from the viewport bottom).
+   Because width/height stay intrinsic to content while that corner stays
+   fixed, the panel naturally grows upward and leftward as more tags render
+   (8 today, up to 12 before .filter-drawer-page-nav appears) — no JS
+   position calculation needed. Mobile/tablet keep the bottom-sheet rules
+   above completely untouched; this query only fires at 1024px+.
+   No scrim/backdrop change needed — .archive-scrim already renders at
+   opacity: 0 unconditionally (invisible click-outside hit-area only, see
+   above), so "no dimmed scrim" already holds true at every breakpoint.
+   Dismiss (Close button, click-outside via the scrim, Escape) and the
+   floating trigger's own hide-while-open behaviour are both already
+   breakpoint-agnostic in script.js's openDrawer()/closeDrawer() — nothing
+   to change there either. */
+@media (min-width: 1024px) {
+    .filter-drawer {
+        top: auto;
+        left: auto;
+        right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+        bottom: calc(50vh - (var(--touch-target-minimum) / 2));
+        width: 632px;
+        max-width: calc(100vw - (var(--space-8) * 2));
+        max-height: calc(100vh - (var(--space-8) * 2));
+        margin: 0;
+        overflow-y: auto;
+        border: var(--border-width-thin) solid var(--color-border-strong);
+        border-radius: var(--border-radius-md);
+        transform: translateY(var(--space-2)) scale(0.98);
+        transform-origin: bottom right;
+        opacity: 0;
+        transition: transform var(--duration-base) var(--ease-out),
+                    opacity var(--duration-base) var(--ease-out);
+    }
+
+    .filter-drawer--open {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        box-shadow: var(--elevation-xl);
+    }
+}
+
+/* ================================
    ARCHIVE PAGE
 ================================ */
 /* No background/border at any breakpoint — blends into the page background,
