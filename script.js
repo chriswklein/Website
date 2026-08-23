@@ -199,8 +199,8 @@ function trapFocus(element) {
 }
 
 // Filter drawer — all triggers via [aria-controls="filter-drawer"].
-// Works for .filter-drawer-trigger (header, tablet/mobile), .action-rail-trigger (floating, all breakpoints),
-// and the internal close trigger inside the drawer itself.
+// Works for .action-rail-trigger (the floating trigger, always visible, all
+// breakpoints) and the drawer's own internal .filter-drawer-trigger (Close).
 // Depends on: trapFocus()
 function initFilterDrawer() {
     const drawer = document.getElementById('filter-drawer');
@@ -243,7 +243,6 @@ function initFilterDrawer() {
     function getInertTargets() {
         return [
             document.getElementById('archive-sticky-header'),
-            document.getElementById('archive-header-sentinel'),
             document.querySelector('.action-rail-group'),
             document.getElementById('theme-toggle'),
             document.getElementById('main-content'),
@@ -285,10 +284,7 @@ function initFilterDrawer() {
         if (themeToggle) themeToggle.classList.remove('theme-toggle-rail--visible');
 
         // Clear (when enabled — e.g. arriving with a filter already active)
-        // is the natural first stop; otherwise land on the first primary chip
-        // rather than falling through to the search input, which would
-        // immediately trigger the search-focus auto-collapse and hide the
-        // very filter chips this dialog is meant to show on open.
+        // is the natural first stop; otherwise land on the first primary chip.
         const firstFocusable =
             drawer.querySelector('.archive-clear-btn:not([disabled])') ||
             drawer.querySelector('.filter-drawer-primary-chips button:not([disabled])') ||
@@ -321,20 +317,9 @@ function initFilterDrawer() {
         // Restore rail group visibility synchronously, BEFORE the
         // openerBtn.focus() call below — not inside the transitionend
         // callback, which fires later. openerBtn is frequently this same
-        // rail trigger now (the only opener on mobile/tablet).
-        // Always shown on mobile/tablet (the inline Clear/Search/Filters row
-        // is hidden there entirely, so this is the only way to reach
-        // filters, not just a scroll-triggered convenience). Desktop keeps
-        // the existing scroll-position-based behaviour, unchanged — read
-        // from the already-tracked .is-condensed class rather than a live
-        // sent.getBoundingClientRect() check: unlockBodyScroll() above just
-        // called window.scrollTo() to restore the pre-lock scroll position,
-        // and a geometry read this same tick can still reflect the pre-
-        // restore position (confirmed by testing — scrollY read back as 0
-        // immediately after scrollTo(0, 800)). .is-condensed doesn't have
-        // this race: the IntersectionObserver's drawer-open guard leaves it
-        // untouched for the drawer's entire open duration, so it still
-        // accurately reflects the scroll state the drawer opened in.
+        // rail trigger now (the only opener at every breakpoint). The rail
+        // is always shown while the drawer is closed (see .action-rail-group
+        // in style.css) — unconditional now, no scroll-position check needed.
         //
         // visibility is a discrete-animatable property: switching it to
         // "visible" only takes effect once the browser commits to starting
@@ -349,14 +334,10 @@ function initFilterDrawer() {
         // restore it immediately after via a forced reflow — same
         // instant-then-re-enable technique used whenever a transitioned
         // property needs to change without animating.
-        const sent = document.getElementById('archive-header-sentinel');
         const railGrp = document.querySelector('.action-rail-group');
-        if (railGrp && sent) {
-            const isMobileTablet = !window.matchMedia('(min-width: 1024px)').matches;
-            const header = document.getElementById('archive-sticky-header');
-            const shouldShowRail = isMobileTablet || (header && header.classList.contains('is-condensed'));
+        if (railGrp) {
             railGrp.classList.add('action-rail-group--instant');
-            railGrp.classList.toggle('action-rail-group--visible', shouldShowRail);
+            railGrp.classList.add('action-rail-group--visible');
             void railGrp.offsetHeight; // force the instant change to commit before re-enabling the transition
             railGrp.classList.remove('action-rail-group--instant');
         }
@@ -364,14 +345,6 @@ function initFilterDrawer() {
         drawer.addEventListener('transitionend', () => {
             drawer.setAttribute('hidden', '');
             if (scrim) scrim.setAttribute('hidden', '');
-            // Re-evaluate condensed state on next genuine scroll after drawer close
-            const header = document.getElementById('archive-sticky-header');
-            if (header && sent) {
-                window.addEventListener('scroll', () => {
-                    const rect = sent.getBoundingClientRect();
-                    header.classList.toggle('is-condensed', rect.bottom <= 0);
-                }, { once: true, passive: true });
-            }
             const themeToggle = document.getElementById('theme-toggle');
             if (themeToggle) themeToggle.classList.add('theme-toggle-rail--visible');
         }, { once: true });
@@ -390,11 +363,10 @@ function initFilterDrawer() {
     }
 
     allTriggers.forEach(btn => {
-        // Same fix as the search field's X button: without this, mousedown
-        // on Close (while search is focused) blurs the input first, which
-        // re-expands the collapsed rows and shifts this fixed-bottom drawer's
-        // layout — moving the button out from under the cursor before
-        // mouseup/click land, so the first press silently misses it.
+        // Prevents mousedown from blurring whatever currently has focus
+        // before the click lands — defensive against any focus-driven
+        // layout shift moving this button out from under the cursor
+        // between mousedown and mouseup.
         btn.addEventListener('mousedown', (e) => e.preventDefault());
 
         btn.addEventListener('click', () => {
@@ -417,14 +389,9 @@ function initArchive(filterDrawer) {
 
     const titleEl          = document.getElementById('archive-title');
     const countEl          = document.getElementById('archive-count');
-    const searchInputs     = document.querySelectorAll('.archive-search-input');
-    const railGroup        = document.querySelector('.action-rail-group');
     const primaryChips     = document.querySelectorAll('[data-filter-type]');
-    const activeChipsEl    = document.getElementById('archive-active-chips');
     const drawerActiveChipsEl = document.getElementById('filter-drawer-active-chips');
-    const inlineFiltersEl  = document.getElementById('archive-secondary-chips');
     const drawerChipsEl    = document.getElementById('filter-drawer-chips');
-    const primaryChipsEl   = document.querySelector('.archive-primary-chips');
     const drawerPrimaryChipsEl = document.querySelector('.filter-drawer-primary-chips');
     const loadMoreBtn      = document.querySelector('.archive-load-more-btn');
     const pageNavEl        = document.getElementById('filter-drawer-page-nav');
@@ -432,7 +399,7 @@ function initArchive(filterDrawer) {
     const pagePrevBtn      = document.querySelector('.filter-drawer-page-prev');
     const pageNextBtn      = document.querySelector('.filter-drawer-page-next');
     const pageStatusEl     = document.getElementById('filter-drawer-page-status');
-    const SECONDARY_PAGE_SIZE = 6;
+    const SECONDARY_PAGE_SIZE = 12;
 
     // State
     let allEntries         = [];
@@ -441,7 +408,7 @@ function initArchive(filterDrawer) {
     let currentSort        = 'latest';
     let currentQuery       = '';
     let visibleCount       = 25;
-    let secondaryPage      = 0; // Filter Drawer paginated secondary tags (mobile/tablet), 0-indexed
+    let secondaryPage      = 0; // Filter Drawer paginated secondary tags, 0-indexed
     // The grid page the user was on right before any secondary tag went
     // active (see .filter-drawer--tags-active in style.css) — restored when
     // the last active tag is cleared, so the grid reappears on the same
@@ -451,8 +418,6 @@ function initArchive(filterDrawer) {
     // more tags stay active).
     let secondaryPageBeforeActive = 0;
     let wasSecondaryActive = false;
-    let moreFiltersOpen    = false; // desktop secondary tag row — hidden by default, revealed via "More Filters"
-    let debounceTimer;
 
     // Current page count for the drawer's secondary tag pagination, derived
     // from the actual (already zero-count-filtered) visible tag count —
@@ -492,8 +457,13 @@ function initArchive(filterDrawer) {
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Build secondary chips in both inline (desktop) and drawer (tablet/mobile)
+    // Build secondary tag chips into the Filter Drawer — the one shared
+    // pool of secondary tags at every breakpoint now, paginated 6 per page
+    // (see the pagination block in render() and the Previous/Next/dots
+    // wiring below).
     function buildSecondaryChips(entries) {
+        if (!drawerChipsEl) return;
+
         const seen = new Set();
         const tags = [];
         entries.forEach(e => (e.tags || []).forEach(t => {
@@ -503,58 +473,30 @@ function initArchive(filterDrawer) {
 
         tags.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
 
-        [inlineFiltersEl, drawerChipsEl].filter(Boolean).forEach(container => {
-            container.innerHTML = '';
-            tags.forEach(({ label, slug }) => {
-                const btn = document.createElement('button');
-                btn.className = 'tag-chip';
-                btn.type = 'button';
-                btn.dataset.filterTag = slug;
-                btn.dataset.label = label;
-                btn.setAttribute('aria-pressed', 'false');
-                btn.textContent = label;
-                const countSpan = document.createElement('span');
-                countSpan.className = 'chip-count';
-                countSpan.setAttribute('aria-hidden', 'true');
-                btn.appendChild(countSpan);
-                btn.addEventListener('click', () => {
-                    if (activeSecondary.has(slug)) {
-                        activeSecondary.delete(slug);
-                    } else {
-                        activeSecondary.add(slug);
-                    }
-                    visibleCount = 25;
-                    render();
-                });
-                container.appendChild(btn);
-            });
-        });
-
-        // Filter Drawer (mobile/tablet) secondary tags are paginated instead
-        // of the old "Show More" disclosure — see the pagination block in
-        // render() and the Previous/Next/dots wiring below. Unaffected by
-        // the desktop More Filters toggle below.
-
-        // Desktop "More Filters" / "Less Filters" toggle — appended after the
-        // Work/Thoughts chips in the desktop inline primary row. Reveals or
-        // hides the entire secondary tag row (#archive-secondary-chips) as a
-        // block; reuses the existing "Filters" trigger's button styling
-        // (.filter-drawer-trigger) via a shared CSS selector, not a new
-        // aria-controls="filter-drawer" trigger, so it never opens the drawer.
-        if (primaryChipsEl) {
-            const moreFiltersToggle = document.createElement('button');
-            moreFiltersToggle.type = 'button';
-            moreFiltersToggle.className = 'more-filters-toggle';
-            moreFiltersToggle.hidden = true;
-            moreFiltersToggle.setAttribute('aria-expanded', 'false');
-            moreFiltersToggle.setAttribute('aria-controls', 'archive-secondary-chips');
-            moreFiltersToggle.textContent = 'More Filters';
-            moreFiltersToggle.addEventListener('click', () => {
-                moreFiltersOpen = !moreFiltersOpen;
+        drawerChipsEl.innerHTML = '';
+        tags.forEach(({ label, slug }) => {
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip';
+            btn.type = 'button';
+            btn.dataset.filterTag = slug;
+            btn.dataset.label = label;
+            btn.setAttribute('aria-pressed', 'false');
+            btn.textContent = label;
+            const countSpan = document.createElement('span');
+            countSpan.className = 'chip-count';
+            countSpan.setAttribute('aria-hidden', 'true');
+            btn.appendChild(countSpan);
+            btn.addEventListener('click', () => {
+                if (activeSecondary.has(slug)) {
+                    activeSecondary.delete(slug);
+                } else {
+                    activeSecondary.add(slug);
+                }
+                visibleCount = 25;
                 render();
             });
-            primaryChipsEl.appendChild(moreFiltersToggle);
-        }
+            drawerChipsEl.appendChild(btn);
+        });
     }
 
     // Filter + sort the full entry list
@@ -634,26 +576,24 @@ function initArchive(filterDrawer) {
     // happens to be first in DOM order on whatever page is showing —
     // exactly the "different, unrelated tag" symptom reported.
     //
-    // isDrawerPool: true for the paginated mobile/tablet drawer pool
-    // (#filter-drawer-chips), false for desktop's unbounded, unpaginated
-    // pool (#archive-secondary-chips) — desktop never paginates, so the
-    // page-jump step below is skipped there.
-    function focusDeactivatedSecondaryTag(slug, isDrawerPool) {
-        const poolEl = isDrawerPool ? drawerChipsEl : inlineFiltersEl;
+    // Single shared pool now (#filter-drawer-chips, paginated 6 per page) at
+    // every breakpoint.
+    function focusDeactivatedSecondaryTag(slug) {
+        const poolEl = drawerChipsEl;
         if (!poolEl) return;
 
         let chip = poolEl.querySelector(`[data-filter-tag="${slug}"]`);
         if (!chip) return;
 
-        // Drawer only: secondaryPageBeforeActive (above) restores the page
-        // the user was on before the FIRST tag went active, not
-        // necessarily where THIS tag sits — with more than one tag cycled
-        // through active state those can diverge. If the restored page
-        // doesn't actually show this tag, jump to its real page using the
-        // same alphabetical-index math the initial ?tag= URL arrival uses
-        // (see fetch().then() below), then re-render before focusing, so
-        // the focus call fires once that page is actually showing.
-        if (isDrawerPool && chip.classList.contains('tag-chip--collapsed')) {
+        // secondaryPageBeforeActive (above) restores the page the user was
+        // on before the FIRST tag went active, not necessarily where THIS
+        // tag sits — with more than one tag cycled through active state
+        // those can diverge. If the restored page doesn't actually show
+        // this tag, jump to its real page using the same alphabetical-index
+        // math the initial ?tag= URL arrival uses (see fetch().then()
+        // below), then re-render before focusing, so the focus call fires
+        // once that page is actually showing.
+        if (chip.classList.contains('tag-chip--collapsed')) {
             const visibleTags = [...poolEl.querySelectorAll('[data-filter-tag]')]
                 .filter(b => !b.classList.contains('tag-chip--zero-count'));
             const idx = visibleTags.indexOf(chip);
@@ -669,81 +609,63 @@ function initArchive(filterDrawer) {
             return;
         }
 
-        // Chip still isn't visible — reachable two ways, confirmed by
-        // testing, not assumed: (1) it became zero-count-hidden as a side
-        // effect of the changed filter state (its own count doesn't
-        // depend on activeSecondary, but it can already have been 0 while
-        // active if activeType/currentQuery excluded it — the
-        // active-chips row shows it regardless of zero-count, unlike the
-        // main pool); (2) on desktop specifically, "More Filters" can be
-        // closed (#archive-secondary-chips stays [hidden] independently
-        // of #archive-active-chips's own visibility) whenever the tag was
-        // activated via a ?tag= URL rather than by opening that list —
-        // confirmed reachable via a live ?tag= arrival + deactivate test.
+        // Chip still isn't visible — its own zero-count-hidden state changed
+        // as a side effect of the deactivation (its count doesn't depend on
+        // activeSecondary, but it can already have been 0 while active if
+        // activeType/currentQuery excluded it — the active-chips row shows
+        // it regardless of zero-count, unlike the main pool).
         if (activeSecondary.size > 0) {
-            // Other tags are still active — on the drawer this keeps the
-            // pool/pagination hidden (.filter-drawer--tags-active); on
-            // desktop the pool may or may not be open, so either way the
-            // active-chips row itself (always visible whenever any tag is
-            // active — it doesn't depend on moreFiltersOpen) is the
+            // Other tags are still active — the pool/pagination stays
+            // hidden (.filter-drawer--tags-active), so the active-chips row
+            // itself (always visible whenever any tag is active) is the
             // reachable, contextually relevant fallback.
-            const activeRow = isDrawerPool ? drawerActiveChipsEl : activeChipsEl;
-            const firstActive = activeRow ? activeRow.querySelector('.tag-chip') : null;
+            const firstActive = drawerActiveChipsEl ? drawerActiveChipsEl.querySelector('.tag-chip') : null;
             if (firstActive) { firstActive.focus(); return; }
-        } else if (!isDrawerPool && inlineFiltersEl && inlineFiltersEl.hidden) {
-            // This was the last active tag, and desktop's "More Filters"
-            // pool is closed — no chip in it is reachable at all. The
-            // toggle that reveals it is the real, always-visible, most
-            // relevant target.
-            const moreToggle = primaryChipsEl ? primaryChipsEl.querySelector('.more-filters-toggle') : null;
-            if (moreToggle) { moreToggle.focus(); return; }
         } else {
             // This was the last active tag and the pool is visible again
-            // (drawer: .filter-drawer--tags-active just came off; desktop:
-            // "More Filters" already open) — first visible chip on the
-            // now-current page.
+            // (.filter-drawer--tags-active just came off) — first visible
+            // chip on the now-current page.
             const firstVisible = poolEl.querySelector('[data-filter-tag]:not(.tag-chip--collapsed):not(.tag-chip--zero-count)');
             if (firstVisible) { firstVisible.focus(); return; }
         }
 
-        // Last resort, drawer only — pagination Previous, gated on actual
-        // visibility: .filter-drawer-page-nav[hidden] uses
-        // visibility: hidden, not display: none, specifically to stay out
-        // of the tab order (see style.css) — a .focus() call on anything
-        // inside it while hidden is a silent no-op, confirmed, not assumed.
-        if (isDrawerPool && pageNavEl && !pageNavEl.hidden && pagePrevBtn) {
+        // Last resort — pagination Previous, gated on actual visibility:
+        // .filter-drawer-page-nav[hidden] uses visibility: hidden, not
+        // display: none, specifically to stay out of the tab order (see
+        // style.css) — a .focus() call on anything inside it while hidden
+        // is a silent no-op, confirmed, not assumed.
+        if (pageNavEl && !pageNavEl.hidden && pagePrevBtn) {
             pagePrevBtn.focus();
         }
     }
 
     // Update active secondary chips row (shown above secondary list)
     function updateActiveChipsRow() {
-        [activeChipsEl, drawerActiveChipsEl].filter(Boolean).forEach(container => {
-            const isDrawerPool = container === drawerActiveChipsEl;
-            container.innerHTML = '';
-            container.classList.toggle('is-active', activeSecondary.size > 0);
-            activeSecondary.forEach(slug => {
-                const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
-                const label = sourceBtn ? sourceBtn.dataset.label : slug;
-                const btn = document.createElement('button');
-                btn.className = 'tag-chip tag-chip--active';
-                btn.type = 'button';
-                btn.setAttribute('aria-pressed', 'true');
-                btn.setAttribute('aria-label', `Remove ${label} filter`);
-                const x = document.createElement('span');
-                x.className = 'tag-chip-x';
-                x.setAttribute('aria-hidden', 'true');
-                x.textContent = '×';
-                btn.textContent = label;
-                btn.appendChild(x);
-                btn.addEventListener('click', () => {
-                    activeSecondary.delete(slug);
-                    visibleCount = 25;
-                    render();
-                    focusDeactivatedSecondaryTag(slug, isDrawerPool);
-                });
-                container.appendChild(btn);
+        if (!drawerActiveChipsEl) return;
+        const container = drawerActiveChipsEl;
+        container.innerHTML = '';
+        container.classList.toggle('is-active', activeSecondary.size > 0);
+        activeSecondary.forEach(slug => {
+            const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
+            const label = sourceBtn ? sourceBtn.dataset.label : slug;
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip tag-chip--active';
+            btn.type = 'button';
+            btn.setAttribute('aria-pressed', 'true');
+            btn.setAttribute('aria-label', `Remove ${label} filter`);
+            const x = document.createElement('span');
+            x.className = 'tag-chip-x';
+            x.setAttribute('aria-hidden', 'true');
+            x.textContent = '×';
+            btn.textContent = label;
+            btn.appendChild(x);
+            btn.addEventListener('click', () => {
+                activeSecondary.delete(slug);
+                visibleCount = 25;
+                render();
+                focusDeactivatedSecondaryTag(slug);
             });
+            container.appendChild(btn);
         });
     }
 
@@ -780,15 +702,14 @@ function initArchive(filterDrawer) {
     // Shared class/aria/× state for a tag-chip button — single source of truth
     // for the primary-chip and secondary-chip render loops below.
     // isDuplicateOfActiveRow: true for chips living in the full secondary
-    // list (#archive-secondary-chips on desktop, #filter-drawer-chips in the
-    // Filter Drawer), where an active tag is already shown separately in its
-    // context's own active-chips row (#archive-active-chips /
-    // #filter-drawer-active-chips) — that duplicate must render Dim, not
-    // Active, so only the true active-chips-row instance ever shows the
-    // Active state for a given slug. aria-pressed/×/aria-label stay driven by
-    // the real isActive value regardless of this distinction, since the
-    // underlying toggle state (and its removability) is unchanged — only the
-    // visual Active/Dim classing differs for the duplicate.
+    // list (#filter-drawer-chips), where an active tag is already shown
+    // separately in the active-chips row (#filter-drawer-active-chips) —
+    // that duplicate must render Dim, not Active, so only the true
+    // active-chips-row instance ever shows the Active state for a given
+    // slug. aria-pressed/×/aria-label stay driven by the real isActive value
+    // regardless of this distinction, since the underlying toggle state
+    // (and its removability) is unchanged — only the visual Active/Dim
+    // classing differs for the duplicate.
     function applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow = false }) {
         const dimAsDuplicate = isDuplicateOfActiveRow && isActive;
         const showAsActive = isActive && !dimAsDuplicate;
@@ -865,12 +786,20 @@ function initArchive(filterDrawer) {
             btn.disabled = filterCount === 0 && currentQuery.length === 0;
         });
 
-        // Secondary tag chips (inline + drawer)
+        // External Clear (floating action rail) — no empty-state Clear
+        // button, unlike the header/drawer instances above which stay
+        // present but disabled. Rendered only while a filter is active;
+        // hides along with the rest of .action-rail-group while the drawer
+        // is open (openDrawer()/closeDrawer() toggle the whole group).
+        const railClearBtn = document.querySelector('.action-rail-clear');
+        if (railClearBtn) railClearBtn.hidden = filterCount === 0;
+
+        // Secondary tag chips (drawer — the one shared pool at every breakpoint)
         document.querySelectorAll('[data-filter-tag]').forEach(btn => {
             const slug     = btn.dataset.filterTag;
             const isActive = activeSecondary.has(slug);
             const anyActive = activeSecondary.size > 0;
-            const isDuplicateOfActiveRow = !!btn.closest('#archive-secondary-chips, #filter-drawer-chips');
+            const isDuplicateOfActiveRow = !!btn.closest('#filter-drawer-chips');
             applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow });
             const count = getChipCountForTag(slug);
             const tagCountEl = btn.querySelector('.chip-count');
@@ -878,20 +807,10 @@ function initArchive(filterDrawer) {
             btn.classList.toggle('tag-chip--zero-count', count === 0);
         });
 
-        // Filter Drawer (mobile/tablet) secondary tags — paginated 6 per
-        // page (already alphabetically sorted; zero-count tags already
-        // excluded above) — but ONLY at mobile/tablet width. This shared
-        // .filter-drawer is also reachable at desktop width, scrolled into
-        // condensed state, via the floating rail trigger (confirmed
-        // intentional — see the isMobileTablet/shouldShowRail logic
-        // elsewhere in this file), so pagination needs an explicit
-        // viewport check here rather than assuming desktop never reaches
-        // this code path. Desktop's SEPARATE inline "More Filters" list
-        // (#archive-secondary-chips, .archive-inline-filters) is a
-        // different, always-unpaginated container, handled entirely below
-        // — untouched by any of this.
+        // Filter Drawer secondary tags — paginated 6 per page (already
+        // alphabetically sorted; zero-count tags already excluded above) —
+        // same drawer, same pagination, at every breakpoint now.
         if (drawerChipsEl) {
-            const isDesktopWidth = window.matchMedia('(min-width: 1024px)').matches;
             // One or more secondary tags active — collapse the grid +
             // pagination in favour of #filter-drawer-active-chips alone
             // (see .filter-drawer--tags-active in style.css), which already
@@ -916,23 +835,18 @@ function initArchive(filterDrawer) {
             const pageCount = getDrawerSecondaryPageCount();
             if (secondaryPage >= pageCount) secondaryPage = pageCount - 1;
             if (secondaryPage < 0) secondaryPage = 0;
-            // Desktop shows the full, unbounded list — pageStart/pageEnd
-            // spanning the whole array means nothing gets marked collapsed.
-            const pageStart = isDesktopWidth ? 0 : secondaryPage * SECONDARY_PAGE_SIZE;
-            const pageEnd = isDesktopWidth ? visibleTags.length : pageStart + SECONDARY_PAGE_SIZE;
+            const pageStart = secondaryPage * SECONDARY_PAGE_SIZE;
+            const pageEnd = pageStart + SECONDARY_PAGE_SIZE;
 
             visibleTags.forEach((btn, i) => {
                 btn.classList.toggle('tag-chip--collapsed', i < pageStart || i >= pageEnd);
             });
 
-            // Hidden at desktop width unconditionally — no pagination
-            // controls ever, matching desktop's unbounded list. At mobile/
-            // tablet, also hidden (space still reserved, see the [hidden]
-            // rule in style.css) whenever a tag is active — there's no grid
-            // to paginate through in that state regardless of the
-            // underlying pageCount, so Prev/Next/dots would be
-            // functionally pointless even if pageCount > 1.
-            if (pageNavEl) pageNavEl.hidden = isDesktopWidth || pageCount <= 1 || hasActiveSecondary;
+            // Space still reserved when hidden (see the [hidden] rule in
+            // style.css) — hidden whenever there's nothing to paginate
+            // through (pageCount <= 1) or a tag is active (no grid showing
+            // in that state regardless of the underlying pageCount).
+            if (pageNavEl) pageNavEl.hidden = pageCount <= 1 || hasActiveSecondary;
 
             if (pageDotsEl) {
                 // Rebuild only when the page count actually changes — avoids
@@ -962,25 +876,6 @@ function initArchive(filterDrawer) {
             // reads as noise to screen reader users.
             if (pageStatusEl) {
                 pageStatusEl.textContent = pageCount > 1 ? `Page ${secondaryPage + 1} of ${pageCount}` : '';
-            }
-        }
-
-        // Desktop "More Filters" / "Less Filters" — the entire secondary tag
-        // row is hidden by default (on load and on every fresh navigation,
-        // since moreFiltersOpen always starts false) and revealed as one
-        // block, rather than the drawer's first-10-then-overflow disclosure.
-        // A currently-active secondary tag (e.g. from a ?tag= URL param)
-        // still shows in #archive-active-chips regardless of this state —
-        // that row is separate from #archive-secondary-chips.
-        if (inlineFiltersEl) {
-            const hasSecondaryTags = !!inlineFiltersEl.querySelector('[data-filter-tag]:not(.tag-chip--zero-count)');
-            inlineFiltersEl.hidden = !moreFiltersOpen;
-
-            const moreFiltersToggle = primaryChipsEl ? primaryChipsEl.querySelector('.more-filters-toggle') : null;
-            if (moreFiltersToggle) {
-                moreFiltersToggle.hidden = !hasSecondaryTags;
-                moreFiltersToggle.textContent = moreFiltersOpen ? 'Less Filters' : 'More Filters';
-                moreFiltersToggle.setAttribute('aria-expanded', String(moreFiltersOpen));
             }
         }
 
@@ -1043,104 +938,8 @@ function initArchive(filterDrawer) {
         });
     }
 
-    // Shows/hides a search input's own inline Clear (X) button — visible
-    // whenever the field has text, regardless of focus state. Purely a
-    // display concern, no filter state involved.
-    //
-    // Text-only (not focus-dependent) on purpose: an earlier focus-AND-text
-    // rule needed a blurRelatedTarget guard here plus a mousedown
-    // preventDefault on the button itself, both working around blur hiding
-    // the button (display: none) at the exact moment a mouse click or Tab
-    // press was landing on it. Neither workaround is needed now — blur no
-    // longer changes visibility while text remains, so the button never
-    // disappears out from under a click or a Tab press.
-    function updateSearchClearVisibility(input) {
-        const clearBtn = input.closest('.archive-search-wrap')?.querySelector('.archive-search-clear');
-        if (clearBtn) clearBtn.hidden = !(input.value.length > 0);
-    }
-
-    // Wire search inputs (header + drawer), debounced 250ms, synced
-    searchInputs.forEach(input => {
-        input.addEventListener('input', () => {
-            updateSearchClearVisibility(input);
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                currentQuery = input.value.trim().toLowerCase();
-                searchInputs.forEach(other => {
-                    if (other !== input) {
-                        other.value = input.value;
-                        updateSearchClearVisibility(other);
-                    }
-                });
-                visibleCount = 25;
-                render();
-            }, 250);
-        });
-
-        // Enter/Return dismisses the keyboard only — live search already
-        // updates as the user types, so this doesn't submit or filter again.
-        // No visible button triggers this anymore — the virtual keyboard's
-        // own Return/Search key and the physical Enter key are the only
-        // affordances, and both already fire this same 'keydown' listener.
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                input.blur();
-            }
-        });
-    });
-
-    // Wire inline Clear (X) buttons — clears this field's text only (both
-    // instances stay synced), leaves activeType/activeSecondary untouched,
-    // and keeps focus in the field so the user can immediately retype. This
-    // is distinct from .archive-clear-btn, which resets everything.
-    document.querySelectorAll('.archive-search-clear').forEach(btn => {
-        const input = btn.closest('.archive-search-wrap')?.querySelector('.archive-search-input');
-        if (!input) return;
-
-        // Same fix as the drawer's Close/Filters trigger (see initFilterDrawer):
-        // without this, mousedown here blurs the still-focused search input
-        // first, which (on mobile) collapses/re-expands the drawer's rows via
-        // .filter-drawer--search-focused and shifts this fixed-bottom drawer's
-        // layout — moving the button out from under the cursor before
-        // mouseup/click land, so the first press silently misses it.
-        btn.addEventListener('mousedown', (e) => e.preventDefault());
-
-        btn.addEventListener('click', () => {
-            input.value = '';
-            currentQuery = '';
-            searchInputs.forEach(other => {
-                if (other !== input) {
-                    other.value = '';
-                    updateSearchClearVisibility(other);
-                }
-            });
-            updateSearchClearVisibility(input);
-            visibleCount = 25;
-            clearTimeout(debounceTimer);
-            render();
-            input.focus();
-        });
-    });
-
-    // Auto-collapse the Filter Drawer's chip rows on search focus — mobile
-    // only (max-width: 767px, matching style.css's mobile breakpoint).
-    // Deliberately independent of the sticky header's scroll-driven
-    // .is-condensed state (a different element, a different trigger) — this
-    // only toggles .filter-drawer--search-focused on #filter-drawer itself.
+    // Referenced by render()'s pagination block above (.filter-drawer--tags-active toggle).
     const filterDrawerEl = document.getElementById('filter-drawer');
-    if (filterDrawerEl) {
-        searchInputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                if (window.matchMedia('(max-width: 767px)').matches) {
-                    filterDrawerEl.classList.add('filter-drawer--search-focused');
-                }
-            });
-            input.addEventListener('blur', () => {
-                filterDrawerEl.classList.remove('filter-drawer--search-focused');
-            });
-        });
-    }
 
     function doReset() {
         activeType = null;
@@ -1154,29 +953,17 @@ function initArchive(filterDrawer) {
         // recent tag went active.
         secondaryPageBeforeActive = 0;
         wasSecondaryActive = false;
-        searchInputs.forEach(input => {
-            input.value = '';
-            updateSearchClearVisibility(input);
-            // Now that mousedown on Clear no longer blurs a focused search
-            // input as a side effect (see the mousedown listener below),
-            // blur explicitly so a full reset also restores the drawer's
-            // collapsed-on-search-focus rows to their normal expanded view,
-            // instead of leaving it stuck collapsed with nothing left to hide.
-            input.blur();
-        });
         const url = new URL(window.location.href);
         url.searchParams.delete('type');
         window.history.replaceState({}, '', url.toString());
         render();
     }
 
-    // Wire clear buttons (header + drawer)
+    // Wire clear buttons (header, drawer, and floating external instance)
     document.querySelectorAll('.archive-clear-btn').forEach(btn => {
-        // Same fix as the drawer's Close/Filters trigger and the inline
-        // search Clear (X) button above — prevents mousedown from blurring
-        // a focused search input and shifting this button out from under
-        // the cursor before the click lands (mobile drawer only, see
-        // .filter-drawer--search-focused above).
+        // Same fix as the drawer's Close/Filters trigger (see
+        // initFilterDrawer) — prevents mousedown from shifting focus/layout
+        // before the click lands.
         btn.addEventListener('mousedown', (e) => e.preventDefault());
         btn.addEventListener('click', doReset);
     });
@@ -1189,25 +976,10 @@ function initArchive(filterDrawer) {
         });
     }
 
-    // IntersectionObserver — show action-rail-group and condense header when
-    // sentinel leaves viewport. Mobile/tablet: the inline Clear/Search/
-    // Filters row is hidden entirely there (no scroll-based condensing to
-    // react to), so the floating trigger stays visible unconditionally —
-    // only desktop keeps the original scroll-position-driven show/hide.
-    const sentinel = document.getElementById('archive-header-sentinel');
-    const archiveHeader = document.getElementById('archive-sticky-header');
-    if (sentinel && railGroup) {
-        const headerObserver = new IntersectionObserver(entries => {
-            const headerInView = entries[0].isIntersecting;
-            // Drawer-open guard: don't update rail visibility or condensed state while drawer is open
-            if (!document.querySelector('.filter-drawer--open')) {
-                const isMobileTablet = !window.matchMedia('(min-width: 1024px)').matches;
-                railGroup.classList.toggle('action-rail-group--visible', isMobileTablet || !headerInView);
-                if (archiveHeader) archiveHeader.classList.toggle('is-condensed', !headerInView);
-            }
-        }, { threshold: 0 });
-        headerObserver.observe(sentinel);
-    }
+    // The floating action rail is visible by default at every breakpoint
+    // now (see .action-rail-group in style.css) — no scroll-position
+    // watcher needed. openDrawer()/closeDrawer() (initFilterDrawer above)
+    // are what toggle it off/on, on drawer open/close.
 
     // Fetch manifest and initialise
     fetch('/data/archive-entries.json')
@@ -1246,20 +1018,23 @@ function initArchive(filterDrawer) {
 
             render();
 
-            // Filter Drawer (mobile/tablet) arrival state — desktop's inline
-            // filters have no open/closed concept, so this never applies there.
-            // Scenario 2 only: arrived via a "View more Work/Thoughts" style
-            // link (?type= present, no ?tag=) — open the drawer on arrival with
-            // that primary filter already active. Direct navigation (no params)
-            // and tag-link arrivals (Scenario 3, handled above) stay closed.
+            // Filter Drawer arrival state, scoped to mobile/tablet only —
+            // pre-existing behaviour, unchanged by the desktop inline-filters
+            // removal. Scenario 2 only: arrived via a "View more Work/
+            // Thoughts" style link (?type= present, no ?tag=) — open the
+            // drawer on arrival with that primary filter already active.
+            // Direct navigation (no params) and tag-link arrivals
+            // (Scenario 3, handled above) stay closed. Desktop arrivals via
+            // the same link now show the same active-filter state (badge
+            // count, filtered results) without auto-opening the drawer to
+            // reveal it — worth a follow-up look, out of scope here.
             const isDrawerBreakpoint = !window.matchMedia('(min-width: 1024px)').matches;
             if (isDrawerBreakpoint && filterDrawer && activeType && !arrivedViaValidTag) {
-                // The floating rail trigger is the only visible opener on
-                // mobile/tablet now (the inline .archive-controls-row
-                // trigger is hidden entirely there) — target it explicitly
-                // rather than the first generic [aria-controls="filter-drawer"]
-                // match, which would resolve to that hidden element and
-                // silently fail to receive focus back when the drawer closes.
+                // The floating rail trigger is the only opener now, at every
+                // breakpoint — target it explicitly rather than the first
+                // generic [aria-controls="filter-drawer"] match, which would
+                // resolve to the header's hidden instance and silently fail
+                // to receive focus back when the drawer closes.
                 const opener = document.querySelector('.action-rail-trigger');
                 filterDrawer.openDrawer(opener);
             }

@@ -26,62 +26,18 @@
                 <h1 class="archive-title" id="archive-title">Archive</h1>
             </div>
 
-            <!-- Controls row:
-                 Desktop (uncondensed): Clear (left) + Search (fills width). No sort toggle, no Filters trigger.
-                 Mobile/tablet: Clear + Search + Filters trigger. Filters trigger hidden on desktop via CSS. -->
-            <div class="archive-controls-row">
-                <button class="archive-clear-btn btn" type="button" disabled>Clear</button>
-                <div class="archive-search-wrap">
-                    <label for="archive-search" class="sr-only">Search entries</label>
-                    <input type="search" class="archive-search-input" id="archive-search"
-                           placeholder="Search" autocomplete="off" inputmode="search">
-                    <button type="button" class="archive-search-btn archive-search-clear"
-                            aria-label="Clear search text" hidden>
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <button class="filter-drawer-trigger" type="button"
-                        aria-expanded="false"
-                        aria-controls="filter-drawer"
-                        aria-haspopup="dialog">
-                    <span class="trigger-label">Filters</span>
-                    <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
-                </button>
-            </div>
-
-            <!-- Desktop inline filters — primary chips, active chips row, and secondary tags;
-                 visible only on desktop while header is uncondensed (top of page);
-                 hidden on tablet/mobile at every scroll position — those breakpoints use the drawer -->
-            <div class="archive-inline-filters" id="archive-inline-filters">
-
-                <!-- Primary type chips: Work / Thoughts -->
-                <div class="archive-primary-chips" role="group" aria-label="Filter by type">
-                    <button class="tag-chip" type="button"
-                            data-filter-type="work" data-label="Work"
-                            aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
-                    <button class="tag-chip" type="button"
-                            data-filter-type="thoughts" data-label="Thoughts"
-                            aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
-                </div>
-
-                <!-- Active secondary filters row — collapses to zero height when empty -->
-                <div class="archive-active-chips" id="archive-active-chips"></div>
-
-                <!-- Secondary tag chips — populated by JS; hidden by default,
-                     revealed via the "More Filters" toggle appended into
-                     .archive-primary-chips -->
-                <div id="archive-secondary-chips" aria-label="Filter by tag" hidden></div>
-
-            </div>
-
         </div>
     </div>
 
-    <!-- Sentinel watched by IntersectionObserver — when this leaves viewport, show action-rail-group -->
-    <div id="archive-header-sentinel" aria-hidden="true"></div>
+    <!-- Floating action rail group — fixed at the viewport edge; the one persistent
+         filter entry point, visible at every scroll position, at all three breakpoints.
+         External Clear only renders while a filter is active (see script.js render()),
+         and hides along with the rest of the group whenever the drawer is open. -->
+    <div class="action-rail-group action-rail-group--visible" id="action-rail-group">
 
-    <!-- Floating action rail group — fixed at right viewport edge; visible when header has condensed -->
-    <div class="action-rail-group" id="action-rail-group">
+        <button class="archive-clear-btn btn action-rail-clear" type="button" hidden aria-label="Clear filters">
+            <span class="tag-chip-x" aria-hidden="true">×</span>
+        </button>
 
         <!-- Filters trigger — opens Filter Drawer -->
         <button class="action-rail-trigger" type="button"
@@ -100,22 +56,14 @@
 
     <!-- Filter drawer — unified bottom sheet, available on all breakpoints -->
     <div class="filter-drawer" id="filter-drawer"
-         role="dialog" aria-modal="true" aria-label="Search and filter"
+         role="dialog" aria-modal="true" aria-label="Filter"
          hidden inert>
         <div class="filter-drawer-body">
 
-            <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right) -->
+            <!-- Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right) -->
             <div class="filter-drawer-controls">
                 <button class="archive-clear-btn btn" type="button" disabled>Clear</button>
-                <div class="archive-search-wrap">
-                    <label for="drawer-search" class="sr-only">Search entries</label>
-                    <input type="search" class="archive-search-input" id="drawer-search"
-                           placeholder="Search" autocomplete="off" inputmode="search">
-                    <button type="button" class="archive-search-btn archive-search-clear"
-                            aria-label="Clear search text" hidden>
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
+                <p class="filter-drawer-label">Filter by Tag</p>
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"
@@ -140,23 +88,20 @@
                  +N-more collapse state of the full list below -->
             <div class="archive-active-chips" id="filter-drawer-active-chips"></div>
 
-            <!-- Row 3: Secondary tag chips, paginated 6 per page (mobile/
-                 tablet drawer only — desktop's "More Filters" list stays a
-                 single unbounded list, unaffected). Fixed min-height on the
-                 page container keeps the drawer's size stable across pages
-                 with different tag counts/label lengths, populated by
+            <!-- Row 3: Secondary tag chips, paginated 6 per page — same drawer,
+                 same pagination, at all three breakpoints now. Fixed min-height
+                 on the page container keeps the drawer's size stable across
+                 pages with different tag counts/label lengths, populated by
                  initArchive(). -->
             <div class="filter-drawer-secondary-page">
                 <div id="filter-drawer-chips"></div>
             </div>
             <div class="filter-drawer-page-nav" id="filter-drawer-page-nav" hidden>
-                <div class="filter-drawer-page-buttons">
-                    <button type="button" class="filter-drawer-page-btn filter-drawer-page-prev"
-                            aria-label="Previous page of tags">Previous</button>
-                    <button type="button" class="filter-drawer-page-btn filter-drawer-page-next"
-                            aria-label="Next page of tags">Next</button>
-                </div>
+                <button type="button" class="filter-drawer-page-btn filter-drawer-page-prev"
+                        aria-label="Previous page of tags">Previous</button>
                 <div class="filter-drawer-page-dots" id="filter-drawer-page-dots"></div>
+                <button type="button" class="filter-drawer-page-btn filter-drawer-page-next"
+                        aria-label="Next page of tags">Next</button>
             </div>
             <p class="sr-only" id="filter-drawer-page-status" aria-live="polite"></p>
 
