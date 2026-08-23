@@ -393,7 +393,6 @@ function initArchive(filterDrawer) {
     const drawerActiveChipsEl = document.getElementById('filter-drawer-active-chips');
     const drawerChipsEl    = document.getElementById('filter-drawer-chips');
     const drawerPrimaryChipsEl = document.querySelector('.filter-drawer-primary-chips');
-    const loadMoreBtn      = document.querySelector('.archive-load-more-btn');
     const pageNavEl        = document.getElementById('filter-drawer-page-nav');
     const pageDotsEl       = document.getElementById('filter-drawer-page-dots');
     const pagePrevBtn      = document.querySelector('.filter-drawer-page-prev');
@@ -407,7 +406,6 @@ function initArchive(filterDrawer) {
     const activeSecondary  = new Set();
     let currentSort        = 'latest';
     let currentQuery       = '';
-    let visibleCount       = 25;
     let secondaryPage      = 0; // Filter Drawer paginated secondary tags, 0-indexed
     // The grid page the user was on right before any secondary tag went
     // active (see .filter-drawer--tags-active in style.css) — restored when
@@ -492,7 +490,6 @@ function initArchive(filterDrawer) {
                 } else {
                     activeSecondary.add(slug);
                 }
-                visibleCount = 25;
                 render();
             });
             drawerChipsEl.appendChild(btn);
@@ -661,7 +658,6 @@ function initArchive(filterDrawer) {
             btn.appendChild(x);
             btn.addEventListener('click', () => {
                 activeSecondary.delete(slug);
-                visibleCount = 25;
                 render();
                 focusDeactivatedSecondaryTag(slug);
             });
@@ -737,7 +733,6 @@ function initArchive(filterDrawer) {
     // Main render — updates all UI from current state
     function render() {
         const filtered = getFiltered();
-        const slice    = filtered.slice(0, visibleCount);
 
         // Title
         if (titleEl) {
@@ -881,19 +876,51 @@ function initArchive(filterDrawer) {
 
         updateActiveChipsRow();
 
-        // Results
+        // Results — all entries matching the current filter state, no cap
         resultsEl.innerHTML = '';
-        if (slice.length === 0) {
-            const msg = document.createElement('p');
-            msg.className = 'archive-empty';
-            msg.textContent = 'No entries match the current filters.';
-            resultsEl.appendChild(msg);
+        if (filtered.length === 0) {
+            resultsEl.appendChild(buildEmptyState());
         } else {
-            slice.forEach(e => resultsEl.appendChild(buildCard(e)));
+            filtered.forEach(e => resultsEl.appendChild(buildCard(e)));
         }
+    }
 
-        // Load More
-        if (loadMoreBtn) loadMoreBtn.hidden = filtered.length <= visibleCount;
+    // No-results empty state — mascot + friendly message + a Clear Filters
+    // button wired to the same doReset() every other Clear control uses
+    // (defined below; safe to reference here — function declarations are
+    // hoisted, and render() only ever executes after the full module body,
+    // doReset included, has run once).
+    function buildEmptyState() {
+        const wrap = document.createElement('div');
+        wrap.className = 'archive-empty';
+
+        const img = document.createElement('img');
+        img.className = 'archive-empty-image';
+        img.src = '/assets/images/entries/no-entries/no-entries.png';
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        img.width = 300;
+        img.height = 300;
+        img.loading = 'lazy';
+        wrap.appendChild(img);
+
+        const content = document.createElement('div');
+        content.className = 'archive-empty-content';
+
+        const msg = document.createElement('p');
+        msg.className = 'archive-empty-message';
+        msg.textContent = 'Nothing to see here!';
+        content.appendChild(msg);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'archive-clear-btn btn archive-empty-clear-btn';
+        btn.textContent = 'Clear Filters!';
+        btn.addEventListener('click', doReset);
+        content.appendChild(btn);
+
+        wrap.appendChild(content);
+        return wrap;
     }
 
     // Wire primary type chips (exclusive toggle — replace, not stack)
@@ -902,7 +929,6 @@ function initArchive(filterDrawer) {
         btn.addEventListener('click', () => {
             const type = btn.dataset.filterType;
             activeType = activeType === type ? null : type;
-            visibleCount = 25;
             const url = new URL(window.location.href);
             if (activeType) url.searchParams.set('type', activeType);
             else            url.searchParams.delete('type');
@@ -915,7 +941,6 @@ function initArchive(filterDrawer) {
     document.querySelectorAll('.archive-sort-toggle').forEach(btn => {
         btn.addEventListener('click', () => {
             currentSort = currentSort === 'latest' ? 'earliest' : 'latest';
-            visibleCount = 25;
             render();
         });
     });
@@ -946,7 +971,6 @@ function initArchive(filterDrawer) {
         activeSecondary.clear();
         currentQuery = '';
         currentSort = 'latest';
-        visibleCount = 25;
         secondaryPage = 0;
         // Full reset, not a single-tag removal — land back on page 1 like
         // secondaryPage above, not wherever the user was before their most
@@ -967,14 +991,6 @@ function initArchive(filterDrawer) {
         btn.addEventListener('mousedown', (e) => e.preventDefault());
         btn.addEventListener('click', doReset);
     });
-
-    // Wire Load More
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', () => {
-            visibleCount += 25;
-            render();
-        });
-    }
 
     // The floating action rail is visible by default at every breakpoint
     // now (see .action-rail-group in style.css) — no scroll-position
