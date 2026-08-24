@@ -1506,21 +1506,25 @@ footer p {
     scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
 }
 
-.toc-rail-list::-webkit-scrollbar {
+.toc-rail-list::-webkit-scrollbar,
+.toc-panel::-webkit-scrollbar {
     width: 8px;
 }
 
-.toc-rail-list::-webkit-scrollbar-track {
+.toc-rail-list::-webkit-scrollbar-track,
+.toc-panel::-webkit-scrollbar-track {
     background-color: var(--color-background-subtle);
     border-radius: var(--border-radius-full);
 }
 
-.toc-rail-list::-webkit-scrollbar-thumb {
+.toc-rail-list::-webkit-scrollbar-thumb,
+.toc-panel::-webkit-scrollbar-thumb {
     background-color: var(--color-border-strong);
     border-radius: var(--border-radius-full);
 }
 
-.toc-rail-list::-webkit-scrollbar-thumb:hover {
+.toc-rail-list::-webkit-scrollbar-thumb:hover,
+.toc-panel::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-text-secondary);
 }
 
@@ -1623,7 +1627,25 @@ footer p {
         bottom: calc(50vh - (var(--touch-target-minimum) / 2));
         width: var(--toc-rail-width);
         max-width: calc(100vw - (var(--space-8) * 2));
-        max-height: calc(100vh - (var(--space-8) * 2));
+        /* max-height: NOT the Filter Panel's calc(100vh - (--space-8 * 2))
+           formula this shipped with (copied verbatim per Rule 3a) — that
+           value is only safe at the Filter Panel's own >=1024px breakpoint,
+           where the viewport is tall enough that content never actually
+           reaches the cap. This panel's anchor (bottom, above) sits at
+           50vh minus half the trigger's own height, so what's actually
+           free to grow into is just the gap between that bottom edge and
+           the fixed header's bottom (64px — same literal
+           .archive-sort-count-row already anchors to elsewhere), not the
+           full viewport. Left uncapped at the real anchor, the panel
+           overflowed off the top of the screen on shorter real-device
+           viewports (Safari's toolbar chrome shrinks the visible viewport
+           below the 100vh this was measured against) or, on taller ones,
+           grew tall enough to draw over the header instead of stopping
+           short of it — both confirmed via direct measurement at reduced
+           viewport heights, not assumed. --space-6 reuses the same
+           breathing-room token this panel's own `right` offset already
+           uses. */
+        max-height: calc(50vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2));
         overflow-y: auto;
         margin: 0;
         padding: var(--space-3);
@@ -1635,6 +1657,8 @@ footer p {
         opacity: 0;
         transition: transform var(--duration-base) var(--ease-out),
                     opacity var(--duration-base) var(--ease-out);
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
     }
 
     .toc-panel--open {
@@ -1649,9 +1673,14 @@ footer p {
        section, below) — bottom mirrors that same centre (100vh - 70vh =
        30vh from the bottom) rather than the 50vh math above, so the panel
        stays anchored to the trigger's real position instead of drifting
-       from it once the trigger itself moves. */
+       from it once the trigger itself moves. max-height mirrors the same
+       shift (70vh of headroom above the anchor instead of 50vh, same
+       header/space-6 reservation as the tier above — see that comment) so
+       the cap keeps tracking the anchor's real position at this tier too,
+       not the wider tier's now-stale one. */
     .toc-panel {
         bottom: calc(30vh - (var(--touch-target-minimum) / 2));
+        max-height: calc(70vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2));
     }
 }
 
