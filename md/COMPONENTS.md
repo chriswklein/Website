@@ -152,7 +152,6 @@ Tags sit above `.card-block-link` via `.card-tags { position: relative; z-index:
 
 ### When to Use
 - Categorising Work entries and Thoughts entries
-- Displaying skill labels in the Profile card
 
 ### When NOT to Use
 - As non-interactive labels — tags are always links in this system
@@ -617,7 +616,6 @@ Cards are the primary content presentation unit. The entire card is clickable vi
 |---|---|---|---|
 | Feature | `.card--feature` | `Style=Feature` | Work / portfolio cards on Home and Work index |
 | Thought | `.card--thought` | `Style=Thought` | Blog / writing entries on Home and Thoughts index |
-| Profile | `.card--profile` | `Style=Profile` | Profile card in left column on Home page |
 
 ### Block Link Pattern (Feature and Thought variants only)
 
@@ -765,81 +763,6 @@ Same content order, padding, and hover treatment as Feature — see above. `.car
 - `.card-cta` `aria-label` action: "read this thought"
 - Screen reader output: "Article. {Title}, heading level 3. ... Read, link." (with aria-label: "{Title} — read this thought")
 - Same tag/excerpt accessibility notes as Feature, above
-
----
-
-### Variant: Profile (Card/Profile)
-
-**CSS Class:** `.card.card--profile`
-**Usage:** Profile card in the left column of the Home page. Desktop: sticky. Mobile: static, appears first in source order.
-
-The Profile variant does not use the block link / CTA pattern. It has multiple action buttons (LinkedIn, About) and is not a single-destination card.
-
-#### Anatomy
-
-```
-[ .card-image — illustration, full width ]
-[ p.card-image-caption ]
-[ .card-content ]
-  [ h2.card-profile-name ]
-  [ .card-tags ]
-    [ .tag ]
-  [ p bio ]
-  [ .card-profile-actions ]
-    [ a.btn — LinkedIn ]
-    [ a.btn--ghost — About ]
-```
-
-```html
-<article class="card card--profile">
-    <div class="card-image">
-        <img src="assets/images/C-Rex-by-Bob-Nelson-2017.png" alt="" aria-hidden="true" width="300" height="300" loading="lazy">
-    </div>
-    <p class="card-image-caption">{Caption}</p>
-    <div class="card-content">
-        <h2 class="card-profile-name">{Name}</h2>
-        <div class="card-tags">
-            <span class="tag" aria-hidden="true">{Skill}</span>
-            <span class="tag" aria-hidden="true">{Skill}</span>
-        </div>
-        <p>{Bio}</p>
-        <div class="card-profile-actions">
-            <a href="{linkedin-url}" class="btn">Connect on LinkedIn</a>
-            <a href="about.html" class="btn btn--ghost">Read More about Chris<span class="sr-only"> on the About page</span></a>
-        </div>
-    </div>
-</article>
-```
-
-#### Component Tokens (Profile-specific)
-
-```css
---card-profile-name-size:       var(--font-size-2xl);
---card-profile-name-weight:     var(--font-weight-bold);
---card-profile-caption-size:    var(--font-size-xs);
---card-profile-caption-color:   var(--color-text-secondary);
---card-profile-sticky-top:      80px;
-```
-
-#### States
-
-- Desktop: `position: sticky; top: var(--card-profile-sticky-top)`
-- Mobile: `position: static`
-
-#### Accessibility
-
-- `<article>` announces as a landmark
-- Illustration: `alt=""` and `aria-hidden="true"` — decorative
-- "Read More about Chris" has `.sr-only` context: "on the About page"
-- LinkedIn button is a standard `<a>` — opens in same tab by default
-
-#### Responsive Behaviour
-
-| Breakpoint | Layout | Image Column | Content Column |
-|---|---|---|---|
-| Desktop 1024px+ | Two column — Auto left, Fill right | 348px auto width, full height, object-fit cover | Fills remaining space, 24px padding, flex column |
-| Tablet 768px–1023px | Two column — Auto left, Fill right | 220px auto width, full height, object-fit cover | Fills remaining space, 20px padding, flex column |
-| Mobile below 768px | Single column stacked | Max 300px, centred, 16px top padding | Full width below image |
 
 ---
 
@@ -1527,8 +1450,8 @@ call to override if a specific table genuinely needs more columns) and
 scrolls horizontally (`overflow-x: auto` directly on the table, the same
 approach `pre` already uses for wide content, rather than an extra wrapper
 element) instead of trying to reflow columns on narrow viewports. `th` reuses
-`.card-meta-label`'s exact label treatment (size/weight/color) by value, not
-by selector reference. `td` matches body paragraph text. Row separators use
+`.standard-page-details-label`'s exact label treatment (size/weight/color) by
+value, not by selector reference. `td` matches body paragraph text. Row separators use
 the sitewide thin-border convention, with the last row's border removed the
 same way `.about-history-item:last-child` drops its own.
 
@@ -1553,13 +1476,14 @@ Thoughts" link) both use the identical `/archive.html?type={work|thoughts}`
 href pattern, one substitution point per template — not divergent
 hardcoded logic — so consolidating later stays a mechanical merge.
 
-**Migration status (2026-08-17):** the two templates plus `work/star-engine.html`
-and `thoughts/thrilling-beginnings.html` were migrated to this design.
-`work/this-website.html`, `thoughts/physical-and-digital-media.html`, and
-`thoughts/industrializing-the-industry.html` still use the previous
-`.standard-page-meta` / `.standard-page-nav` structure — the CSS for both
-generations coexists in style.css intentionally so those three pages keep
-rendering correctly. They need the same mechanical migration as a follow-up.
+**Migration status (confirmed complete 2026-08-23):** all five live entries
+(`work/star-engine.html`, `work/this-website.html`,
+`thoughts/thrilling-beginnings.html`,
+`thoughts/physical-and-digital-media.html`,
+`thoughts/industrializing-the-industry.html`) plus both templates use this
+design. The previous `.standard-page-meta` / `.standard-page-nav` structure
+has no remaining consumers anywhere in the repo and its CSS has been removed
+from style.css — there is no longer a second generation to keep in sync.
 
 ### Project Details / Details Card
 
@@ -1589,9 +1513,9 @@ flex-grow ratios were used instead per Rule 6.
 **Revised 2026-08-19:** label and value text was reduced from the original
 Figma-derived Body-20 sizing (`--font-size-lg`, 20px) down to
 `--font-size-sm` (14px) + `--line-height-normal` — the same "card body copy"
-scale `.card-meta-label` / `.card-meta` already use for metadata elsewhere
-on the site (Archive/Home card date-author line). Label keeps
-`--font-weight-medium` (matching `.card-meta-label`); value stays
+scale `.card-meta` already uses for metadata elsewhere on the site
+(Archive/Home card date-author line). Label additionally takes
+`--font-weight-medium` to distinguish it from the value column, which stays
 `--font-weight-regular`. This also resolved a mobile overflow/wrap risk the
 larger Figma-derived sizing had at narrow widths.
 
@@ -1604,8 +1528,8 @@ Details card, per visual review. All interaction states (hover,
 focus-visible) are the sitewide `.tag` states, unchanged.
 
 Responsive: rows stack to a single column (`flex-direction: column`) at
-mobile (≤767px), matching the existing `.standard-page-nav` /
-`.about-history-meta` stacking pattern.
+mobile (≤767px), matching the existing `.about-history-meta` stacking
+pattern.
 
 ### Footer
 

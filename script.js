@@ -3,6 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     loadComponent('nav-placeholder', '/nav.html', () => {
         initNav();
         setActiveNavLink();
+        // Deferred until nav.html is actually injected: the sticky header
+        // it contains is what scroll-margin-top clears, and initTocRail()
+        // both measures heading positions and (if the URL loaded with a
+        // #hash) re-corrects the browser's native fragment scroll, which
+        // fires before this fetch resolves and so lands short of real
+        // clearance — confirmed via direct measurement, not assumed.
+        initTocRail();
     });
     loadComponent('footer-placeholder', '/footer.html');
     setActiveTabBar();
@@ -158,6 +165,156 @@ function initBackToTop() {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     });
+}
+
+// Matches the NEW-ENTRY-PROCESS.md heading-id convention exactly (strip
+// punctuation first, then collapse whitespace/hyphen runs to one hyphen) —
+// not the local slugify() inside initArchive below, which is tag-specific
+// and produces doubled hyphens on input like "Research & Discovery".
+function slugifyHeading(text) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/[\s-]+/g, '-');
+}
+
+// Walks .standard-page-content's H2/H3s in document order and assigns a
+// generated id to any heading that doesn't already have one (every entry
+// today is hand-authored per NEW-ENTRY-PROCESS.md, so this is a safety net
+// for future entries, not something that changes current pages). Existing
+// ids — hand-authored or already generated — are never overwritten, and
+// collisions get a numeric suffix. Returns the full heading list so
+// initTocRail() doesn't need to re-discover it.
+function getTocHeadings() {
+    const content = document.querySelector('.standard-page-content');
+    if (!content) return [];
+
+    const headings = Array.from(content.querySelectorAll('h2, h3'));
+    const usedIds = new Set(headings.filter(h => h.id).map(h => h.id));
+
+    headings.forEach(heading => {
+        if (heading.id) return;
+        const base = slugifyHeading(heading.textContent) || 'section';
+        let id = base;
+        let suffix = 2;
+        while (usedIds.has(id)) {
+            id = `${base}-${suffix}`;
+            suffix++;
+        }
+        heading.id = id;
+        usedIds.add(id);
+    });
+
+    return headings;
+}
+
+// Desktop-only (CSS handles the <1024px hide) floating rail: lists every
+// H2/H3 in an entry, H3s indented under their parent H2, with scrollspy
+// highlighting the current heading. Built entirely here — no hand-authored
+// markup in any entry's HTML — and inserted right after the skip link so
+// it's reachable early in tab order, not after the whole page's content.
+function initTocRail() {
+    const headings = getTocHeadings();
+    if (!headings.length) return;
+
+    const rail = document.createElement('nav');
+    rail.className = 'toc-rail';
+    rail.setAttribute('aria-label', 'Table of contents');
+
+    const list = document.createElement('ul');
+    list.className = 'toc-rail-list';
+
+    const links = headings.map(heading => {
+        const item = document.createElement('li');
+        if (heading.tagName === 'H3') item.className = 'toc-rail-item--sub';
+
+        const link = document.createElement('a');
+        link.className = 'toc-rail-link';
+        link.href = `#${heading.id}`;
+        link.textContent = heading.textContent;
+
+        item.appendChild(link);
+        list.appendChild(item);
+        return link;
+    });
+
+    rail.appendChild(list);
+
+    const main = document.getElementById('main-content');
+    document.body.insertBefore(rail, main);
+
+    // Anchors the rail's fixed top offset to .standard-page-banner's real
+    // bottom edge, not the page's fixed chrome. The banner's rendered
+    // height comes from its aspect-ratio and the viewport width alone —
+    // nothing below it (Details card row count, tag wrapping) affects it —
+    // so this position is identical across entries at a given width,
+    // unlike a heading-based anchor: confirmed via direct measurement, a
+    // 4-row Work entry and a short Thoughts entry land on the exact same
+    // pixel at every tested width. Gap reuses --space-8, read from the
+    // rail's own computed style rather than duplicated as a number.
+    // Recomputed on resize, since the banner's height changes with
+    // viewport width; not on scroll — this sets a fixed starting point,
+    // it doesn't track the banner as the page scrolls. If an entry has no
+    // banner, --toc-rail-top is simply never set and CSS's own
+    // var(--toc-rail-top, <fallback>) takes over — no duplicated fallback
+    // value to keep in sync here.
+    function updateRailTop() {
+        const banner = document.querySelector('.standard-page-banner');
+        if (!banner) return;
+        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-8'));
+        const top = banner.getBoundingClientRect().bottom + window.scrollY + gap;
+        rail.style.setProperty('--toc-rail-top', `${top}px`);
+    }
+
+    updateRailTop();
+    window.addEventListener('resize', updateRailTop);
+
+    // Threshold read from the heading's own computed scroll-margin-top
+    // (style.css) rather than a duplicated magic number, so the two never
+    // drift out of sync.
+    const threshold = parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 0;
+
+    function updateActiveLink() {
+        // +1px tolerance absorbs sub-pixel rendering (header's real height
+        // is a fractional 64.6667px — see NAVIGATION section, style.css) so
+        // a heading landed on via anchor jump doesn't miss its own
+        // threshold by a fraction of a pixel and leave the previous
+        // heading highlighted instead — confirmed via direct #anchor
+        // navigation, not assumed.
+        let current = headings[0];
+        for (const heading of headings) {
+            if (heading.getBoundingClientRect().top <= threshold + 1) {
+                current = heading;
+            } else {
+                break;
+            }
+        }
+        links.forEach(link => {
+            const isActive = link.getAttribute('href') === `#${current.id}`;
+            link.classList.toggle('toc-rail-link--active', isActive);
+            if (isActive) {
+                link.setAttribute('aria-current', 'true');
+            } else {
+                link.removeAttribute('aria-current');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', updateActiveLink, { passive: true });
+    window.addEventListener('resize', updateActiveLink);
+
+    // Re-lands on the URL's own #hash now that the header's real height is
+    // known, correcting the browser's earlier native fragment scroll (see
+    // comment at the call site in the DOMContentLoaded handler above).
+    if (location.hash) {
+        const target = document.getElementById(location.hash.slice(1));
+        if (target && headings.includes(target)) {
+            target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+    }
+
+    updateActiveLink();
 }
 
 // Traps keyboard focus within element while open.

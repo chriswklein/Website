@@ -79,14 +79,14 @@ Raw colour values. Never apply these directly to elements. Always reference via 
 | `--color-interactive-focus` | `grey-0` `#FFFFFF` | Focus ring colour — ~19:1 contrast ✅ |
 | `--color-interactive-disabled` | `grey-500` `#666666` | Disabled interactive elements |
 
-### 1.6 Semantic Tokens — Accent (Gold)
+### 1.6 Semantic Tokens — Accent (Primary)
 
-Gold is the primary accent. Used for dividers, primary tags, links, code borders, and tooltip borders.
+Teal is the live default primary accent — used for dividers, primary tags, links, code borders, and tooltip borders. `--color-accent-primary` / `--color-accent-primary-text` resolve to the teal values below by default; gold is a dormant `[data-theme="gold"]` override, not a co-equal option — see §1.10 Theme System for the full theme mechanism.
 
-| CSS Variable | References | Contrast vs Base | Usage |
+| CSS Variable | References (live default) | Contrast vs Base | Usage |
 |---|---|---|---|
-| `--color-accent-primary` | `gold-dark` `#BA8200` | ~5.2:1 ✅ | Primary tag fill, hr dividers, code block border |
-| `--color-accent-primary-text` | `gold-light` `#E5A000` | ~8.9:1 ✅ | Hyperlinks, tooltip text accents, text on dark |
+| `--color-accent-primary` | `teal-dark` `#00BAA5` | ~7.7:1 ✅ | Primary tag fill, hr dividers, code block border |
+| `--color-accent-primary-text` | `teal-light` `#00E5CB` | ~11.8:1 ✅ | Hyperlinks, tooltip text accents, text on dark |
 
 ### 1.7 Semantic Tokens — Accent (Pink)
 

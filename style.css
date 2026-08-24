@@ -117,6 +117,7 @@
     /* ---- Layout ---- */
     --max-content: 1200px;
     --card-image-column-width: 42%;
+    --toc-rail-width: 240px;
 
     /* ---- Border Radius ---- */
     --border-radius-none: 0px;
@@ -1183,8 +1184,8 @@ footer p {
    the banner is meant to span .standard-page's full width (up to
    --max-content, 1200px), wider than the 65ch text column, same as before
    round 1. Text column components (.standard-page-content,
-   .standard-page-divider, .standard-page-nav) keep their own 65ch cap
-   unchanged — only this banner reverts. */
+   .standard-page-divider) keep their own 65ch cap unchanged — only this
+   banner reverts. */
 .standard-page-banner {
     width: 100%;
     aspect-ratio: 3 / 1;
@@ -1239,44 +1240,6 @@ footer p {
     margin-bottom: var(--space-6);
 }
 
-.standard-page-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-8);
-}
-
-.standard-page-meta-author {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-}
-
-.standard-page-meta-dates {
-    display: grid;
-    grid-template-columns: auto auto;
-    gap: var(--space-2) var(--space-6);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    text-align: left;
-}
-
-.card-meta-label {
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-}
-
-.standard-page-meta-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    justify-content: center;
-}
-
 /* ================================
    STANDARD PAGE — DETAILS CARD
    Left-aligned label/value rows: Employer, Role, Timeline, Tools on Work
@@ -1284,7 +1247,7 @@ footer p {
    flex-grow ratios (1:2), not a hardcoded pixel width, to approximate the
    Figma label-column proportion while staying fluid — no existing
    sitewide label/value column pattern to reuse instead (see grep of
-   .standard-page-meta-dates / .about-history-meta, neither matches).
+   .about-history-meta, doesn't match).
    Tags moved out to their own standalone row above this card as of
    revision round 3 (2026-08-19) — see .standard-page-details-tags below.
 ================================ */
@@ -1307,9 +1270,8 @@ footer p {
 }
 
 /* font-size-sm + font-weight-medium — the same "card body copy" scale
-   .card-meta-label already uses for metadata labels elsewhere (Archive/
-   Home card date-author line, the pre-redesign standard-page-meta labels),
-   not the H3/Body-20-derived sizing from the original Figma spec. */
+   .card-meta already uses for the Archive/Home card date-author line, not
+   the H3/Body-20-derived sizing from the original Figma spec. */
 .standard-page-details-label {
     flex: 1;
     font-size: var(--font-size-sm);
@@ -1333,8 +1295,8 @@ footer p {
    no longer applies here. flex-wrap + gap are unchanged, reused as-is.
    max-width: 65ch + centred margin match .standard-page-details' own
    rendered width (the same 65ch cap .standard-page-content /
-   .standard-page-divider / .standard-page-nav already use), not the
-   wider banner/.standard-page width. */
+   .standard-page-divider already use), not the wider banner/.standard-page
+   width. */
 .standard-page-details-tags {
     display: flex;
     flex-wrap: wrap;
@@ -1389,6 +1351,13 @@ footer p {
     width: 100%;
 }
 
+/* scroll-margin-top: var(--space-16) (64px) matches the sticky header/
+   fixed tab bar's real measured height at every breakpoint (see NAVIGATION
+   and MOBILE TAB BAR sections), + var(--space-4) breathing room — so a
+   heading anchor jump (or the ToC rail's own scrollspy links below) lands
+   the heading clear of that fixed chrome instead of underneath it, same
+   class of fix already applied elsewhere on this site for fixed/sticky
+   clearance. */
 .standard-page-content h2 {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
@@ -1396,6 +1365,7 @@ footer p {
     color: var(--color-text-primary);
     margin-top: var(--space-10);
     margin-bottom: var(--space-4);
+    scroll-margin-top: calc(var(--space-16) + var(--space-4));
 }
 
 .standard-page-content h3 {
@@ -1405,6 +1375,7 @@ footer p {
     color: var(--color-text-primary);
     margin-top: var(--space-8);
     margin-bottom: var(--space-3);
+    scroll-margin-top: calc(var(--space-16) + var(--space-4));
 }
 
 .standard-page-content p {
@@ -1464,42 +1435,139 @@ footer p {
     border-bottom: none;
 }
 
-.standard-page-nav {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--space-4);
-    max-width: 65ch;
-    margin: 0 auto;
-    margin-bottom: var(--space-10);
+/* ================================
+   STANDARD PAGE — TABLE OF CONTENTS RAIL
+   Desktop-only (min-width: 1024px), always visible, no trigger/collapse —
+   built entirely by initTocRail() (script.js) on any page with
+   .standard-page-content; no hand-authored markup lives in any entry's
+   HTML. Tablet/mobile render nothing (separate trigger + panel pattern,
+   not built here).
+================================ */
+/* top: --toc-rail-top is set by initTocRail() (script.js) to
+   .standard-page-banner's real bottom edge + a gap — the banner's height
+   comes from its own aspect-ratio and the viewport width alone, not from
+   anything below it, so this lands on the same pixel across entries
+   regardless of Details-card length (confirmed via direct measurement,
+   not assumed — see script.js comment on updateRailTop()). Fallback
+   (pre-JS, or an entry with no banner) keeps the original static offset. */
+.toc-rail {
+    display: none;
+    position: fixed;
+    top: var(--toc-rail-top, calc(var(--space-16) + var(--space-8)));
+    z-index: 10;
 }
 
-.standard-page-nav-prev {
-    text-align: left;
+@media (min-width: 1024px) {
+    /* --toc-rail-left: 50% of the viewport (this is position: fixed) +
+       32.5ch (half of .standard-page-content's own 65ch column) lines the
+       rail's left edge up with the real text column's right edge at any
+       width, using the browser's own ch resolution rather than an assumed
+       pixel value. width falls back via min() to whatever room is
+       actually left before the viewport's right edge — at the 1024px
+       floor there isn't room for the full --toc-rail-width, so this keeps
+       the rail from running off-screen at the narrow end of the desktop
+       range (confirmed by measuring the math, not assumed). */
+    .toc-rail {
+        display: block;
+        --toc-rail-left: calc(50% + 32.5ch + var(--space-6));
+        left: var(--toc-rail-left);
+        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left) - var(--space-6)));
+    }
 }
 
-.standard-page-nav-next {
-    text-align: right;
-    margin-left: auto;
-}
-
-.standard-page-nav-label {
+/* max-height: self-adjusts to whatever room exists between the rail's own
+   top offset (--toc-rail-top, same custom property .toc-rail's own top
+   uses — see comment there) and a bottom-of-viewport margin — not a fixed
+   item cap. Overflow scrolls internally with the next item deliberately
+   clipped mid-row (no fade/gradient — would read as a rendering glitch on
+   this two-tone palette) so it reads as "there's more, scroll".
+   scrollbar-width/scrollbar-color (Firefox) and the ::-webkit-scrollbar*
+   rules below (Chrome/Edge/Safari) restyle the internal scrollbar this
+   overflow produces — left at browser default it renders as a stark,
+   full-size light grey bar with arrow buttons, badly out of place against
+   this dark two-tone palette. Thumb reuses --color-border-strong (this
+   component's own border colour, and the sitewide "emphasized border"
+   token per DESIGN-SYSTEM.md §1.4); track reuses --color-background-subtle
+   (the sitewide "recessed surface" token, §1.2) — no new colour values. */
+.toc-rail-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: var(--space-2);
+    max-height: calc(100vh - var(--toc-rail-top, calc(var(--space-16) + var(--space-8))) - var(--space-16));
+    margin: 0;
+    padding: var(--space-3);
+    list-style: none;
+    overflow-y: auto;
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--elevation-md);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
 }
 
-.standard-page-nav-direction {
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: var(--letter-spacing-widest);
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
+.toc-rail-list::-webkit-scrollbar {
+    width: 8px;
 }
 
-.standard-page-nav-title {
+.toc-rail-list::-webkit-scrollbar-track {
+    background-color: var(--color-background-subtle);
+    border-radius: var(--border-radius-full);
+}
+
+.toc-rail-list::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: var(--border-radius-full);
+}
+
+.toc-rail-list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-secondary);
+}
+
+.toc-rail-item--sub {
+    padding-left: var(--space-4);
+}
+
+/* Inactive state reuses .action-rail-trigger/.filter-drawer-page-btn's
+   shared traits (font-size-sm, border-strong, subtle background) rather
+   than inventing a parallel style — elevation lives on .toc-rail-list
+   above (the panel as a whole), not per-item, since neither reference
+   button is a list row. */
+.toc-rail-link {
+    display: block;
+    padding: var(--space-2) var(--space-3);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
     color: var(--color-text-primary);
+    background-color: var(--color-background-subtle);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.toc-rail-link:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.toc-rail-link:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* Same active treatment as .tag-chip--active, values reused verbatim —
+   including the text-shadow "faux bold" that class relies on for its bold
+   look, since neither class sets font-weight for its active state — not a
+   new teal active colour. */
+.toc-rail-link--active,
+.toc-rail-link--active:hover {
+    border: var(--border-width-medium) solid var(--color-accent-primary-text);
+    background-color: var(--color-background-surface);
+    color: var(--color-accent-primary-text);
+    text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
 }
 
 /* ================================
@@ -2733,15 +2801,6 @@ footer p {
 
     .standard-page-title {
         font-size: var(--font-size-2xl);
-    }
-
-    .standard-page-nav {
-        flex-direction: column;
-        gap: var(--space-3);
-    }
-
-    .standard-page-nav-next {
-        margin-left: 0;
     }
 
     .standard-page-details-row {

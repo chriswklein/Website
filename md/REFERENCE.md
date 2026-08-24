@@ -60,17 +60,24 @@ dev → main
 ```
 my-website/
 ├── index.html          — Home page
-├── work.html           — Work / Portfolio page
-├── thoughts.html       — Thoughts / Blog page
-├── about.html          — About page (also handles contact)
+├── archive.html        — Unified Work + Thoughts index — client-side fetch/filter/sort of data/archive-entries.json
+├── about.html           — About page (also handles contact)
 ├── design-system.html  — Design system reference page (dev reference only)
 ├── nav.html            — Navigation component (partial)
 ├── footer.html         — Footer component (partial)
 ├── style.css           — All styles and design tokens as CSS variables
-├── script.js           — JS: component injection, mobile nav, aria-current, back-to-top, tooltip escape
+├── script.js           — JS: component injection, mobile nav, aria-current, back-to-top, Archive filter/search/sort, Filter Drawer, ToC rail, tooltip escape
+├── work/                — Individual Work entry pages (hand-authored static HTML, one file per entry)
+├── thoughts/             — Individual Thoughts entry pages (hand-authored static HTML, one file per entry)
+├── templates/
+│   ├── work-entry-template.html
+│   └── thought-entry-template.html
+├── data/
+│   └── archive-entries.json — Manifest driving archive.html's listing/filtering and any JS-built card; Home's Featured cards are hand-written and NOT synced to this file
 ├── assets/
-│   ├── images/         — WebP images, srcset variants
-│   └── icons/          — SVG icons if needed beyond Tabler
+│   ├── images/         — WebP/PNG images (see md/DESIGN-SYSTEM.md §11.3 for folder structure — flagged as currently out of sync with real paths, see §11 note there)
+│   ├── icons/           — Favicons and any SVG icons beyond Tabler
+│   └── docs/            — Downloadable documents (e.g. resume PDF)
 ├── tokens/
 │   └── design-system.json — Design tokens in Tokens Studio format (reference only)
 ├── md/                  — Governance docs: REFERENCE.md (this document), DESIGN-SYSTEM.md, COMPONENTS.md, PROMPT-GUIDE.md, NEW-ENTRY-PROCESS.md
@@ -328,38 +335,27 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 ---
 
 ### Home (index.html)
-**Purpose:** First impression. Page-grid layout — profile, featured work, recent thoughts.
-**Status:** Built — IxDF block link pattern, page-grid structure
-**Layout:** Single-column page-grid. Cards in full-width and two-column rows.
-**Mobile:** Single column — Profile, Featured Work, Thoughts. Bottom tab bar navigation.
-**Content counts:** 3 Featured Work cards (1 full width + 2 side-by-side), 3 Thoughts entries (1 full width + 2 side-by-side)
+**Purpose:** First impression. Page-grid layout — greeting, featured work, recent thoughts, recommendations, contact.
+**Status:** Built — IxDF block link pattern, page-grid structure. No Profile sidebar/card — that was a Figma-era concept that never shipped (see md/COMPONENTS.md, "Home-page Profile Sidebar" removed 2026-08-23).
+**Layout:** Single-column page-grid. Cards in full-width rows.
+**Mobile:** Single column — same section order as desktop. Bottom tab bar navigation.
+**Content counts:** 2 Featured Work cards (hand-written, not synced to the manifest), 1 Featured Thought card (hand-written), 2 recommendation quotes, contact section. Home's featured cards must be updated by hand if a featured entry is renamed or removed — see md/NEW-ENTRY-PROCESS.md.
 
-### Work (work.html)
-**Purpose:** Portfolio or professional work showcase — index of all projects.
-**Status:** Scaffolded — design pending
+### Archive (archive.html)
+**Purpose:** Unified index of every Work and Thoughts entry — replaces the earlier separate `work.html` / `thoughts.html` page concept entirely.
+**Status:** Built — client-side fetch of `data/archive-entries.json`, with search, sort, and the Filter Drawer (type + tag filtering, unified across all three breakpoints). Full behaviour spec: md/COMPONENTS.md "## 2c. Filter Drawer".
+**Layout:** Sticky/condensing header with inline filter chips on desktop (floating rail trigger once scrolled), bottom-sheet/anchored-panel Filter Drawer on tablet/mobile and on desktop once condensed. Results grid below, single column of cards.
+**Entry points:** `?type=work`, `?type=thoughts`, `?tag={slug}` query params pre-filter on load — used by nav links, tag links, and Home's "View more work" / "Read more thoughts" links.
 
 ### Standard Page Template (Work entries, Thoughts entries)
 **Purpose:** Individual work or blog post pages.
-**Status:** Design locked — ready to build after Home
-**Layout:** Single column, centred, max-width content
-**Elements:**
-- Breadcrumb navigation: Section > Month/Year > Title
-- Full width banner image (3:1 ratio) with caption
-- Centre aligned H1 title
-- Author avatar, name, published date, updated date
-- Tags and Share button (copy URL to clipboard with toast confirmation)
-- Left-aligned section headings (H2, H3)
-- Left-aligned body text
-- Tags and Share repeated at bottom of content
-- Back to Top button
-
-### Thoughts (thoughts.html)
-**Purpose:** Blog / writing index.
-**Status:** Scaffolded — design pending
+**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/thrilling-beginnings.html`, `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Desktop-only floating Table of Contents rail (scrollspy, auto-generated heading ids) added 2026-08-23 — mobile/tablet trigger+panel variant not yet built. Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
+**Layout:** Single column, centred, max-width 65ch content.
+**Creation process:** md/NEW-ENTRY-PROCESS.md.
 
 ### About (about.html)
 **Purpose:** Detailed personal bio. Handles contact and feedback link.
-**Status:** Scaffolded — design pending
+**Status:** Built — hero, history/experience entries, recommendations, contact section.
 
 ---
 
@@ -457,10 +453,10 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 ## 8. Planned Features (Deferred — Post Launch)
 
 ### Floating Table of Contents
-- Target: Thoughts individual post pages
-- Behaviour: Sidebar on desktop, floating collapsed button on mobile
-- Auto-tracks scroll with `IntersectionObserver` API
-- Status: Logged — build after Thoughts page content exists
+- Target: all Standard Page entries (Work and Thoughts both — broader than originally scoped to Thoughts only)
+- Behaviour: Desktop — always-visible sidebar rail with scrollspy highlighting, shipped 2026-08-23. Mobile/tablet — floating trigger + anchored panel, not yet built.
+- Desktop implementation tracks scroll position directly (not `IntersectionObserver`) against each heading's own `scroll-margin-top`
+- Status: Partially shipped — desktop rail live; mobile/tablet variant still logged
 
 ### Advanced Tooltips
 - Inspired by Baldur's Gate 3 — rich contextual cards with nested information
@@ -475,8 +471,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - Status: Logged — build when Thoughts content exists
 
 ### Tag and Author Filtering
-- Lives on Thoughts index page
-- Status: Logged
+- **Shipped** — tag and type filtering live on `archive.html` via the Filter Drawer (unified Work + Thoughts index, not a separate "Thoughts index page" as originally planned). See md/COMPONENTS.md "## 2c. Filter Drawer". Author filtering was never built or scoped further — the site has one author.
 
 ### Draggable Floating Button / Context Menu
 - Press and hold to drag, tap to expand context menu
@@ -489,11 +484,11 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - Status: Logged — post launch
 
 ### Vertical Action Rail
-- A fixed vertical sidebar of icon-only action buttons (e.g. share, bookmark, react)
-- Sits adjacent to long-form content on standard pages (Thoughts posts)
-- Desktop only — collapses or hides on tablet/mobile
-- Similar pattern to Medium / Substack article sidebars
-- Status: Backlog — design not started
+- A fixed vertical rail of floating action buttons, right-edge gutter, desktop
+- **Filters trigger: shipped** — `.action-rail-group` / `.action-rail-trigger` live on `archive.html`, appears once the header condenses on scroll. See md/COMPONENTS.md "## 2c. Filter Drawer".
+- Theme toggle: built (`.theme-toggle-rail`, `initThemeToggle()`) but dormant — call site commented out in script.js pending a permanent home in this rail; no toggle currently renders on any page
+- Still logged/not built: additional actions (share, bookmark, react) and an accessibility-options slot
+- Status: In progress — Filters trigger shipped; remaining slots (theme toggle activation, share/bookmark/react, accessibility options) still logged
 
 ---
 
@@ -673,3 +668,15 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
 - The five governance docs — REFERENCE.md, DESIGN-SYSTEM.md, COMPONENTS.md, PROMPT-GUIDE.md, NEW-ENTRY-PROCESS.md — moved from the project root into a new `md/` folder. README.md stays at the root.
 - None of the five were ever fetched, linked, or referenced by any live page or script (confirmed by repo-wide grep before the move) — the move has no effect on the live site.
 - All cross-references between these five files were updated in place to the `md/{filename}` form. Future sessions and prompts should reference them as `md/REFERENCE.md`, `md/DESIGN-SYSTEM.md`, `md/COMPONENTS.md`, `md/PROMPT-GUIDE.md`, `md/NEW-ENTRY-PROCESS.md` — not the old root-level paths.
+
+**2026-08-17 to 2026-08-21 — summarized retroactively on 2026-08-23; see md/COMPONENTS.md for full detail on each, this is an index not a replacement**
+- **8/17:** Standard Page Template redesign — Details card (label/value rows for Employer/Role/Timeline/Tools or Published/Updated) replaced the old author-row + `.standard-page-meta` header; footer rebuilt around Share + tag-driven "More Work"/"More Thoughts" + reused contact section, replacing the old non-functional Previous/Next `.standard-page-nav`. Breadcrumb simplified to 2 segments (Primary Tag › Title), dropping a redundant Month/Year segment. `work/star-engine.html`, `thoughts/thrilling-beginnings.html`, and both templates migrated first.
+- **8/18:** In-body images and tables added to `.standard-page-content` (captioned via `<figure>`/`.standard-page-caption`, tables capped to 65ch with horizontal scroll). PROMPT-GUIDE.md Rule 3a added (reuse an existing component pattern over mapping a Figma/spec value to the nearest token) after a concrete Body-20 tag/text oversizing incident.
+- **8/19:** Revision pass on the 8/17 redesign per visual review — author row removed outright (not just deferred), Details card text sizes walked back from Figma-derived Body-20 to the site's existing `.card-meta` scale, footer's Share/More-Work buttons fixed to equal width, banner max-width capped to the text column's own 65ch instead of the full 1200px page width, `.tag--details` modifier removed so Details-card tags match Archive-card tags exactly.
+- **8/21:** Archive Filter Drawer redesign — the three-breakpoint filter UI unified onto one shared drawer pattern (previously more breakpoint-divergent); PROMPT-GUIDE.md Rule 5a added (assume a decision spans all three breakpoints unless a prompt names one specifically) after stale two-breakpoint wording nearly shipped that way.
+- **By 8/21:** the remaining two entries (`work/this-website.html`, `thoughts/physical-and-digital-media.html`) and `thoughts/industrializing-the-industry.html` were also migrated to the 8/17-era Details/Footer structure — md/COMPONENTS.md's "Migration status" note had drifted out of sync claiming these three were still on the old structure; corrected 2026-08-23 after direct verification found zero real consumers of `.standard-page-meta` / `.standard-page-nav` anywhere in the repo.
+
+**2026-08-23**
+- Desktop-only floating Table of Contents rail shipped for Standard Page entries (Work and Thoughts both) — automatic heading-id generation (preserving any hand-authored id), always-visible scrollspy rail at ≥1024px, H3s nested under their parent H2. Mobile/tablet trigger + panel variant not built yet (separate follow-on). See `getTocHeadings()` / `initTocRail()` in script.js and the "STANDARD PAGE — TABLE OF CONTENTS RAIL" section of style.css.
+- Documentation sync pass: REFERENCE.md (this document), DESIGN-SYSTEM.md, and COMPONENTS.md corrected against the real repo state after discovering several docs had been iterated on in claude.ai Project knowledge but never actually committed here. Dead CSS from the pre-8/17 Standard Page structure (`.standard-page-meta*`, `.standard-page-nav*`, `.card-meta-label`) removed from style.css — confirmed zero real consumers first. `.claude/settings.json` permission entries referencing the deleted `card-variants-preview.html` removed. Two referenced planning docs (`claude/2026-08-23-floating-toc-spec.md`, `2026-08-09-redesign-status.md`) do not exist anywhere in this repo — likely never committed from wherever they were drafted; flagged rather than reconstructed from assumption.
+- DESIGN-SYSTEM.md §1.6 corrected — was still documenting gold as the primary accent after teal became the live default; now states teal as canonical, gold as the dormant `[data-theme="gold"]` override. §11.3/§11.4's documented asset path (`assets/images/work/{slug}/{slug}-banner.webp`) vs. the real path in use (`assets/images/entries/{slug}/{Slug}-banner.png`) was flagged, not resolved — needs a decision on which one changes.
