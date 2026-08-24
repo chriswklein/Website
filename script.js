@@ -521,12 +521,32 @@ function initTocRail() {
         // threshold by a fraction of a pixel and leave the previous
         // heading highlighted instead — confirmed via direct #anchor
         // navigation, not assumed.
+        //
+        // atBottom special-case: the last heading's own threshold-crossing
+        // check below can be permanently unreachable, not just late. Every
+        // entry ends in the same shared footer block (Share/More Work,
+        // contact section, Back to Top, copyright) below the final
+        // heading; whenever that trailing content is shorter than the
+        // viewport, the document runs out of scrollable room before the
+        // last heading's top can ever reach the threshold line, so the
+        // loop below would leave the second-to-last heading active no
+        // matter how far the user scrolls — confirmed via direct
+        // measurement (heading.getBoundingClientRect().top at max
+        // scrollY was still ~192px, well past the ~80px threshold, on
+        // both a short and a long entry), not assumed. Scrolled to the
+        // document's actual bottom, the last heading is unambiguously the
+        // current one regardless of where its top sits.
+        const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
         let currentIndex = 0;
-        for (let i = 0; i < headings.length; i++) {
-            if (headings[i].getBoundingClientRect().top <= threshold + 1) {
-                currentIndex = i;
-            } else {
-                break;
+        if (atBottom) {
+            currentIndex = headings.length - 1;
+        } else {
+            for (let i = 0; i < headings.length; i++) {
+                if (headings[i].getBoundingClientRect().top <= threshold + 1) {
+                    currentIndex = i;
+                } else {
+                    break;
+                }
             }
         }
         const current = headings[currentIndex];
