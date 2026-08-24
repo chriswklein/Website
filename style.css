@@ -1571,6 +1571,146 @@ footer p {
 }
 
 /* ================================
+   STANDARD PAGE — TABLE OF CONTENTS TRIGGER + PANEL (<1024px)
+   Trigger reuses .action-rail-group/.action-rail-trigger/
+   .action-rail-badge verbatim (Rule 3a) — same classes Archive's Filter
+   trigger uses, safe to share since the two never appear on the same
+   page. .toc-trigger-group only adds the display override below, which
+   inverts .toc-rail's own breakpoint (rail: block at >=1024px, hidden
+   below; trigger/panel: the reverse) so the two surfaces never coexist.
+   Heading-list items inside the panel reuse .toc-rail-link/
+   .toc-rail-item--sub/.toc-rail-link--active verbatim too — same
+   font-size-sm treatment as the desktop rail (confirmed via direct grep,
+   not assumed), same active/inactive states, no parallel styling.
+================================ */
+.action-rail-group.toc-trigger-group {
+    display: none;
+}
+
+.toc-panel {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .action-rail-group.toc-trigger-group {
+        display: flex;
+    }
+
+    /* :not([hidden]) rather than toggling display in script.js — this way
+       the >=1024px rule above still wins on its own regardless of the
+       hidden attribute's state, so the panel can never render at desktop
+       widths even if JS state were ever wrong. */
+    .toc-panel:not([hidden]) {
+        display: block;
+    }
+
+    /* Anchor: bottom-right corner pinned to the trigger's own resting
+       position, same technique the Desktop Filter Panel already uses for
+       .filter-drawer (see DESKTOP (min-width: 1024px) — Filter Drawer
+       becomes an anchored panel, below) — right formula reused verbatim;
+       bottom derived the same way (trigger's vertical centre, offset by
+       half its own height) but recomputed for *this* trigger's real
+       centre at this breakpoint: .action-rail-group sits at top: 50% here
+       (no override until the 767px tier below), so bottom mirrors the
+       Filter Panel's own 50vh math exactly. Width reuses --toc-rail-width
+       (the desktop rail's own width token) rather than a new value;
+       max-width clamps it against a narrow phone viewport the same way
+       the Filter Panel's own max-width does. */
+    .toc-panel {
+        position: fixed;
+        z-index: 250;
+        right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+        bottom: calc(50vh - (var(--touch-target-minimum) / 2));
+        width: var(--toc-rail-width);
+        max-width: calc(100vw - (var(--space-8) * 2));
+        max-height: calc(100vh - (var(--space-8) * 2));
+        overflow-y: auto;
+        margin: 0;
+        padding: var(--space-3);
+        background-color: var(--color-background-surface);
+        border: var(--border-width-thin) solid var(--color-border-strong);
+        border-radius: var(--border-radius-md);
+        transform: translateY(var(--space-2)) scale(0.98);
+        transform-origin: bottom right;
+        opacity: 0;
+        transition: transform var(--duration-base) var(--ease-out),
+                    opacity var(--duration-base) var(--ease-out);
+    }
+
+    .toc-panel--open {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        box-shadow: var(--elevation-xl);
+    }
+}
+
+@media (max-width: 767px) {
+    /* .action-rail-group moves to top: 70% at this tier (see MOBILE
+       section, below) — bottom mirrors that same centre (100vh - 70vh =
+       30vh from the bottom) rather than the 50vh math above, so the panel
+       stays anchored to the trigger's real position instead of drifting
+       from it once the trigger itself moves. */
+    .toc-panel {
+        bottom: calc(30vh - (var(--touch-target-minimum) / 2));
+    }
+}
+
+.toc-panel-label {
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-widest);
+    color: var(--color-text-secondary);
+}
+
+/* Layout only — no background/border/shadow here, unlike .toc-rail-list:
+   .toc-panel (above) already carries that chrome at the container level,
+   so putting it on the list too would double it up. */
+.toc-panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Scrim — real click-catching element, not just a document click listener:
+   values reused verbatim from .archive-scrim (the Filter Drawer's own
+   scrim — see ARCHIVE PAGE section below), a new class rather than the
+   literal one since this is a genuinely separate overlay instance (unlike
+   the trigger/badge/link classes above, a scrim's opacity/pointer-events
+   state is tied to one specific panel's open/close lifecycle, not
+   interchangeable the way a button's static shape is). opacity stays 0 in
+   both states — invisible hit-area only, no dimming — same as the Filter
+   Drawer's; pointer-events: auto on --open is what actually catches and
+   stops a background click from also reaching whatever is underneath.
+   z-index 249 — one below .toc-panel's own 250, same relative offset as
+   .archive-scrim (249) sits below .filter-drawer (250). display: none
+   unconditionally above 1023px is a hard gate independent of JS state,
+   matching .toc-panel's own belt-and-suspenders pattern. */
+.toc-panel-scrim {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .toc-panel-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 249;
+        background-color: var(--color-background-base);
+        opacity: 0;
+        transition: opacity var(--duration-base) var(--ease-out);
+        pointer-events: none;
+    }
+
+    .toc-panel-scrim--open {
+        pointer-events: auto;
+    }
+}
+
+/* ================================
    ABOUT PAGE
 ================================ */
 .about-hero {

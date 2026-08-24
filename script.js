@@ -209,23 +209,12 @@ function getTocHeadings() {
     return headings;
 }
 
-// Desktop-only (CSS handles the <1024px hide) floating rail: lists every
-// H2/H3 in an entry, H3s indented under their parent H2, with scrollspy
-// highlighting the current heading. Built entirely here — no hand-authored
-// markup in any entry's HTML — and inserted right after the skip link so
-// it's reachable early in tab order, not after the whole page's content.
-function initTocRail() {
-    const headings = getTocHeadings();
-    if (!headings.length) return;
-
-    const rail = document.createElement('nav');
-    rail.className = 'toc-rail';
-    rail.setAttribute('aria-label', 'Table of contents');
-
-    const list = document.createElement('ul');
-    list.className = 'toc-rail-list';
-
-    const links = headings.map(heading => {
+// Builds one <li><a class="toc-rail-link"> per heading into `container`,
+// H3s getting the --sub indent modifier. Shared by the desktop rail and
+// the <1024px panel so the two never carry two different copies of this
+// markup-building logic — only their outer containers differ.
+function buildTocLinks(headings, container) {
+    return headings.map(heading => {
         const item = document.createElement('li');
         if (heading.tagName === 'H3') item.className = 'toc-rail-item--sub';
 
@@ -235,13 +224,36 @@ function initTocRail() {
         link.textContent = heading.textContent;
 
         item.appendChild(link);
-        list.appendChild(item);
+        container.appendChild(item);
         return link;
     });
+}
 
-    rail.appendChild(list);
+// Desktop rail (CSS shows it only at >=1024px) plus the <1024px trigger +
+// anchored panel (Prompt B) — built together from one shared heading list
+// and one shared scrollspy pass, so current-heading tracking never runs
+// twice or drifts between the two surfaces. Nothing here is gated behind
+// viewport width in JS: both surfaces are always built and scrollspy
+// always runs; CSS alone decides which surface is actually visible at a
+// given width (mirror-image display:none/block pairs — see style.css),
+// so the position badge can read live state even when the rail itself is
+// hidden. Inserted right after the skip link so both are reachable early
+// in tab order, not after the whole page's content.
+function initTocRail() {
+    const headings = getTocHeadings();
+    if (!headings.length) return;
 
     const main = document.getElementById('main-content');
+
+    // --- Desktop rail (>=1024px) ---------------------------------------
+    const rail = document.createElement('nav');
+    rail.className = 'toc-rail';
+    rail.setAttribute('aria-label', 'Table of contents');
+
+    const railList = document.createElement('ul');
+    railList.className = 'toc-rail-list';
+    const railLinks = buildTocLinks(headings, railList);
+    rail.appendChild(railList);
     document.body.insertBefore(rail, main);
 
     // Anchors the rail's fixed top offset to .standard-page-banner's real
@@ -270,39 +282,280 @@ function initTocRail() {
     updateRailTop();
     window.addEventListener('resize', updateRailTop);
 
+    // --- <1024px trigger + anchored panel (Prompt B) --------------------
+    // Trigger reuses .action-rail-group/.action-rail-trigger/
+    // .action-rail-badge verbatim (Rule 3a) — same position, shape and
+    // badge treatment as Archive's Filter trigger. The two never coexist
+    // on the same page (Filter trigger only exists on archive.html, this
+    // only on Standard Page entries), so sharing the literal classes
+    // carries no collision risk. .toc-trigger-group is an additional
+    // class, not a replacement — it only overrides display (see
+    // style.css) to invert the breakpoint versus Archive's own always-
+    // visible use of the same base classes; show/hide *within* that range
+    // is scroll-threshold driven (matching .back-to-top's own mechanism,
+    // via .action-rail-group--visible, the same modifier class Archive's
+    // trigger already uses) rather than Archive's drawer-open-state
+    // toggle, since this trigger has no drawer-open state of its own to
+    // key off.
+    const triggerGroup = document.createElement('div');
+    triggerGroup.className = 'action-rail-group toc-trigger-group';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'action-rail-trigger';
+    trigger.id = 'toc-trigger';
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', 'toc-panel');
+    trigger.setAttribute('aria-haspopup', 'true');
+
+    const triggerLabel = document.createElement('span');
+    triggerLabel.className = 'trigger-label';
+    triggerLabel.textContent = 'Contents';
+
+    // aria-hidden: the count is announced via the trigger's own aria-label
+    // instead (updated in updateActiveState() below) so it isn't announced
+    // twice — matching the "heading X of Y" wording asked for, without a
+    // second accessible node nested inside the button's own accessible name.
+    const badge = document.createElement('span');
+    badge.className = 'action-rail-badge';
+    badge.setAttribute('aria-hidden', 'true');
+
+    trigger.append(triggerLabel, badge);
+    triggerGroup.appendChild(trigger);
+    document.body.insertBefore(triggerGroup, main);
+
+    // Same scroll-threshold value as .back-to-top's own (initBackToTop()
+    // above) — not approximated.
+    window.addEventListener('scroll', () => {
+        triggerGroup.classList.toggle('action-rail-group--visible', window.scrollY > 400);
+    }, { passive: true });
+
+    // Panel: <nav>, same landmark type and aria-label as the desktop rail
+    // (this is the same navigational content, just rendered differently
+    // per breakpoint) — not role="dialog": the Filter Drawer's own
+    // role="dialog" belongs to that specific full-screen sheet; this is a
+    // small anchored popover, same category of thing as the Desktop
+    // Filter Panel it's modelled on, which doesn't carry dialog semantics
+    // either.
+    //
+    // Outside-close now matches the real Filter Drawer pattern exactly
+    // (scrim + body-scroll-lock + inert), not the lighter document-click-
+    // listener version this shipped with initially — that version let a
+    // background click both close the panel AND activate whatever was
+    // underneath it, since a listener alone (without stopping the event)
+    // can observe a click but not catch it. A real scrim element with
+    // pointer-events: auto while open intercepts the click itself, so
+    // nothing beneath it ever receives it.
+    const panel = document.createElement('nav');
+    panel.className = 'toc-panel';
+    panel.id = 'toc-panel';
+    panel.setAttribute('aria-label', 'Table of contents');
+    panel.hidden = true;
+
+    // aria-hidden: redundant with the <nav>'s own aria-label above once
+    // announced as a landmark — visible for sighted users only.
+    const panelLabel = document.createElement('p');
+    panelLabel.className = 'toc-panel-label';
+    panelLabel.textContent = 'Table of Contents';
+    panelLabel.setAttribute('aria-hidden', 'true');
+
+    const panelList = document.createElement('ul');
+    panelList.className = 'toc-panel-list';
+    const panelLinks = buildTocLinks(headings, panelList);
+
+    panel.append(panelLabel, panelList);
+
+    const scrim = document.createElement('div');
+    scrim.className = 'toc-panel-scrim';
+    scrim.setAttribute('aria-hidden', 'true');
+    scrim.hidden = true;
+
+    document.body.insertBefore(scrim, main);
+    document.body.insertBefore(panel, main);
+
+    let removeTrapFocus = null;
+    let savedScrollY = 0;
+
+    // Same technique as initFilterDrawer()'s lockBodyScroll()/
+    // unlockBodyScroll() (script.js, above) — position: fixed rather than
+    // overflow: hidden, which is known to leak scroll on iOS Safari — and
+    // the same .body-scroll-locked class. Not calling into
+    // initFilterDrawer() itself: that closure is private to Archive
+    // (initFilterDrawer() no-ops entirely on Entry pages — there's no
+    // #filter-drawer element here to find), so this is a second instance
+    // of the same technique, not a shared one — Rule 3a covers reusing a
+    // value/pattern, not literally sharing unrelated closures across
+    // unrelated components.
+    function lockBodyScroll() {
+        savedScrollY = window.scrollY;
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.classList.add('body-scroll-locked');
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('body-scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+    }
+
+    // Elements to inert while the panel is open — prevents Tab from
+    // reaching background content the scrim already blocks from clicks.
+    // .toc-trigger-group isn't included: it's hidden via the
+    // action-rail-group--visible toggle below, which already removes it
+    // from focus order and the accessibility tree on its own (visibility:
+    // hidden), so inerting it too would be redundant.
+    function getTocInertTargets() {
+        return [
+            document.getElementById('nav-placeholder'),
+            document.getElementById('main-content'),
+            document.querySelector('.toast'),
+            document.querySelector('.tab-bar'),
+            document.getElementById('footer-placeholder'),
+        ].filter(Boolean);
+    }
+
+    function openPanel() {
+        lockBodyScroll();
+        scrim.removeAttribute('hidden');
+        panel.hidden = false;
+        requestAnimationFrame(() => {
+            panel.classList.add('toc-panel--open');
+            scrim.classList.add('toc-panel-scrim--open');
+        });
+        trigger.setAttribute('aria-expanded', 'true');
+        trigger.setAttribute('aria-label', 'Close table of contents');
+
+        getTocInertTargets().forEach(el => el.setAttribute('inert', ''));
+
+        // Same visibility mechanism the scroll-threshold show/hide above
+        // already uses (.action-rail-group--visible) — one hide method for
+        // the trigger, not two. Mirrors exactly how initFilterDrawer()'s
+        // openDrawer() hides Archive's own .action-rail-group while its
+        // drawer is open (script.js, above).
+        triggerGroup.classList.remove('action-rail-group--visible');
+
+        removeTrapFocus = trapFocus(panel);
+        document.addEventListener('keydown', handlePanelEscape);
+
+        const firstLink = panelList.querySelector('.toc-rail-link');
+        // preventScroll: true — firstLink is inside a position: fixed
+        // panel, always on-screen regardless of scrollY, so the browser's
+        // default scroll-into-view on focus is not just unneeded but
+        // actively wrong here — confirmed via testing, not assumed: without
+        // it, focusing the link scrolled the whole page back to top.
+        if (firstLink) requestAnimationFrame(() => firstLink.focus({ preventScroll: true }));
+    }
+
+    function closePanel({ returnFocus = true } = {}) {
+        unlockBodyScroll();
+        panel.classList.remove('toc-panel--open');
+        scrim.classList.remove('toc-panel-scrim--open');
+        trigger.setAttribute('aria-expanded', 'false');
+        updateActiveState();
+
+        if (removeTrapFocus) {
+            removeTrapFocus();
+            removeTrapFocus = null;
+        }
+        document.removeEventListener('keydown', handlePanelEscape);
+
+        getTocInertTargets().forEach(el => el.removeAttribute('inert'));
+
+        // Restore trigger visibility synchronously, BEFORE trigger.focus()
+        // below — not inside the transitionend callback further down,
+        // which fires later. A still visibility: hidden element silently
+        // refuses .focus(), which would reintroduce the exact keyboard-
+        // accessibility regression already fixed once on the Filter
+        // Drawer's own trigger (see closeDrawer()'s identical comment,
+        // above) — same root cause, same fix: disable the transition just
+        // for this one change so it applies instantly and deterministically
+        // (confirmed via testing, not assumed), then restore it immediately
+        // via a forced reflow.
+        triggerGroup.classList.add('action-rail-group--instant');
+        triggerGroup.classList.add('action-rail-group--visible');
+        void triggerGroup.offsetHeight; // forces the instant change to commit before re-enabling the transition
+        triggerGroup.classList.remove('action-rail-group--instant');
+
+        panel.addEventListener('transitionend', () => {
+            panel.hidden = true;
+            scrim.setAttribute('hidden', '');
+        }, { once: true });
+
+        // preventScroll: true — same reasoning as unlockBodyScroll()'s own
+        // restore above: trigger is fixed-position, always on-screen
+        // regardless of scrollY, so no scroll-into-view is ever needed.
+        if (returnFocus) trigger.focus({ preventScroll: true });
+    }
+
+    function handlePanelEscape(event) {
+        if (event.key === 'Escape') closePanel();
+    }
+
+    trigger.addEventListener('mousedown', (e) => e.preventDefault());
+    trigger.addEventListener('click', () => {
+        if (panel.hidden) openPanel();
+        else closePanel();
+    });
+
+    scrim.addEventListener('click', () => closePanel({ returnFocus: false }));
+
+    // Selecting a heading closes the panel (per spec) without returning
+    // focus to the trigger — the clicked link's own default navigation
+    // (scroll + browser's native fragment-focus behavior) already moves
+    // focus meaningfully, so pulling it back to the trigger would fight
+    // that instead of helping it.
+    panelList.addEventListener('click', (event) => {
+        if (event.target.closest('.toc-rail-link')) closePanel({ returnFocus: false });
+    });
+
+    // --- Shared scrollspy -------------------------------------------------
     // Threshold read from the heading's own computed scroll-margin-top
     // (style.css) rather than a duplicated magic number, so the two never
     // drift out of sync.
     const threshold = parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 0;
 
-    function updateActiveLink() {
+    function updateActiveState() {
         // +1px tolerance absorbs sub-pixel rendering (header's real height
         // is a fractional 64.6667px — see NAVIGATION section, style.css) so
         // a heading landed on via anchor jump doesn't miss its own
         // threshold by a fraction of a pixel and leave the previous
         // heading highlighted instead — confirmed via direct #anchor
         // navigation, not assumed.
-        let current = headings[0];
-        for (const heading of headings) {
-            if (heading.getBoundingClientRect().top <= threshold + 1) {
-                current = heading;
+        let currentIndex = 0;
+        for (let i = 0; i < headings.length; i++) {
+            if (headings[i].getBoundingClientRect().top <= threshold + 1) {
+                currentIndex = i;
             } else {
                 break;
             }
         }
-        links.forEach(link => {
-            const isActive = link.getAttribute('href') === `#${current.id}`;
-            link.classList.toggle('toc-rail-link--active', isActive);
-            if (isActive) {
-                link.setAttribute('aria-current', 'true');
-            } else {
-                link.removeAttribute('aria-current');
-            }
+        const current = headings[currentIndex];
+
+        [railLinks, panelLinks].forEach(links => {
+            links.forEach(link => {
+                const isActive = link.getAttribute('href') === `#${current.id}`;
+                link.classList.toggle('toc-rail-link--active', isActive);
+                if (isActive) {
+                    link.setAttribute('aria-current', 'true');
+                } else {
+                    link.removeAttribute('aria-current');
+                }
+            });
         });
+
+        badge.textContent = `${currentIndex + 1}/${headings.length}`;
+        // Only while closed — while open the label says "Close table of
+        // contents" instead (set in openPanel()); background scroll can
+        // still move the badge/position while the panel is open (no
+        // scroll-lock), but the trigger's own accessible name doesn't
+        // need to chase that in real time the way the visible badge does.
+        if (trigger.getAttribute('aria-expanded') !== 'true') {
+            trigger.setAttribute('aria-label', `Table of contents, heading ${currentIndex + 1} of ${headings.length}`);
+        }
     }
 
-    window.addEventListener('scroll', updateActiveLink, { passive: true });
-    window.addEventListener('resize', updateActiveLink);
+    window.addEventListener('scroll', updateActiveState, { passive: true });
+    window.addEventListener('resize', updateActiveState);
 
     // Re-lands on the URL's own #hash now that the header's real height is
     // known, correcting the browser's earlier native fragment scroll (see
@@ -314,7 +567,7 @@ function initTocRail() {
         }
     }
 
-    updateActiveLink();
+    updateActiveState();
 }
 
 // Traps keyboard focus within element while open.
