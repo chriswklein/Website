@@ -158,6 +158,17 @@ function initBackToTop() {
     if (!button) return;
 
     window.addEventListener('scroll', () => {
+        // Skip while any scroll-lock (.body-scroll-locked — shared by the
+        // ToC panel and the Archive Filter Drawer, see lockBodyScroll() in
+        // each) is active: position: fixed on <body> makes window.scrollY
+        // read 0 regardless of the real, visually frozen scroll position,
+        // so this would otherwise read a corrupted 0 and hide the button —
+        // confirmed via direct DOM inspection, not assumed: opening the ToC
+        // panel deep in an entry stripped this button's own --visible class
+        // immediately, with no scrolling having actually happened. True
+        // scroll position can't change while locked, so there's nothing to
+        // recompute here until the lock lifts.
+        if (document.body.classList.contains('body-scroll-locked')) return;
         button.classList.toggle('back-to-top--visible', window.scrollY > 400);
     });
 
@@ -250,10 +261,20 @@ function initTocRail() {
     rail.className = 'toc-rail';
     rail.setAttribute('aria-label', 'Table of contents');
 
+    // Reuses .toc-panel-label verbatim (Rule 3a) — same class the </1024px
+    // panel's own label already uses, same reasoning for aria-hidden
+    // (redundant with the <nav>'s own aria-label once announced as a
+    // landmark — visible for sighted users only), not a new parallel
+    // class for what's visually and semantically the same element.
+    const railLabel = document.createElement('p');
+    railLabel.className = 'toc-panel-label';
+    railLabel.textContent = 'Table of Contents';
+    railLabel.setAttribute('aria-hidden', 'true');
+
     const railList = document.createElement('ul');
     railList.className = 'toc-rail-list';
     const railLinks = buildTocLinks(headings, railList);
-    rail.appendChild(railList);
+    rail.append(railLabel, railList);
     document.body.insertBefore(rail, main);
 
     // Anchors the rail's fixed top offset to .standard-page-banner's real
@@ -279,8 +300,44 @@ function initTocRail() {
         rail.style.setProperty('--toc-rail-top', `${top}px`);
     }
 
+    // Anchors the rail's left edge to .standard-page-content's real
+    // rendered right edge (this is position: fixed, so a viewport-relative
+    // rect needs no scrollY correction the way updateRailTop()'s vertical
+    // measurement does — horizontal position doesn't move on vertical
+    // scroll). Replaces a pure-CSS `50% + 32.5ch` estimate that depended
+    // on 'ch' resolving against whichever font is active when the browser
+    // evaluates it — this entry's font (Noto Sans, loaded async via
+    // display: swap) briefly isn't, and real iPad landscape testing showed
+    // the rail collapse to a near-unusable width even though re-deriving
+    // the same arithmetic against this browser's own metrics at matching
+    // viewports never reproduced a collapse — font-metric drift between
+    // the fallback and loaded font, not the formula's arithmetic, is the
+    // most likely cause. Measuring the column's actual box sidesteps that
+    // dependency entirely. Recomputed on resize (the column's fixed 65ch
+    // width means its centred right edge still shifts as the viewport
+    // widens) and once fonts finish loading, since a font swap can change
+    // the column's own rendered width (also 'ch'-based) after this first
+    // runs.
+    function updateRailLeft() {
+        const content = document.querySelector('.standard-page-content');
+        if (!content) return;
+        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-6'));
+        const left = content.getBoundingClientRect().right + gap;
+        rail.style.setProperty('--toc-rail-left', `${left}px`);
+    }
+
     updateRailTop();
+    updateRailLeft();
     window.addEventListener('resize', updateRailTop);
+    window.addEventListener('resize', updateRailLeft);
+    // Only --toc-rail-left, not --toc-rail-top, needs a font-load re-run:
+    // the banner's height (top's own basis) comes from aspect-ratio and
+    // viewport width alone, not font metrics — see updateRailTop()'s own
+    // comment — but .standard-page-content's rendered width is 'ch'-based,
+    // so its right edge can still shift once the swap completes.
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(updateRailLeft);
+    }
 
     // --- <1024px trigger + anchored panel (Prompt B) --------------------
     // Trigger reuses .action-rail-group/.action-rail-trigger/
@@ -515,6 +572,24 @@ function initTocRail() {
     const threshold = parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 0;
 
     function updateActiveState() {
+        // Skip entirely while the panel's scroll-lock is active (see
+        // lockBodyScroll() below): position: fixed on <body> is what makes
+        // the lock work, but as a side effect it also collapses
+        // document.documentElement.scrollHeight to just the viewport's own
+        // height and makes window.scrollY read 0, regardless of the real
+        // (visually frozen) scroll position — confirmed via direct
+        // measurement, not assumed: scrollHeight dropped from ~10669 to
+        // exactly innerHeight the instant the lock class was applied. Any
+        // scroll/resize event that fires while locked (confirmed one does
+        // fire immediately on lock, in addition to whatever a live device-
+        // preset resize drag produces) would otherwise recompute against
+        // those corrupted values and wrongly force the LAST heading active
+        // no matter the true scroll position. There's nothing to recompute
+        // here anyway while locked — true scroll position cannot change
+        // until unlockBodyScroll() runs, and closePanel() already calls
+        // updateActiveState() once explicitly right after that happens.
+        if (document.body.classList.contains('body-scroll-locked')) return;
+
         // +1px tolerance absorbs sub-pixel rendering (header's real height
         // is a fractional 64.6667px — see NAVIGATION section, style.css) so
         // a heading landed on via anchor jump doesn't miss its own

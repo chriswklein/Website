@@ -1458,29 +1458,62 @@ footer p {
 }
 
 @media (min-width: 1024px) {
-    /* --toc-rail-left: 50% of the viewport (this is position: fixed) +
-       32.5ch (half of .standard-page-content's own 65ch column) lines the
-       rail's left edge up with the real text column's right edge at any
-       width, using the browser's own ch resolution rather than an assumed
-       pixel value. width falls back via min() to whatever room is
-       actually left before the viewport's right edge — at the 1024px
-       floor there isn't room for the full --toc-rail-width, so this keeps
-       the rail from running off-screen at the narrow end of the desktop
-       range (confirmed by measuring the math, not assumed). */
+    /* --toc-rail-left: set by initTocRail() (script.js) to the real
+       rendered right edge of .standard-page-content (the 65ch text
+       column) + a gap, the same "measure the real DOM, don't derive it"
+       approach --toc-rail-top already uses for the vertical axis (see
+       updateRailTop() and its comment there). The var()'s own fallback
+       (50% of the viewport, this is position: fixed, + 32.5ch — half the
+       column's own 65ch width — + the gap) is pure CSS for the pre-JS
+       case only; it depends on 'ch' resolving against the *currently
+       active* font, which made it fragile as the live formula — Noto
+       Sans loads async (display: swap; see the <link> in each entry's
+       <head>) so the page briefly renders in a fallback font with
+       different glyph metrics, and this custom property didn't reliably
+       reflow once the swap completed (confirmed real-iPad landscape
+       testing showed the rail collapsed to a near-unusable width even
+       though re-deriving the same math against Chromium's own metrics at
+       matching viewports — 1024, ~1194, 1280, ~1366, 1440, 1920px — never
+       produced a collapse there; font-metric drift between the fallback
+       and loaded font, not the formula's arithmetic, is the most likely
+       explanation). Measuring the column's actual box sidesteps the
+       'ch'/font-timing dependency entirely: correct regardless of which
+       font is active when it runs. width still falls back via min() to
+       whatever room is actually left before the viewport's right edge —
+       at the 1024px floor there isn't room for the full --toc-rail-width,
+       so this keeps the rail from running off-screen at the narrow end of
+       the desktop range (unchanged from before, confirmed by measuring
+       the math). */
     .toc-rail {
-        display: block;
-        --toc-rail-left: calc(50% + 32.5ch + var(--space-6));
-        left: var(--toc-rail-left);
-        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left) - var(--space-6)));
+        display: flex;
+        flex-direction: column;
+        left: var(--toc-rail-left, calc(50% + 32.5ch + var(--space-6)));
+        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left, calc(50% + 32.5ch + var(--space-6))) - var(--space-6)));
+        /* max-height/chrome moved here from .toc-rail-list below, now that
+           the list has a label sibling above it inside this same card —
+           mirrors .toc-panel's own architecture (outer element carries
+           the card chrome + height cap, inner list is layout-only) so the
+           label reads as part of one unified card instead of a floating
+           line above a separately-bordered box. Formula itself is
+           unchanged from the one .toc-rail-list used to carry: self-
+           adjusts to whatever room exists between --toc-rail-top and a
+           bottom-of-viewport margin. */
+        max-height: calc(100vh - var(--toc-rail-top, calc(var(--space-16) + var(--space-8))) - var(--space-16));
+        padding: var(--space-3);
+        background-color: var(--color-background-surface);
+        border: var(--border-width-thin) solid var(--color-border-strong);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--elevation-md);
     }
 }
 
-/* max-height: self-adjusts to whatever room exists between the rail's own
-   top offset (--toc-rail-top, same custom property .toc-rail's own top
-   uses — see comment there) and a bottom-of-viewport margin — not a fixed
-   item cap. Overflow scrolls internally with the next item deliberately
-   clipped mid-row (no fade/gradient — would read as a rendering glitch on
-   this two-tone palette) so it reads as "there's more, scroll".
+/* flex: 1 1 auto + min-height: 0 lets this shrink below its own content
+   size inside .toc-rail's flex column so max-height (above, on the
+   parent now) actually constrains it instead of the list pushing the
+   card taller than its cap — standard flex-scroll-child pattern.
+   Overflow scrolls internally with the next item deliberately clipped
+   mid-row (no fade/gradient — would read as a rendering glitch on this
+   two-tone palette) so it reads as "there's more, scroll".
    scrollbar-width/scrollbar-color (Firefox) and the ::-webkit-scrollbar*
    rules below (Chrome/Edge/Safari) restyle the internal scrollbar this
    overflow produces — left at browser default it renders as a stark,
@@ -1492,16 +1525,13 @@ footer p {
 .toc-rail-list {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
     gap: var(--space-2);
-    max-height: calc(100vh - var(--toc-rail-top, calc(var(--space-16) + var(--space-8))) - var(--space-16));
     margin: 0;
-    padding: var(--space-3);
+    padding: 0;
     list-style: none;
     overflow-y: auto;
-    background-color: var(--color-background-surface);
-    border: var(--border-width-thin) solid var(--color-border-strong);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--elevation-md);
     scrollbar-width: thin;
     scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
 }
