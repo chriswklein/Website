@@ -471,8 +471,30 @@ function initTocRail() {
         ].filter(Boolean);
     }
 
+    // Closes the panel the moment the underlying page scrolls, per spec —
+    // without this, the trigger's own scroll-threshold listener (above,
+    // shared with .back-to-top) has no idea the panel is open and re-shows
+    // itself the instant background scroll crosses 400px again, visually
+    // overlapping the still-open panel (confirmed via direct reproduction:
+    // openPanel()'s one-time class removal only holds until the next
+    // scroll event re-evaluates that unrelated listener). Reuses window's
+    // native 'scroll' event rather than separate wheel/touchmove/keydown
+    // listeners — confirmed via direct testing that .toc-panel's own
+    // internal overflow-y: auto scroll (the height-cap fix's scrollable
+    // region) never reaches this listener: element-level scroll events
+    // don't bubble, and only a capture-phase listener on window would see
+    // them despite that — this one is bubble-phase (no `capture`), same as
+    // the trigger's own existing scroll listener above, so it only ever
+    // fires for genuine page scroll. openScrollY + the small tolerance
+    // below guards against closing on imperceptible sub-pixel jitter (e.g.
+    // the first frame of a touch momentum scroll) rather than a real,
+    // intentional scroll.
+    let openScrollY = 0;
+    function handlePanelScroll() {
+        if (Math.abs(window.scrollY - openScrollY) > 2) closePanel({ returnFocus: false });
+    }
+
     function openPanel() {
-        lockBodyScroll();
         scrim.removeAttribute('hidden');
         panel.hidden = false;
         requestAnimationFrame(() => {
@@ -494,6 +516,14 @@ function initTocRail() {
         removeTrapFocus = trapFocus(panel);
         document.addEventListener('keydown', handlePanelEscape);
 
+        // Attached here (not once at init) and removed in closePanel() below
+        // so it's only ever live while the panel is actually open — confirmed
+        // via direct testing that opening the panel itself (focus-shift,
+        // trapFocus, inert, the transition) never fires a spurious window
+        // scroll event, so no extra delay is needed before attaching.
+        openScrollY = window.scrollY;
+        window.addEventListener('scroll', handlePanelScroll, { passive: true });
+
         const firstLink = panelList.querySelector('.toc-rail-link');
         // preventScroll: true — firstLink is inside a position: fixed
         // panel, always on-screen regardless of scrollY, so the browser's
@@ -504,7 +534,6 @@ function initTocRail() {
     }
 
     function closePanel({ returnFocus = true } = {}) {
-        unlockBodyScroll();
         panel.classList.remove('toc-panel--open');
         scrim.classList.remove('toc-panel-scrim--open');
         trigger.setAttribute('aria-expanded', 'false');
@@ -515,6 +544,7 @@ function initTocRail() {
             removeTrapFocus = null;
         }
         document.removeEventListener('keydown', handlePanelEscape);
+        window.removeEventListener('scroll', handlePanelScroll);
 
         getTocInertTargets().forEach(el => el.removeAttribute('inert'));
 
@@ -538,8 +568,7 @@ function initTocRail() {
             scrim.setAttribute('hidden', '');
         }, { once: true });
 
-        // preventScroll: true — same reasoning as unlockBodyScroll()'s own
-        // restore above: trigger is fixed-position, always on-screen
+        // preventScroll: true — trigger is fixed-position, always on-screen
         // regardless of scrollY, so no scroll-into-view is ever needed.
         if (returnFocus) trigger.focus({ preventScroll: true });
     }
