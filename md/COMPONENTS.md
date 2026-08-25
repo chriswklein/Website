@@ -1,6 +1,6 @@
 # Design System — Component Specifications
 **Version:** 2.0.0
-**Last Updated:** 2026-07-08
+**Last Updated:** 2026-08-25
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -70,7 +70,7 @@ Buttons are the primary interactive call-to-action element. They communicate the
 |---|---|---|
 | Primary | `.btn` | Default — main CTA, filled background |
 | Ghost | `.btn--ghost` | Secondary — outline only, no fill |
-| Icon + Label | `.btn--icon` | Button with a Tabler icon left of label |
+| Icon + Label | `.btn--icon` | Button with an icon left of label — not currently built in style.css; no icon library is in use site-wide (see md/REFERENCE.md §5) |
 
 ### Component Tokens
 
@@ -106,7 +106,7 @@ Buttons are the primary interactive call-to-action element. They communicate the
 ```
 
 - Container: `<button class="btn">` or `<a class="btn">`
-- Optional icon: `<i class="ti ti-{name}" aria-hidden="true"></i>`
+- Optional icon (if `.btn--icon` is ever built): `<i class="icon-{name}" aria-hidden="true"></i>` — no icon library currently in use
 - Label: visible text
 - Optional screen reader context: `<span class="sr-only">{additional context}</span>`
 
@@ -1020,13 +1020,10 @@ The toast notification provides brief confirmation that an action was completed.
 ### Anatomy
 
 ```
-[ .toast ]
-  [ icon ] [ "URL copied to clipboard!" ]
+[ .toast — "URL copied to clipboard!" ]
 ```
 
-- Container: `<div role="status" aria-live="polite" class="toast">`
-- Icon: `<i class="ti ti-check" aria-hidden="true"></i>`
-- Text: "URL copied to clipboard!"
+- Container: `<div role="status" aria-live="polite" class="toast">URL copied to clipboard!</div>` — bare text, no icon (no icon library currently in use — see md/REFERENCE.md §5)
 
 ### States
 
@@ -1342,29 +1339,22 @@ window.scrollTo({ top: 0, behavior: 'auto' });
 
 **Figma Component Name:** `ShareButton`
 **CSS Class:** `.share-btn`
-**HTML Element:** `<button class="share-btn" aria-label="Copy link to clipboard">`
+**HTML Element:** `<button class="share-btn btn btn--ghost" aria-label="Copy link to clipboard">Share</button>`
 
 ### Design Intent
 The Share button allows users to copy the current page URL to their clipboard. It appears in the metadata block on all standard pages, both at the top below the title and repeated at the bottom of the content. On click, it triggers the Toast notification confirming the copy action.
 
 ### Component Tokens
 
-Inherits from Button component tokens plus:
-
-```css
---share-btn-icon-size:  16px;
-```
+Inherits from Button component tokens (`.btn`, `.btn--ghost`) — no component-specific tokens of its own. (Previously documented a `--share-btn-icon-size` token; removed with the icon it sized — no icon library currently in use, see md/REFERENCE.md §5.)
 
 ### Anatomy
 
 ```
-[ .share-btn ]
-  [ icon ti-share ] [ "Share" ]
+[ .share-btn.btn.btn--ghost — "Share" ]
 ```
 
-- Button: `<button class="share-btn" aria-label="Copy link to clipboard">`
-- Icon: `<i class="ti ti-share" aria-hidden="true"></i>`
-- Label: `<span>Share</span>`
+- Button: `<button class="share-btn btn btn--ghost" aria-label="Copy link to clipboard">Share</button>` — bare text label, no icon
 
 ### Interaction Spec
 
@@ -1398,7 +1388,7 @@ The standard page template provides a consistent reading experience for all long
 
 ```
 [ nav.breadcrumb — Primary Tag › Page Title, 2 segments ]
-[ .standard-page-banner — 3:1 ratio (3:2 mobile), max-width 65ch (matches the text column), contained within .standard-page at every breakpoint ]
+[ .standard-page-banner — 3:1 ratio (3:2 mobile), full-width (`width: 100%`, no max-width — confirmed 2026-08-25; the 8/19 revision's intent to cap it to the 65ch text column was reverted later the same day and never carried into this doc until now), contained within .standard-page's own padding at every breakpoint ]
 [ p.standard-page-caption ]
 [ h1.standard-page-title — centre aligned ]
 [ .standard-page-details — card ]
@@ -1562,6 +1552,190 @@ split the row evenly, the same fix already used sitewide for the identical
 problem on `.filter-drawer-page-btn` (Previous/Next in the Filter Drawer —
 see `## 2c. Filter Drawer`).
 
+### Table of Contents — Desktop Rail
+
+**CSS Classes:** `.toc-rail` (nav), `.toc-rail-list` (ul), `.toc-rail-link`
+(row — shared with the panel and with the Back to Top row), `.toc-rail-item--sub`
+(H3 indent), `.toc-rail-link--active` (current heading)
+
+Built entirely by `initTocRail()` in script.js on any entry with
+`.standard-page-content` — no hand-authored markup lives in any entry's
+HTML. Visible at `min-width: 1440px` — deliberately narrower than this
+site's usual 1024px desktop floor: Chris decided no real iPad width or
+orientation (including the 1366px-wide 12.9" Pro) should ever get the
+rail's permanently-docked treatment; the mobile/tablet panel below
+covers all of them instead.
+
+**Positioning, both axes measured from the real DOM, not derived:**
+- `top` (`--toc-rail-top`, set by `updateRailTop()`): `.standard-page-banner`'s
+  real bottom edge + `--space-8` gap, recomputed on resize only — not
+  scroll, this is a fixed starting point. Falls back to
+  `calc(--space-16 + --space-8)` pre-JS or on a bannerless entry.
+- `left` (`--toc-rail-left`, set by `updateRailLeft()`): `.standard-page-content`'s
+  real rendered right edge + `--space-6` gap, recomputed on resize and
+  again once `document.fonts.ready` resolves and on every
+  `document.fonts` `loadingdone` event (two separate Font Loading API
+  signals, not just one — `.ready` is documented as unreliable on
+  WebKit, resolving before the visual font swap actually commits, which
+  real iPad testing traced as the cause of the rail's width still
+  visibly changing after load). Falls back to `calc(50% + 32.5ch + --space-6)`
+  pre-JS only.
+- `width`: `min(--toc-rail-width` (`240px`) `, calc(100vw - --toc-rail-left - --space-6))`
+  — the clamp no longer binds at any width the rail actually renders at
+  today (confirmed 240px unclamped from 1440px up), kept as a safety net
+  for a narrower future floor.
+
+**Height-cap, scroll, overflow:** `.toc-rail` itself is a flex column with
+`max-height: calc(100vh - --toc-rail-top - --space-16)`; `.toc-rail-list`
+is `flex: 1 1 auto; min-height: 0; overflow-y: auto` (standard
+flex-scroll-child pattern) so the list — not the whole card — scrolls
+once content exceeds the cap. Overflow deliberately clips the next row
+mid-item (no fade/gradient) so it reads as "there's more, scroll."
+Scrollbar is restyled, not left at browser default: `scrollbar-width: thin`
+/ `scrollbar-color` (Firefox) plus `::-webkit-scrollbar*` rules (Chrome/
+Edge/Safari) — thumb `--color-border-strong`, track
+`--color-background-subtle`, both shared with the mobile/tablet panel's
+own scrollbar (same selectors, comma-joined in the real CSS, not a
+duplicated second set).
+
+**Anatomy:** `.toc-rail-list` contains one Back to Top row first
+(`buildBackToTopRow()` — see below), then one `<li><a class="toc-rail-link">`
+per heading in document order (H3s additionally get `.toc-rail-item--sub`
+for indent).
+
+**Scrollspy:** shared with the mobile/tablet panel — one pass,
+`updateActiveState()`, tracks scroll position directly against each
+heading's own computed `scroll-margin-top` (not `IntersectionObserver`).
+An `atBottom` special case forces the last heading active once the page
+is genuinely scrolled to its true bottom: every entry's shared footer
+block (Share/More Work, contact, Back to Top, copyright) below the final
+heading is shorter than a typical viewport, so that heading's own
+threshold-crossing check is otherwise unreachable at any scroll
+position.
+
+**Active/inactive styling:** inactive rows reuse `.action-rail-trigger`/
+`.filter-drawer-page-btn`'s shared traits (font-size-sm, border-strong,
+subtle background) rather than a parallel style; the active row reuses
+`.tag-chip--active`'s exact treatment verbatim, including the
+text-shadow "faux bold" neither class sets `font-weight` for.
+
+**Back to Top row:** `buildBackToTopRow()` builds a
+`<button class="toc-rail-link" aria-label="Back to top">` — a button,
+not an `<a>`, since there's no `#heading` to link to. Deliberately built
+outside `buildTocLinks()` and never added to the `railLinks`/`panelLinks`
+arrays `updateActiveState()` tracks, which is what makes "never active,
+never counted" automatic rather than a special case: the active-toggle
+loop only touches those arrays (and this button has no `href` to match
+in the first place), and the badge's `headings.length` denominator never
+includes it. Click calls the same `scrollToTop()` function `.back-to-top`
+itself uses (§12) — one implementation shared by both this row and the
+panel's own copy, not a separately-implemented scroll.
+
+Below 1440px, the trigger and panel (below) are hidden unconditionally
+via CSS — a hard gate independent of JS state, so the rail can never
+render at a width it isn't meant to even if script state were ever wrong.
+
+### Table of Contents — Mobile/Tablet Trigger & Panel
+
+**CSS Classes:** `.action-rail-group.toc-trigger-group` (trigger's
+positioned wrapper), `.action-rail-trigger` (trigger button, `id="toc-trigger"`),
+`.action-rail-badge` (position count), `.toc-panel` (panel `<nav>`,
+`id="toc-panel"`), `.toc-panel-label`, `.toc-panel-list`, `.toc-panel-scrim`
+
+Visible at `max-width: 1439px` — the exact complement of the rail's own
+`min-width: 1440px`, so the two surfaces never coexist. Covers every real
+iPad width in both orientations (1024–1366px), not just phone.
+
+**Trigger:** reuses `.action-rail-group`/`.action-rail-trigger`/
+`.action-rail-badge` verbatim from Archive's own Filter trigger (Rule
+3a) — labeled "Contents", a `.trigger-label` span plus an
+`.action-rail-badge` span showing the live "X/Y" position (`aria-hidden`;
+the count is announced instead via the trigger's own dynamic
+`aria-label`, updated by the same shared `updateActiveState()` pass).
+Show/hide uses the same scroll-threshold mechanism as `.back-to-top` —
+visible only once `window.scrollY > 400`, via the shared
+`.action-rail-group--visible` modifier class. Clicking toggles the panel
+open/closed directly (`if (panel.hidden) openPanel(); else closePanel();`).
+
+**Hide-while-open:** `openPanel()` removes `--visible` from the trigger's
+wrapper synchronously — one hide method, not two. `closePanel()`
+restores it via an instant-transition trick (add an `--instant` modifier
+that disables the transition, add `--visible`, force a reflow, remove
+`--instant`) so focus can return to the trigger immediately without the
+`visibility: hidden`-elements-silently-refuse-`.focus()` problem that
+would otherwise reintroduce a keyboard-accessibility regression.
+
+**Panel positioning:** `position: fixed`, anchored bottom-right to the
+trigger's own resting position — `right: max(--space-6, (100vw - --max-content)/4)`
+(same formula the Desktop Filter Panel uses), `width: var(--toc-rail-width)`
+(`240px`, the same token the rail uses), `max-width: calc(100vw - --space-8 * 2)`.
+`bottom` is tiered: `calc(50vh - --touch-target-minimum/2)` at this
+breakpoint's own ≤1439px floor, narrowing to `calc(30vh - --touch-target-minimum/2)`
+at a separate, narrower `max-width: 767px` tier nested inside it — this
+inner bottom-anchor tiering did **not** move when the outer rail/panel
+boundary shifted from 1024px to 1440px; it's still keyed to 767px,
+confirmed by direct read rather than assumed.
+
+**Height-cap, scroll, overflow:** unlike the rail, `.toc-panel` (the
+outer `<nav>`) is itself the scroll container — there's no separate
+inner scrolling list; `.toc-panel-list` is layout-only, no chrome or
+scroll properties of its own. `max-height` is tiered the same way
+`bottom` is: `calc(50vh - 64px - --space-6 + --touch-target-minimum/2)`
+at the wider tier, `calc(70vh - 64px - --space-6 + --touch-target-minimum/2)`
+at the ≤767px tier (`64px` = the fixed header/tab-bar height reserved
+so the panel can never draw over it). `overflow-y: auto` plus the same
+restyled-scrollbar treatment the rail's own list uses — same
+`::-webkit-scrollbar*` selectors (shared, not duplicated) and its own
+`scrollbar-width: thin` / `scrollbar-color` declaration (Firefox scrollbar
+properties can't be shared via `::-webkit` pseudo-elements, so each
+scrollable element declares them, with identical values).
+
+**Scrim:** `.toc-panel-scrim` is a real click-catching element
+(`pointer-events: auto` only while `--open`), not a document-click
+listener — a background click can never both close the panel and
+activate whatever's underneath it. `display: none` unconditionally
+above 1439px, independent of JS state — the same belt-and-suspenders
+pattern the panel itself uses.
+
+**`inert`:** `getTocInertTargets()` returns `#nav-placeholder`,
+`#main-content`, `.toast`, `.tab-bar`, `#footer-placeholder` — all get
+`inert` while the panel is open (removed on close), excluding
+background content from Tab order and the accessibility tree in both
+directions. The trigger itself isn't included in this list — its own
+`visibility: hidden` state (from the hide-while-open above) already
+removes it from both on its own.
+
+**Scroll-lock is NOT used here** — worth stating plainly, since the
+Filter Drawer this panel is otherwise modeled on *does* lock
+background scroll, and a future session could reasonably assume this
+one does too. `lockBodyScroll()` / `unlockBodyScroll()` are still
+defined inside this same closure but are never called from `openPanel()`
+or `closePanel()` — confirmed by reading every call site directly, not
+by assuming from a prior summary. It was added for this panel
+originally, then traced as the root cause of several real, confirmed
+bugs (the badge/scrollspy state reading corrupted values while the
+lock's `position: fixed` on `<body>` was active; `.back-to-top`
+disappearing with no actual scroll having happened; a WebKit-only
+content-blanking issue on a second panel open) and removed entirely.
+The scrim + `inert` combination alone proved sufficient to block
+background interaction and keep focus contained, with none of
+`position: fixed`-on-`<body>`'s side effects.
+
+**Dismiss paths** — three direct, plus a fourth external-scroll
+mechanism:
+1. **Escape** (`handlePanelEscape()`) — closes with focus returned to the trigger.
+2. **Scrim click** — closes without returning focus (the user clicked away, not on a path expecting focus back).
+3. **Selecting a row** — a real heading link or the Back to Top row, both sharing the `.toc-rail-link` class, so one generic click listener on `.toc-panel-list` closes on either without special-casing which was clicked. Closes without returning focus, since the row's own action (scroll, and for headings the browser's native fragment-focus) already moves focus meaningfully.
+4. **External scroll** (`handlePanelScroll()`) — closes the instant the underlying page scrolls more than a 2px tolerance from its position when the panel opened, so the trigger's own independent scroll-threshold listener never gets a chance to re-show it over a still-open panel. The listener is attached only while open (added in `openPanel()`, removed in `closePanel()`) and is bubble-phase only (no `capture`), confirmed via direct testing not to fire from the panel's own internal `overflow-y: auto` scrolling — element-level scroll events don't bubble to a bubble-phase `window` listener.
+
+**Back to Top row:** the same `buildBackToTopRow()` function the rail
+uses (Rule 3a — one implementation, not a parallel one for the panel),
+prepended as the panel's own first row ahead of the real headings.
+Selecting it both scrolls to the real top (the shared `scrollToTop()`
+function, §12) and closes the panel via the same generic
+`.toc-rail-link` click listener every other row uses — no separate close
+path written for it.
+
 ### Accessibility
 
 - Details card tag links: same accessibility as `.tag` (real links, own
@@ -1574,9 +1748,9 @@ see `## 2c. Filter Drawer`).
 
 | Breakpoint | Layout |
 |---|---|
-| Desktop (≥1024px) | Banner capped to the same 65ch as the text column beneath it (no longer stretching to the page's 1200px ceiling); details rows label/value side by side; footer actions row side by side, matched width |
-| Tablet (768–1023px) | Same as desktop (65ch already exceeds this viewport width, so the banner change is a no-op here) |
-| Mobile (<768px) | Banner contained (no longer full-bleed) and already narrower than 65ch, so the change is a no-op here too; details rows stack to single column; footer actions stack full-width |
+| Desktop (≥1024px) | Banner full-width (`width: 100%`, no max-width — confirmed 2026-08-25, see Anatomy above), contained within `.standard-page`'s own padding, not capped to the 65ch text column beneath it; details rows label/value side by side; footer actions row side by side, matched width |
+| Tablet (768–1023px) | Same as desktop — banner still full-width within the page's own padding |
+| Mobile (<768px) | Banner contained (no longer full-bleed) but still full-width within the page's own padding, same as the other two tiers; details rows stack to single column; footer actions stack full-width |
 
 ---
 
@@ -1596,10 +1770,10 @@ Quick reference mapping every component token to its semantic source.
 | `--card-image-column-width` | — (global `:root` token, see md/DESIGN-SYSTEM.md §4.5) | `42%` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
-| `--tag-border` | `--color-accent-primary` | `#BA8200` |
-| `--tag-border-hover` | `--color-accent-primary-text` | `#E5A000` |
-| `--tag-text` | `--color-accent-primary` | `#BA8200` |
-| `--tag-text-hover` | `--color-accent-primary-text` | `#E5A000` |
+| `--tag-border` | `--color-accent-primary` | `#00BAA5` |
+| `--tag-border-hover` | `--color-accent-primary-text` | `#00E5CB` |
+| `--tag-text` | `--color-accent-primary` | `#00BAA5` |
+| `--tag-text-hover` | `--color-accent-primary-text` | `#00E5CB` |
 | `--tag-bg` | `transparent` | `transparent` |
 | `--tag-bg-hover` | `--color-background-base` | `#111111` |
 | `--nav-bg` | `--color-background-base` | `#111111` |
@@ -1609,11 +1783,11 @@ Quick reference mapping every component token to its semantic source.
 | `--tab-bar-item-color` | `--color-text-secondary` | `#AAAAAA` |
 | `--tab-bar-item-active` | `--color-interactive-default` | `#F5F5F5` |
 | `--tooltip-bg` | `--color-tooltip-bg` → `--color-background-surface` | `#1A1A1A` |
-| `--tooltip-border` | `--color-tooltip-border` → `--color-accent-primary` | `#BA8200` |
-| `--toast-border` | `--color-accent-primary` | `#BA8200` |
+| `--tooltip-border` | `--color-tooltip-border` → `--color-accent-primary` | `#00BAA5` |
+| `--toast-border` | `--color-accent-primary` | `#00BAA5` |
 | `--blockquote-border-color` | `--color-quote-border` → `--color-accent-quote` | `#A9407C` |
-| `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#BA8200` |
-| `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#BA8200` |
+| `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#00BAA5` |
+| `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
 
 ---
 
@@ -1623,4 +1797,4 @@ Tracked fixes and enhancements queued for future Claude Code sessions.
 
 | # | Item | Status |
 |---|---|---|
-| 6 | Remove Tabler Icons CDN from all pages, remove all icon elements, text-only tab bar and back to top button, update any CSS that sizes or positions icons | ✅ Done 2026-07-05 |
+| 6 | Remove Tabler Icons CDN from all pages site-wide, remove all icon elements everywhere (not scoped to just the tab bar and Back to Top button), text-only tab bar and back to top button, update any CSS that sizes or positions icons | ✅ Done 2026-07-05 |

@@ -1,6 +1,6 @@
 # Personal Website — Project Reference Document
 **Version:** 1.3.0
-**Last Updated:** 2026-06-29
+**Last Updated:** 2026-08-25
 **Status:** In Progress — Home page ready to build
 
 ---
@@ -28,7 +28,7 @@ A personal website built with plain HTML, CSS, and JavaScript. The goal is full 
 | Version Control | GitHub | Public repository |
 | Hosting | Netlify | Free tier, automatic deploys on push |
 | Fonts | Noto Sans | Via Google Fonts — chosen for universal script/localization coverage |
-| Icons | Tabler Icons | Via CDN webfont — outline style only, never filled variants |
+| Icons | None | Tabler Icons CDN removed site-wide 2026-07-05 (commit 7d71326) — text-only. See §5 Icons. |
 
 ### Tokens Studio Note
 Tokens Studio free tier does not reliably resolve aliases between token sets. Figma Variables are set up manually in a single `global` collection instead. The `tokens/design-system.json` file is kept as a reference and backup but is not actively synced via Tokens Studio.
@@ -92,7 +92,6 @@ Every new page needs:
 4. `<div id="footer-placeholder"></div>` at the bottom of `<body>`
 5. Mobile tab bar `<nav class="tab-bar">` before footer placeholder
 6. `<script src="script.js"></script>` before closing `</body>`
-7. Tabler Icons CDN in `<head>`
 
 Nav and footer inject automatically via `script.js`.
 
@@ -108,11 +107,9 @@ Nav and footer inject automatically via `script.js`.
 - "No tofu" — renders all scripts without missing character boxes
 
 ### Icons
-**Tabler Icons** — loaded via CDN webfont.
-- Outline style only — never use `-filled` suffix variants
-- Always include `aria-hidden="true"` on decorative icons
-- Icon-only interactive elements must have `aria-label`
-- CDN: `https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css`
+**None currently in use — text-only site-wide.** Tabler Icons was removed completely 2026-07-05 (commit 7d71326): CDN link dropped from every page, all icon elements removed, tab bar and Back to Top button rebuilt text-only. A future iteration may reintroduce Tabler Icons self-hosted (not via CDN) — see md/COMPONENTS.md's Mobile Tab Bar and Back to Top Button "Deferred" sections for the planned icon mapping. Until then:
+- No icon library is loaded on any page
+- Icon-only interactive elements must still have `aria-label` if icons are reintroduced
 
 ### Type Scale (Major Third — 1.25 ratio from 16px base)
 
@@ -169,10 +166,12 @@ Nav and footer inject automatically via `script.js`.
 | `grey-1000` | #000000 |
 
 #### Accent Primitives
+Teal is the live default primary accent (confirmed against style.css's real `:root` block) — gold is a dormant `[data-theme="gold"]` override, not a co-equal option. See md/DESIGN-SYSTEM.md §1.6 for the full theme mechanism.
+
 | Token | Value | Notes |
 |---|---|---|
-| `--color-accent-primary` | #BA8200 | Primary tag fill, dividers, code border. Contrast on base: ~5.2:1 ✅ |
-| `--color-accent-primary-text` | #E5A000 | Gold text on dark, hyperlinks, tooltip border. Contrast on base: ~8.9:1 ✅ |
+| `--color-accent-primary` | #00BAA5 | Primary tag fill, dividers, code border. Live default — teal. Contrast on base: ~7.7:1 ✅ |
+| `--color-accent-primary-text` | #00E5CB | Teal text on dark, hyperlinks, tooltip border. Live default. Contrast on base: ~11.8:1 ✅ |
 | `--color-accent-quote` | #A9407C | Secondary tag fill, quote block border. Contrast on base: ~4.6:1 ✅ |
 | `--color-accent-quote-text` | #FF60BB | Pink text on dark, alt text contexts |
 
@@ -349,7 +348,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Standard Page Template (Work entries, Thoughts entries)
 **Purpose:** Individual work or blog post pages.
-**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/thrilling-beginnings.html`, `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Desktop-only floating Table of Contents rail (scrollspy, auto-generated heading ids) added 2026-08-23 — mobile/tablet trigger+panel variant not yet built. Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
+**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/thrilling-beginnings.html`, `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Floating Table of Contents added 2026-08-23, mobile/tablet trigger+panel variant completed 2026-08-25 — now fully shipped on both surfaces: an always-visible scrollspy rail at ≥1440px, and a floating trigger + anchored panel below that (covers every real iPad width in both orientations, by design). Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
 **Layout:** Single column, centred, max-width 65ch content.
 **Creation process:** md/NEW-ENTRY-PROCESS.md.
 
@@ -370,8 +369,8 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Mobile Bottom Tab Bar
 - Fixed to bottom of viewport
-- Items: Home (ti-home), Work (ti-briefcase), Thoughts (ti-pencil), About (ti-user)
-- Icon + text label — never icon only
+- Items: Home, Work, Thoughts, About
+- Text-only (no icon library currently in use — see §5 Icons); a future iteration may add icons alongside the labels, never icon only
 - Font size xs (12px) for labels
 - Active state uses `--color-interactive-default`
 - Min touch target 44px per item
@@ -436,11 +435,11 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Code / Pre Blocks
 - Background: `--color-code-bg`
-- Left border: `--color-code-border` (gold)
+- Left border: `--color-code-border` → `--color-accent-primary` (live default — teal `#00BAA5`; gold is a dormant `[data-theme="gold"]` override, see §5)
 - Monospace font
 
 ### Dividers (hr)
-- 1px solid `--color-divider-accent` (gold `#BA8200`)
+- 1px solid `--color-divider-accent` → `--color-accent-primary` (live default — teal `#00BAA5`; gold is a dormant `[data-theme="gold"]` override, see §5)
 - Used as section separators site-wide
 
 ### Profile Sidebar (Home page only)
@@ -453,10 +452,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 ## 8. Planned Features (Deferred — Post Launch)
 
 ### Floating Table of Contents
-- Target: all Standard Page entries (Work and Thoughts both — broader than originally scoped to Thoughts only)
-- Behaviour: Desktop — always-visible sidebar rail with scrollspy highlighting, shipped 2026-08-23. Mobile/tablet — floating trigger + anchored panel, not yet built.
-- Desktop implementation tracks scroll position directly (not `IntersectionObserver`) against each heading's own `scroll-margin-top`
-- Status: Partially shipped — desktop rail live; mobile/tablet variant still logged
+- **Shipped** — both surfaces, on all Standard Page entries (Work and Thoughts both — broader than originally scoped to Thoughts only). Desktop (≥1440px): always-visible sidebar rail with scrollspy highlighting, shipped 2026-08-23. Below that (covers every real iPad width in both orientations, by design — not just phone): a floating trigger + anchored panel, completed 2026-08-25 after several rounds of real-device fixes. Scrollspy tracks scroll position directly (not `IntersectionObserver`) against each heading's own `scroll-margin-top`, shared by both surfaces. Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template".
 
 ### Advanced Tooltips
 - Inspired by Baldur's Gate 3 — rich contextual cards with nested information
@@ -525,7 +521,6 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - One `<h1>` per page
 - `.skip-link` as first child of `<body>` on every page
 - `<main id="main-content">` on every page
-- Tabler Icons CDN in `<head>` on every page
 
 ### CSS
 - All values reference CSS variables — no hardcoded colours or sizes
@@ -583,9 +578,11 @@ Accessibility is a stated project pillar (see Core Principles, §1), not a post-
 **Motion**
 - `prefers-reduced-motion` is respected for the Filter Drawer's open/close animation and all other transitions site-wide
 
+**Typography**
+- **Font-size tokens converted `px` → `rem`** (confirmed 2026-08-10, commit c2ea59f) — type now respects the user's browser/OS font-size preference, distinct from browser zoom, which already worked correctly before this. All `--font-size-*` tokens in style.css are rem-based; see md/DESIGN-SYSTEM.md §2.2 for the current values.
+
 ### Planned / Backlog
 
-- **Font-size tokens:** convert `px` to `rem` so type respects the user's browser/OS font-size preference — distinct from browser zoom, which already works correctly today. Scoped as its own dedicated phase, not bundled into unrelated work.
 - **Tag link "visited" state:** tag links (`<a href="/archive.html?tag={slug}">`) currently announce as "visited" indefinitely in screen readers once clicked, which isn't meaningful here since they're filter controls, not content links. Needs an explicit `aria-label` override.
 - **A real WAVE + Lighthouse accessibility baseline audit** — deliberately held until real content replaces the remaining placeholder text and images, so the audit measures the actual site rather than placeholder artifacts.
 - **Accessibility options** as a planned future slot in the Vertical Action Rail (alongside language/translation) — not yet scoped in detail.
@@ -680,3 +677,14 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
 - Desktop-only floating Table of Contents rail shipped for Standard Page entries (Work and Thoughts both) — automatic heading-id generation (preserving any hand-authored id), always-visible scrollspy rail at ≥1024px, H3s nested under their parent H2. Mobile/tablet trigger + panel variant not built yet (separate follow-on). See `getTocHeadings()` / `initTocRail()` in script.js and the "STANDARD PAGE — TABLE OF CONTENTS RAIL" section of style.css.
 - Documentation sync pass: REFERENCE.md (this document), DESIGN-SYSTEM.md, and COMPONENTS.md corrected against the real repo state after discovering several docs had been iterated on in claude.ai Project knowledge but never actually committed here. Dead CSS from the pre-8/17 Standard Page structure (`.standard-page-meta*`, `.standard-page-nav*`, `.card-meta-label`) removed from style.css — confirmed zero real consumers first. `.claude/settings.json` permission entries referencing the deleted `card-variants-preview.html` removed. Two referenced planning docs (`claude/2026-08-23-floating-toc-spec.md`, `2026-08-09-redesign-status.md`) do not exist anywhere in this repo — likely never committed from wherever they were drafted; flagged rather than reconstructed from assumption.
 - DESIGN-SYSTEM.md §1.6 corrected — was still documenting gold as the primary accent after teal became the live default; now states teal as canonical, gold as the dormant `[data-theme="gold"]` override. §11.3/§11.4's documented asset path (`assets/images/work/{slug}/{slug}-banner.webp`) vs. the real path in use (`assets/images/entries/{slug}/{Slug}-banner.png`) was flagged, not resolved — needs a decision on which one changes.
+
+**2026-08-25**
+- Documentation-only audit follow-up pass across all three governance docs. Tabler Icons references corrected to "none currently in use, text-only" throughout REFERENCE.md (§2 Stack, §5 Icons, §7 Mobile Bottom Tab Bar, §11 Coding Standards) and DESIGN-SYSTEM.md §10 — confirmed complete removal was already site-wide (commit 7d71326, 2026-07-05), not scoped to only the tab bar and Back to Top button as COMPONENTS.md's own Fix List item 6 had understated. COMPONENTS.md's Mobile Tab Bar / Back to Top "Deferred" sections were already accurate and left untouched.
+- Font-size rem conversion (commit c2ea59f, 2026-08-10) confirmed complete in style.css; moved out of this document's Planned/Backlog into a dated confirmation (§12). DESIGN-SYSTEM.md §2.2's Font Size Scale table was still documenting the pre-conversion px values — corrected to the real rem values.
+- COMPONENTS.md's Component Token Reference table still showed 8 rows resolving to the dormant gold theme's hex (`#BA8200`/`#E5A000`) instead of the live teal default (`#00BAA5`/`#00E5CB`) — corrected; independently re-verified against style.css's `:root` block, not just the audit's claim. `--blockquote-border-color` (pink, `--color-accent-quote`) confirmed genuinely unaffected by the theme and left as-is.
+- COMPONENTS.md's Toast Notification and Share Button anatomy blocks still showed `<i class="ti ti-check">` / `<i class="ti ti-share">` examples from before the Tabler removal — replaced with the real current markup (bare text `.toast` div; `.share-btn.btn.btn--ghost` with no icon). Share Button's own dead `--share-btn-icon-size` token (no icon left to size) removed as a direct consequence.
+- `.standard-page-banner`'s real `max-width` confirmed definitively via direct style.css read: `none` (only `width: 100%` is set) — genuinely full-width, not capped to the 65ch text column. This resolves an open discrepancy flagged across multiple prior sessions: the 8/19 revision's intent to cap the banner was evidently reverted later the same day and never reflected in COMPONENTS.md §14, which still described the 65ch cap in both its Anatomy diagram and Responsive Behaviour table. Both corrected to describe the real full-width behavior.
+- Not touched, flagged instead: REFERENCE.md §5's own Colour System (Accent Primitives table) still resolves `--color-accent-primary` to gold `#BA8200` — the same staleness already corrected in DESIGN-SYSTEM.md §1.6 on 2026-08-23 was never carried over to this document. Out of today's scope (not part of the audit's change list); needs its own pass. COMPONENTS.md's general Button component section (`.btn--icon` variant row, its Anatomy's `<i class="ti ti-{name}">` line) still names Tabler specifically for a variant that was never built in CSS — corrected as a direct, minimal extension of the Tabler cleanup already in scope, since leaving it would contradict this session's own "no icon library in use" corrections elsewhere. COMPONENTS.md §14's ToC rail/trigger/panel documentation (and this document's own §6/§8 ToC status lines, now stale after the mobile/tablet panel, 1440px breakpoint, scroll-lock removal, and Back to Top shipped since 8/23) deliberately left untouched — explicitly deferred to its own dedicated documentation session.
+- REFERENCE.md §5's own Colour System (Accent Primitives table) — the discrepancy flagged just above — corrected in a follow-up pass: `--color-accent-primary` / `--color-accent-primary-text` now show the live teal values (`#00BAA5` / `#00E5CB`) with their real contrast figures (~7.7:1 / ~11.8:1), matching DESIGN-SYSTEM.md §1.6's already-established wording exactly, with a one-line note that gold is the dormant `[data-theme="gold"]` override.
+- REFERENCE.md §7's Code/Pre Blocks and Dividers entries corrected from "gold" to the same teal live-default / dormant-gold-override framing, closing the last gold-as-current reference anywhere in this document.
+- **ToC mobile/tablet variant completed and documented.** Read `initTocRail()` and every related function in script.js fresh, start to finish, confirming (not assuming from any prior summary) the real current state: both surfaces — the desktop rail (≥1440px) and the mobile/tablet floating trigger + anchored panel (below that, covering every real iPad width in both orientations) — are fully shipped, share one heading list and one scrollspy pass, and both include a non-counted, never-active "Back to Top" row (`buildBackToTopRow()`) alongside the existing `.back-to-top` button at the page bottom. Confirmed `lockBodyScroll()`/`unlockBodyScroll()` are defined but never called anywhere in `initTocRail()`'s closure (verified via direct grep of call sites, not just definitions) — scroll-lock was added for the panel, traced as the root cause of several real-device bugs (badge/scrollspy corruption, Back to Top disappearing, a WebKit content-blanking issue), and fully removed; the panel now relies on the scrim + `inert` combination alone, which proved sufficient on its own. The panel's own internal bottom-anchor tiering (50vh above ≤1439px, 30vh below ≤767px) is a separate, narrower tier nested inside the outer rail-vs-panel boundary — confirmed the two did not move together when the outer boundary shifted from 1024px to 1440px. Full real anatomy, tokens, and behavior for both surfaces now documented in COMPONENTS.md "## 14. Standard Page Template" (two new subsections) — REFERENCE.md §6 and §8 updated to match.

@@ -1,6 +1,6 @@
 # Design System — Atomic Foundation
 **Version:** 1.0.0
-**Last Updated:** 2026-07-01
+**Last Updated:** 2026-08-25
 **Status:** Active — source of truth for all design and build decisions
 
 ---
@@ -182,20 +182,20 @@ Google Fonts link required in every page `<head>`:
 
 ### 2.2 Font Size Scale
 
-Built on a 1.25 Major Third modular ratio from a 16px base.
+Built on a 1.25 Major Third modular ratio from a 16px base. Converted from `px` to `rem` 2026-08-10 (commit c2ea59f) so type respects the user's browser/OS font-size preference — values below are rem, `px` equivalents shown for reference against the 16px base only.
 
-| CSS Variable | Value | Usage |
-|---|---|---|
-| `--font-size-xs` | `12px` | Tab bar labels, legal fine print only |
-| `--font-size-sm` | `14px` | Captions, tags, metadata, timestamps, nav labels |
-| `--font-size-base` | `16px` | Body text — browser default, WCAG recommended minimum |
-| `--font-size-md` | `18px` | Large body, intro paragraphs |
-| `--font-size-lg` | `20px` | H4 |
-| `--font-size-xl` | `24px` | H3 |
-| `--font-size-2xl` | `30px` | H2 |
-| `--font-size-3xl` | `36px` | H1 on mobile |
-| `--font-size-4xl` | `48px` | H1 on desktop |
-| `--font-size-5xl` | `60px` | Display / hero headline desktop only |
+| CSS Variable | Value | px equivalent | Usage |
+|---|---|---|---|
+| `--font-size-xs` | `0.75rem` | `12px` | Tab bar labels, legal fine print only |
+| `--font-size-sm` | `0.875rem` | `14px` | Captions, tags, metadata, timestamps, nav labels |
+| `--font-size-base` | `1rem` | `16px` | Body text — browser default, WCAG recommended minimum |
+| `--font-size-md` | `1.125rem` | `18px` | Large body, intro paragraphs |
+| `--font-size-lg` | `1.25rem` | `20px` | H4 |
+| `--font-size-xl` | `1.5rem` | `24px` | H3 |
+| `--font-size-2xl` | `1.875rem` | `30px` | H2 |
+| `--font-size-3xl` | `2.25rem` | `36px` | H1 on mobile |
+| `--font-size-4xl` | `3rem` | `48px` | H1 on desktop |
+| `--font-size-5xl` | `3.75rem` | `60px` | Display / hero headline desktop only |
 
 ### 2.3 Font Weight
 
@@ -593,23 +593,13 @@ Visually hidden until keyboard focus. First child of `<body>` on every page.
 
 ## 10. Icons
 
-**Library:** Tabler Icons — outline style only.
+**None currently in use — text-only site-wide.** Tabler Icons (outline style) was removed completely 2026-07-05 (commit 7d71326): CDN link dropped from every page `<head>`, all icon elements removed, tab bar and Back to Top button rebuilt text-only. No icon CDN or library should be added to any page.
 
-CDN link required in every page `<head>`:
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-```
-
-**Rules:**
+A future iteration may reintroduce Tabler Icons **self-hosted** (webfont downloaded into `assets/icons/`, not via CDN) — see md/COMPONENTS.md's Mobile Tab Bar and Back to Top Button "Deferred" sections for the planned icon mapping and sizes. If that happens:
 - Always use outline variants — never use `-filled` suffix variants
 - Always add `aria-hidden="true"` to decorative icons
 - Icon-only interactive elements must have an `aria-label`
 - Pair icons with text labels wherever space allows — never icon only in navigation
-
-**Standard icon sizes:**
-- Tab bar icons: `20px`
-- Inline with text: `16px`
-- Standalone decorative: `24px`
 
 ---
 
