@@ -1437,7 +1437,14 @@ footer p {
 
 /* ================================
    STANDARD PAGE — TABLE OF CONTENTS RAIL
-   Desktop-only (min-width: 1024px), always visible, no trigger/collapse —
+   Desktop-only (min-width: 1440px — deliberately narrower than this
+   site's usual 1024px desktop floor: Chris decided iPad, any orientation
+   or model including the 1366px-wide 12.9" Pro, should never get the
+   rail's permanently-docked treatment at all — he's explicitly fine with
+   the panel's overlap-on-open there instead, since it gives back more
+   usable space than a width-constrained sidebar could at these sizes.
+   1440px puts every real iPad width (1024–1366px) on the panel side of
+   the line), always visible, no trigger/collapse —
    built entirely by initTocRail() (script.js) on any page with
    .standard-page-content; no hand-authored markup lives in any entry's
    HTML. Tablet/mobile render nothing (separate trigger + panel pattern,
@@ -1457,7 +1464,7 @@ footer p {
     z-index: 10;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1440px) {
     /* --toc-rail-left: set by initTocRail() (script.js) to the real
        rendered right edge of .standard-page-content (the 65ch text
        column) + a gap, the same "measure the real DOM, don't derive it"
@@ -1471,19 +1478,25 @@ footer p {
        <head>) so the page briefly renders in a fallback font with
        different glyph metrics, and this custom property didn't reliably
        reflow once the swap completed (confirmed real-iPad landscape
-       testing showed the rail collapsed to a near-unusable width even
-       though re-deriving the same math against Chromium's own metrics at
-       matching viewports — 1024, ~1194, 1280, ~1366, 1440, 1920px — never
-       produced a collapse there; font-metric drift between the fallback
-       and loaded font, not the formula's arithmetic, is the most likely
-       explanation). Measuring the column's actual box sidesteps the
-       'ch'/font-timing dependency entirely: correct regardless of which
-       font is active when it runs. width still falls back via min() to
-       whatever room is actually left before the viewport's right edge —
-       at the 1024px floor there isn't room for the full --toc-rail-width,
-       so this keeps the rail from running off-screen at the narrow end of
-       the desktop range (unchanged from before, confirmed by measuring
-       the math). */
+       testing showed the rail collapsed to a near-unusable width; re-
+       deriving the same math against Chromium's own metrics at matching
+       viewports never produced a collapse there, and a follow-up session
+       found the width could still change again specifically on the
+       user's first scroll — see updateRailLeft()'s own comment in
+       script.js for the current best explanation, since this MCP
+       environment has no WebKit engine to confirm directly against.
+       Measuring the column's actual box sidesteps the 'ch'/font-timing
+       dependency entirely: correct regardless of which font is active
+       when it runs). width still falls back via min() to whatever room
+       is actually left before the viewport's right edge — at 1440px
+       (this breakpoint's own new floor, moved up from 1024px so no real
+       iPad width ever gets the rail — see this section's top comment)
+       the full --toc-rail-width already fits with room to spare
+       (confirmed by direct measurement: 240px, unclamped, at 1440px and
+       every wider width tested), so this min() no longer binds at any
+       width the rail actually renders at today — kept as a safety net
+       against a narrower future floor or a wider --toc-rail-width, not
+       because it's load-bearing right now. */
     .toc-rail {
         display: flex;
         flex-direction: column;
@@ -1605,12 +1618,16 @@ footer p {
 }
 
 /* ================================
-   STANDARD PAGE — TABLE OF CONTENTS TRIGGER + PANEL (<1024px)
+   STANDARD PAGE — TABLE OF CONTENTS TRIGGER + PANEL (<1440px)
+   Covers every real iPad width in both orientations (1024–1366px) as
+   well as phone/tablet — deliberate, per Chris's decision that iPad
+   should never get the permanently-docked rail (see the rail's own
+   section comment above for the full reasoning).
    Trigger reuses .action-rail-group/.action-rail-trigger/
    .action-rail-badge verbatim (Rule 3a) — same classes Archive's Filter
    trigger uses, safe to share since the two never appear on the same
    page. .toc-trigger-group only adds the display override below, which
-   inverts .toc-rail's own breakpoint (rail: block at >=1024px, hidden
+   inverts .toc-rail's own breakpoint (rail: block at >=1440px, hidden
    below; trigger/panel: the reverse) so the two surfaces never coexist.
    Heading-list items inside the panel reuse .toc-rail-link/
    .toc-rail-item--sub/.toc-rail-link--active verbatim too — same
@@ -1625,13 +1642,13 @@ footer p {
     display: none;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1439px) {
     .action-rail-group.toc-trigger-group {
         display: flex;
     }
 
     /* :not([hidden]) rather than toggling display in script.js — this way
-       the >=1024px rule above still wins on its own regardless of the
+       the >=1440px rule above still wins on its own regardless of the
        hidden attribute's state, so the panel can never render at desktop
        widths even if JS state were ever wrong. */
     .toc-panel:not([hidden]) {
@@ -1746,13 +1763,13 @@ footer p {
    stops a background click from also reaching whatever is underneath.
    z-index 249 — one below .toc-panel's own 250, same relative offset as
    .archive-scrim (249) sits below .filter-drawer (250). display: none
-   unconditionally above 1023px is a hard gate independent of JS state,
+   unconditionally above 1439px is a hard gate independent of JS state,
    matching .toc-panel's own belt-and-suspenders pattern. */
 .toc-panel-scrim {
     display: none;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1439px) {
     .toc-panel-scrim {
         display: block;
         position: fixed;

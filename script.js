@@ -222,7 +222,7 @@ function getTocHeadings() {
 
 // Builds one <li><a class="toc-rail-link"> per heading into `container`,
 // H3s getting the --sub indent modifier. Shared by the desktop rail and
-// the <1024px panel so the two never carry two different copies of this
+// the <1440px panel so the two never carry two different copies of this
 // markup-building logic — only their outer containers differ.
 function buildTocLinks(headings, container) {
     return headings.map(heading => {
@@ -240,7 +240,7 @@ function buildTocLinks(headings, container) {
     });
 }
 
-// Desktop rail (CSS shows it only at >=1024px) plus the <1024px trigger +
+// Desktop rail (CSS shows it only at >=1440px) plus the <1440px trigger +
 // anchored panel (Prompt B) — built together from one shared heading list
 // and one shared scrollspy pass, so current-heading tracking never runs
 // twice or drifts between the two surfaces. Nothing here is gated behind
@@ -256,12 +256,12 @@ function initTocRail() {
 
     const main = document.getElementById('main-content');
 
-    // --- Desktop rail (>=1024px) ---------------------------------------
+    // --- Desktop rail (>=1440px) ---------------------------------------
     const rail = document.createElement('nav');
     rail.className = 'toc-rail';
     rail.setAttribute('aria-label', 'Table of contents');
 
-    // Reuses .toc-panel-label verbatim (Rule 3a) — same class the </1024px
+    // Reuses .toc-panel-label verbatim (Rule 3a) — same class the </1440px
     // panel's own label already uses, same reasoning for aria-hidden
     // (redundant with the <nav>'s own aria-label once announced as a
     // landmark — visible for sighted users only), not a new parallel
@@ -335,11 +335,30 @@ function initTocRail() {
     // viewport width alone, not font metrics — see updateRailTop()'s own
     // comment — but .standard-page-content's rendered width is 'ch'-based,
     // so its right edge can still shift once the swap completes.
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(updateRailLeft);
+    //
+    // Two separate Font Loading API signals, not just `.ready` — real
+    // iPad testing found the rail's width still changing well after
+    // load, specifically the first time the user scrolled, which doesn't
+    // fit a value that's simply wrong-once-then-static; `.ready` is
+    // documented as unreliable on WebKit (can resolve before the visual
+    // swap actually commits), which would explain a stale measurement
+    // surviving past that promise resolving — the eventual correction
+    // then only ever arriving via the *next* thing that happens to fire
+    // a 'resize' event, which on iOS/iPadOS Safari includes the dynamic
+    // toolbar collapsing on first scroll. Not confirmed on a real device
+    // in this environment (Playwright here has no WebKit engine — see
+    // memory), so this is a defensive hardening against a plausible,
+    // well-documented failure mode, not a guaranteed fix: 'loadingdone'
+    // is a second, independently-implemented Font Loading API signal
+    // that doesn't share `.ready`'s specific quirk, fired every time a
+    // batch of font loads completes — calling updateRailLeft() again
+    // here is a harmless no-op once metrics are already correct.
+    if (document.fonts) {
+        if (document.fonts.ready) document.fonts.ready.then(updateRailLeft);
+        document.fonts.addEventListener('loadingdone', updateRailLeft);
     }
 
-    // --- <1024px trigger + anchored panel (Prompt B) --------------------
+    // --- <1440px trigger + anchored panel (Prompt B) --------------------
     // Trigger reuses .action-rail-group/.action-rail-trigger/
     // .action-rail-badge verbatim (Rule 3a) — same position, shape and
     // badge treatment as Archive's Filter trigger. The two never coexist
