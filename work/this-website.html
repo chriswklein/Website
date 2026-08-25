@@ -234,5 +234,62 @@
 
     <div id="footer-placeholder"></div>
     <script src="/script.js"></script>
+    <!-- TEMPORARY DIAGNOSTIC — remove this whole <script> block once the
+         real iPad breakpoint numbers are in hand; not a permanent feature.
+         Gated behind ?tocdebug so it never appears in normal browsing;
+         inline styles are deliberate here (not style.css) so this stays
+         fully self-contained and leaves zero trace on any other page or
+         on this page's normal behavior once removed. Polls rather than
+         reading once on DOMContentLoaded — initTocRail() (script.js) only
+         runs inside the async nav.html fetch's callback, not synchronously
+         during DOMContentLoaded, so a one-shot read here raced it and
+         always reported "none found" (confirmed via direct testing, not
+         assumed) regardless of real device speed. -->
+    <script>
+    if (new URLSearchParams(location.search).has('tocdebug')) {
+        document.addEventListener('DOMContentLoaded', () => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5s at 100ms/attempt — generous for a slow mobile fetch
+
+            function renderOverlay(tocLabel, tocDisplay) {
+                const viewportMeta = document.querySelector('meta[name="viewport"]');
+                const lines = [
+                    'TOC DEBUG (temporary — remove before shipping)',
+                    'innerWidth: ' + window.innerWidth,
+                    'innerHeight: ' + window.innerHeight,
+                    "matchMedia (min-width:1440px): " + window.matchMedia('(min-width: 1440px)').matches,
+                    "matchMedia (max-width:1439px): " + window.matchMedia('(max-width: 1439px)').matches,
+                    'viewport meta content: ' + (viewportMeta ? viewportMeta.getAttribute('content') : 'none found'),
+                    'userAgent: ' + navigator.userAgent,
+                    'ToC element: ' + tocLabel,
+                    'ToC computed display: ' + tocDisplay,
+                ];
+
+                const overlay = document.createElement('pre');
+                overlay.textContent = lines.join('\n');
+                overlay.style.cssText = 'position:fixed;bottom:0;left:0;z-index:2147483647;' +
+                    'margin:0;padding:8px 10px;max-width:100vw;box-sizing:border-box;' +
+                    'background:#000;color:#0f0;opacity:0.9;font:11px/1.4 monospace;' +
+                    'white-space:pre-wrap;word-break:break-all;pointer-events:none;';
+                document.body.appendChild(overlay);
+            }
+
+            (function poll() {
+                const rail = document.querySelector('.toc-rail');
+                const panel = document.querySelector('.toc-panel');
+                const trigger = document.querySelector('.action-rail-trigger');
+                const tocEl = rail || panel || trigger;
+                attempts++;
+                if (tocEl || attempts >= maxAttempts) {
+                    const tocLabel = rail ? '.toc-rail' : panel ? '.toc-panel' : trigger ? '.action-rail-trigger' : 'none found after ' + (maxAttempts * 100) + 'ms';
+                    const tocDisplay = tocEl ? getComputedStyle(tocEl).display : 'n/a';
+                    renderOverlay(tocLabel, tocDisplay);
+                } else {
+                    setTimeout(poll, 100);
+                }
+            })();
+        });
+    }
+    </script>
 </body>
 </html>
