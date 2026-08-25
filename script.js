@@ -152,6 +152,15 @@ function initShareButtons() {
     });
 }
 
+// Shared by .back-to-top's own button and both ToC "Back to Top" surfaces
+// (the rail/panel row, the standalone mobile/tablet trigger) — one
+// implementation of the scroll behavior + prefers-reduced-motion check,
+// not a separately-implemented copy per surface.
+function scrollToTop() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+}
+
 // Back to Top button
 function initBackToTop() {
     const button = document.querySelector('.back-to-top');
@@ -172,10 +181,7 @@ function initBackToTop() {
         button.classList.toggle('back-to-top--visible', window.scrollY > 400);
     });
 
-    button.addEventListener('click', () => {
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-    });
+    button.addEventListener('click', scrollToTop);
 }
 
 // Matches the NEW-ENTRY-PROCESS.md heading-id convention exactly (strip
@@ -240,6 +246,35 @@ function buildTocLinks(headings, container) {
     });
 }
 
+// Prepends a "Back to Top" row to `container`, ahead of the real heading
+// rows buildTocLinks() adds — same .toc-rail-link row treatment (Rule 3a:
+// reuse the shape, not a parallel row style) via a <button> instead of an
+// <a> (there's no #heading to navigate to, just an action), so it needs
+// font-family: inherit and cursor: pointer added to .toc-rail-link itself
+// (style.css) — harmless for the existing <a> rows, which already got
+// both for free from the browser. Deliberately NOT built by
+// buildTocLinks() and NOT added to the railLinks/panelLinks arrays
+// updateActiveState() tracks: those arrays are exactly what drives both
+// the active-heading toggle (matched by href, which this button has none
+// of) and the badge's total count (headings.length, untouched) — keeping
+// this row out of them is what makes "never active, never counted"
+// automatic rather than a special case to maintain. aria-label matches
+// .back-to-top's own exact wording (initBackToTop() above) so both routes
+// to the same action announce identically, distinct from a real heading
+// row's own accessible name (its heading text).
+function buildBackToTopRow(container) {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'toc-rail-link';
+    button.textContent = 'Back to Top';
+    button.setAttribute('aria-label', 'Back to top');
+    button.addEventListener('click', scrollToTop);
+    item.appendChild(button);
+    container.appendChild(item);
+    return button;
+}
+
 // Desktop rail (CSS shows it only at >=1440px) plus the <1440px trigger +
 // anchored panel (Prompt B) — built together from one shared heading list
 // and one shared scrollspy pass, so current-heading tracking never runs
@@ -273,6 +308,7 @@ function initTocRail() {
 
     const railList = document.createElement('ul');
     railList.className = 'toc-rail-list';
+    buildBackToTopRow(railList);
     const railLinks = buildTocLinks(headings, railList);
     rail.append(railLabel, railList);
     document.body.insertBefore(rail, main);
@@ -437,6 +473,11 @@ function initTocRail() {
 
     const panelList = document.createElement('ul');
     panelList.className = 'toc-panel-list';
+    // Reuses .toc-rail-link (Rule 3a) — the click-to-close listener below
+    // already keys off that class generically, so this row closes the
+    // panel via the exact same path a real heading row does, with no
+    // special-casing needed for it here.
+    buildBackToTopRow(panelList);
     const panelLinks = buildTocLinks(headings, panelList);
 
     panel.append(panelLabel, panelList);

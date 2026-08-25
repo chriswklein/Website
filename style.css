@@ -1579,18 +1579,29 @@ footer p {
    shared traits (font-size-sm, border-strong, subtle background) rather
    than inventing a parallel style — elevation lives on .toc-rail-list
    above (the panel as a whole), not per-item, since neither reference
-   button is a list row. */
+   button is a list row. font-family/cursor: this class now also renders
+   as a <button> (the "Back to Top" row — buildBackToTopRow(), script.js
+   — has no #heading to link to, so it's a button, not an <a>); real <a>
+   rows already had both for free from the browser, so adding them here
+   is a no-op for those, not a visible change. width/text-align: a
+   <button>'s intrinsic content-sized/centred defaults would otherwise
+   make it look different from the full-width, left-aligned <a> rows
+   sitting right above and below it. */
 .toc-rail-link {
     display: block;
+    width: 100%;
     padding: var(--space-2) var(--space-3);
+    font-family: inherit;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-wide);
+    text-align: left;
     color: var(--color-text-primary);
     background-color: var(--color-background-subtle);
     border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--border-radius-sm);
     text-decoration: none;
+    cursor: pointer;
     transition: border-color var(--duration-fast) var(--ease-out),
                 color var(--duration-fast) var(--ease-out);
 }
