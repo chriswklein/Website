@@ -327,7 +327,7 @@ Base-4 scale. Every spacing decision must reference one of these tokens. No arbi
 
 | Name | Width | Layout | Nav | Tab Bar | Footer |
 |---|---|---|---|---|---|
-| Mobile | below 768px | Single column | Hidden | Fixed bottom | Hidden |
+| Mobile | below 768px | Single column | Hidden | Fixed top | Hidden |
 | Tablet | 768px–1023px | Single column | Sticky top | Hidden | Visible |
 | Desktop | 1024px and above | Page grid with variable card sizing | Sticky top | Hidden | Visible |
 
@@ -398,26 +398,27 @@ Content centred using `.standard-page` (max-width 1200px, horizontal padding). B
 
 ### 4.4 Navigation Layout
 
-**Desktop — Sticky top header:**
-- Logo/site name: centre aligned, `--font-size-base`, `--font-weight-bold`
-- Nav links: centre aligned, below logo
+**Desktop and landscape-tablet (>=1024px) — Sticky top header:**
+- Logo/site name: left aligned, to the left of nav links (not stacked above), `--font-size-base`, `--font-weight-bold`
+- Nav links: same row as logo, gap `--space-20`
 - Height: `64px`
 - Background: `--color-background-base`
 - Border bottom: `1px solid --color-border-default`
 - Position: `sticky`, `top: 0`, `z-index: 100`
+- Portrait-tablet (768-1023px) shows the same sticky header with the logo hidden — links only
 
-**Mobile — Bottom tab bar:**
-- Position: `fixed`, `bottom: 0`, full width
+**Mobile — Top-fixed tab bar:**
+- Position: `fixed`, `top: 0`, full width
 - Height: `64px`
 - Background: `--color-background-surface`
-- Border top: `1px solid --color-border-default`
+- Border bottom: `1px solid --color-border-default`
 - Items: Home, Work, Thoughts, About — icon above label
 - Icon size: `20px`
 - Label style: `nav-tab` type style
 - Active item: `--color-interactive-default`
 - Inactive item: `--color-text-secondary`
 - Min touch target per item: `44px`
-- Body padding-bottom on mobile: `80px` to prevent content overlap
+- `main` gets `padding-top: 80px` on mobile to prevent content overlap
 
 ### 4.5 Component-Specific Layout Tokens
 

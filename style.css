@@ -571,6 +571,25 @@ pre code {
     --btn-text:   var(--color-text-primary);
 }
 
+/* "View more Work" / "Read more Thoughts" — borrows the Contact/Resume/
+   LinkedIn/Email icon buttons' colour and hover treatment (surface
+   background, default border, teal border+text on hover) while keeping
+   this button's own full-width pill shape and visible label — not their
+   fixed 80x80 icon-only square, which wouldn't fit a text CTA. */
+.btn--cta {
+    --btn-bg:     var(--color-background-surface);
+    --btn-border: var(--color-border-default);
+    --btn-text:   var(--color-text-primary);
+}
+
+@media (hover: hover) {
+    .btn--cta:hover {
+        --btn-bg-hover:     var(--color-background-surface);
+        --btn-border-hover: var(--color-accent-primary-text);
+        --btn-text-hover:   var(--color-accent-primary-text);
+    }
+}
+
 /* Share button — auto-width, not full-width like .btn default */
 .share-btn {
     width: auto;
@@ -698,7 +717,6 @@ pre code {
     --card-padding:         var(--space-6);
     --card-image-bg:        var(--color-background-subtle);
     --card-block-link-z:    1;
-    --card-cta-z:           2;
 
     background-color: var(--card-bg);
     border: var(--border-width-thin) solid var(--card-border);
@@ -756,7 +774,48 @@ pre code {
     margin-bottom: var(--space-3);
 }
 
-/* Block link — covers full card for mouse users, hidden from AT and keyboard */
+/* Title row — type icon + title on the left, open-link icon on the
+   right. Shared by Work Entry and Thought Entry cards. Icons sized at
+   --space-10 (40px) per spec. */
+.card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.card-title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.card-type-icon {
+    width: var(--space-10);
+    height: var(--space-10);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.card-link-icon {
+    width: var(--space-10);
+    height: var(--space-10);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.card:hover .card-link-icon {
+    color: var(--color-accent-primary-text);
+}
+
+/* Sole card link — no separate View/Read button. Covers the full card,
+   carries the real accessible name, and is the card's only keyboard
+   focus stop (see aria-label on the element itself, set per entry).
+   Tags remain independent real links above it (z-index: 3, unaffected)
+   — this doesn't nest anchors since tags sit as .card-tags's own
+   siblings, not descendants of this link. */
 .card-block-link {
     position: absolute;
     inset: 0;
@@ -764,56 +823,27 @@ pre code {
     border-radius: var(--card-radius);
 }
 
-/* Card CTA — sole keyboard-focusable element; carries full aria-label */
-.card-cta {
-    --btn-bg:     var(--color-background-subtle);
-    --btn-border: var(--color-border-strong);
-    --btn-text:   var(--color-text-primary);
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: var(--card-cta-z);
-    width: 100%;
-    min-height: 44px;
-    padding: var(--space-3) var(--space-5);
-    background-color: var(--btn-bg);
-    border: var(--border-width-thin) solid var(--btn-border);
-    border-radius: var(--border-radius-sm);
-    color: var(--btn-text);
-    font-family: inherit;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: var(--letter-spacing-wide);
-    text-align: center;
-    text-decoration: none;
-    margin-top: var(--space-1);
-    transition: background-color var(--duration-fast) var(--ease-out),
-                border-color var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
-}
-
-.card-cta:hover {
-    background-color: var(--color-border-strong);
-    border-color: var(--color-interactive-hover);
-    color: var(--color-interactive-default);
-}
-
-.card-cta:focus-visible {
+/* .card has overflow: hidden, which would clip a standard positive-offset
+   focus ring on a link that spans the full card — inset offset keeps the
+   ring visible within that clipped boundary. */
+.card-block-link:focus-visible {
     outline: var(--border-width-medium) solid var(--color-interactive-focus);
-    outline-offset: 3px;
+    outline-offset: -3px;
 }
 
-/* Card meta — date and author line */
-.card-meta {
+/* Date row — Thought Entry cards only. Reuses the tag/meta text size
+   (--font-size-sm) but the more muted tertiary tier, distinct from
+   description text's secondary tier. */
+.card-date {
     font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
     line-height: var(--line-height-loose);
     max-width: none;
 }
 
-/* Thought cards — no image */
+/* Thought cards — no image, otherwise identical single-column content
+   flow to Feature (no separate icon column any more — the type icon now
+   lives in .card-title-row like Work Entry's). */
 .card--thought .card-image {
     display: none;
 }
@@ -910,18 +940,85 @@ pre code {
 }
 
 /* ================================
-   HOME GREETING
-================================ */
-.home-greeting {
+   HOME HERO
+   Desktop/tablet: natural height, --space-32 vertical padding (the
+   documented "Hero and banner vertical padding" token, previously
+   unused). Mobile gets its own min-height: 100dvh override below (see
+   MOBILE section) so the hero is the sole first-screen block there. */
+.home-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    gap: var(--space-6);
+    padding: var(--space-32) 0;
 }
 
-.home-greeting p {
-    margin: 0 auto;
+.home-hero-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
 }
 
-.home-greeting-accent {
+/* Sized off an existing font-size token rather than a new one-off value —
+   these are decorative, not text, but reusing the scale keeps the icon
+   size token-derived instead of an invented magic number. */
+.home-hero-icon {
+    width: var(--font-size-3xl);
+    height: var(--font-size-3xl);
     color: var(--color-accent-primary-text);
+    flex-shrink: 0;
+}
+
+/* No CSS width here on purpose — the <img> carries its real intrinsic
+   width/height (300x300) per DESIGN-SYSTEM.md §11.7, and the sitewide
+   img { max-width: 100%; height: auto } rule handles responsive
+   shrinking, so no raw pixel size needs introducing here. */
+.home-hero-image {
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.home-hero-image img {
+    display: block;
+}
+
+.home-hero-title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.home-hero-subtitle {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-relaxed);
+}
+
+.home-hero-scroll {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--touch-target-comfortable);
+    height: var(--touch-target-comfortable);
+    color: var(--color-text-secondary);
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+    .home-hero-scroll:hover {
+        color: var(--color-accent-primary-text);
+    }
+}
+
+.home-hero-scroll:focus-visible {
+    color: var(--color-accent-primary-text);
+}
+
+.home-hero-scroll svg {
+    width: var(--font-size-2xl);
+    height: var(--font-size-2xl);
 }
 
 /* ================================
@@ -1109,6 +1206,22 @@ header {
     color: var(--color-text-primary);
     text-decoration: underline;
     text-underline-offset: 2px;
+}
+
+/* Desktop and landscape-tablet — logo shown, left of nav links (not
+   stacked above). This project's breakpoints are width-only with no
+   orientation query anywhere else in the codebase; real landscape-tablet
+   widths already land at >=1024px here, so "desktop and landscape-tablet"
+   maps directly onto the existing min-width: 1024px breakpoint rather
+   than introducing a new orientation axis. Portrait-tablet (768-1023px)
+   and mobile hide the logo entirely — see .nav-logo display:none in the
+   TABLET and MOBILE sections below. */
+@media (min-width: 1024px) {
+    .site-nav .container {
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: var(--space-20);
+    }
 }
 
 /* ================================
@@ -2852,8 +2965,11 @@ footer p {
    TABLET (max-width: 1023px) — single column collapse
 ================================ */
 @media (max-width: 1023px) {
-    .card-row--two {
-        grid-template-columns: 1fr;
+    /* Portrait-tablet — nav logo hidden (see the min-width: 1024px block
+       above); mobile below hides the whole header anyway, so this is a
+       no-op there, not a separate rule. */
+    .nav-logo {
+        display: none;
     }
 
     /* Tablet — same row layout as desktop, scaled down; a smaller version of
@@ -2969,6 +3085,40 @@ footer p {
 
     main {
         padding-top: var(--space-20);
+    }
+
+    /* Featured Work collapses to one column on mobile only — tablet and
+       desktop both stay two-column (see .card-row--two's own base rule). */
+    .card-row--two {
+        grid-template-columns: 1fr;
+    }
+
+    /* Mobile only — hero is the sole first-screen block: full dynamic
+       viewport height (dvh, not vh — avoids the iOS Safari address-bar
+       dead-space bug), flex-centered so leftover space distributes evenly,
+       padding clamped between existing --space-* tokens rather than a
+       fixed value. Desktop/tablet keep the base rule's --space-32 padding
+       and natural (non-min-height) flow — the hero may show more below it
+       there. */
+    .home-hero {
+        min-height: 100dvh;
+        justify-content: center;
+        padding: clamp(var(--space-6), 6vw, var(--space-12)) var(--space-4);
+    }
+
+    /* The portrait and flanking icons rendered at their unclamped desktop
+       size here (300px / 36px, flex-shrink: 0 blocking any responsive
+       shrink) — the dominant cause of a measured 1071px hero on a 667px
+       viewport. Mobile-only fluid sizing bounded by existing tokens. */
+    .home-hero-image {
+        width: clamp(var(--space-16), 24vw, var(--space-24));
+        flex-shrink: 1;
+    }
+
+    .home-hero-icon {
+        width: clamp(var(--space-6), 6vw, var(--font-size-3xl));
+        height: clamp(var(--space-6), 6vw, var(--font-size-3xl));
+        flex-shrink: 1;
     }
 
     /* Mobile — the only breakpoint narrow enough to need a vertical stack

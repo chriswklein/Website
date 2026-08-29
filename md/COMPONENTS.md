@@ -843,7 +843,7 @@ Active nav link:
 **HTML Element:** `<nav class="tab-bar" aria-label="Mobile navigation">`
 
 ### Design Intent
-The tab bar replaces the desktop nav entirely on mobile. It is always visible at the bottom of the viewport — close to the thumb — giving users constant access to all four primary sections without scrolling. Icon and text label always shown together. Never icon only.
+The tab bar replaces the desktop nav entirely on mobile. It is always visible, fixed to the top of the viewport, giving users constant access to all four primary sections without scrolling. Icon and text label always shown together. Never icon only.
 
 ### Component Tokens
 
@@ -913,7 +913,7 @@ Active item: `.tab-bar-item.is-active` or `[aria-current="page"]`
 
 ### Responsive Behaviour
 
-- Mobile: visible — `position: fixed`, `bottom: 0`
+- Mobile: visible — `position: fixed`, `top: 0`
 - Desktop: hidden via `display: none`
 - Body requires `padding-bottom: 80px` on mobile to prevent content being obscured
 
@@ -1331,7 +1331,7 @@ window.scrollTo({ top: 0, behavior: 'auto' });
 ### Responsive Behaviour
 
 - Desktop: centred below content, above footer
-- Mobile: centred above bottom tab bar — ensure it clears the tab bar height
+- Mobile: same centred, in-flow placement at the end of page content — the tab bar is fixed to the top of the viewport (see §5), not the bottom, so no special clearance is needed here
 
 ---
 

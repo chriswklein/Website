@@ -325,7 +325,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 **Mobile (below 768px):**
 - `footer` hidden via `display: none`.
-- Tab bar fixed to bottom. `body` has `padding-bottom: 80px` to prevent content overlap.
+- Tab bar fixed to top. `main` has `padding-top: 80px` to prevent content overlap.
 - `<header>` (nav) hidden.
 - All card rows are single column.
 - Page padding reduces to `var(--space-4)`.
@@ -337,7 +337,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 **Purpose:** First impression. Page-grid layout — greeting, featured work, recent thoughts, recommendations, contact.
 **Status:** Built — IxDF block link pattern, page-grid structure. No Profile sidebar/card — that was a Figma-era concept that never shipped (see md/COMPONENTS.md, "Home-page Profile Sidebar" removed 2026-08-23).
 **Layout:** Single-column page-grid. Cards in full-width rows.
-**Mobile:** Single column — same section order as desktop. Bottom tab bar navigation.
+**Mobile:** Single column — same section order as desktop. Top-fixed tab bar navigation.
 **Content counts:** 2 Featured Work cards (hand-written, not synced to the manifest), 1 Featured Thought card (hand-written), 2 recommendation quotes, contact section. Home's featured cards must be updated by hand if a featured entry is renamed or removed — see md/NEW-ENTRY-PROCESS.md.
 
 ### Archive (archive.html)
@@ -362,19 +362,19 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Navigation (nav.html)
 - **Desktop:** Sticky top header — logo/name left, links right
-- **Mobile:** Bottom tab bar — replaces hamburger entirely
+- **Mobile:** Top-fixed tab bar — replaces hamburger entirely
 - Nav links: Home, Work, Thoughts, About
 - `aria-current="page"` set dynamically via `script.js` after nav injection
 - Injected via `script.js` fetch into `#nav-placeholder`
 
-### Mobile Bottom Tab Bar
-- Fixed to bottom of viewport
+### Mobile Tab Bar
+- Fixed to top of viewport
 - Items: Home, Work, Thoughts, About
 - Text-only (no icon library currently in use — see §5 Icons); a future iteration may add icons alongside the labels, never icon only
 - Font size xs (12px) for labels
 - Active state uses `--color-interactive-default`
 - Min touch target 44px per item
-- Body gets `padding-bottom: 80px` on mobile to prevent content overlap
+- `main` gets `padding-top: 80px` on mobile to prevent content overlap
 - Hidden on desktop via `display: none` outside mobile media query
 
 ### Footer (footer.html)
@@ -388,7 +388,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - Smooth scrolls to top
 - `aria-label="Back to top"`
 - Respects `prefers-reduced-motion`
-- Positioned above bottom tab bar on mobile
+- Same centred, in-flow placement at every breakpoint — the tab bar is fixed to the top of the viewport on mobile, not the bottom, so no special clearance is needed
 
 ### Card Component
 - Style: Image card with CSS background image
