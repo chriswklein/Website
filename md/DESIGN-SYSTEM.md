@@ -400,7 +400,9 @@ Content centred using `.standard-page` (max-width 1200px, horizontal padding). B
 
 **Desktop and landscape-tablet (>=1024px) — Sticky top header:**
 - Logo/site name: left aligned, to the left of nav links (not stacked above), `--font-size-base`, `--font-weight-bold`
-- Nav links: same row as logo, gap `--space-20`
+- Container: `display: flex; justify-content: space-between` — logo is the left child, the nav-links group is the right child, no fixed gap between them
+- Nav links: gap `--space-20` between individual links (Home/Archive/About), via `.nav-links`
+- Container aligns to the same `.container`/`var(--max-content)` edges as other page sections (Featured Work, Thoughts)
 - Height: `64px`
 - Background: `--color-background-base`
 - Border bottom: `1px solid --color-border-default`

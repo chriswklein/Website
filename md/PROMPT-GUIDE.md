@@ -117,6 +117,14 @@ When asked to commit changes, use lowercase descriptive messages matching the pr
 Never use generic messages like "update styles" or "fix bugs".
  
 ---
+
+## Rule 8 — Known Gotchas
+
+**Local dev server caching:** Local dev servers (e.g. Python's `http.server`) send no cache-control headers, and Chromium will silently keep serving a cached copy of `style.css`, `script.js`, or even the HTML document itself across navigations in the same browser tab — even after the file changed on disk. This produces false-negative verification results: a fix looks like it "didn't work" when it's actually just not being loaded.
+
+If an edit doesn't appear to take effect during Playwright/browser verification, don't conclude the change is wrong — first restart the dev server on a fresh port (forces a new origin, guaranteeing no cached assets) before re-checking. A same-tab stylesheet-only reload (replacing the `<link>` element via `page.evaluate`) can work for CSS alone, but a fresh port is the reliable fix when HTML or script.js are also in question.
+
+---
  
 ## Quick Reference — Most Common Task Types
  

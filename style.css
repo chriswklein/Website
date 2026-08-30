@@ -743,10 +743,10 @@ pre code {
 }
 
 .card-content {
-    padding: var(--space-3) var(--space-6);
+    padding: var(--space-2);
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-2);
 }
 
 .card p {
@@ -770,8 +770,20 @@ pre code {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    margin-top: var(--space-3);
-    margin-bottom: var(--space-3);
+}
+
+/* Card-preview tags — plain, non-interactive teal text. Not the real
+   .tag filter component (untouched, see "## TAGS" above) — this is a
+   separate class specifically so entry-page/Archive-filter tags keep
+   their pill/link styling and behaviour unchanged. No border, background,
+   or hover/focus state, since these are plain <span>s, not links. */
+.card-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-accent-primary-text);
 }
 
 /* Title row — type icon + title on the left, open-link icon on the
@@ -908,11 +920,12 @@ pre code {
 .card-row {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    gap: var(--space-2);
 }
 
 .card-row--two {
     grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
 }
 
 .card-row--full {
@@ -921,7 +934,7 @@ pre code {
 
 /* Spacing between consecutive card-rows within a section */
 .card-row + .card-row {
-    margin-top: var(--space-6);
+    margin-top: var(--space-2);
 }
 
 .section-heading {
@@ -956,33 +969,55 @@ pre code {
 
 .home-hero-icons {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: var(--space-8);
 }
 
-/* Sized off an existing font-size token rather than a new one-off value —
-   these are decorative, not text, but reusing the scale keeps the icon
-   size token-derived instead of an invented magic number. */
+/* Positioned anchor for the overlapping icons below — no overflow:
+   hidden here (that would clip the icons' overlapping halves); the
+   circular crop instead lives on the <img> itself, which has nothing
+   of its own that needs clipping. */
+.home-hero-image {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Explicit width: 100%/height: auto here rather than relying on the
+   sitewide img { max-width: 100% } rule alone — belt-and-suspenders
+   against the <img>'s own width="300" height="300" attributes (kept
+   intentionally, per DESIGN-SYSTEM.md §11.7's CLS-prevention
+   requirement) winning in any rendering path where max-width alone
+   doesn't reliably beat them. Confirmed max-width alone already works
+   correctly in Chromium (measured 120px matching the clamp), but this
+   makes the override explicit rather than implicit. */
+.home-hero-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-full);
+}
+
+/* Icons overlap the image's edges — half in, half out — rather than
+   sitting beside it in a flex row. Sized off an existing font-size
+   token rather than a new one-off value (decorative, not text, but
+   reusing the scale keeps this token-derived, not an invented magic
+   number). translate() offsets are percentages of the icon's own box,
+   not a length needing a --space-* token. */
 .home-hero-icon {
+    position: absolute;
+    top: 50%;
     width: var(--font-size-3xl);
     height: var(--font-size-3xl);
     color: var(--color-accent-primary-text);
-    flex-shrink: 0;
 }
 
-/* No CSS width here on purpose — the <img> carries its real intrinsic
-   width/height (300x300) per DESIGN-SYSTEM.md §11.7, and the sitewide
-   img { max-width: 100%; height: auto } rule handles responsive
-   shrinking, so no raw pixel size needs introducing here. */
-.home-hero-image {
-    border-radius: var(--border-radius-full);
-    overflow: hidden;
-    flex-shrink: 0;
+.home-hero-icon--left {
+    left: 0;
+    transform: translate(-50%, -50%);
 }
 
-.home-hero-image img {
-    display: block;
+.home-hero-icon--right {
+    right: 0;
+    transform: translate(50%, -50%);
 }
 
 .home-hero-title {
@@ -1184,7 +1219,7 @@ header {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: var(--space-8);
+    gap: var(--space-20);
     list-style: none;
 }
 
@@ -1219,8 +1254,7 @@ header {
 @media (min-width: 1024px) {
     .site-nav .container {
         flex-direction: row;
-        justify-content: flex-start;
-        gap: var(--space-20);
+        justify-content: space-between;
     }
 }
 
@@ -2197,14 +2231,14 @@ footer p {
 }
 
 /* ================================
-   FEATURE CARD — horizontal layout, tablet and desktop (768px and above)
-   Image becomes a left column at --card-image-column-width; content fills
-   the remainder. Image has no fixed height — align-items: stretch matches
-   it to whatever height the content column reaches for its real text.
-   Thought cards have no image and are unaffected — selector is scoped to
-   .card--feature only. Below 768px, cards fall back to normal block flow
-   (image on top, content below) with no additional CSS needed for that.
+   FEATURE CARD — horizontal layout, formerly tablet/desktop (768px+)
+   DORMANT — commented out, not deleted, per Chris's explicit request.
+   Work cards now use one vertical-stack layout (image full-width on top,
+   content below) at every breakpoint, matching mobile's structure and
+   unifying Home/Archive. See REFERENCE.md "Unused Assets / Dormant Code"
+   for --card-image-column-width, which only fed this block.
 ================================ */
+/*
 @media (min-width: 768px) {
     .card--feature {
         display: flex;
@@ -2223,6 +2257,7 @@ footer p {
         min-width: 0;
     }
 }
+*/
 
 /* ================================
    ARCHIVE HEADER
@@ -3103,22 +3138,39 @@ footer p {
     .home-hero {
         min-height: 100dvh;
         justify-content: center;
-        padding: clamp(var(--space-6), 6vw, var(--space-12)) var(--space-4);
+        /* Vertical clamp bounds dropped one token step (space-6->space-4,
+           space-12->space-10) to help the scroll chevron clear the fold —
+           shorthand ties top/bottom together, so this reduces both, not
+           top alone (there's no separate top-only value to trim instead). */
+        padding: clamp(var(--space-4), 6vw, var(--space-10)) var(--space-4);
     }
 
-    /* The portrait and flanking icons rendered at their unclamped desktop
-       size here (300px / 36px, flex-shrink: 0 blocking any responsive
-       shrink) — the dominant cause of a measured 1071px hero on a 667px
-       viewport. Mobile-only fluid sizing bounded by existing tokens. */
+    /* The portrait rendered at its unclamped desktop size here (300px)
+       originally — mobile-only fluid sizing bounded by existing tokens.
+       Bounds raised again per Chris's feedback that the prior pass
+       (--space-20 to --space-32 at 28vw) still read too small.
+       --space-32 (128px) is the largest spacing token defined anywhere
+       in the system — this clamp's ceiling is already at that limit, so
+       there is no larger existing token to reach for if this still
+       isn't big enough; that would need a new token, flagged rather
+       than invented here. First pass, not pixel-final; report computed
+       size for confirmation. */
     .home-hero-image {
-        width: clamp(var(--space-16), 24vw, var(--space-24));
+        width: clamp(var(--space-24), 32vw, var(--space-32));
         flex-shrink: 1;
     }
 
-    .home-hero-icon {
-        width: clamp(var(--space-6), 6vw, var(--font-size-3xl));
-        height: clamp(var(--space-6), 6vw, var(--font-size-3xl));
-        flex-shrink: 1;
+    /* One step down the existing H1 type scale from mobile's default
+       3xl (36px) — first pass, report for visual confirmation. */
+    .home-hero-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    /* Mobile only — same token standard entry body paragraphs use
+       elsewhere (.standard-page-content p), not the desktop/tablet xl
+       lead-paragraph size. */
+    .home-hero-subtitle {
+        font-size: var(--font-size-base);
     }
 
     /* Mobile — the only breakpoint narrow enough to need a vertical stack

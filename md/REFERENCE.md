@@ -688,3 +688,21 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
 - REFERENCE.md §5's own Colour System (Accent Primitives table) — the discrepancy flagged just above — corrected in a follow-up pass: `--color-accent-primary` / `--color-accent-primary-text` now show the live teal values (`#00BAA5` / `#00E5CB`) with their real contrast figures (~7.7:1 / ~11.8:1), matching DESIGN-SYSTEM.md §1.6's already-established wording exactly, with a one-line note that gold is the dormant `[data-theme="gold"]` override.
 - REFERENCE.md §7's Code/Pre Blocks and Dividers entries corrected from "gold" to the same teal live-default / dormant-gold-override framing, closing the last gold-as-current reference anywhere in this document.
 - **ToC mobile/tablet variant completed and documented.** Read `initTocRail()` and every related function in script.js fresh, start to finish, confirming (not assuming from any prior summary) the real current state: both surfaces — the desktop rail (≥1440px) and the mobile/tablet floating trigger + anchored panel (below that, covering every real iPad width in both orientations) — are fully shipped, share one heading list and one scrollspy pass, and both include a non-counted, never-active "Back to Top" row (`buildBackToTopRow()`) alongside the existing `.back-to-top` button at the page bottom. Confirmed `lockBodyScroll()`/`unlockBodyScroll()` are defined but never called anywhere in `initTocRail()`'s closure (verified via direct grep of call sites, not just definitions) — scroll-lock was added for the panel, traced as the root cause of several real-device bugs (badge/scrollspy corruption, Back to Top disappearing, a WebKit content-blanking issue), and fully removed; the panel now relies on the scrim + `inert` combination alone, which proved sufficient on its own. The panel's own internal bottom-anchor tiering (50vh above ≤1439px, 30vh below ≤767px) is a separate, narrower tier nested inside the outer rail-vs-panel boundary — confirmed the two did not move together when the outer boundary shifted from 1024px to 1440px. Full real anatomy, tokens, and behavior for both surfaces now documented in COMPONENTS.md "## 14. Standard Page Template" (two new subsections) — REFERENCE.md §6 and §8 updated to match.
+
+---
+
+## 15. Unused Assets / Dormant Code
+
+Per explicit instruction: nothing gets deleted without Chris's approval. Items below became unreferenced as a result of the 2026-08-30 card-icon-removal/layout-unification session (or earlier sessions) but are left in place — logged here instead of removed.
+
+**Icon assets (`assets/icons/`)** — all still on disk, `fill="white"` source files, none currently inlined anywhere:
+- `cards/work.svg` (briefcase) — was the Work Entry card type icon, removed 2026-08-30
+- `cards/thoughts.svg` (chat bubble) — was the Thought Entry card type icon, removed 2026-08-30
+- `cards/open-link.svg` — was the card title-row open-link icon, removed 2026-08-30
+- `cards/message.svg` — was the original Thought Entry left-column icon (superseded by `thoughts.svg` in an earlier pass, already unused before 2026-08-30)
+
+**CSS classes (`style.css`)** — rules remain defined but no HTML/JS currently references them:
+- `.card-title-row`, `.card-title-group`, `.card-type-icon`, `.card-link-icon` — built for the now-removed card icon row
+- `--card-image-column-width` (`:root`, 42%) — fed only the commented-out Feature-card horizontal layout below
+
+**Commented-out CSS (not deleted)** — `style.css`, "FEATURE CARD — horizontal layout" section: the `@media (min-width: 768px) { .card--feature {...} }` block that gave Work cards an image-left row layout at tablet/desktop. Work cards now use one vertical-stack layout at every breakpoint; the block is left in the file as a comment rather than removed.
