@@ -1314,6 +1314,20 @@ function setActiveNavLink() {
                 </div>
             </section>
 
+            <!-- ================================
+                 SECTION 22 — VIDEO EMBED
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s22-heading">
+                <h2 id="s22-heading">Section 22 — Video Embed</h2>
+                <p class="preview-section-desc">Added 2026-08-31. <code>.video-embed</code> — the pattern for embedding video (e.g. YouTube) anywhere on the site, entry pages included. Wraps the <code>&lt;iframe&gt;</code> in a container sized with CSS <code>aspect-ratio: 16 / 9</code> and <code>border-radius: var(--border-radius-md)</code>, matching the in-body image treatment in Section 10. The iframe itself keeps its <code>width</code>/<code>height</code> attributes as a fallback for browsers without <code>aspect-ratio</code> support, but is absolutely positioned to fill the wrapper — CSS governs the actual display size, so it scales fluidly at all breakpoints instead of rendering at a fixed 560×315. Use the privacy-conscious <code>youtube-nocookie.com</code> embed domain, standard controls, no autoplay. Shown unframed below, as it would appear in <code>.standard-page-content</code> on a real entry page.</p>
+
+                <div class="standard-page-content">
+                    <div class="video-embed">
+                        <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/RZ_0ImDYrPY?si=WSsDmf7l3nxmfFrS" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
 </body>

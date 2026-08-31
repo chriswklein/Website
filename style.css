@@ -1382,6 +1382,27 @@ footer p {
     margin-bottom: 0;
 }
 
+/* Video embed — aspect-ratio governs display size; the iframe's own
+   width/height attributes are a fallback for browsers without
+   aspect-ratio support only, and are overridden here. */
+.video-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+}
+
+.video-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
 .standard-page-title {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
