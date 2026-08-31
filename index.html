@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
+    <script>/* hero-vh-lock: reads window.innerHeight ONCE at load and pins it as --hero-vh-locked, so the mobile hero's height is a JS-computed constant rather than a live viewport unit (100dvh, then 100svh, both still recalculated inconsistently across iOS WKWebView-based browsers — Brave/Edge specifically — during the toolbar's show/hide animation, causing a scroll-time jitter neither CSS-only fix resolved). Deliberately NOT kept live via a resize/orientationchange listener — see style.css's .home-hero mobile rule and DESIGN-SYSTEM.md §3.2 for the full reasoning; a stale value after a real device rotation is an accepted tradeoff, not an oversight. Home-only: this page's own script, not the shared flash-prevention snippet other pages also carry verbatim. */document.documentElement.style.setProperty('--hero-vh-locked', window.innerHeight + 'px');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home — Christopher Klein</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">

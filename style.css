@@ -3123,22 +3123,28 @@ footer p {
         grid-template-columns: 1fr;
     }
 
-    /* Mobile only — hero is the sole first-screen block: small viewport
-       height (svh, not vh — avoids the iOS Safari address-bar dead-space
-       bug that plain vh has) and NOT dvh — dvh recalculates live as the
-       address bar collapses/expands mid-scroll, which was growing this
-       in-flow, page-top element's height while the user was actively
-       scrolling past it, producing a visible lurch/jitter on Home only
-       (confirmed: dvh was the only such unit anywhere on the site, and
-       no JS touches this element — the resize was purely CSS-driven).
-       svh uses the static minimum-toolbar value instead, so it never
-       changes mid-gesture. Flex-centered so leftover space distributes
-       evenly, padding clamped between existing --space-* tokens rather
-       than a fixed value. Desktop/tablet keep the base rule's padding
-       and natural (non-min-height) flow — the hero may show more below
-       it there. */
+    /* Mobile only — hero is the sole first-screen block. Two CSS-unit
+       attempts here previously (100dvh, then 100svh) both still let a
+       scroll-time jitter reproduce on iOS WKWebView-based browsers
+       (Brave/Edge specifically — not Safari/Chrome), which apparently
+       handle live viewport-height changes during the toolbar's show/
+       hide animation less consistently than Safari's own native path.
+       Replaced the CSS-unit approach entirely: --hero-vh-locked is a
+       JS-computed constant (window.innerHeight read ONCE at load, see
+       the inline <script> in index.html's <head>), not a viewport unit
+       at all, so it cannot react to an in-progress toolbar animation
+       regardless of how any given browser implements dvh/svh. The
+       var()'s fallback (100svh) only matters if JS is unavailable.
+       Deliberately not kept live via resize/orientationchange — see
+       that same inline script's comment. This is a --space-* token
+       exception by necessity (a runtime pixel value, not a design-scale
+       token) — see DESIGN-SYSTEM.md §3.2. Flex-centered so leftover
+       space distributes evenly, padding clamped between existing
+       --space-* tokens rather than a fixed value. Desktop/tablet keep
+       the base rule's padding and natural (non-min-height) flow — the
+       hero may show more below it there. */
     .home-hero {
-        min-height: 100svh;
+        min-height: var(--hero-vh-locked, 100svh);
         justify-content: center;
         /* Vertical clamp bounds dropped one token step (space-6->space-4,
            space-12->space-10) to help the scroll chevron clear the fold —

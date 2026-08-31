@@ -319,6 +319,18 @@ Base-4 scale. Every spacing decision must reference one of these tokens. No arbi
 - Distinct components in a layout: `--space-8`
 - Major page sections: `--space-16` to `--space-20`
 
+### 3.2 Runtime Exceptions
+
+One narrow, intentional exception to "every value must be a token" exists: `--hero-vh-locked`, used only by `.home-hero`'s mobile `min-height` (`style.css`, MOBILE section).
+
+It is **not** a design-scale value and never will be — it's `window.innerHeight` in pixels, read once by an inline `<script>` in `index.html`'s `<head>` and written to `document.documentElement.style` on every load. This exists because two CSS-only viewport-unit attempts (`100dvh`, then `100svh`) both still allowed a scroll-time layout jitter to reproduce on iOS WKWebView-based browsers (Brave/Edge — not Safari/Chrome), which handle live viewport-height recalculation during the toolbar's show/hide animation less consistently than Safari's native rendering path. A JS-computed constant sidesteps the inconsistency entirely, since it isn't a viewport unit at all and cannot react to an in-progress toolbar animation no matter how a given browser implements `dvh`/`svh`.
+
+Deliberately **not** kept live via a `resize`/`orientationchange` listener — that would reintroduce the exact recalculate-during-scroll behavior this exists to eliminate. A stale value after a genuine device rotation is an accepted tradeoff, not an oversight; making it live again is a separate, deliberate future decision if it ever becomes a real problem, not a default to build in now.
+
+`min-height: var(--hero-vh-locked, 100svh)` — the fallback is `100svh`, not a raw value, so the rule degrades to the previous (still-reasonable) CSS-only behavior if JS is ever unavailable.
+
+If a future audit flags `--hero-vh-locked` as a hardcoded/non-token value: it's this documented exception, not a violation to fix.
+
 ---
 
 ## 4. Grid and Layout
