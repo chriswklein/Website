@@ -773,6 +773,22 @@ img {
 }
 ```
 
+### 11.10 Video Demo (GIF Replacement)
+
+`.video-demo` is the pattern for local UI/bug-demo clips that would otherwise be a GIF — distinct from `.video-embed` (third-party embeds; see COMPONENTS.md). No forced aspect-ratio: demo recordings vary in shape (square, portrait mobile capture), so the `<video>` sizes from its own intrinsic `width`/`height` attributes, the same CLS-prevention approach as §11.7/§11.9, constrained to `max-width: 100%` within its column.
+
+Every `<video class="video-demo">` must have:
+```html
+<video poster="poster.jpg" width="1024" height="640" muted loop playsinline controls>
+    <source src="clip.webm" type="video/webm">
+    <source src="clip.mp4" type="video/mp4">
+</video>
+```
+
+`poster` is required on every instance — it prevents a blank flash before decode, and is also the static state shown when `prefers-reduced-motion` is set.
+
+The §8.3 CSS reduced-motion block does not govern `<video>` autoplay, so this is handled in `script.js`: `autoplayUnlessReducedMotion(selector)` adds `autoplay` only when `prefers-reduced-motion: reduce` is not set; otherwise the video is left on its poster with native controls, requiring an explicit user action to play. This is the implementation of the site's general `prefers-reduced-motion` commitment (§8) for looping demo content specifically.
+
 ---
 
 ## 12. Checklist for Claude Code Sessions

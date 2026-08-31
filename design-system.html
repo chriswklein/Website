@@ -1328,6 +1328,27 @@ function setActiveNavLink() {
                 </div>
             </section>
 
+            <!-- ================================
+                 SECTION 23 — VIDEO DEMO
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s23-heading">
+                <h2 id="s23-heading">Section 23 — Video Demo</h2>
+                <p class="preview-section-desc">Added 2026-08-31. <code>.video-demo</code> — a GIF replacement for local UI/bug-demo recordings (Section 22's <code>.video-embed</code> is for third-party embeds like YouTube; use this instead for anything self-hosted in <code>assets/videos/</code>). Unlike <code>.video-embed</code>'s fixed 16:9 wrapper, there's no forced aspect-ratio here — demo clips vary in shape (square, portrait mobile capture) — so sizing comes from the <code>&lt;video&gt;</code> element's own <code>width</code>/<code>height</code> attributes, the same intrinsic-size CLS-prevention pattern required of <code>&lt;img&gt;</code> (DESIGN-SYSTEM.md §11.7), constrained to <code>max-width: 100%</code> within the column. <code>border-radius: var(--border-radius-md)</code> matches <code>.video-embed</code> and in-body images for visual consistency across media components. A <code>poster</code> attribute is required on every instance — it prevents a blank flash before the video decodes, and doubles as the static reduced-motion state.</p>
+
+                <p class="preview-section-desc"><strong>Reduced-motion behaviour:</strong> the CSS reduced-motion block at the bottom of <code>style.css</code> only kills transitions/animations — it has no effect on <code>&lt;video&gt;</code> autoplay, so this is handled in <code>script.js</code> instead. On page load, <code>autoplayUnlessReducedMotion('.video-demo video')</code> checks <code>matchMedia('(prefers-reduced-motion: reduce)')</code>: when it's <em>not</em> set, autoplay is added and the video loops silently, GIF-equivalent. When it <em>is</em> set, nothing is added — the video sits on its <code>poster</code> image with native controls, and only plays on an explicit tap/click. That's the capability this component exists to add over a plain GIF. The function takes a selector, so it's reusable for any future autoplay-capable media, not a one-off inline check.</p>
+
+                <p class="preview-section-desc">This page loads no <code>script.js</code> by design (see the file-level comment at the top), so the example below shows the markup pattern only — <code>autoplay</code> is not applied live here the way it would be on a real page. The <code>src</code>/<code>poster</code> paths are illustrative placeholders, not a real asset, so playback itself can't be verified on this page either.</p>
+
+                <div class="standard-page-content">
+                    <div class="video-demo">
+                        <video poster="/assets/videos/example-demo-poster.jpg" width="1024" height="640" muted loop playsinline controls>
+                            <source src="/assets/videos/example-demo.webm" type="video/webm">
+                            <source src="/assets/videos/example-demo.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
 </body>

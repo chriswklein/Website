@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setActiveTabBar();
     initBackToTop();
     initShareButtons();
+    autoplayUnlessReducedMotion('.video-demo video');
     const filterDrawer = initFilterDrawer();
     initArchive(filterDrawer);
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
@@ -159,6 +160,21 @@ function initShareButtons() {
 function scrollToTop() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+}
+
+// Reusable for any future autoplay-capable media, not just .video-demo.
+// The CSS reduced-motion block (bottom of style.css) only kills
+// transitions/animations — it has no effect on <video> autoplay, so
+// looping demo clips need this JS-level check instead. When set, the
+// video is left alone: it shows its required poster with native controls,
+// requiring an explicit user action to play.
+function autoplayUnlessReducedMotion(selector) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    document.querySelectorAll(selector).forEach(video => {
+        video.setAttribute('autoplay', '');
+        video.play().catch(() => {});
+    });
 }
 
 // Back to Top button

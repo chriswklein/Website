@@ -238,7 +238,7 @@ img {
 - Focus ring: 2px solid white, 3px offset
 - Touch targets: 44px minimum (48px comfortable)
 - Line length: 45ch minimum, 65ch optimal, 80ch maximum
-- `prefers-reduced-motion` respected — animations disabled when set
+- `prefers-reduced-motion` respected — animations disabled when set; for looping video (`.video-demo`, see md/COMPONENTS.md §15) this is a JS-level check in script.js, since the CSS reduced-motion block doesn't reach `<video>` autoplay
 - Semantic HTML required — no div soup
 - `lang` attribute on every `<html>` tag
 - Alt text required on every meaningful image

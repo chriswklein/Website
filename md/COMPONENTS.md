@@ -44,6 +44,7 @@ Rules for Claude Code:
 12. Back to Top Button
 13. Share Button
 14. Standard Page Template
+15. Video Demo
 
 ---
 
@@ -1751,6 +1752,69 @@ path written for it.
 | Desktop (≥1024px) | Banner full-width (`width: 100%`, no max-width — confirmed 2026-08-25, see Anatomy above), contained within `.standard-page`'s own padding, not capped to the 65ch text column beneath it; details rows label/value side by side; footer actions row side by side, matched width |
 | Tablet (768–1023px) | Same as desktop — banner still full-width within the page's own padding |
 | Mobile (<768px) | Banner contained (no longer full-bleed) but still full-width within the page's own padding, same as the other two tiers; details rows stack to single column; footer actions stack full-width |
+
+---
+
+## 15. Video Demo
+
+**Figma Component Name:** `VideoDemo`
+**CSS Class:** `.video-demo`
+**HTML Element:** `<div class="video-demo"><video poster="..." width="..." height="..." muted loop playsinline controls>...</video></div>`
+
+### Design Intent
+`.video-demo` is a GIF replacement for local UI/bug-demo recordings — a short, silent, looping clip embedded inline in a page. It's the sibling of `.video-embed` (see design-system.html Section 22): use `.video-embed` for third-party embeds like YouTube, use `.video-demo` for self-hosted clips in `assets/videos/`. Unlike `.video-embed`'s fixed 16:9 wrapper, there's no forced aspect-ratio, since UI/bug demo recordings vary in shape (square, portrait mobile capture, full-desktop landscape).
+
+### When to Use
+Anywhere a GIF would otherwise be used to show a UI interaction or reproduce a bug — entry pages, bug reports, changelogs.
+
+### When NOT to Use
+Third-party video (YouTube, Vimeo, etc.) — use `.video-embed` instead.
+
+### Component Tokens
+
+```css
+--video-demo-radius:        var(--border-radius-md);
+--video-demo-margin-bottom: var(--space-6);
+```
+
+### Anatomy
+
+```html
+<div class="video-demo">
+    <video poster="/assets/videos/example-demo-poster.jpg" width="1024" height="640" muted loop playsinline controls>
+        <source src="/assets/videos/example-demo.webm" type="video/webm">
+        <source src="/assets/videos/example-demo.mp4" type="video/mp4">
+    </video>
+</div>
+```
+
+- Wrapper: `<div class="video-demo">` — no styling role beyond bottom margin; the `<video>` itself carries size and radius.
+- `poster` — required on every instance. Prevents a blank flash before decode, and is the static state shown under reduced motion.
+- `width`/`height` — the video's real intrinsic dimensions, same CLS-prevention role as `<img>` (DESIGN-SYSTEM.md §11.7).
+- `muted loop playsinline` — required for autoplay to be permitted by the browser and to loop GIF-style.
+- `controls` — native controls only; no custom play/pause UI.
+- Two `<source>` elements — `webm` first (smaller), `mp4` fallback.
+
+### States
+
+| State | Behaviour |
+|---|---|
+| `prefers-reduced-motion: reduce` not set | `autoplay` is added by `script.js` on page load; video loops silently, GIF-equivalent |
+| `prefers-reduced-motion: reduce` set | No `autoplay` added; video shows its `poster` with native controls, requiring an explicit user action to play |
+
+### Accessibility
+Respects `prefers-reduced-motion` (see Interaction Spec) — this is the implementation of that site-wide commitment (see md/REFERENCE.md) for looping demo content specifically, since the CSS-only reduced-motion block (DESIGN-SYSTEM.md §8.3) doesn't reach `<video>` autoplay. Native `controls` give keyboard and screen-reader users a standard, accessible play/pause/seek interface — no custom control UI to reimplement.
+
+### Interaction Spec
+
+On page load, `script.js` runs:
+```javascript
+autoplayUnlessReducedMotion('.video-demo video');
+```
+which checks `matchMedia('(prefers-reduced-motion: reduce)')` and only sets `autoplay` (and calls `.play()`) when it's not set. Written to take a selector so it's reusable for any future autoplay-capable media, not a one-off inline check.
+
+### Responsive Behaviour
+No breakpoint-specific overrides — `max-width: 100%` plus the video's own `width`/`height` attributes already scale it fluidly within its column at every breakpoint.
 
 ---
 

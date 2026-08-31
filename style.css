@@ -1403,6 +1403,23 @@ footer p {
     border: 0;
 }
 
+/* Video demo — local UI/bug-demo clips (GIF replacement). No aspect-ratio
+   wrapper: unlike .video-embed's fixed 16:9, these recordings vary in
+   shape (square, portrait mobile capture, etc.), so sizing comes from the
+   <video>'s own width/height attributes — same CLS-prevention pattern as
+   img (DESIGN-SYSTEM.md §11.7/§11.9) — constrained to the column. */
+.video-demo {
+    max-width: 100%;
+    margin-bottom: var(--space-6);
+}
+
+.video-demo video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+}
+
 .standard-page-title {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
