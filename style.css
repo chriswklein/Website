@@ -1005,17 +1005,15 @@ pre code {
 
 /* Icons sit beside the image again (not overlapping it) — each one
    wrapped in the existing .contact-icon-btn class directly in the HTML
-   (background, border, radius, sizing all reused verbatim, not
-   redeclared here). This rule only sets the icon's own colour: teal by
-   default, matching the hero's established decorative accent, rather
-   than .contact-icon-btn's own text-primary-until-hover treatment —
-   these containers are non-interactive (no link, nothing to focus), so
-   that hover/focus swap is inert dead weight here, not a real state
-   change; flagging that reusing the class also brings its :hover along
-   for the ride even though nothing is actually clickable. */
-.home-hero-icon {
-    color: var(--color-accent-primary-text);
-}
+   (background, border, radius, sizing, AND colour all reused verbatim
+   from that component, nothing redeclared here). .home-hero-icon
+   previously forced color: teal directly on the svg, which overrode
+   .contact-icon-btn's real default (text-primary, shifting to teal
+   only on hover) since a property set directly on an element always
+   wins over an inherited one, regardless of selector specificity. That
+   override is removed — the class stays as a markup hook only, with no
+   CSS of its own, so these icons now render exactly like a real
+   Contact/Resume/Email/LinkedIn button. */
 
 .home-hero-title {
     display: flex;
