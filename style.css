@@ -954,30 +954,37 @@ pre code {
 
 /* ================================
    HOME HERO
-   Desktop/tablet: natural height, --space-32 vertical padding (the
-   documented "Hero and banner vertical padding" token, previously
-   unused). Mobile gets its own min-height: 100dvh override below (see
-   MOBILE section) so the hero is the sole first-screen block there. */
+   Desktop/tablet: natural height, --space-24 vertical padding (one
+   token step down from --space-32, reduced per Chris's request —
+   --space-32 remains the documented "Hero and banner vertical padding"
+   token but was reading too generous here). Mobile gets its own
+   min-height: 100svh override below (see MOBILE section) so the hero
+   is the sole first-screen block there. */
 .home-hero {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: var(--space-6);
-    padding: var(--space-32) 0;
+    padding: var(--space-24) 0;
 }
 
 .home-hero-icons {
     display: flex;
+    align-items: center;
     justify-content: center;
+    gap: var(--space-8);
 }
 
-/* Positioned anchor for the overlapping icons below — no overflow:
-   hidden here (that would clip the icons' overlapping halves); the
-   circular crop instead lives on the <img> itself, which has nothing
-   of its own that needs clipping. */
+/* Mobile/tablet — tighter gap between the icon containers and the
+   portrait than desktop's --space-8. */
+@media (max-width: 1023px) {
+    .home-hero-icons {
+        gap: var(--space-4);
+    }
+}
+
 .home-hero-image {
-    position: relative;
     flex-shrink: 0;
 }
 
@@ -996,28 +1003,18 @@ pre code {
     border-radius: var(--border-radius-full);
 }
 
-/* Icons overlap the image's edges — half in, half out — rather than
-   sitting beside it in a flex row. Sized off an existing font-size
-   token rather than a new one-off value (decorative, not text, but
-   reusing the scale keeps this token-derived, not an invented magic
-   number). translate() offsets are percentages of the icon's own box,
-   not a length needing a --space-* token. */
+/* Icons sit beside the image again (not overlapping it) — each one
+   wrapped in the existing .contact-icon-btn class directly in the HTML
+   (background, border, radius, sizing all reused verbatim, not
+   redeclared here). This rule only sets the icon's own colour: teal by
+   default, matching the hero's established decorative accent, rather
+   than .contact-icon-btn's own text-primary-until-hover treatment —
+   these containers are non-interactive (no link, nothing to focus), so
+   that hover/focus swap is inert dead weight here, not a real state
+   change; flagging that reusing the class also brings its :hover along
+   for the ride even though nothing is actually clickable. */
 .home-hero-icon {
-    position: absolute;
-    top: 50%;
-    width: var(--font-size-3xl);
-    height: var(--font-size-3xl);
     color: var(--color-accent-primary-text);
-}
-
-.home-hero-icon--left {
-    left: 0;
-    transform: translate(-50%, -50%);
-}
-
-.home-hero-icon--right {
-    right: 0;
-    transform: translate(50%, -50%);
 }
 
 .home-hero-title {
@@ -3128,15 +3125,22 @@ footer p {
         grid-template-columns: 1fr;
     }
 
-    /* Mobile only — hero is the sole first-screen block: full dynamic
-       viewport height (dvh, not vh — avoids the iOS Safari address-bar
-       dead-space bug), flex-centered so leftover space distributes evenly,
-       padding clamped between existing --space-* tokens rather than a
-       fixed value. Desktop/tablet keep the base rule's --space-32 padding
-       and natural (non-min-height) flow — the hero may show more below it
-       there. */
+    /* Mobile only — hero is the sole first-screen block: small viewport
+       height (svh, not vh — avoids the iOS Safari address-bar dead-space
+       bug that plain vh has) and NOT dvh — dvh recalculates live as the
+       address bar collapses/expands mid-scroll, which was growing this
+       in-flow, page-top element's height while the user was actively
+       scrolling past it, producing a visible lurch/jitter on Home only
+       (confirmed: dvh was the only such unit anywhere on the site, and
+       no JS touches this element — the resize was purely CSS-driven).
+       svh uses the static minimum-toolbar value instead, so it never
+       changes mid-gesture. Flex-centered so leftover space distributes
+       evenly, padding clamped between existing --space-* tokens rather
+       than a fixed value. Desktop/tablet keep the base rule's padding
+       and natural (non-min-height) flow — the hero may show more below
+       it there. */
     .home-hero {
-        min-height: 100dvh;
+        min-height: 100svh;
         justify-content: center;
         /* Vertical clamp bounds dropped one token step (space-6->space-4,
            space-12->space-10) to help the scroll chevron clear the fold —

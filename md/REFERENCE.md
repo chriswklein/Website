@@ -704,5 +704,6 @@ Per explicit instruction: nothing gets deleted without Chris's approval. Items b
 **CSS classes (`style.css`)** — rules remain defined but no HTML/JS currently references them:
 - `.card-title-row`, `.card-title-group`, `.card-type-icon`, `.card-link-icon` — built for the now-removed card icon row
 - `--card-image-column-width` (`:root`, 42%) — fed only the commented-out Feature-card horizontal layout below
+- `.home-hero-icon--left`, `.home-hero-icon--right` — built for the mobile-hero-jitter-fix session's icon-overlaps-image treatment (position: absolute + translate offset). Superseded when the hero icons moved back to sitting beside the image inside `.contact-icon-btn` containers instead of overlapping it.
 
 **Commented-out CSS (not deleted)** — `style.css`, "FEATURE CARD — horizontal layout" section: the `@media (min-width: 768px) { .card--feature {...} }` block that gave Work cards an image-left row layout at tablet/desktop. Work cards now use one vertical-stack layout at every breakpoint; the block is left in the file as a comment rather than removed.
