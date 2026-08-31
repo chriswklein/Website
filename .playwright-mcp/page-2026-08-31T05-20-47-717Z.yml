@@ -1,0 +1,81 @@
+- generic [active] [ref=f5e1]:
+  - link "Skip to main content" [ref=f5e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=f5e3]:
+    - generic [ref=f5e4]:
+      - img "Christopher Klein" [ref=f5e11]
+      - heading "QA Analyst and UX Designer for games and the tools that make them" [level=1] [ref=f5e16]
+      - paragraph [ref=f5e18]:
+        - link "Christopher Klein" [ref=f5e19] [cursor=pointer]:
+          - /url: /about.html
+        - text: has 13 years within game development owning test strategy for large and small projects and features, and designing tools for development.
+      - link "Scroll to content" [ref=f5e20] [cursor=pointer]:
+        - /url: "#featured-work-heading"
+    - generic [ref=f5e23]:
+      - region [ref=f5e24]:
+        - heading "Featured Work" [level=2] [ref=f5e25]
+        - generic [ref=f5e26]:
+          - article [ref=f5e27]:
+            - link "View This Website" [ref=f5e28] [cursor=pointer]:
+              - /url: /work/this-website.html
+            - generic [ref=f5e29]:
+              - heading "This Website" [level=3] [ref=f5e30]
+              - paragraph [ref=f5e31]: July 1, 2026
+              - generic [ref=f5e32]: User Experience, Web Development
+              - paragraph [ref=f5e34]: With Claude and Claude Code, I created this Website to rid myself of Squarespace, learn how to utilize AI, Learn about web development, and implement Accessibility standards.
+          - article [ref=f5e35]:
+            - link "View Star Engine" [ref=f5e36] [cursor=pointer]:
+              - /url: /work/star-engine.html
+            - generic [ref=f5e37]:
+              - heading "Star Engine" [level=3] [ref=f5e38]
+              - paragraph [ref=f5e39]: March 1, 2024
+              - generic [ref=f5e40]: User Experience, Software Tools
+              - paragraph [ref=f5e42]: At Cloud Imperium Games working within the Core Technology Group on the Editor and its tools, I created an avenue for developers to speak their minds so that my team and I could translate grievances into bug fixes and deliver improvements to their pipeline tools.
+        - link "View more work in the Work section" [ref=f5e44] [cursor=pointer]:
+          - /url: /archive.html?type=work
+          - text: View more work
+          - generic [ref=f5e45]: in the Work section
+      - separator [ref=f5e46]
+      - region [ref=f5e48]:
+        - heading "Thoughts" [level=2] [ref=f5e49]
+        - article [ref=f5e51]:
+          - link "Read Thrilling Beginnings" [ref=f5e52] [cursor=pointer]:
+            - /url: /thoughts/thrilling-beginnings.html
+          - generic [ref=f5e53]:
+            - heading "Thrilling Beginnings" [level=3] [ref=f5e54]
+            - paragraph [ref=f5e55]: June 20, 2026
+            - generic [ref=f5e56]: Web Development
+            - paragraph [ref=f5e58]: You like thing-a-ma-bobs? I've got 4.
+        - link "Read more thoughts in the Thoughts section" [ref=f5e60] [cursor=pointer]:
+          - /url: /archive.html?type=thoughts
+          - text: Read more thoughts
+          - generic [ref=f5e61]: in the Thoughts section
+      - separator [ref=f5e62]
+      - generic [ref=f5e64]:
+        - heading "Nice Words" [level=2] [ref=f5e65]
+        - generic [ref=f5e66]:
+          - blockquote [ref=f5e67]:
+            - paragraph [ref=f5e68]: Chris is the kind of Senior QA every team hopes to have - passionate about UI/UX, deeply invested in tools design, and always thinking about how to make things better for the people using them. I worked closely with him on the Systems team while leading embedded QA and managing external testing support. His attention to usability, combined with strong testing instincts, helped streamline test documentation, reduce inefficiencies, and increase overall quality. He's thoughtful, reliable, and a true partner in delivering great player experiences. I'd highly recommend him.
+            - generic [ref=f5e69]: — Hector Melendres, QA Manager
+          - blockquote [ref=f5e70]:
+            - paragraph [ref=f5e71]: It was a pleasure working with Chris. He is always eager to learn new skills and pro-actively proposes major tool improvements and potential new workflows. Iteratively working together with Chris on new tools feels seamlessly and is a lot of fun. He was always a highly valuable part of the team and respected across the board. His fast way to adapt, his always positive attitude and his grow into the UX designer position over the years was really impressive.
+            - generic [ref=f5e72]: — Sascha Hoba, Senior Lead Development Tools Programmer
+      - separator [ref=f5e73]
+      - region [ref=f5e75]:
+        - heading "Want to work together? Contact me!" [level=2] [ref=f5e76]
+        - generic [ref=f5e77]:
+          - link "Resume (opens in new tab)" [ref=f5e78] [cursor=pointer]:
+            - /url: /assets/docs/Christopher-Klein-QA-UX-Resume.pdf
+          - link "Email" [ref=f5e84] [cursor=pointer]:
+            - /url: mailto:christopherwalterklein@gmail.com
+          - link "LinkedIn (opens in new tab)" [ref=f5e88] [cursor=pointer]:
+            - /url: https://www.linkedin.com/in/crzdev/
+      - button "Back to top" [ref=f5e100] [cursor=pointer]:
+        - generic [ref=f5e101]: Back to Top
+  - navigation "Mobile navigation" [ref=f5e93]:
+    - link "Home" [ref=f5e94] [cursor=pointer]:
+      - /url: /index.html
+    - link "Archive" [ref=f5e96] [cursor=pointer]:
+      - /url: /archive.html
+    - link "About" [ref=f5e98] [cursor=pointer]:
+      - /url: /about.html

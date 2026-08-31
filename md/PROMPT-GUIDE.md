@@ -100,7 +100,13 @@ After completing all tasks, run these checks before reporting completion:
 - Confirm any element resembling an existing site pattern (tags, buttons, card text, etc.) reuses that pattern's actual class/size rather than a new parallel value — see Rule 3a
 - Confirm the change was applied consistently across all breakpoints the decision covers per Rule 5a (all three by default, unless explicitly scoped narrower) — not just the breakpoint that happened to be top of mind
 - When a browser-automation tool (Playwright/Chrome) is available, use it to confirm the rendered result at mobile, tablet, and desktop widths — do not rely on static code/CSS review alone when a rendering check is possible. If no such tool is available in the session, say so explicitly in the completion report rather than reporting full verification.
-Report what changed in each file. If nothing changed in a file, say so explicitly.
+
+**Report file changes concisely.**
+What changed: file(s) and the specific rule/element.
+How: the mechanism (one line, no restating the diff).
+Why: root cause or reason, only if non-obvious.
+Learned: only if something generalizes beyond this task.
+Skip: reassurance language, restating the TLDR, narrating each verification step performed. State the result, not the process of getting there. If a judgment call was made, one line: what was decided and why — no framing paragraph.
  
 ---
  

@@ -1,0 +1,125 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to main content" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f1e4]:
+    - navigation "Main navigation" [ref=f1e5]:
+      - generic [ref=f1e6]:
+        - link "Christopher Klein" [ref=f1e7] [cursor=pointer]:
+          - /url: /index.html
+        - list [ref=f1e8]:
+          - listitem [ref=f1e9]:
+            - link "Home" [ref=f1e10] [cursor=pointer]:
+              - /url: /index.html
+          - listitem [ref=f1e11]:
+            - link "Archive" [ref=f1e12] [cursor=pointer]:
+              - /url: /archive.html
+          - listitem [ref=f1e13]:
+            - link "About" [ref=f1e14] [cursor=pointer]:
+              - /url: /about.html
+  - main [ref=f1e15]:
+    - generic [ref=f1e16]:
+      - generic [ref=f1e17]:
+        - heading "About Christopher" [level=1] [ref=f1e18]
+        - figure [ref=f1e19]:
+          - 'img "A side-by-side comparison image: a photo-realistic portrait of Christopher Klein on the left, and an illustrated T-rex version of him on the right." [ref=f1e20]'
+          - generic [ref=f1e21]:
+            - text: Left - a photo-real me, - Right - me as a T-rex courtesy of concept pal,
+            - link "Bob Nelson (opens in new tab)" [ref=f1e22] [cursor=pointer]:
+              - /url: https://www.bobnelsonart.com/
+              - text: Bob Nelson
+        - generic [ref=f1e23]:
+          - paragraph [ref=f1e24]: I grew up playing video and board games with my family and that led to a career in game development.
+          - paragraph [ref=f1e25]: After graduating from DePaul University, I have worked on a variety of games on most every platform as a Senior Quality Assurance Analyst and User Experience Developer.
+          - paragraph [ref=f1e26]: I enjoy setting up effective QA teams and plans from scratch or working to improve established user workflows. My aim is to continuously deliver high quality reports and improve best practices which benefit the entire development team.
+          - paragraph [ref=f1e27]: I currently reside in Los Angeles, California and am open to working with good people on cool projects.
+      - separator [ref=f1e28]
+      - generic [ref=f1e30]:
+        - heading "Interests" [level=2] [ref=f1e31]
+        - paragraph [ref=f1e32]: You can often find me at a record store, cycling with my wife, reading comic books, and playing board games with friends. Currently working towards Japanese N5 and working on some software tools to get me there.
+      - separator [ref=f1e33]
+      - generic [ref=f1e35]:
+        - heading "Skills and Expertise" [level=2] [ref=f1e36]
+        - generic [ref=f1e37]:
+          - link "Filter by Quality Assurance" [ref=f1e38] [cursor=pointer]:
+            - /url: /archive.html?tag=quality-assurance
+            - text: Quality Assurance
+          - link "Filter by User Experience" [ref=f1e39] [cursor=pointer]:
+            - /url: /archive.html?tag=user-experience
+            - text: User Experience
+          - link "Filter by Game Development" [ref=f1e40] [cursor=pointer]:
+            - /url: /archive.html?tag=game-development
+            - text: Game Development
+          - link "Filter by Web Development" [ref=f1e41] [cursor=pointer]:
+            - /url: /archive.html?tag=web-development
+            - text: Web Development
+          - link "Filter by Software Tools" [ref=f1e42] [cursor=pointer]:
+            - /url: /archive.html?tag=software-tools
+            - text: Software Tools
+      - generic [ref=f1e43]:
+        - heading "Employment History" [level=2] [ref=f1e44]
+        - list [ref=f1e45]:
+          - listitem [ref=f1e46]:
+            - generic [ref=f1e47]:
+              - generic [ref=f1e48]: Quality Assurance / UX Designer
+              - generic [ref=f1e49]: Current
+            - link "Freelance" [ref=f1e50] [cursor=pointer]:
+              - /url: "#contact-heading"
+          - listitem [ref=f1e51]:
+            - generic [ref=f1e52]:
+              - generic [ref=f1e53]: Senior Quality Assurance Analyst
+              - generic [ref=f1e54]: Previous
+            - link "Intrepid Studios (opens in new tab)" [ref=f1e55] [cursor=pointer]:
+              - /url: https://en.wikipedia.org/wiki/Ashes_of_Creation#Studio_closure
+              - text: Intrepid Studios
+          - listitem [ref=f1e56]:
+            - generic [ref=f1e57]:
+              - generic [ref=f1e58]: UX Designer
+              - generic [ref=f1e59]: Previous
+            - link "Cloud Imperium Games (opens in new tab)" [ref=f1e60] [cursor=pointer]:
+              - /url: https://cloudimperiumgames.com/
+              - text: Cloud Imperium Games
+          - listitem [ref=f1e61]:
+            - generic [ref=f1e62]:
+              - generic [ref=f1e63]: Senior Quality Assurance Analyst
+              - generic [ref=f1e64]: Previous
+            - link "Cloud Imperium Games (opens in new tab)" [ref=f1e65] [cursor=pointer]:
+              - /url: https://cloudimperiumgames.com/
+              - text: Cloud Imperium Games
+          - listitem [ref=f1e66]:
+            - generic [ref=f1e67]:
+              - generic [ref=f1e68]: Quality Assurance Lead
+              - generic [ref=f1e69]: Previous
+            - link "Phosphor Games (opens in new tab)" [ref=f1e70] [cursor=pointer]:
+              - /url: https://en.wikipedia.org/wiki/People_Can_Fly#cite_note-24
+              - text: Phosphor Games
+          - listitem [ref=f1e71]:
+            - generic [ref=f1e72]:
+              - generic [ref=f1e73]: Quality Assurance Analyst
+              - generic [ref=f1e74]: Previous
+            - link "Wargaming Chicago (opens in new tab)" [ref=f1e75] [cursor=pointer]:
+              - /url: https://wargaming.net/en
+              - text: Wargaming Chicago
+          - listitem [ref=f1e76]:
+            - generic [ref=f1e77]:
+              - generic [ref=f1e78]: Quality Assurance Tester
+              - generic [ref=f1e79]: Previous
+            - link "Phosphor Games (opens in new tab)" [ref=f1e80] [cursor=pointer]:
+              - /url: https://en.wikipedia.org/wiki/People_Can_Fly#cite_note-24
+              - text: Phosphor Games
+      - link "View Christopher Klein resume — opens in new tab" [ref=f1e82] [cursor=pointer]:
+        - /url: /assets/docs/Christopher-Klein-QA-UX-Resume.pdf
+        - text: View Resume
+      - separator [ref=f1e83]
+      - region [ref=f1e85]:
+        - heading "Want to work together? Contact me!" [level=2] [ref=f1e86]
+        - generic [ref=f1e87]:
+          - link "Resume (opens in new tab)" [ref=f1e88] [cursor=pointer]:
+            - /url: /assets/docs/Christopher-Klein-QA-UX-Resume.pdf
+          - link "Email" [ref=f1e94] [cursor=pointer]:
+            - /url: mailto:christopherwalterklein@gmail.com
+          - link "LinkedIn (opens in new tab)" [ref=f1e98] [cursor=pointer]:
+            - /url: https://www.linkedin.com/in/crzdev/
+      - button "Back to top" [ref=f1e107] [cursor=pointer]:
+        - generic [ref=f1e108]: Back to Top
+  - contentinfo [ref=f1e104]:
+    - paragraph [ref=f1e106]: © 2026 Christopher Klein. All rights reserved.

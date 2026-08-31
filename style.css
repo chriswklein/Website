@@ -946,6 +946,16 @@ pre code {
     margin-bottom: var(--space-4);
 }
 
+/* scroll-margin-top: var(--space-16) (64px) matches the sticky header's
+   real measured height (.site-nav .container height: 64px) at every
+   breakpoint, + var(--space-4) breathing room — same clearance fix
+   already applied to .standard-page-content h2/h3 anchors — so the hero
+   chevron's #featured-work-heading jump lands the heading clear of the
+   fixed nav instead of underneath it. */
+#featured-work-heading {
+    scroll-margin-top: calc(var(--space-16) + var(--space-4));
+}
+
 .section-footer {
     display: flex;
     justify-content: flex-start;
@@ -2050,6 +2060,14 @@ footer p {
    scale, not a link-colour concern. */
 .about-history-company {
     font-size: var(--font-size-sm);
+}
+
+/* Freelance entry — plain text, not a link (was a leftover
+   #contact-heading reuse from an earlier session). Overrides the
+   sitewide a { color: var(--color-link) } this class would otherwise
+   inherit, matching surrounding paragraph text instead. */
+.about-history-company--static {
+    color: var(--color-text-primary);
 }
 
 .about-recommendations {
