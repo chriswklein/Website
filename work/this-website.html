@@ -64,30 +64,102 @@
 
             <!-- Body Content -->
             <div class="standard-page-content">
-                <h2 id="overview">Overview</h2>
-                <p>For the past month or so, I sought to eliminate my need for Squarespace as a platform for my portfolio. I had used it on and off for years, and it was never what I wanted. The way to do that, I felt, was to learn some HTML and set up a workflow with Claude and Claude Code to create a personal website where I can feature both my work and my thoughts. This page covers the development of the website and will continue to be updated as I add more to the site.</p>
+                
+                <h2 id="problem">Problem</h2>
+                <p>For the past 3 months, I sought to eliminate my need for Squarespace as a platform for my portfolio, as I've utilized the service on and off for many years but it was never what I truely wanted.</p>
+                
+                
+                <p>Problem #1: Squarespace is an expensive recoccuring charge and specific features are gated behind a more expensive tier.</p>
+
+                <p>Problem #2: I don't know much about web development</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
+
+                <h2 id="solution">Solution</h2>
+                <p>Solution #1: Replace Squarespace subscription with Anthropic subscription to establish a workflow Claude and utilize Claude Code to construct the portfolio which reflects my designs via Figma, of which will reflect my design principles.</p>
+
+                <p>Solution #2: Have fun in the process, and learn through fun.</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                
                 <h2 id="foundations">.LANG-ing the Foundations</h2>
-                <p>Not being a web-head by trade - I wanted to avoid costly overhead as it pertained to any kind of Content Management System site, Claude Token usage, and overall site performance</p>
-
-                </p>I was done with Squarespace or anything like it, had learned to be more proactive in what Claude utilizes tokens for in other small projects, and I have seen too many websites over my years on the internet that prefer to bogged down by popups or flashy performance animation that displays how inconsiderate they are towards the user.</p>
-
-                </p>After a few back and forth sessions with Claude, we decided on the following Tech stack:</p>
-
+                <p>Not being a web-head by trade, I knew I was going to get myself caught in the sticky webbing of setup. I spent time inquiring about scalability, performance, and accessibility principles with Claude in order to establish a basic spec and the tech stack we would use.</p>
+         
+               
+                </p>Core Principles</p>
                 <ul>
-                    <li>HTML</li>
-                    <li>CSS</li>
-                    <li>Minimal JavaScript</li>
+                    <li>No frameworks, no build tools, no subscriptions</li>
+                    <li>Accessible by default — WCAG AA minimum on every decision</li>
+                    <li>Localization-ready from the start</li>
+                    <li>Performant — static files only</li>
+                    <li>Scope-disciplined — ship simple, iterate later</li>
                 </ul>
 
-                </p>And finally hosting the site on Netlify via GitHub and established two environments - Development and Release - to avoid releasing content early without testing.</p>
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                </p>Specifications and Tech Stack</p>
+
+                <div class="ds-content-frame">
+                    <div class="standard-page-content">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Layer</th>
+                                    <th scope="col">Tool</th>
+                                    <th scope="col">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Design</td>
+                                    <td>Figma</td>
+                                    <td>Utilize MCP to provide bridge between Figma and Claude Code</td>
+                                </tr>
+                                <tr>
+                                    <td>Code Editor</td>
+                                    <td>VS Studio</td>
+                                    <td>With Live Server extension for local preview</td>
+                                </tr>
+                                <tr>
+                                    <td>Version Control</td>
+                                    <td>GitHub</td>
+                                    <td>Repository to ensure safe iteration, and reference for project for Claude Code</td>
+                                </tr>
+                                <tr>
+                                    <td>Infrastructure</td>
+                                    <td>HTML, CSS, JavaScript</td>
+                                    <td>Plain — no frameworks or preprocessors</td>
+                                </tr>
+                                <tr>
+                                    <td>Hosting</td>
+                                    <td>Netlify</td>
+                                    <td>Free tier and allows multiple environments to test and secure release</td>
+                                </tr>
+                                <tr>
+                                    <td>Typeface</td>
+                                    <td>Noto Sans</td>
+                                    <td>Free via Google, chosen for high localization script/coverage</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 </p>The Markdown (MD) Stack</p>
 
-                </p>I am also self aware in that I know I have a tendency to go off on design tangents, nitpicks, and need to reign myself in. So in an effort to keep myself on track, and my work documented, Claude and I built out a few MD’s to assist production and development.</p>
+                </p>In earlier LLM expirements, I ran into hallucinations and or the models would infer and do thier own thing without guidence. Since then, I had read enough cautionary tales and workflow improvement articles from developers that informed how I would go about this project.</p>
+                
+                </p>I established a project within Claude, and through Chat, built out the project MD’s overtime to avoid the afformentioned issues, building development and process guardrails as well as containing best practices based on my design intent.</p>
+
+                </p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
 
                 <ul>
                     <li>REFERENCE.md for project decisions and session handoffs</li>
@@ -95,8 +167,6 @@
                     <li>COMPONENTS.md for component specs</li>
                     <li>PROMPT-GUIDE.md to control what context got loaded per task type</li>
                 </ul>
-    
-                </p>Architecture and planning happened in Claude while implementation and git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
 
 
                 <!-- Dot divider -->
@@ -106,14 +176,14 @@
                 <p>My initial goal was to build the following:</p>
 
                 <ul>
-                    <li>Home Page</li>
-                    <li>About</li>
-                    <li>Standard Page Template for Entries</li>
+                    <li>Home Page - containing selected work</li>
+                    <li>About - containing more about me and my resume</li>
+                    <li>Standard Page Template - for case studies</li>
                 </ul>
 
                 </p>I decided on accessible Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
                 
-                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. It also helps to step away from your desk long enough to realize how similar something is to another thing you’ve seen before. Could be the color or the shape.</p>
+                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself often enough where you push back on your own simplicity guardrails in favor of implementing and even removing a feature</p>
 
                 </p>As a result of just having the basics - the site didn’t feel like me yet.</p>
 
@@ -121,10 +191,18 @@
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
 
-                <h2 id="Thoughts">Thoughts</h2>
-                <p>I could have stopped there, but instead - I decided I wanted to create a space to express my Thoughts.</p>
+                <h2 id="Thoughts and Filters">Thoughts and Filters</h2>
+                <p>I could have stopped there, but instead - I decided I wanted to create a space to express my Thoughts and create a bit of a headache for myself.</p>
 
-                </p>This was arguably the largest site based architectural change I made. While it has taken longer to set up, I don’t regret the time spent fixing things up, learning how to utilize browser inspection tools and the console. Do I think it’s perfect? No, but it’s a solid foundation.</p>
+                </p>Arguably the largest site based architecture I made due to it surfacing a need to build a centralized location to store the entries.
+                
+                <p>Blogs aren't typical portfolio single entries - I mean they can be, but modern standards to me, are being able to Search, Sort, and Filter by date, author, and other variables.</p>
+                
+                <p>This caused many self inflicted headaches.</p>
+
+                <p>Even when I felt I had mapped the structure out well, much of it broke during testing across devices and eventually lead me to disable a search field</p>
+                
+                </p>While it has taken longer to set up, I don’t regret the time spent fixing things up, learning how to utilize browser inspection tools and the console. Do I think it’s perfect? No, but it’s a solid foundation.</p>
 
                 <ul>
                     <li>Home Page</li>
@@ -154,6 +232,17 @@
 
                 <h2 id="the-future">The Future</h2>
                 <p>Next up for me is to add more features, accessibility, performance tweaks, adding juice to interactions and of course to write and post new projects. Stay tuned y’all!</p>
+
+
+
+
+
+
+
+
+
+
+
             </div>
 
             <!-- Divider + Footer -->
