@@ -1036,32 +1036,34 @@
 
                 <div class="ds-content-frame">
                     <div class="standard-page-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Token</th>
-                                    <th scope="col">Value</th>
-                                    <th scope="col">Used for</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>--space-6</td>
-                                    <td>24px</td>
-                                    <td>Block spacing, standard indent</td>
-                                </tr>
-                                <tr>
-                                    <td>--space-2</td>
-                                    <td>8px</td>
-                                    <td>List item / chip spacing</td>
-                                </tr>
-                                <tr>
-                                    <td>--border-radius-md</td>
-                                    <td>8px</td>
-                                    <td>Banner, images, cards</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Token</th>
+                                        <th scope="col">Value</th>
+                                        <th scope="col">Used for</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>--space-6</td>
+                                        <td>24px</td>
+                                        <td>Block spacing, standard indent</td>
+                                    </tr>
+                                    <tr>
+                                        <td>--space-2</td>
+                                        <td>8px</td>
+                                        <td>List item / chip spacing</td>
+                                    </tr>
+                                    <tr>
+                                        <td>--border-radius-md</td>
+                                        <td>8px</td>
+                                        <td>Banner, images, cards</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1088,7 +1090,8 @@
 
                 <p>Use <code>aria-current="page"</code> on the active nav link after injection to mark the current page for screen readers.</p>
 
-                <pre><code>/* Set aria-current on the matching nav link */
+                <div class="code-wrap">
+                    <pre><code>/* Set aria-current on the matching nav link */
 function setActiveNavLink() {
     const page = location.pathname.split('/').pop() || 'index.html';
     document.querySelectorAll('.nav-links a').forEach(link => {
@@ -1097,6 +1100,7 @@ function setActiveNavLink() {
         );
     });
 }</code></pre>
+                </div>
             </section>
 
             <!-- ================================
@@ -1104,12 +1108,12 @@ function setActiveNavLink() {
             ================================ -->
             <section class="preview-section" aria-labelledby="s14-heading">
                 <h2 id="s14-heading">Section 14 — Card Components</h2>
-                <p class="preview-section-desc">The two card variants actually built by <code>script.js</code>'s <code>buildCard()</code> today — Feature (Work entries, with image) and Thought (no image). Markup order matches the live function exactly: block-link → image (Feature only) → title → date → tags → excerpt, one vertical stack at every breakpoint. No separate View/Read button — <code>.card-block-link</code> is the sole, real, keyboard-focusable link, carrying the accessible name directly. Tags are plain, non-interactive, comma-separated teal text (<code>.card-tag</code>) — not the real <code>.tag</code> filter links used on entry pages and the Archive filter panel. <code>.card--profile</code> is intentionally excluded — it's fully dead sitewide, a flagged cleanup item, not a variant to resurrect here.</p>
+                <p class="preview-section-desc">The two card variants actually built by <code>script.js</code>'s <code>buildCard()</code> today — Feature (Work entries, with image) and Thought (no image). Markup order matches the live function exactly: block-link → image (Feature only) → title → date → tags → excerpt → CTA link, one vertical stack at every breakpoint. <strong>Updated 2026-09-02:</strong> <code>.card-block-link</code> is now <code>aria-hidden="true" tabindex="-1"</code> — mouse-only, no longer keyboard-focusable — since it carried no descriptive accessible name a screen reader could announce distinctly from the surrounding card. The new <code>.link-cta</code> (see Section 25) is the real, visible, keyboard-focusable link on each card now. Tags are plain, non-interactive, comma-separated teal text (<code>.card-tag</code>) — not the real <code>.tag</code> filter links used on entry pages and the Archive filter panel. <code>.card--profile</code> is intentionally excluded — it's fully dead sitewide, a flagged cleanup item, not a variant to resurrect here.</p>
 
                 <div class="preview-card-grid">
                     <!-- Card/Feature — real .card--feature markup, Work entry -->
                     <article class="card card--feature">
-                        <a href="#" class="card-block-link" aria-label="View Star Engine"></a>
+                        <a href="#" class="card-block-link" aria-label="View Star Engine" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-image" role="presentation"></div>
                         <div class="card-content">
                             <h3 class="card-title" data-searchable>Star Engine</h3>
@@ -1118,12 +1122,18 @@ function setActiveNavLink() {
                                 <span class="card-tag">User Experience, Software Tools</span>
                             </div>
                             <p class="card-excerpt">A short description of the project and the problem it solved, clamped to two lines with the full text kept in the DOM for screen readers.</p>
+                            <a href="#" class="link-cta" aria-label="Star Engine — View this work">
+                                View this work
+                                <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                                </svg>
+                            </a>
                         </div>
                     </article>
 
                     <!-- Card/Thought — real .card--thought markup, no image -->
                     <article class="card card--thought">
-                        <a href="#" class="card-block-link" aria-label="Read A Thought Title"></a>
+                        <a href="#" class="card-block-link" aria-label="Read A Thought Title" aria-hidden="true" tabindex="-1"></a>
                         <div class="card-content">
                             <h3 class="card-title" data-searchable>A Thought Title</h3>
                             <p class="card-date">June 14, 2026</p>
@@ -1131,6 +1141,12 @@ function setActiveNavLink() {
                                 <span class="card-tag">Reflection, Career</span>
                             </div>
                             <p class="card-excerpt">A short summary of the thought, enough to draw someone in before they click through to read the rest.</p>
+                            <a href="#" class="link-cta" aria-label="A Thought Title — View this thought">
+                                View this thought
+                                <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                                </svg>
+                            </a>
                         </div>
                     </article>
                 </div>
@@ -1346,6 +1362,56 @@ function setActiveNavLink() {
                             <source src="/assets/videos/example-demo.mp4" type="video/mp4">
                         </video>
                     </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 24 — INLINE LINK
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s24-heading">
+                <h2 id="s24-heading">Section 24 — Inline Link</h2>
+                <p class="preview-section-desc">Added 2026-09-02. <code>.link-inline</code> — for links embedded mid-sentence in body copy (hero subtitle, entry body text). Underlined at rest, not just on hover, so it reads as a link independent of colour alone. Trailing open-link icon at <code>var(--icon-size-sm)</code>, inline with the text. No touch-target padding is added — an inline link within a running block of text is exempt from the 44px minimum under WCAG 2.5.5 (Target Size, AAA), unlike a standalone link such as Section 25's CTA Link. <strong>Not yet applied anywhere real</strong> — this is a visual reference only, for review before it replaces any existing plain-text inline links (e.g. the hero subtitle's "Christopher Klein" link) in a follow-up task.</p>
+
+                <div class="standard-page-content">
+                    <p>Christopher Klein has 13 years within game development, and this <a href="#" class="link-inline">example inline link<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/></svg></a> shows how <code>.link-inline</code> sits inside a normal paragraph, at the site's default body line-height.</p>
+                </div>
+
+                <p class="preview-section-desc"><strong>Flag for review:</strong> the icon is built at <code>var(--icon-size-sm)</code> (14px) per spec. Against 16px body copy this may read slightly large next to the text — <code>var(--icon-size-xs)</code> (12px) is the first thing to try if it looks oversized once reviewed in context.</p>
+
+                <h3 id="s24-icon-tokens-heading">Icon Size Tokens</h3>
+                <p class="preview-section-desc">Added 2026-09-02 alongside <code>.link-inline</code> and <code>.link-cta</code> (Section 25). Four sizes, following the same rem-based approach as the Type Scale (Section 2).</p>
+
+                <div class="standard-page-content">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Token</th><th>rem</th><th>px</th><th>Used by</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>--icon-size-xs</code></td><td>0.75rem</td><td>12px</td><td>Not yet consumed by any live component — flagged above as the likely fallback for <code>.link-inline-icon</code></td></tr>
+                                <tr><td><code>--icon-size-sm</code></td><td>0.875rem</td><td>14px</td><td><code>.link-inline-icon</code> (this section)</td></tr>
+                                <tr><td><code>--icon-size-md</code></td><td>1rem</td><td>16px</td><td><code>.link-cta-icon</code> (Section 25)</td></tr>
+                                <tr><td><code>--icon-size-lg</code></td><td>1.25rem</td><td>20px</td><td>Not yet consumed by any live component</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================================
+                 SECTION 25 — CTA LINK
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s25-heading">
+                <h2 id="s25-heading">Section 25 — CTA Link</h2>
+                <p class="preview-section-desc">Added 2026-09-02. <code>.link-cta</code> — the real, visible, keyboard-focusable link on every card now, replacing <code>.card-block-link</code> in that role (see Section 14). Underlined text link, no border/background/button chrome — but padded with invisible <code>padding</code> (offset by an equal negative <code>margin</code> so the visible text doesn't shift or add extra gap in the card layout) so the full clickable/tappable area meets the 44px minimum touch target per WCAG 2.5.5, since — unlike Section 24's Inline Link — this link stands alone rather than sitting inline in a run of surrounding text. Trailing open-link icon at <code>var(--icon-size-md)</code>. Text content is driven by entry type: "View this work" for Work entries, "View this thought" for Thoughts entries — never hardcoded per card. <code>aria-label</code> carries the full descriptive string ("{Title} — {action}").</p>
+
+                <div class="standard-page-content">
+                    <a href="#" class="link-cta" aria-label="Example Entry — View this work">
+                        View this work
+                        <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                            <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                        </svg>
+                    </a>
                 </div>
             </section>
 

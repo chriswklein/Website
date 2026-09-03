@@ -94,7 +94,7 @@
                 <ul>
                     <li>No frameworks, no build tools, no subscriptions</li>
                     <li>Accessible by default — WCAG AA minimum on every decision</li>
-                    <li>Localization-ready from the start</li>
+                    <li>Localization-ready from the start using Noto Sans</li>
                     <li>Performant — static files only</li>
                     <li>Scope-disciplined — ship simple, iterate later</li>
                 </ul>
@@ -104,50 +104,43 @@
 
                 </p>Specifications and Tech Stack</p>
 
-                <div class="ds-content-frame">
-                    <div class="standard-page-content">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Layer</th>
-                                    <th scope="col">Tool</th>
-                                    <th scope="col">Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Design</td>
-                                    <td>Figma</td>
-                                    <td>Utilize MCP to provide bridge between Figma and Claude Code</td>
-                                </tr>
-                                <tr>
-                                    <td>Code Editor</td>
-                                    <td>VS Studio</td>
-                                    <td>With Live Server extension for local preview</td>
-                                </tr>
-                                <tr>
-                                    <td>Version Control</td>
-                                    <td>GitHub</td>
-                                    <td>Repository to ensure safe iteration, and reference for project for Claude Code</td>
-                                </tr>
-                                <tr>
-                                    <td>Infrastructure</td>
-                                    <td>HTML, CSS, JavaScript</td>
-                                    <td>Plain — no frameworks or preprocessors</td>
-                                </tr>
-                                <tr>
-                                    <td>Hosting</td>
-                                    <td>Netlify</td>
-                                    <td>Free tier and allows multiple environments to test and secure release</td>
-                                </tr>
-                                <tr>
-                                    <td>Typeface</td>
-                                    <td>Noto Sans</td>
-                                    <td>Free via Google, chosen for high localization script/coverage</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Layer</th>
+                                <th scope="col">Tool</th>
+                                <th scope="col">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Design</td>
+                                <td>Figma</td>
+                                <td>Utilize MCP to provide bridge between Figma and Claude Code</td>
+                            </tr>
+                            <tr>
+                                <td>Code Editor</td>
+                                <td>VS Studio</td>
+                                <td>With Live Server extension for local preview</td>
+                            </tr>
+                            <tr>
+                                <td>Version Control</td>
+                                <td>GitHub</td>
+                                <td>Repository to ensure safe iteration, and reference for project for Claude Code</td>
+                            </tr>
+                            <tr>
+                                <td>Infrastructure</td>
+                                <td>HTML, CSS, JavaScript</td>
+                                <td>Plain — no frameworks or preprocessors</td>
+                            </tr>
+                            <tr>
+                                <td>Hosting</td>
+                                <td>Netlify</td>
+                                <td>Free tier and allows multiple environments to test and secure release</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Dot divider -->
@@ -194,7 +187,15 @@
                 <h2 id="Thoughts and Filters">Thoughts and Filters</h2>
                 <p>I could have stopped there, but instead - I decided I wanted to create a space to express my Thoughts and create a bit of a headache for myself.</p>
 
-                </p>Arguably the largest site based architecture I made due to it surfacing a need to build a centralized location to store the entries.
+                <p>I opted to take on a central container - the "Arhcive" - in it would be any entry: Work, Thought, and others that might come after.</p>
+
+                <p>Each entry would contain the associated entry primary tag, and contain secondary tags which users could filter by.</p>
+
+                <p>Text</p>
+
+                <p>The two biggest challenges within the Archive was not the creation of the Filters </p>
+
+                </p>Arguably the largest site based architecture I made due to it surfacing a need to build a centralized location to store the entries.<p>
                 
                 <p>Blogs aren't typical portfolio single entries - I mean they can be, but modern standards to me, are being able to Search, Sort, and Filter by date, author, and other variables.</p>
                 

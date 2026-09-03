@@ -29,6 +29,7 @@ A personal website built with plain HTML, CSS, and JavaScript. The goal is full 
 | Hosting | Netlify | Free tier, automatic deploys on push |
 | Fonts | Noto Sans | Via Google Fonts — chosen for universal script/localization coverage |
 | Icons | None | Tabler Icons CDN removed site-wide 2026-07-05 (commit 7d71326) — text-only. See §5 Icons. |
+| Testing | Playwright (`@playwright/test`, via `package.json`) | Automated verification/testing layer, Chromium-based. Known WebKit blind spots — real-device testing still required as a supplement. |
 
 ### Tokens Studio Note
 Tokens Studio free tier does not reliably resolve aliases between token sets. Figma Variables are set up manually in a single `global` collection instead. The `tokens/design-system.json` file is kept as a reference and backup but is not actively synced via Tokens Studio.
@@ -560,7 +561,7 @@ Accessibility is a stated project pillar (see Core Principles, §1), not a post-
 - Focus trap inside the open Filter Drawer (`trapFocus()`)
 - Background content excluded from Tab order via `inert` while the drawer is open, and the drawer's own content excluded via `inert` while closed — both directions handled, not just one
 - Escape closes the drawer, with focus returned to whichever trigger opened it
-- The invisible full-card click overlay (`.card-block-link`) is correctly hidden from keyboard users (`aria-hidden="true"`, `tabindex="-1"`) — mouse convenience never creates a redundant or confusing tab stop
+- The invisible full-card click overlay (`.card-block-link`) is `aria-hidden="true"` and `tabindex="-1"` on every card (`index.html`, `buildCard()` in `script.js`, `design-system.html`'s previews) as of 2026-09-02 — mouse convenience never creates a redundant or confusing tab stop. The real, visible, keyboard-focusable link on each card is now `.link-cta` (md/COMPONENTS.md §17), which sits above the block-link (`z-index: 2` vs `1`) and carries a full descriptive `aria-label`. Confirmed via a real accessibility-tree snapshot and Tab-key walkthrough, not just markup review — Tab moves directly from content before the card to `.link-cta`, and the block-link never receives focus.
 
 **Screen Reader & Semantic**
 - Real NVDA testing conducted during development — not automated-only
@@ -705,5 +706,6 @@ Per explicit instruction: nothing gets deleted without Chris's approval. Items b
 - `.card-title-row`, `.card-title-group`, `.card-type-icon`, `.card-link-icon` — built for the now-removed card icon row
 - `--card-image-column-width` (`:root`, 42%) — fed only the commented-out Feature-card horizontal layout below
 - `.home-hero-icon--left`, `.home-hero-icon--right` — built for the mobile-hero-jitter-fix session's icon-overlaps-image treatment (position: absolute + translate offset). Superseded when the hero icons moved back to sitting beside the image inside `.contact-icon-btn` containers instead of overlapping it.
+- `.card-block-link:focus-visible` — unreachable since 2026-09-02: every `.card-block-link` now carries `tabindex="-1"`, so it can never receive focus and this rule can never match. Left in place per this section's own convention rather than removed; `.link-cta` (md/COMPONENTS.md §17) is the real focused element on cards now, styled by the sitewide `:focus-visible` rule, not this one.
 
 **Commented-out CSS (not deleted)** — `style.css`, "FEATURE CARD — horizontal layout" section: the `@media (min-width: 768px) { .card--feature {...} }` block that gave Work cards an image-left row layout at tablet/desktop. Work cards now use one vertical-stack layout at every breakpoint; the block is left in the file as a comment rather than removed.

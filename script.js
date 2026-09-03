@@ -1137,6 +1137,11 @@ function initArchive(filterDrawer) {
         const date       = formatDate(entry.date);
         const ctaText    = entry.type === 'work' ? 'View' : 'Read';
         const blockLinkLabel = `${ctaText} ${escapeHTML(entry.title)}`;
+        const linkCtaText = entry.type === 'work' ? 'View this work' : 'View this thought';
+        const linkCtaLabel = `${escapeHTML(entry.title)} — ${linkCtaText}`;
+        const linkCtaIcon = `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                </svg>`;
 
         // Card-preview tags: plain, non-interactive teal text, comma-
         // separated in a single span — not the real .tag filter links
@@ -1155,13 +1160,17 @@ function initArchive(filterDrawer) {
         const dateHTML = `<p class="card-date">${date}</p>`;
 
         article.innerHTML = `
-            <a href="${escapeHTML(url)}" class="card-block-link" aria-label="${blockLinkLabel}"></a>
+            <a href="${escapeHTML(url)}" class="card-block-link" aria-label="${blockLinkLabel}" aria-hidden="true" tabindex="-1"></a>
             ${imageHTML}
             <div class="card-content">
                 <h3 class="card-title" data-searchable>${escapeHTML(entry.title)}</h3>
                 ${dateHTML}
                 <div class="card-tags">${tagsHTML}</div>
                 <p class="card-excerpt">${escapeHTML(entry.excerpt || '')}</p>
+                <a href="${escapeHTML(url)}" class="link-cta" aria-label="${linkCtaLabel}">
+                    ${linkCtaText}
+                    ${linkCtaIcon}
+                </a>
             </div>`;
 
         // Set background image via JS (not an inline HTML style attribute)

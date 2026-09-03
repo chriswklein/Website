@@ -153,6 +153,12 @@
     /* ---- Accessibility ---- */
     --touch-target-minimum: 44px;
     --touch-target-comfortable: 48px;
+
+    /* ---- Icon Size ---- */
+    --icon-size-xs: 0.75rem;
+    --icon-size-sm: 0.875rem;
+    --icon-size-md: 1rem;
+    --icon-size-lg: 1.25rem;
 }
 
 /* ================================
@@ -362,7 +368,31 @@ pre {
     padding: var(--space-4) var(--space-5);
     border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
     overflow-x: auto;
+}
+
+/* ================================
+   CODE WRAPPER — horizontal scroll container
+   Same root cause and fix pattern as .table-wrap (2026-09-03): a long,
+   unbroken code line (white-space: pre, never wrapped — wrapping would
+   break code formatting/readability, the wrong tradeoff here) can push a
+   block wider than its container without a dedicated scroll container,
+   silently expanding window.innerWidth on a narrow screen instead of
+   producing a scrollbar. overflow-x: auto is kept directly on `pre` too
+   as a defensive fallback (unlike .table-wrap, this one isn't provably
+   broken on its own — <pre> is a normal block box, not the historically
+   inconsistent <table> box type) but .code-wrap is the primary, reliable
+   fix: confirmed via testing that on design-system.html, pre's own
+   overflow-x: auto alone did not stop window.innerWidth from expanding.
+   Not table-layout's problem, so no table-layout-equivalent to avoid here
+   — just wrap any <pre> that might overflow its container.
+================================ */
+.code-wrap {
+    overflow-x: auto;
     margin: var(--space-6) 0;
+}
+
+.code-wrap pre {
+    margin: 0;
 }
 
 pre code {
@@ -841,6 +871,72 @@ pre code {
 .card-block-link:focus-visible {
     outline: var(--border-width-medium) solid var(--color-interactive-focus);
     outline-offset: -3px;
+}
+
+/* ================================
+   INLINE LINK
+   For links embedded mid-sentence in body copy (hero, entry body text).
+   Underlined at rest (not hover-only) so it reads as a link without
+   relying on colour alone. No touch-target padding — WCAG 2.5.5 exempts
+   inline links within a block of text from the 44px minimum.
+================================ */
+.link-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-link);
+    text-decoration: underline;
+    font-style: normal;
+}
+
+.link-inline:hover {
+    color: var(--color-link-hover);
+}
+
+.link-inline-icon {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+    flex-shrink: 0;
+}
+
+/* ================================
+   CTA LINK
+   Replaces .card-block-link as the real, visible, keyboard-focusable
+   link on cards (see .card-block-link's aria-hidden/tabindex=-1 above).
+   Underlined text link, not a button — no border/background/chrome —
+   but padded to meet the 44px touch target since it isn't sitting
+   inline in a line of surrounding text the way .link-inline does.
+================================ */
+.link-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-2);
+    margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+    color: var(--color-link);
+    text-decoration: underline;
+    font-style: normal;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.link-cta:hover {
+    color: var(--color-link-hover);
+}
+
+.link-cta-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+/* Sits above .card-block-link (z-index 1) so it stays the real,
+   clickable/focusable link once the block-link is aria-hidden +
+   tabindex=-1. Scoped to card usage only — .link-cta itself carries no
+   z-index so it can be reused outside a stacking-context card body. */
+.card-content .link-cta {
+    position: relative;
+    z-index: 2;
 }
 
 /* Date row — Thought Entry cards only. Reuses the tag/meta text size
@@ -1595,12 +1691,35 @@ footer p {
     margin-bottom: 0;
 }
 
-.standard-page-content table {
+/* ================================
+   TABLE WRAPPER — horizontal scroll container
+   Confirmed fix (2026-09-03 diagnostic): overflow-x: auto set directly on
+   a <table> element (the previous approach, immediately below) does not
+   reliably constrain the table's own auto-layout computed width — with
+   enough cell content, the table's preferred width won this fight instead
+   of being clipped/scrolled, which silently expanded window.innerWidth
+   past the true 375px viewport on a narrow screen rather than producing
+   a scrollbar. A separate wrapping block-level element with its own
+   overflow-x: auto reliably contains that width instead, since overflow
+   on non-table boxes doesn't share the same cross-engine inconsistency.
+   table-layout: fixed is deliberately not used alongside this — it would
+   force equal-width columns and change how existing tables look; this
+   wrapper alone is sufficient and preserves natural column proportions.
+   Reusable anywhere a <table> is used, not just Standard Page entries.
+================================ */
+.table-wrap {
+    overflow-x: auto;
+}
+
+.standard-page-content .table-wrap {
     width: 100%;
     max-width: 65ch;
-    border-collapse: collapse;
-    overflow-x: auto;
     margin-bottom: var(--space-6);
+}
+
+.standard-page-content table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .standard-page-content th {

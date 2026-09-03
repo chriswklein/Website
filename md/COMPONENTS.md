@@ -45,6 +45,8 @@ Rules for Claude Code:
 13. Share Button
 14. Standard Page Template
 15. Video Demo
+16. Inline Link
+17. CTA Link
 
 ---
 
@@ -1251,10 +1253,20 @@ Code blocks display technical content with clear visual distinction from body te
 
 Inline: `<code>{snippet}</code>`
 
-Block:
+Block — always wrapped in `.code-wrap` (added 2026-09-03, see below):
 ```html
-<pre><code>{multiline code}</code></pre>
+<div class="code-wrap">
+    <pre><code>{multiline code}</code></pre>
+</div>
 ```
+
+### Horizontal Overflow — `.code-wrap`
+
+**Every block `<pre><code>` must be wrapped in `<div class="code-wrap">`.** `.code-wrap { overflow-x: auto; margin: var(--space-6) 0; }` (`style.css`) — a plain scroll container, no visual styling of its own. `pre` itself also keeps its own `overflow-x: auto` as a defensive fallback, but `.code-wrap` is the reliable fix; do not rely on `pre`'s own overflow alone.
+
+**Why this exists:** a long, unbroken code line (`white-space: pre` — never wrapped; wrapping code text would break formatting/readability, the wrong tradeoff here) can render wider than its container. Without a dedicated scroll container, this silently expanded `window.innerWidth` on a narrow screen instead of producing a scrollbar — confirmed via testing 2026-09-03, the same root mechanism as `.table-wrap` (`## 3. Card`'s sibling table-overflow fix, same date). Never use `white-space: pre-wrap` or `word-break` to force-wrap code text to avoid this — horizontal scroll is the correct pattern for code, same as it is for wide tables.
+
+This is currently the only code block on the site (`design-system.html` Section 13) — no Work or Thoughts entry currently contains one — but any future code block, anywhere, must use this wrapper from the start rather than being discovered as a bug later.
 
 ---
 
@@ -1815,6 +1827,126 @@ which checks `matchMedia('(prefers-reduced-motion: reduce)')` and only sets `aut
 
 ### Responsive Behaviour
 No breakpoint-specific overrides — `max-width: 100%` plus the video's own `width`/`height` attributes already scale it fluidly within its column at every breakpoint.
+
+---
+
+## 16. Inline Link
+
+**CSS Class:** `.link-inline`
+**HTML Element:** `<a href="{url}" class="link-inline">{Label}<svg class="link-inline-icon">...</svg></a>`
+
+Not yet named in Figma — built directly in code 2026-09-02, no Figma component reference exists yet.
+
+### Design Intent
+For links embedded mid-sentence in running body copy — the hero subtitle, entry body text. Underlined at rest, not just on hover, so the link reads as a link independent of colour alone. Sibling of `## 17. CTA Link`: this variant is for links inside a run of surrounding text; use the CTA Link variant for a standalone link that doesn't sit inline in a sentence.
+
+### When to Use
+- Inline text links inside a sentence or paragraph of body copy
+
+### When NOT to Use
+- Standalone links not embedded in a run of surrounding text — use `.link-cta` (`## 17`) instead
+- The Card block-link overlay — see `.card-block-link` under `## 3. Card`
+
+### Component Tokens
+No component-scoped tokens — reuses semantic tokens directly:
+```css
+color:  var(--color-link);          /* rest */
+color:  var(--color-link-hover);    /* hover */
+```
+Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
+
+### Anatomy
+```
+[ Label text ][ trailing icon ]
+```
+- Container: `<a class="link-inline">`
+- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor
+- `font-style: normal` is set explicitly on `.link-inline` — a deliberate reset so the link never inherits italics from an italic context (e.g. inside a `<cite>` or `<em>`), per the "no italics" requirement
+- No separate `aria-label` — the visible label text is the accessible name
+
+### States
+
+| State | Colour | Text Decoration |
+|---|---|---|
+| Default | `--color-link` | underline |
+| Hover | `--color-link-hover` | underline |
+| Focus | `--color-link` | underline + sitewide `:focus-visible` ring (2px solid white, 3px offset) — `.link-inline` defines no focus override of its own |
+
+### Accessibility
+
+- No touch-target padding — WCAG 2.5.5 (Target Size) exempts inline links within a running block of text from the 44px minimum, since `.link-inline` is never meant to appear as a standalone target the way `.link-cta` is
+- Icon: `aria-hidden="true" focusable="false"` — decorative; the label text alone carries the accessible name
+- Focus ring: inherited from the sitewide `:focus-visible` rule (`style.css`, "FOCUS STYLES") — no component-level override
+
+### Responsive Behaviour
+Same at all breakpoints — no responsive overrides defined.
+
+### Status
+Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Not yet applied to any real page** — a visual reference only, pending a follow-up task to apply it to existing inline links (e.g. the Home hero subtitle's "Christopher Klein" link). Flagged for review in that same section: the icon at `var(--icon-size-sm)` (14px) may read large against 16px body copy — `var(--icon-size-xs)` (12px) is the first fallback to try.
+
+---
+
+## 17. CTA Link
+
+**CSS Class:** `.link-cta`
+**HTML Element:** `<a href="{url}" class="link-cta" aria-label="{Title} — {action}">{action}<svg class="link-cta-icon">...</svg></a>`
+
+Not yet named in Figma — built directly in code 2026-09-02, no Figma component reference exists yet.
+
+### Design Intent
+The real, visible, keyboard-focusable link on every Card component as of 2026-09-02 — replaces `.card-block-link` in that role (see `## 3. Card`; `.card-block-link` is now `aria-hidden="true" tabindex="-1"` on every card). An underlined text link, not a button — no border, background, or button chrome — but padded to meet the 44px touch target, since (unlike `## 16. Inline Link`) it stands alone rather than sitting inline in a run of surrounding text.
+
+### When to Use
+- The primary destination link on a Card (Feature or Thought variant)
+
+### When NOT to Use
+- Mid-sentence inline links — use `.link-inline` (`## 16`) instead
+- Anywhere `.btn` / `.btn--ghost` button styling is called for — this is a text link, not a button, and carries no button chrome
+
+### Component Tokens
+No component-scoped tokens — reuses semantic tokens directly:
+```css
+color:   var(--color-link);          /* rest */
+color:   var(--color-link-hover);    /* hover */
+padding: var(--space-3) var(--space-2);
+margin:  calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+```
+Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
+
+### Anatomy
+```
+[ Label text ][ trailing icon ]
+```
+- Container: `<a class="link-cta" aria-label="{Title} — {action}">`
+- Label text: `"View this work"` (Work entries) or `"View this thought"` (Thoughts entries) — driven by `entry.type` in `buildCard()` (`script.js`), not hardcoded per card; `index.html`'s hand-written cards match this exactly per-card
+- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor
+- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) — the visible "View this work" / "View this thought" text alone would be ambiguous out of context (several cards share the same visible label on one page), so the accessible name adds the title
+- `font-style: normal` set explicitly, same reset rationale as `.link-inline`
+
+### Touch-Target Padding
+`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. This is offset by an equal, negated `margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1)` so the added padding doesn't visually shift the link's position or widen the gap between it and the card excerpt above it — the padding grows the hit area only; the visible text stays exactly where it would sit with no padding at all.
+
+### States
+
+| State | Colour | Text Decoration |
+|---|---|---|
+| Default | `--color-link` | underline |
+| Hover | `--color-link-hover` | underline |
+| Focus | `--color-link` | underline + sitewide `:focus-visible` ring (2px solid white, 3px offset) — `.link-cta` defines no focus override of its own |
+
+### Accessibility
+
+- Sole keyboard-focusable link on the card as of 2026-09-02 — Tab moves directly from whatever precedes the card to `.link-cta`, skipping `.card-block-link` entirely. Confirmed via a real Tab-key walkthrough and a real accessibility-tree snapshot (not just markup review) on both `index.html`'s hand-written cards and `buildCard()`'s Archive cards.
+- `aria-label` carries the full descriptive string so the link is unambiguous read out of context (e.g. in a screen reader's links list, where several cards' plain "View this work" text would otherwise collide)
+- Icon: `aria-hidden="true" focusable="false"` — decorative
+- Focus ring: inherited from the sitewide `:focus-visible` rule — no component-level override
+- `.card-content .link-cta { position: relative; z-index: 2; }` keeps it above `.card-block-link` (`z-index: 1`) so it remains the real target for both mouse and keyboard, even though the block-link still visually covers the full card for mouse-anywhere convenience
+
+### Responsive Behaviour
+Same at all breakpoints — no responsive overrides defined.
+
+### Status
+Built and live on every card as of 2026-09-02: `index.html`'s Feature and Thought cards, `buildCard()` in `script.js` (drives every Archive card — all 5 live entries), and previewed in `design-system.html` Sections 14 and 25.
 
 ---
 
