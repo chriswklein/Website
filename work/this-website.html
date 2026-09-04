@@ -90,7 +90,7 @@
                 <p>Not being a web-head by trade, I knew I was going to get myself caught in the sticky webbing of setup. I spent time inquiring about scalability, performance, and accessibility principles with Claude in order to establish a basic spec and the tech stack we would use.</p>
          
                
-                </p>Core Principles</p>
+                <h3 id="core-principles">Core Principles</h3>
                 <ul>
                     <li>No frameworks, no build tools, no subscriptions</li>
                     <li>Accessible by default — WCAG AA minimum on every decision</li>
@@ -102,8 +102,8 @@
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                </p>Specifications and Tech Stack</p>
-
+                <h3 id="tech-stack">Specs and Stack</h3>
+                
                 <div class="table-wrap">
                     <table>
                         <thead>
@@ -146,11 +146,11 @@
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                </p>The Markdown (MD) Stack</p>
-
-                </p>In earlier LLM expirements, I ran into hallucinations and or the models would infer and do thier own thing without guidence. Since then, I had read enough cautionary tales and workflow improvement articles from developers that informed how I would go about this project.</p>
+                <h3 id="markdown">Markdown Files</h3>
                 
-                </p>I established a project within Claude, and through Chat, built out the project MD’s overtime to avoid the afformentioned issues, building development and process guardrails as well as containing best practices based on my design intent.</p>
+                </p>In earlier LLM expirements, I ran into slight hallucinations and or the models would infer and do thier own thing without guidance. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
+                
+                </p>First step was to get out of singular chats and established a project within Claude and creating the Markdown (MD) files which would provide the support pillars. The MD’s would grow overtime, avoid the afformentioned issues, build development and process guardrails, contain best practices, archive changes, and note my design intent for design specs.</p>
 
                 </p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
 
@@ -165,7 +165,7 @@
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h2 id="Information-Architecture">Information Architecture</h2>
+                <h3 id="Information-Architecture">Information Architecture</h3>
                 <p>My initial goal was to build the following:</p>
 
                 <ul>
@@ -176,24 +176,27 @@
 
                 </p>I decided on accessible Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
                 
-                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself often enough where you push back on your own simplicity guardrails in favor of implementing and even removing a feature</p>
+                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or removing a feature after testing.</p>
 
-                </p>As a result of just having the basics - the site didn’t feel like me yet.</p>
+                </p>As a result of just having the basics - the site didn’t feel like me. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-
                 <h2 id="Thoughts and Filters">Thoughts and Filters</h2>
                 <p>I could have stopped there, but instead - I decided I wanted to create a space to express my Thoughts and create a bit of a headache for myself.</p>
 
-                <p>I opted to take on a central container - the "Arhcive" - in it would be any entry: Work, Thought, and others that might come after.</p>
+                </p>I opted to take on a central container - the "Archive" - which would house any entry for the site:</p>
 
-                <p>Each entry would contain the associated entry primary tag, and contain secondary tags which users could filter by.</p>
+                <ul>
+                    <li>Work - for case studies</li>
+                    <li>Thoughts - for commentary</li>
+                    <li>and for other entry types in the future like Japanese, and Side-Quests</li>
+                </ul>
 
-                <p>Text</p>
+                </p>Each entry contains a primary tag (hidden on the entry itself and its card), and contain Secondary tags. Of which can be utilized by a Filter within the Archive.</p>
 
-                <p>The two biggest challenges within the Archive was not the creation of the Filters </p>
+                </p>The two biggest challenges within the Archive was not the creation of the Filters but rather creating a Filter Drawer.</p>
 
                 </p>Arguably the largest site based architecture I made due to it surfacing a need to build a centralized location to store the entries.<p>
                 
