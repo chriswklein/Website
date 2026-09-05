@@ -709,3 +709,6 @@ Per explicit instruction: nothing gets deleted without Chris's approval. Items b
 - `.card-block-link:focus-visible` — unreachable since 2026-09-02: every `.card-block-link` now carries `tabindex="-1"`, so it can never receive focus and this rule can never match. Left in place per this section's own convention rather than removed; `.link-cta` (md/COMPONENTS.md §17) is the real focused element on cards now, styled by the sitewide `:focus-visible` rule, not this one.
 
 **Commented-out CSS (not deleted)** — `style.css`, "FEATURE CARD — horizontal layout" section: the `@media (min-width: 768px) { .card--feature {...} }` block that gave Work cards an image-left row layout at tablet/desktop. Work cards now use one vertical-stack layout at every breakpoint; the block is left in the file as a comment rather than removed.
+
+**Image assets (`assets/images/`)** — on disk, confirmed zero references in any HTML/CSS/JS:
+- `profile/c-rex-by-bob-nelson-2017.webp` — former author-row photo, removed in the 8/18 Standard Page redesign. Intentionally dormant, not deleted. Moved from `assets/images/` to `assets/images/profile/` during the 2026-09-05 entries/ folder reorganization.
