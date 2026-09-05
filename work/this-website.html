@@ -65,7 +65,7 @@
             <!-- Body Content -->
             <div class="standard-page-content">
                 
-                <h2 id="problem">Problem</h2>
+                <h2 id="overview">Overview</h2>
                 <p>For the past 3 months, I sought to eliminate my need for Squarespace as a platform for my portfolio, as I've utilized the service on and off for many years but it was never what I truely wanted.</p>
                 
                 
@@ -87,7 +87,7 @@
 
                 
                 <h2 id="foundations">.LANG-ing the Foundations</h2>
-                <p>Not being a web-head by trade, I knew I was going to get myself caught in the sticky webbing of setup. I spent time inquiring about scalability, performance, and accessibility principles with Claude in order to establish a basic spec and the tech stack we would use.</p>
+                <p>Not being a web-head by trade, I knew I was going to get myself caught in the sticky webbing of setup. I spent time inquiring about scalability, performance, and accessibility principles with Claude in order to establish specification documents and the technical stack we would use.</p>
          
                
                 <h3 id="core-principles">Core Principles</h3>
@@ -150,7 +150,9 @@
                 
                 </p>In earlier LLM expirements, I ran into slight hallucinations and or the models would infer and do thier own thing without guidance. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
                 
-                </p>First step was to get out of singular chats and established a project within Claude and creating the Markdown (MD) files which would provide the support pillars. The MD’s would grow overtime, avoid the afformentioned issues, build development and process guardrails, contain best practices, archive changes, and note my design intent for design specs.</p>
+                </p>First step was to get out of singular chats and established a project within Claude and creating the Markdown (MD) files which would provide the support pillars.</p> 
+                
+                </p>The MD’s would grow over the months, adding methods to avoid the afformentioned issues, build development and process guardrails, contain best practices to avoid wasting tokens on specific tasks I could easily check myself, archive changes overtime, and note design intent.</p>
 
                 </p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
 
@@ -166,6 +168,7 @@
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h3 id="Information-Architecture">Information Architecture</h3>
+              
                 <p>My initial goal was to build the following:</p>
 
                 <ul>
@@ -175,52 +178,79 @@
                 </ul>
 
                 </p>I decided on accessible Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
-                
-                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or removing a feature after testing.</p>
 
-                </p>As a result of just having the basics - the site didn’t feel like me. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
+                <!-- image -->
+                
+                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or even removing a feature after testing.</p>
+
+                </p>As a result of just having the basics - the site has taken longer than I wanted. I would see and reproduce a bug, and those bugs might have user experience issues that needed new solutions designed and tested. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h2 id="Thoughts and Filters">Thoughts and Filters</h2>
-                <p>I could have stopped there, but instead - I decided I wanted to create a space to express my Thoughts and create a bit of a headache for myself.</p>
-
-                </p>I opted to take on a central container - the "Archive" - which would house any entry for the site:</p>
-
-                <ul>
-                    <li>Work - for case studies</li>
-                    <li>Thoughts - for commentary</li>
-                    <li>and for other entry types in the future like Japanese, and Side-Quests</li>
-                </ul>
-
-                </p>Each entry contains a primary tag (hidden on the entry itself and its card), and contain Secondary tags. Of which can be utilized by a Filter within the Archive.</p>
-
-                </p>The two biggest challenges within the Archive was not the creation of the Filters but rather creating a Filter Drawer.</p>
-
-                </p>Arguably the largest site based architecture I made due to it surfacing a need to build a centralized location to store the entries.<p>
+                <h2 id="archive">The Archive</h2>
                 
-                <p>Blogs aren't typical portfolio single entries - I mean they can be, but modern standards to me, are being able to Search, Sort, and Filter by date, author, and other variables.</p>
+                <!-- image -->
+
+                <h3 id="lean-database">Lean Database</h3>
+                </p>To get around using a more complicated content manager, I opted for a lean singular static Json file which functions as a lightweight database. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundrens or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
+
+                <h3 id="entries">Entries</h3>
+                </p>Each entry contains a primary tag (hidden on the entry itself and its card), as well as Secondary tags. Both can be utilized by a user by accessing the Filter within the Archive.</p>
+
+
+                <h3 id="searching">Searching</h3>
+                <p>While structurally sound, the majority of my efforts working on the Archive was caused by the way I initially implemented the Search and Filter Drawer across Desktop, Tablet, and Mobile devices.</p>
+
+                </p>Initially, I placed Search and the Filters together when on Desktop and Mobile. I personally enjoy compacting </p>
+
+
+                </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but it's accessibility is top notch and it implemented Split Window before - and wayyyy better than Google Chrome, and Firefox.</p>
+
+                </p>One day, after being proud of my implementation, I was biking to the grocery store, when I had a realization: "I forgot about the Virtual Keyboard".</p>
+
+                <!-- image -->
+
+                </p>While attempting to focus on the grocery list, the importance of touching grass washed over me and pushed changes and tested on my iphoneSE2. Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.</p>
+
+                </p>As I tested, I saw the major issues I knew would be present:
                 
-                <p>This caused many self inflicted headaches.</p>
-
-                <p>Even when I felt I had mapped the structure out well, much of it broke during testing across devices and eventually lead me to disable a search field</p>
+                </p>As the Archive live updates based on a users search and filtering, the results on a mobile or tablet become apparent right away:</p>
                 
-                </p>While it has taken longer to set up, I don’t regret the time spent fixing things up, learning how to utilize browser inspection tools and the console. Do I think it’s perfect? No, but it’s a solid foundation.</p>
+                </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
 
-                <ul>
-                    <li>Home Page</li>
-                    <li>About</li>
-                    <li>Archive - Work, Thoughts, etc</li>
-                </ul>
+                <!-- image -->
+                
+                </p>Issue #2: Search fields Auto-zoom when active. Not only was the virtual keyboard resulting in a loss of space, a further loss of space was the resulting in a Zoom in on the Archives Body. If a user searched, the entries would be illegable.</p> 
 
-                </p>To get around the CSM or any kind of server, a single static Json file functions as a lightweight database. Every Work and Thoughts entry is referenced in a singular file and Javascript fetches and allows the user to sort and filter as they so choose. Fast and efficient for what I need right now.</p>
+                <!-- image -->
+                
+                </p>While I fought to redesign variants of the current implementations - I ultimatley made the decision to feature flag search until I find a cleaner solution. I had other issues to solve and content to generate.</p>
+
+                <!-- image -->
+
+                <h3 id="drawers">Drawers</h3>
+                </p>After removing the field, I had to modify the layout. My designs were built to scale so it wasn't too much of a departure, so I'll display its capabilities.</p>
+
+                <!-- image -->
+                
+                
+
+
+
+
+
+                
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="accessibility">Accessibility</h2>
+                <!-- image -->
+
+
                 <p>As it stands right now, my site has the following currently implemented:</p>
+
 
                 <ul>
                     <li>Keyboard & Focus</li>
@@ -229,21 +259,15 @@
                     <li>Motion</li>
                 </ul>
 
-                </p>As time goes on, I will introduce more accessibility options to the site.</p>
+                </p>As time goes on, I will ensure, introduce, and verify accessibility options to the site.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="the-future">The Future</h2>
-                <p>Next up for me is to add more features, accessibility, performance tweaks, adding juice to interactions and of course to write and post new projects. Stay tuned y’all!</p>
+                <p>Next up for me is to take a web break, and work on new projects. Stay tuned y’all!</p>
 
-
-
-
-
-
-
-
+                <!-- image -->
 
 
 
