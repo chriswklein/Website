@@ -189,34 +189,47 @@
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="archive">The Archive</h2>
-                
-                <!-- image -->
-
-                <h3 id="lean-database">Lean Database</h3>
-                </p>To get around using a more complicated content manager, I opted for a lean singular static Json file which functions as a lightweight database. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundrens or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
-
-                <h3 id="entries">Entries</h3>
-                </p>Each entry contains a primary tag (hidden on the entry itself and its card), as well as Secondary tags. Both can be utilized by a user by accessing the Filter within the Archive.</p>
-
-
-                <h3 id="searching">Searching</h3>
-                <p>While structurally sound, the majority of my efforts working on the Archive was caused by the way I initially implemented the Search and Filter Drawer across Desktop, Tablet, and Mobile devices.</p>
-
-                </p>Initially, I placed Search and the Filters together when on Desktop and Mobile. I personally enjoy compacting </p>
-
-
-                </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but it's accessibility is top notch and it implemented Split Window before - and wayyyy better than Google Chrome, and Firefox.</p>
-
-                </p>One day, after being proud of my implementation, I was biking to the grocery store, when I had a realization: "I forgot about the Virtual Keyboard".</p>
+                </p>The Archive is made of multiple key components:</p>
 
                 <!-- image -->
 
-                </p>While attempting to focus on the grocery list, the importance of touching grass washed over me and pushed changes and tested on my iphoneSE2. Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.</p>
+                <ul>
+                    <li>The Database</li>
+                    <li>Entries and their Tags</li>
+                    <li>Search
+                    </li>Filter Drawer</li>
+                </ul>
 
-                </p>As I tested, I saw the major issues I knew would be present:
+                <h3 id="lean-database">The Database</h3>
+                </p>To get around using a more complicated content manager, I opted for a lean singular static Json file. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundrens or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
+
+                <!-- image -->
+
+                <h3 id="entries-and-tags">Entries and Tags</h3>
+                </p>Each entry contains a Hidden Primary 'Type' Tag (Work, Thoughts, etc.) - as well as Secondary 'Topic' Tags (Quality Assurance, User Experience, etc.) While the Primary Tags are hidden on the Entry Pages and their representative Card on the Archive - they both can be utilized by a user by accessing the Filter Drawer.</p>
+
+
+                <h3 id="search">Search</h3>
+                <p>While search is fully functional, it is currently dormant on the Archive. The reason for this is due to how I initially implemented the Search across devices.</p>
+
+                </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
+
+                <!-- image -->
+
+                </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
+
+                <!-- image -->
+
+                </p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
+
+                <!-- image -->
+
+                </p>As I picked out a good cabbage in the vegitable isle, it's sprinkler spritzed my face with cold water, and barely managed to wash away the embarressment I felt for forgetting something I see every single day.</p>  
                 
-                </p>As the Archive live updates based on a users search and filtering, the results on a mobile or tablet become apparent right away:</p>
-                
+                </p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
+
+                </p>As I tested, I saw the major issues I knew would be present.</p>
+                                
                 </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
 
                 <!-- image -->
@@ -225,21 +238,27 @@
 
                 <!-- image -->
                 
-                </p>While I fought to redesign variants of the current implementations - I ultimatley made the decision to feature flag search until I find a cleaner solution. I had other issues to solve and content to generate.</p>
+                </p>While I fought for a day to redesign variants of the current implementations - I ultimatley made the decision to feature flag search until I find a cleaner solution and I had other issues to solve, features to implement, and bugs to fix. I went for another walk later that day to let it all go and trust myself enough to figure it out another day.</p>
 
                 <!-- image -->
 
-                <h3 id="drawers">Drawers</h3>
-                </p>After removing the field, I had to modify the layout. My designs were built to scale so it wasn't too much of a departure, so I'll display its capabilities.</p>
+                <h3 id="filters">Filters</h3>
+                </p>After removing the field, I was able to retain the structure and instead of a search field, I replaced it with text indicating the purpose of the drawer.</p>
 
                 <!-- image -->
                 
-                
+                </p>As I anticipated tag growth, I made sure the drawer would scale. Pagination was built into the drawer to ensure the user could parse the potential plethora of tags. If the user wants to Filter by a specific Primary Tag - the applicable entries with associated secondary tags will display, and the unrelated tags will be hidden.</p>
+
+                </p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
 
 
+                <h2 id="contents">Contents</h2>
+                <p>The next major implementation, was the Floating and Collapsable Table of Contents.</p>
+
+                <p>When I had a Squarespace, this type of feature was gated behind a paywall. I had searched for templates but no luck. Then when I found a script some other squarespace user wrote - I was restricted as Code Injection was of course that higher tier. So this became a must for me as I wanted to the viewers of any entry to feel like they could navigate up and down the page with ease.</p>
 
 
-
+                <!-- image -->
                 
 
                 <!-- Dot divider -->
@@ -248,28 +267,31 @@
                 <h2 id="accessibility">Accessibility</h2>
                 <!-- image -->
 
-
-                <p>As it stands right now, my site has the following currently implemented:</p>
+                <p>Last but not least, is one of the Core Principles of the site: Accessibility.</p>
+                    
+                </p>As it stands right now, my site has the following accessibility implemented:</p>
 
 
                 <ul>
-                    <li>Keyboard & Focus</li>
-                    <li>Screen Reader / Semantic</li>
-                    <li>Visual / Contrast</li>
-                    <li>Motion</li>
+                    <li>Visual / Contrast right now sits at....</li>
+                    <li>Motion is Reduced</li>
+                    <li>Keyboard & Focus navigation has logical paths for each of the pages and focus rings to indicate position</li>
+                    <li>Screen Reader was tested using NVDA</li>
+                    <li>All images have Alt Text and Buttons have Aria Labels</li>
                 </ul>
 
-                </p>As time goes on, I will ensure, introduce, and verify accessibility options to the site.</p>
+                <p>Here are the Results of Accessibility Tests I ran it through:</p>
+                <!-- image -->
+
+                </p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="the-future">The Future</h2>
-                <p>Next up for me is to take a web break, and work on new projects. Stay tuned y’all!</p>
+                <p>Next up for me is to take a web break to work on new projects. Stay tuned y’all!</p>
 
                 <!-- image -->
-
-
 
             </div>
 
