@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="With Claude and Claude Code, Christopher Klein built this site to leave Squarespace, learn web development and AI workflows, and implement accessibility.">
     <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
     <title>This Website — Work — Christopher Klein</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -104,7 +105,7 @@
 
                 <h3 id="tech-stack">Specs and Stack</h3>
                 
-                <div class="table-wrap">
+                <div class="table-wrap" tabindex="0" aria-label="Specs and Stack table, scrollable horizontally">
                     <table>
                         <thead>
                             <tr>
@@ -217,7 +218,7 @@
                 </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-intentional-design.png" alt="diagram of the mobile experience I had intended" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-intentional-design.png" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
 
                 </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
 
@@ -237,7 +238,7 @@
 
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.png" alt="diagram of the mobile bugs i found after testing on my iphone" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.png" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
                                 
                 </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
                 

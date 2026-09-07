@@ -931,7 +931,11 @@ function initFilterDrawer() {
             const labelSpan = t.querySelector('.trigger-label');
             if (labelSpan) labelSpan.textContent = isOpen ? 'Close' : 'Filters';
             if (t.classList.contains('action-rail-trigger')) {
-                t.setAttribute('aria-label', isOpen ? 'Close filters' : 'Open filters');
+                // Matches the visible .trigger-label text's exact case ("Filters") —
+                // WCAG 2.5.3 (Label in Name) requires the visible text to appear
+                // verbatim in the accessible name; the prior lowercase "filters"
+                // failed axe/Lighthouse's label-content-name-mismatch check.
+                t.setAttribute('aria-label', isOpen ? 'Close Filters' : 'Open Filters');
             }
         });
     }
@@ -1059,6 +1063,34 @@ function initFilterDrawer() {
 function initArchive(filterDrawer) {
     const resultsEl        = document.getElementById('archive-results');
     if (!resultsEl) return;
+
+    // Skeleton placeholder cards — shown immediately, before the
+    // data/archive-entries.json fetch below resolves, so the results grid
+    // has real reserved height instead of the near-empty div that
+    // previously caused Archive's ~1.0 CLS (confirmed via Lighthouse's
+    // cls-culprits-insight: the entire shift traced to <main> itself,
+    // i.e. the results grid popping in from nothing). aria-hidden since
+    // these are decorative loading state, not real content. Removed for
+    // free the moment the first real render() call runs its own
+    // resultsEl.innerHTML = '' (below) — no separate cleanup needed.
+    function buildSkeletonCard() {
+        const card = document.createElement('div');
+        card.className = 'card card--feature card--skeleton';
+        card.setAttribute('aria-hidden', 'true');
+        card.innerHTML = `
+            <div class="card-image"></div>
+            <div class="card-content">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--meta"></div>
+                <div class="skeleton-line skeleton-line--excerpt"></div>
+                <div class="skeleton-line skeleton-line--excerpt-short"></div>
+            </div>`;
+        return card;
+    }
+    const SKELETON_CARD_COUNT = 3;
+    for (let i = 0; i < SKELETON_CARD_COUNT; i++) {
+        resultsEl.appendChild(buildSkeletonCard());
+    }
 
     const titleEl          = document.getElementById('archive-title');
     const countEl          = document.getElementById('archive-count');

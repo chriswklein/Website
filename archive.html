@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse and filter Christopher Klein's Work and Thoughts entries by tag, type, or search: a searchable archive of case studies and articles.">
     <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
     <title>Archive — Christopher Klein</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +45,7 @@
                 aria-controls="filter-drawer"
                 aria-haspopup="dialog"
                 aria-expanded="false"
-                aria-label="Open filters">
+                aria-label="Open Filters">
             <svg class="action-rail-trigger-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
                 <g opacity="0.9">
                     <path d="M19.6881 2C20.965 2 22 3.03512 22 4.31201V9.9245C22 10.8101 21.6483 11.6594 21.0222 12.2857L12.2874 21.0231C10.983 22.3249 8.87071 22.3259 7.56459 21.0246L2.98017 16.4467C1.67476 15.1438 1.67309 13.0292 2.97629 11.724L11.7098 2.97961C12.3361 2.35242 13.1861 2 14.0725 2H19.6881ZM16.8625 5.5987C16.0113 5.5987 15.3212 6.28877 15.3212 7.14002C15.3212 7.99126 16.0113 8.68133 16.8625 8.68133C17.7137 8.68133 18.4037 7.99126 18.4037 7.14002C18.4037 6.28877 17.7137 5.5987 16.8625 5.5987Z" fill="currentColor"/>
@@ -122,6 +123,13 @@
 
     <main id="main-content">
         <div class="container">
+
+            <!-- Visually-hidden heading closes the h1 -> h3 level-skip the results
+                 grid's card titles would otherwise create (Home avoids this via its
+                 visible "Featured Work"/"Thoughts" h2 section headings; Archive's
+                 single filterable list has no equivalent visible section title, so
+                 this reuses the sitewide .sr-only pattern instead of inventing one). -->
+            <h2 class="sr-only" id="archive-results-heading">Results</h2>
 
             <!-- Entry count (left) and sort toggle (right) — between header and results grid -->
             <div class="archive-sort-count-row">

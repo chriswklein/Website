@@ -1318,6 +1318,31 @@ pre code {
     display: contents;
 }
 
+/* Reserves the injected <header>'s own real rendered height (~65px — the
+   same figure already used in the comment above for this exact
+   measurement, not a newly derived value) before nav.html's fetch
+   resolves, so <main> and everything below it renders in its final
+   position from first paint instead of shifting down once the real
+   header lands — confirmed as the sitewide (not Archive-specific) half
+   of Archive's CLS investigation, claude/2026-09-07-archive-cls-root-
+   cause-spec.md. content on a pseudo-element still generates a real box
+   and participates in body's flex layout as body's actual child, even
+   though display: contents suppresses a box for #nav-placeholder itself
+   — so this doesn't reintroduce the sticky-positioning bug that rule
+   exists to fix (confirmed: header's position: sticky still has its own
+   containing block, untouched by this). :empty is what removes the
+   reservation automatically the instant nav.html's real content lands
+   (no longer empty) — no JS change needed, and no risk of double-
+   counting height once the real header exists alongside it. Disabled at
+   <768px (see MOBILE section) since header itself is display: none
+   there — reserving space nothing will ever use would introduce a new,
+   opposite-direction shift once nav injects, not prevent one. */
+#nav-placeholder:empty::before {
+    content: '';
+    display: block;
+    height: 65px;
+}
+
 header {
     position: sticky;
     top: 0;
@@ -3255,6 +3280,47 @@ footer p {
     padding: var(--space-6) 0;
 }
 
+/* Skeleton placeholder cards — built by buildSkeletonCard() (script.js)
+   and inserted into #archive-results immediately on page load, before
+   the data/archive-entries.json fetch resolves. Confirmed via Lighthouse
+   (cls-culprits-insight) that the near-empty results div was the entire
+   cause of Archive's ~1.0 CLS: real cards popping in with no reserved
+   height shifted the whole page at once. Reuses .card/.card-image/
+   .card-content as-is (same border, radius, aspect-ratio, padding as a
+   real card) so the reserved height genuinely matches — only the inner
+   "bone" rectangles are new. render()'s own resultsEl.innerHTML = ''
+   clears these the moment the first real render() call happens, so
+   there's no separate removal step to keep in sync here. */
+.card--skeleton .card-image,
+.card--skeleton .skeleton-line {
+    background-color: var(--color-background-subtle);
+    animation: skeleton-pulse calc(var(--duration-slower) * 3) var(--ease-in-out) infinite;
+}
+
+.skeleton-line {
+    height: var(--space-4);
+    border-radius: var(--border-radius-sm);
+}
+
+.skeleton-line--title {
+    width: 60%;
+    height: var(--space-5);
+}
+
+.skeleton-line--meta {
+    width: 35%;
+    height: var(--space-3);
+}
+
+.skeleton-line--excerpt-short {
+    width: 70%;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 /* No-results empty state — desktop default: mascot beside message + Clear
    Filters button, row layout. Tablet (max-width: 1023px below) keeps the
    row but scales it down; mobile (max-width: 767px below) switches to a
@@ -3580,6 +3646,13 @@ footer p {
 
     /* Top tab bar replaces desktop nav on mobile */
     header {
+        display: none;
+    }
+
+    /* header is display: none at this width (above) both before and
+       after nav.html injects, so there's nothing to reserve space for —
+       see #nav-placeholder:empty::before's own comment. */
+    #nav-placeholder:empty::before {
         display: none;
     }
 
