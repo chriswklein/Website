@@ -1623,6 +1623,15 @@ function initArchive(filterDrawer) {
     fetch('/data/archive-entries.json')
         .then(r => r.json())
         .then(entries => {
+            // Reversible "published" flag (added 2026-09-07): absent/true
+            // means visible, "published": false means hidden from every
+            // Archive consumer below — grid, primary/secondary tag counts,
+            // secondary tag chip existence, and ?tag= URL validation all
+            // read from this one filtered array, not the raw fetch result,
+            // so a single field flip here is the only place this needs to
+            // be enforced. The pages themselves stay reachable by direct
+            // URL — this filters Archive's data source, not the site.
+            entries = entries.filter(e => e.published !== false);
             allEntries = entries;
 
             // Validate the ?tag= URL param now that real tag data exists —

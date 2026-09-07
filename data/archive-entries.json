@@ -45,7 +45,8 @@
     "date": "2026-06-14",
     "url": "/entries/thoughts/physical-and-digital-media.html",
     "image": "",
-    "imageAlt": ""
+    "imageAlt": "",
+    "published": false
   },
   {
     "id": "industrializing-the-industry",
@@ -57,6 +58,7 @@
     "date": "2026-06-08",
     "url": "/entries/thoughts/industrializing-the-industry.html",
     "image": "",
-    "imageAlt": ""
+    "imageAlt": "",
+    "published": false
   }
 ]
