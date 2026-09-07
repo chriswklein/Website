@@ -206,7 +206,6 @@
                 <h3 id="lean-database">The Database</h3>
                 </p>To get around using a more complicated content manager, I opted for a lean singular static Json file. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundrens or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
 
-                <!-- image -->
 
                 <h3 id="entries-and-tags">Entries and Tags</h3>
                 </p>Each entry contains a Hidden Primary 'Type' Tag (Work, Thoughts, etc.) - as well as Secondary 'Topic' Tags (Quality Assurance, User Experience, etc.) While the Primary Tags are hidden on the Entry Pages and their representative Card on the Archive - they both can be utilized by a user by accessing the Filter Drawer.</p>
@@ -218,7 +217,7 @@
                 </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-intentional-design.png" alt="Text" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-intentional-design.png" alt="diagram of the mobile experience I had intended" width="800" height="450" loading="lazy">
 
                 </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
 
@@ -226,9 +225,11 @@
 
                 </p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
 
-                
 
-                </p>As I picked out a good cabbage in the vegitable isle, it's sprinkler spritzed my face with cold water, and barely managed to wash away the embarressment I felt for forgetting something I see every single day.</p>  
+                </p>As I picked out a good cabbage in the vegitable isle, it's sprinkler spritzed my face with cold water, and barely managed to wash away the embarressment I felt for forgetting something I see every single day.</p> 
+                
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/atla-cabbages.png" alt="The infamous Cabbage vendor from Avatar the Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
                 
                 </p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
 
@@ -236,7 +237,7 @@
 
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.png" alt="Text" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.png" alt="diagram of the mobile bugs i found after testing on my iphone" width="800" height="450" loading="lazy">
                                 
                 </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
                 
@@ -256,7 +257,7 @@
                 </p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/filter-implementation.png" alt="Text" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/filter-implementation.png" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
 
 
                 <h2 id="contents">Contents</h2>
@@ -266,6 +267,7 @@
 
 
                 <!-- image -->
+                <img src="/assets/images/entries/work/this-website/Table-of-contents.png" alt="diagram of the table of contents through device breakpoints. Left Mobile, Center Tablet, and Right Desktop" width="800" height="450" loading="lazy">
                 
 
                 <!-- Dot divider -->

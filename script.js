@@ -366,26 +366,30 @@ function initTocRail() {
     document.body.insertBefore(rail, main);
     document.body.insertBefore(tocSkipLink, rail);
 
-    // Anchors the rail's fixed top offset to .standard-page-banner's real
-    // bottom edge, not the page's fixed chrome. The banner's rendered
-    // height comes from its aspect-ratio and the viewport width alone —
-    // nothing below it (Details card row count, tag wrapping) affects it —
-    // so this position is identical across entries at a given width,
-    // unlike a heading-based anchor: confirmed via direct measurement, a
-    // 4-row Work entry and a short Thoughts entry land on the exact same
-    // pixel at every tested width. Gap reuses --space-8, read from the
-    // rail's own computed style rather than duplicated as a number.
-    // Recomputed on resize, since the banner's height changes with
-    // viewport width; not on scroll — this sets a fixed starting point,
-    // it doesn't track the banner as the page scrolls. If an entry has no
-    // banner, --toc-rail-top is simply never set and CSS's own
-    // var(--toc-rail-top, <fallback>) takes over — no duplicated fallback
-    // value to keep in sync here.
+    // Anchors the rail's fixed top offset to .breadcrumb's real top edge —
+    // flush, no gap, per Chris's decision that the rail should line up
+    // with the breadcrumb row rather than sit lower next to body copy
+    // (previously anchored to .standard-page-banner's bottom edge + a
+    // --space-8 gap instead; moved up by roughly a banner's height plus
+    // that gap as a result). The breadcrumb is present on every entry
+    // (unlike the banner, which some earlier code here defended against
+    // missing) and its own top position doesn't depend on anything below
+    // it either, so this still lands on the same pixel across entries at
+    // a given width. Recomputed on resize (nav height and .standard-page's
+    // own layout are stable across scroll, but not necessarily across a
+    // resize-driven reflow); not on scroll — this sets a fixed starting
+    // point, it doesn't track the breadcrumb as the page scrolls (the
+    // rail is position: fixed and stays put once positioned, same as
+    // before this change). If an entry has no breadcrumb, --toc-rail-top
+    // is simply never set and CSS's own var(--toc-rail-top, <fallback>)
+    // takes over — that fallback (--space-16 + --space-8, the sticky
+    // nav's own height plus main's own padding-top) already approximates
+    // the breadcrumb's real pre-JS position, confirmed by direct
+    // measurement, so it needed no change alongside this anchor swap.
     function updateRailTop() {
-        const banner = document.querySelector('.standard-page-banner');
-        if (!banner) return;
-        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-8'));
-        const top = banner.getBoundingClientRect().bottom + window.scrollY + gap;
+        const breadcrumb = document.querySelector('.breadcrumb');
+        if (!breadcrumb) return;
+        const top = breadcrumb.getBoundingClientRect().top + window.scrollY;
         rail.style.setProperty('--toc-rail-top', `${top}px`);
     }
 
@@ -407,10 +411,15 @@ function initTocRail() {
     // widens) and once fonts finish loading, since a font swap can change
     // the column's own rendered width (also 'ch'-based) after this first
     // runs.
+    // Gap widened from --space-6 (24px) to --space-16 (64px) per Chris's
+    // decision to move the rail noticeably further right, closer to the
+    // viewport edge — same "measure the real content-column edge, add a
+    // token gap" mechanism as before, just a larger token on it, not a
+    // switch to a viewport-relative (e.g. --max-content-based) position.
     function updateRailLeft() {
         const content = document.querySelector('.standard-page-content');
         if (!content) return;
-        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-6'));
+        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-16'));
         const left = content.getBoundingClientRect().right + gap;
         rail.style.setProperty('--toc-rail-left', `${left}px`);
     }

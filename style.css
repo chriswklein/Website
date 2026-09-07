@@ -1786,13 +1786,16 @@ footer p {
    HTML. Tablet/mobile render nothing (separate trigger + panel pattern,
    not built here).
 ================================ */
-/* top: --toc-rail-top is set by initTocRail() (script.js) to
-   .standard-page-banner's real bottom edge + a gap — the banner's height
-   comes from its own aspect-ratio and the viewport width alone, not from
-   anything below it, so this lands on the same pixel across entries
-   regardless of Details-card length (confirmed via direct measurement,
-   not assumed — see script.js comment on updateRailTop()). Fallback
-   (pre-JS, or an entry with no banner) keeps the original static offset. */
+/* top: --toc-rail-top is set by initTocRail() (script.js) to .breadcrumb's
+   real top edge, flush — no gap — so the rail lines up with the
+   breadcrumb row instead of sitting lower next to body copy (previously
+   anchored to .standard-page-banner's bottom edge + a --space-8 gap; see
+   script.js's updateRailTop() for the full history). Fallback (pre-JS, or
+   an entry with no breadcrumb) is --space-16 + --space-8 — the sticky
+   nav's own height plus main's own padding-top, which is exactly what
+   places the breadcrumb's real top edge pre-JS, confirmed by direct
+   measurement — so this value needed no change alongside the anchor
+   swap. */
 .toc-rail {
     display: none;
     position: fixed;
@@ -1803,11 +1806,16 @@ footer p {
 @media (min-width: 1440px) {
     /* --toc-rail-left: set by initTocRail() (script.js) to the real
        rendered right edge of .standard-page-content (the 65ch text
-       column) + a gap, the same "measure the real DOM, don't derive it"
-       approach --toc-rail-top already uses for the vertical axis (see
+       column) + a gap (--space-16, widened from --space-6 per Chris's
+       decision to move the rail noticeably further right, closer to the
+       viewport edge — see updateRailLeft()'s own comment in script.js),
+       the same "measure the real DOM, don't derive it" approach
+       --toc-rail-top already uses for the vertical axis (see
        updateRailTop() and its comment there). The var()'s own fallback
        (50% of the viewport, this is position: fixed, + 32.5ch — half the
-       column's own 65ch width — + the gap) is pure CSS for the pre-JS
+       column's own 65ch width — + the same --space-16 gap, kept in sync
+       with the live JS value above so the rail doesn't visibly jump
+       further right once JS takes over) is pure CSS for the pre-JS
        case only; it depends on 'ch' resolving against the *currently
        active* font, which made it fragile as the live formula — Noto
        Sans loads async (display: swap; see the <link> in each entry's
@@ -1836,8 +1844,8 @@ footer p {
     .toc-rail {
         display: flex;
         flex-direction: column;
-        left: var(--toc-rail-left, calc(50% + 32.5ch + var(--space-6)));
-        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left, calc(50% + 32.5ch + var(--space-6))) - var(--space-6)));
+        left: var(--toc-rail-left, calc(50% + 32.5ch + var(--space-16)));
+        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left, calc(50% + 32.5ch + var(--space-16))) - var(--space-6)));
         /* max-height/chrome moved here from .toc-rail-list below, now that
            the list has a label sibling above it inside this same card —
            mirrors .toc-panel's own architecture (outer element carries
@@ -1846,7 +1854,13 @@ footer p {
            line above a separately-bordered box. Formula itself is
            unchanged from the one .toc-rail-list used to carry: self-
            adjusts to whatever room exists between --toc-rail-top and a
-           bottom-of-viewport margin. */
+           bottom-of-viewport margin. This already recomputes correctly
+           against the breadcrumb-anchored --toc-rail-top (moved up from
+           the old banner-anchored one, see updateRailTop() in script.js)
+           with no formula change needed — it reads the same live custom
+           property either way, so a smaller top offset automatically
+           yields a taller max-height, confirmed by direct measurement
+           rather than assumed. */
         max-height: calc(100vh - var(--toc-rail-top, calc(var(--space-16) + var(--space-8))) - var(--space-16));
         padding: var(--space-3);
         background-color: var(--color-background-surface);
