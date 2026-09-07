@@ -312,6 +312,21 @@ function initTocRail() {
     rail.className = 'toc-rail';
     rail.setAttribute('aria-label', 'Table of contents');
 
+    // Shared by both .toc-panel-label instances below (this rail's own and
+    // the <1440px panel's, further down) — same content.svg icon as the
+    // trigger button above, decorative (the adjacent text already carries
+    // the label, doubly so once aria-hidden is set on the whole <p> below).
+    const TOC_LABEL_ICON_HTML =
+        '<svg class="toc-panel-label-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
+        '<g opacity="0.9">' +
+        '<path d="M6 19C6 19.5523 5.55228 20 5 20H3C2.44772 20 2 19.5523 2 19V17C2 16.4477 2.44772 16 3 16H5C5.55228 16 6 16.4477 6 17V19Z" fill="currentColor"/>' +
+        '<path d="M22 20H8V16H22V20Z" fill="currentColor"/>' +
+        '<path d="M6 13C6 13.5523 5.55228 14 5 14H3C2.44772 14 2 13.5523 2 13V11C2 10.4477 2.44772 10 3 10H5C5.55228 10 6 10.4477 6 11V13Z" fill="currentColor"/>' +
+        '<path d="M22 14H8V10H22V14Z" fill="currentColor"/>' +
+        '<path d="M6 7C6 7.55228 5.55228 8 5 8H3C2.44772 8 2 7.55228 2 7V5C2 4.44772 2.44772 4 3 4H5C5.55228 4 6 4.44772 6 5V7Z" fill="currentColor"/>' +
+        '<path d="M22 8H8V4H22V8Z" fill="currentColor"/>' +
+        '</g></svg>';
+
     // Reuses .toc-panel-label verbatim (Rule 3a) — same class the </1440px
     // panel's own label already uses, same reasoning for aria-hidden
     // (redundant with the <nav>'s own aria-label once announced as a
@@ -321,6 +336,7 @@ function initTocRail() {
     railLabel.className = 'toc-panel-label';
     railLabel.textContent = 'Table of Contents';
     railLabel.setAttribute('aria-hidden', 'true');
+    railLabel.insertAdjacentHTML('afterbegin', TOC_LABEL_ICON_HTML);
 
     const railList = document.createElement('ul');
     railList.className = 'toc-rail-list';
@@ -436,6 +452,22 @@ function initTocRail() {
     trigger.setAttribute('aria-controls', 'toc-panel');
     trigger.setAttribute('aria-haspopup', 'true');
 
+    // Matches Archive's Filter trigger icon markup exactly (same
+    // .action-rail-trigger-icon class, same inline-SVG convention every
+    // icon on this site already uses — see style.css) — content.svg's
+    // real source path data, not tag.svg's, since this trigger opens the
+    // Table of Contents rather than the tag filter.
+    trigger.insertAdjacentHTML('afterbegin',
+        '<svg class="action-rail-trigger-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
+        '<g opacity="0.9">' +
+        '<path d="M6 19C6 19.5523 5.55228 20 5 20H3C2.44772 20 2 19.5523 2 19V17C2 16.4477 2.44772 16 3 16H5C5.55228 16 6 16.4477 6 17V19Z" fill="currentColor"/>' +
+        '<path d="M22 20H8V16H22V20Z" fill="currentColor"/>' +
+        '<path d="M6 13C6 13.5523 5.55228 14 5 14H3C2.44772 14 2 13.5523 2 13V11C2 10.4477 2.44772 10 3 10H5C5.55228 10 6 10.4477 6 11V13Z" fill="currentColor"/>' +
+        '<path d="M22 14H8V10H22V14Z" fill="currentColor"/>' +
+        '<path d="M6 7C6 7.55228 5.55228 8 5 8H3C2.44772 8 2 7.55228 2 7V5C2 4.44772 2.44772 4 3 4H5C5.55228 4 6 4.44772 6 5V7Z" fill="currentColor"/>' +
+        '<path d="M22 8H8V4H22V8Z" fill="currentColor"/>' +
+        '</g></svg>');
+
     const triggerLabel = document.createElement('span');
     triggerLabel.className = 'trigger-label';
     triggerLabel.textContent = 'Contents';
@@ -486,6 +518,7 @@ function initTocRail() {
     panelLabel.className = 'toc-panel-label';
     panelLabel.textContent = 'Table of Contents';
     panelLabel.setAttribute('aria-hidden', 'true');
+    panelLabel.insertAdjacentHTML('afterbegin', TOC_LABEL_ICON_HTML);
 
     const panelList = document.createElement('ul');
     panelList.className = 'toc-panel-list';

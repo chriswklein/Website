@@ -45,6 +45,11 @@
                 aria-haspopup="dialog"
                 aria-expanded="false"
                 aria-label="Open filters">
+            <svg class="action-rail-trigger-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <g opacity="0.9">
+                    <path d="M19.6881 2C20.965 2 22 3.03512 22 4.31201V9.9245C22 10.8101 21.6483 11.6594 21.0222 12.2857L12.2874 21.0231C10.983 22.3249 8.87071 22.3259 7.56459 21.0246L2.98017 16.4467C1.67476 15.1438 1.67309 13.0292 2.97629 11.724L11.7098 2.97961C12.3361 2.35242 13.1861 2 14.0725 2H19.6881ZM16.8625 5.5987C16.0113 5.5987 15.3212 6.28877 15.3212 7.14002C15.3212 7.99126 16.0113 8.68133 16.8625 8.68133C17.7137 8.68133 18.4037 7.99126 18.4037 7.14002C18.4037 6.28877 17.7137 5.5987 16.8625 5.5987Z" fill="currentColor"/>
+                </g>
+            </svg>
             <span class="trigger-label">Filters</span>
             <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
         </button>
@@ -63,7 +68,14 @@
             <!-- Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right) -->
             <div class="filter-drawer-controls">
                 <button class="archive-clear-btn btn" type="button" disabled>Clear</button>
-                <p class="filter-drawer-label">Filter by Tag</p>
+                <p class="filter-drawer-label">
+                    <svg class="filter-drawer-label-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                        <g opacity="0.9">
+                            <path d="M19.6881 2C20.965 2 22 3.03512 22 4.31201V9.9245C22 10.8101 21.6483 11.6594 21.0222 12.2857L12.2874 21.0231C10.983 22.3249 8.87071 22.3259 7.56459 21.0246L2.98017 16.4467C1.67476 15.1438 1.67309 13.0292 2.97629 11.724L11.7098 2.97961C12.3361 2.35242 13.1861 2 14.0725 2H19.6881ZM16.8625 5.5987C16.0113 5.5987 15.3212 6.28877 15.3212 7.14002C15.3212 7.99126 16.0113 8.68133 16.8625 8.68133C17.7137 8.68133 18.4037 7.99126 18.4037 7.14002C18.4037 6.28877 17.7137 5.5987 16.8625 5.5987Z" fill="currentColor"/>
+                        </g>
+                    </svg>
+                    Filter by Tag
+                </p>
                 <button class="filter-drawer-trigger" type="button"
                         aria-expanded="false"
                         aria-controls="filter-drawer"

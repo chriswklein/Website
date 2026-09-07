@@ -2062,12 +2062,25 @@ footer p {
     }
 }
 
+/* display: flex (was block text) lays the new content.svg icon beside
+   the text — shared by both instances of this class (the always-visible
+   desktop rail's own label and the <1440px panel's, script.js), same as
+   the class itself is already shared between them (Rule 3a). */
 .toc-panel-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     margin: 0 0 var(--space-3);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-widest);
     color: var(--color-text-secondary);
+}
+
+.toc-panel-label-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
 }
 
 /* Layout only — no background/border/shadow here, unlike .toc-rail-list:
@@ -2773,15 +2786,26 @@ footer p {
 
 /* Static, non-interactive — replaces the old search field's slot in Row 1
    without any of its interactive styling (no border/background/focus
-   ring). */
+   ring). display: inline-flex (was block + text-align: center) lays the
+   new tag.svg icon and the text side by side; the surrounding grid's own
+   centering (see .filter-drawer-controls above) still centers this whole
+   auto-width column regardless, so true-centre behaviour is unchanged. */
 .filter-drawer-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
     min-width: 0;
-    text-align: center;
     white-space: nowrap;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-wide);
     color: var(--color-text-secondary);
+}
+
+.filter-drawer-label-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
 }
 
 .filter-drawer-primary-chips {
@@ -2870,6 +2894,49 @@ footer p {
 .action-rail-trigger:focus-visible {
     outline: var(--border-width-medium) solid var(--color-interactive-focus);
     outline-offset: 3px;
+}
+
+/* Archive's Filter trigger (tag.svg) and the Entry-page Contents/ToC
+   trigger (content.svg, script.js) both reuse .action-rail-trigger
+   verbatim (Rule 3a) — same shared icon class, same --icon-size-md token
+   Section 24/25's .link-inline-icon/.link-cta-icon already established
+   for "small icon beside text," not a new size. */
+.action-rail-trigger-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+/* Mobile ("Mobile-Btn" in the Figma mockups) — icon + badge only, text
+   visually hidden but still screen-reader-readable. Reproduces .sr-only's
+   own technique by value (Rule 3a) rather than toggling that class via
+   JS, since .sr-only itself has no breakpoint variant and this only ever
+   applies below 768px — the same real mobile tier .action-rail-group's
+   own top: 70% override already uses (MOBILE section, below). Padding
+   drops from the pill shape's asymmetric var(--space-3) var(--space-5)
+   to equal var(--space-3) on all sides, and min-width matches
+   min-height's existing --touch-target-minimum — both existed only to
+   accommodate/center wide text content that's no longer visible; without
+   them the button reads as a lopsided pill instead of a compact
+   icon-button square. */
+@media (max-width: 767px) {
+    .action-rail-trigger {
+        padding: var(--space-3);
+        min-width: var(--touch-target-minimum);
+        justify-content: center;
+    }
+
+    .action-rail-trigger .trigger-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
 }
 
 .action-rail-badge {
