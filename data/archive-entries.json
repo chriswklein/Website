@@ -8,7 +8,7 @@
     "tags": ["User Experience", "Software Tools", "Quality Assurance"],
     "date": "2024-03-01",
     "url": "/entries/work/star-engine.html",
-    "image": "",
+    "image": "/assets/images/entries/work/star-engine/StarEngine-banner.png",
     "imageAlt": ""
   },
   {
@@ -20,8 +20,8 @@
     "tags": ["User Experience", "Web Development"],
     "date": "2026-07-01",
     "url": "/entries/work/this-website.html",
-    "image": "",
-    "imageAlt": ""
+    "image": "/assets/images/entries/work/this-website/this-website-banner.png",
+    "imageAlt": "A dark, dot-patterned background with the stacked words \"scalable,\" \"accessible,\" \"performant,\" and a strikethrough \"basic\" replaced by \"website\""
   },
   {
     "id": "thrilling-beginnings",

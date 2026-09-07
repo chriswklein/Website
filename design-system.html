@@ -16,11 +16,15 @@
         /* ================================
            PREVIEW PAGE LAYOUT
            Dev/design reference only. Not linked from nav.html, footer.html,
-           or any live page. No script.js include on purpose — every example
-           below is static markup; interactive-looking controls (buttons,
-           links) use href="#" / are otherwise inert rather than wired to
-           real JS, since this page's job is to show real CSS classes
-           rendering with real markup, not to reproduce site behaviour.
+           or any live page's nav links, and not listed in md/REFERENCE.md's
+           public page list — unlisted by design, reached only by direct
+           URL. As of 2026-09-06 this page does load script.js and carries
+           the shared nav/footer/ToC shell every other page uses (see the
+           .ds-page-content comment below) — the "no script.js on purpose"
+           era ended once the Floating ToC was wired up here. Most controls
+           inside the 26 sections below are still inert (href="#", no real
+           behaviour) — that hasn't changed; only the page shell itself now
+           runs real JS.
         ================================ */
         .preview-main {
             padding-bottom: var(--space-20);
@@ -64,6 +68,47 @@
             color: var(--color-accent-primary-text);
             font-family: monospace;
             max-width: none;
+        }
+
+        /* ================================
+           SHELL INTEGRATION (2026-09-06) — real .standard-page-content
+           wrapper around every section
+           .standard-page-content's own rule caps at 65ch (style.css) —
+           correct for a real entry's body copy, wrong for this page's
+           deliberate full-width exception (md/DESIGN-SYSTEM.md §4.3).
+           .ds-page-content cancels that cap on the one wrapper div that
+           carries both classes, same technique .ds-content-frame already
+           uses above for Sections 9/11's full-width demos, just without
+           that class's own visual chrome (padding/background/border),
+           which a real page body shouldn't carry.
+           The :is() list below re-asserts every pre-existing label/meta
+           class's own max-width: none against .standard-page-content's
+           child-tag rules (p, ul, ol, table) — before this wrapper existed
+           these classes only ever competed against the sitewide bare `p`
+           selector (style.css), never against the higher-specificity
+           `.standard-page-content p` (etc.) selector, so without this
+           they'd silently lose that fight now that they sit inside it. */
+        .ds-page-content {
+            max-width: none;
+        }
+
+        .ds-page-content :is(.preview-section-desc, .preview-label,
+        .preview-token, .swatch-name, .swatch-hex, .type-meta-name,
+        .type-meta-detail, .type-sample, .space-meta) {
+            max-width: none;
+        }
+
+        /* Section 20's nested anatomy-diagram demo is the one place a
+           <p class="standard-page-caption"> ends up inside this page's
+           real .standard-page-content (production entries never nest one
+           the same way — their banner caption sits beside, not inside,
+           the content div). Without this, .standard-page-content p's
+           font-size/color would win over .standard-page-caption's own
+           smaller/tertiary styling on specificity alone. */
+        .ds-page-content .standard-page-caption {
+            max-width: none;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
         }
 
         /* ================================
@@ -560,11 +605,50 @@
     </style>
 </head>
 <body class="preview-main">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="nav-placeholder"></div>
+
     <main id="main-content">
         <div class="container">
 
+            <!-- Banner Image — temporary placeholder, reused from the This
+                 Website entry (no dedicated design-system banner asset
+                 exists yet). Real .standard-page-banner/.standard-page-caption
+                 classes, same as every Work/Thoughts entry — this page has
+                 no <img>, so the required placeholder string lives in the
+                 caption (the pattern's only real accessible-text carrier;
+                 the banner div itself is aria-hidden, same as production). -->
+            <div class="standard-page-banner" role="img" aria-hidden="true" style="background-image: url('/assets/images/entries/work/this-website/this-website-banner.png');"></div>
+            <p class="standard-page-caption">[PLACEHOLDER — banner image reused from This Website entry, needs real description]</p>
+
             <h1>Design System Reference</h1>
             <p class="preview-subtitle">Every atom and component currently live in style.css, rendered with real classes and (where practical) real markup — not restated values. Dev/design reference only: not linked from nav, footer, or any live page. Renamed and rebuilt from the earlier preview.html on 2026-08-18; card-variants-preview.html (a since-resolved card-layout comparison scratch file) was removed the same session — its "final candidate" layout is what Section 14 and the live .card--feature CSS both already show. Last rebuilt 2026-08-18.</p>
+
+            <!-- Real .standard-page-content wrapper around every section's
+                 heading (2026-09-06) — script.js's getTocHeadings()/
+                 initTocRail() are hardcoded to scan the first
+                 .standard-page-content in the document for h2/h3s, exactly
+                 as they do on a real Work/Thoughts entry; this wrapper is
+                 what lets the Floating ToC find this page's real 25
+                 section headings without any change to that shared,
+                 unmodified script.js logic (md/REFERENCE.md §4). The
+                 companion .ds-page-content class (see <style> above)
+                 cancels .standard-page-content's own 65ch cap on this one
+                 wrapper — this page's body stays full-width by deliberate,
+                 confirmed exception (md/DESIGN-SYSTEM.md §4.3) — without
+                 touching the cap real entries still rely on. Known,
+                 accepted side effect: Section 14's two card-title demo
+                 h3s and Section 20's nested "Overview" demo h2 are real
+                 h2/h3 elements that live inside this same wrapper (they
+                 pre-date this change and are real component-fidelity
+                 demos, not rewritten for this), so getTocHeadings()'s
+                 unmodified auto-id/scan logic picks them up as three
+                 minor extra ToC entries alongside the 25 real ones — not
+                 fixed here, since doing so would mean either editing
+                 script.js's scan behaviour (out of scope) or changing
+                 those two sections' existing demo markup (also out of
+                 scope) purely to serve this integration. -->
+            <div class="standard-page-content ds-page-content">
 
             <!-- ================================
                  SECTION 1 — COLOUR TOKENS
@@ -1423,7 +1507,43 @@ function setActiveNavLink() {
                 </div>
             </section>
 
+            <!-- ================================
+                 SECTION 26 — WIDE vs. READING BODY WIDTH
+            ================================ -->
+            <section class="preview-section" aria-labelledby="s26-heading">
+                <h2 id="s26-heading">Section 26 — Wide vs. Reading Body Width</h2>
+                <p class="preview-section-desc">Added 2026-09-06. Two body-width treatments exist side by side in this codebase now. <strong>Reading</strong> is <code>.standard-page-content</code> unmodified — <code>max-width: 65ch</code>, the convention every Work and Thoughts entry uses for body copy (md/DESIGN-SYSTEM.md §4.3, §9.3). <strong>Wide</strong> is the same class with <code>.ds-content-frame</code>'s existing max-width override applied (the exact technique Sections 9 and 11 above already use to show full-width examples) — the same override this page's own real body uses, via its own dedicated <code>.ds-page-content</code> companion class rather than the frame, since the frame's visual chrome (background/border/padding) is a demo-box treatment, not something a real page body should carry. This page (design-system.html) is the one deliberate, confirmed exception on the site that renders its real body at the Wide treatment instead of Reading — logged so a future session doesn't "correct" it back to 65ch.</p>
+
+                <p class="preview-label">Wide — no reading-width cap (this page's own real body)</p>
+                <div class="ds-content-frame">
+                    <div class="standard-page-content">
+                        <p>Line length is the first thing a reading system gets right or wrong. Sixty-five characters is the width most typography guidance converges on for sustained body copy — narrow enough that the eye finds the start of the next line without losing its place, wide enough that a paragraph doesn't collapse into a ladder of short, choppy lines. This page is the one deliberate exception to that rule: a design-system reference is scanned and compared across columns and swatches, not read start to finish like a Work entry, so its real body content stays at the full 1200px content width instead.</p>
+                    </div>
+                </div>
+
+                <p class="preview-label">Reading — 65ch cap (every Work/Thoughts entry)</p>
+                <div class="standard-page-content">
+                    <p>Line length is the first thing a reading system gets right or wrong. Sixty-five characters is the width most typography guidance converges on for sustained body copy — narrow enough that the eye finds the start of the next line without losing its place, wide enough that a paragraph doesn't collapse into a ladder of short, choppy lines. This page is the one deliberate exception to that rule: a design-system reference is scanned and compared across columns and swatches, not read start to finish like a Work entry, so its real body content stays at the full 1200px content width instead.</p>
+                </div>
+            </section>
+
+            </div>
         </div>
     </main>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="/index.html" class="tab-bar-item">
+            <span>Home</span>
+        </a>
+        <a href="/archive.html" class="tab-bar-item">
+            <span>Archive</span>
+        </a>
+        <a href="/about.html" class="tab-bar-item">
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="footer-placeholder"></div>
+    <script src="/script.js"></script>
 </body>
 </html>

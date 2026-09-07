@@ -408,6 +408,8 @@ Content centred using `.standard-page` (max-width 1200px, horizontal padding). B
 | Section headings | Full content width | Left aligned |
 | Body text | `max-width: 65ch` | Left aligned |
 
+**Exception:** `design-system.html` uses `.standard-page-content` for its real body (needed so the Floating ToC's existing heading-scan can find its section headings) but deliberately cancels the 65ch cap via a companion `.ds-page-content` class, rendering full-width up to `.standard-page`'s 1200px ceiling instead — confirmed 2026-09-06, not a bug to correct back to 65ch. See design-system.html's own Section 26 for a side-by-side of both treatments.
+
 ### 4.4 Navigation Layout
 
 **Desktop and landscape-tablet (>=1024px) — Sticky top header:**
