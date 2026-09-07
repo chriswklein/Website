@@ -1774,6 +1774,19 @@ footer p {
     margin-bottom: var(--space-2);
 }
 
+/* Unordered-list bullets only, matching the same teal token links/tags
+   already use — no existing ::marker rule anywhere else in the file to
+   conflict with (confirmed via grep). Scoped to ul specifically, not the
+   shared .standard-page-content ul, ol base rule above: ol currently has
+   no real consumer anywhere in entry content (confirmed via repo-wide
+   search), so leaving its numeral markers at the default text color is
+   flagged, not assumed correct — matching bullets to teal but leaving
+   numerals white would be a visible inconsistency the moment a real
+   ordered list is ever added. */
+.standard-page-content ul li::marker {
+    color: var(--color-accent-primary-text);
+}
+
 .standard-page-content li:last-child {
     margin-bottom: 0;
 }
