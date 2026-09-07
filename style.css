@@ -2563,29 +2563,33 @@ footer p {
    non-visible overflow), so rings need no special-casing. flex: 1 (no
    max-height) means it grows rather than clips if content needs more room.
 
-   min-height: 109px is a measured, not arbitrary, value — 3 rows of
-   .tag-chip content (31px: --space-1 padding × 2 + --font-size-sm ×
-   --line-height-normal + border-width-thin × 2) plus 2 row gaps
-   (--space-2 = 8px each). This was verified at 6 chips per page (the
-   pre-2026-08-23 SECONDARY_PAGE_SIZE) using the site's actual longest tag
-   labels (Quality Assurance, Game Development, User Experience, Web
-   Development, Software Tools) — every combination tested wrapped to at
-   most 3 rows at 390px (DESIGN-SYSTEM.md's mobile reference width). Not
-   re-verified against a 12-per-page pool or today's real 8-tag page,
-   which may need more than 3 rows — flex: 1 lets the box grow to fit
-   rather than clip if so, but the "identical height across pages"
-   guarantee this min-height exists for is unconfirmed above 6 simultaneous
-   chips. Needs a real render check, not assumed. */
+   --drawer-secondary-height (2026-09-07) replaced a hardcoded min-height:
+   109px here — a one-time manual measurement (3 rows of .tag-chip content
+   against a specific tag set, at a specific breakpoint, for a since-
+   changed SECONDARY_PAGE_SIZE) that had already drifted stale once
+   (never re-verified for 12-per-page) and would drift again the moment
+   the real tag pool changed size, as it did 2026-09-07 when the
+   "published" flag hid two entries down to 4 real secondary tags — a
+   3-row reservation for a pool that now only ever wraps to 1. It's set by
+   updateDrawerSecondaryMetrics() (script.js) via real off-screen DOM
+   measurement of the tallest secondary-tag page across every reachable
+   primary-filter state (All/Work/Thoughts), recomputed on drawer open,
+   primary-filter change, and whenever the entries array changes — so it
+   can never go stale the way a hardcoded value did. No fallback value
+   here deliberately: JS sets this before the drawer can ever actually be
+   seen open (see script.js), so an unset var() simply resolves to this
+   property's own initial value (auto) for the imperceptible instant
+   before that first run. */
 .filter-drawer-secondary-page {
     flex: 1;
-    min-height: 109px;
+    min-height: var(--drawer-secondary-height);
 }
 
 /* Active-secondary-tag collapsed state — see .filter-drawer--tags-active
    below. Hidden outright (display: none, not just emptied) rather than
    left as a zero-content flex item, so it stops competing for flex-grow
    space against #filter-drawer-active-chips, which takes over the same
-   109px reserved slot in this state. */
+   --drawer-secondary-height reserved slot in this state. */
 .filter-drawer--tags-active .filter-drawer-secondary-page {
     display: none;
 }
@@ -2605,23 +2609,24 @@ footer p {
     flex: 1;
 }
 
-/* Reproduces .filter-drawer-secondary-page's exact 109px reserved
-   footprint, so total drawer height is identical whether that slot is
-   filled by the tag grid or by this row (confirmed via measurement;
-   required so entering/exiting this state causes zero visual shift in
-   the bottom sheet's fixed-height layout). Unlike the grid (naturally
-   capped at 6 tags per page), simultaneously active tags aren't bounded
-   by pagination, so this can't rely on content happening to fit —
-   overflow-y: auto caps it hard at 109px regardless of how many tags are
-   active, same idea as .filter-drawer-scroll's own internal-scroll
-   pattern elsewhere in this component. scrollbar-gutter: stable keeps a
-   scrollbar appearing (many tags) from shifting chip layout width versus
-   a scrollbar-free render (few tags). Applies at every breakpoint — the
-   drawer is the same fixed-height bottom sheet everywhere now, not just
-   mobile/tablet. */
+/* Reproduces .filter-drawer-secondary-page's exact
+   --drawer-secondary-height reserved footprint (see that rule above), so
+   total drawer height is identical whether that slot is filled by the
+   tag grid or by this row (confirmed via measurement; required so
+   entering/exiting this state causes zero visual shift in the bottom
+   sheet's fixed-height layout). Unlike the grid (naturally capped at
+   SECONDARY_PAGE_SIZE tags per page), simultaneously active tags aren't
+   bounded by pagination, so this can't rely on content happening to fit —
+   overflow-y: auto caps it hard at this height regardless of how many
+   tags are active, same idea as .filter-drawer-scroll's own
+   internal-scroll pattern elsewhere in this component. scrollbar-gutter:
+   stable keeps a scrollbar appearing (many tags) from shifting chip
+   layout width versus a scrollbar-free render (few tags). Applies at
+   every breakpoint — the drawer is the same fixed-height bottom sheet
+   everywhere now, not just mobile/tablet. */
 .filter-drawer--tags-active #filter-drawer-active-chips {
-    min-height: 109px;
-    max-height: 109px;
+    min-height: var(--drawer-secondary-height);
+    max-height: var(--drawer-secondary-height);
     overflow-y: auto;
     scrollbar-gutter: stable;
 }
@@ -2652,6 +2657,20 @@ footer p {
    aria-hidden/tabindex handling needed, unlike opacity alone. */
 .filter-drawer-page-nav[hidden] {
     visibility: hidden;
+}
+
+/* Real display: none removal (2026-09-07) — distinct from the [hidden]
+   rule above, which intentionally keeps this row's height reserved for
+   whichever primary state the user is CURRENTLY on, because a different
+   reachable state might still need pagination. This class only ever gets
+   set when updateDrawerSecondaryMetrics() (script.js) finds that NO
+   reachable state (All/Work/Thoughts) needs more than one page — restores
+   the original pre-pagination behaviour (no reserved row at all) for
+   exactly that case, e.g. today's real 4-tag pool. The two rules don't
+   conflict: display and visibility are independent properties, and
+   display: none wins the box entirely regardless of visibility's value. */
+.filter-drawer--no-pagination .filter-drawer-page-nav {
+    display: none;
 }
 
 /* flex-shrink: 0 (not flex: 1) — Previous/Next stay sized to their own

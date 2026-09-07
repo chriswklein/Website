@@ -1065,6 +1065,21 @@ function initArchive(filterDrawer) {
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // Shared by buildSecondaryChips() and the drawer height/pagination
+    // measurement below (updateDrawerSecondaryMetrics()) — same
+    // dedupe-by-slug + alphabetical sort in one place, so the measured
+    // chip set can never drift from what actually renders.
+    function getUniqueSortedTags(entries) {
+        const seen = new Set();
+        const tags = [];
+        entries.forEach(e => (e.tags || []).forEach(t => {
+            const slug = slugify(t);
+            if (!seen.has(slug)) { seen.add(slug); tags.push({ label: t, slug }); }
+        }));
+        tags.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+        return tags;
+    }
+
     // Build secondary tag chips into the Filter Drawer — the one shared
     // pool of secondary tags at every breakpoint now, paginated 6 per page
     // (see the pagination block in render() and the Previous/Next/dots
@@ -1072,14 +1087,7 @@ function initArchive(filterDrawer) {
     function buildSecondaryChips(entries) {
         if (!drawerChipsEl) return;
 
-        const seen = new Set();
-        const tags = [];
-        entries.forEach(e => (e.tags || []).forEach(t => {
-            const slug = slugify(t);
-            if (!seen.has(slug)) { seen.add(slug); tags.push({ label: t, slug }); }
-        }));
-
-        tags.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+        const tags = getUniqueSortedTags(entries);
 
         drawerChipsEl.innerHTML = '';
         tags.forEach(({ label, slug }) => {
@@ -1104,6 +1112,117 @@ function initArchive(filterDrawer) {
             });
             drawerChipsEl.appendChild(btn);
         });
+    }
+
+    // Splits an already-sorted tag list into SECONDARY_PAGE_SIZE-sized
+    // pages — same chunking getDrawerSecondaryPageCount() assumes for
+    // whichever primary state is currently active, generalised here so
+    // updateDrawerSecondaryMetrics() below can walk every reachable state.
+    // Always returns at least one (possibly empty) page, matching
+    // getDrawerSecondaryPageCount()'s own Math.max(1, ...) floor.
+    function paginateTags(tags) {
+        const pages = [];
+        for (let i = 0; i < tags.length; i += SECONDARY_PAGE_SIZE) {
+            pages.push(tags.slice(i, i + SECONDARY_PAGE_SIZE));
+        }
+        return pages.length ? pages : [[]];
+    }
+
+    // Builds one off-screen replica of the real drawer's secondary-tag
+    // grid, measures its real rendered height, then removes it. Reuses
+    // .filter-drawer/.filter-drawer-body/.filter-drawer-secondary-page's
+    // real classes (not a copy of their rules) so the responsive width
+    // chain (full-bleed mobile, max-content-capped + centred >=768px —
+    // see .filter-drawer in style.css) is pixel-identical to the live
+    // drawer at whatever viewport this runs at. Can't reuse
+    // #filter-drawer-chips itself (id selector, and this is a detached
+    // scratch node — a duplicate id risks colliding with the real one),
+    // so its handful of layout properties are reproduced by value
+    // instead. visibility: hidden, not display: none or [hidden] — the
+    // real drawer's own [hidden] is display: none, under which no
+    // descendant can wrap text or report a non-zero height at all, which
+    // is exactly why this measures a separate off-screen node rather than
+    // the live (possibly currently-closed) drawer. Replaces the original
+    // 109px value's one-time manual derivation (see the removed comment
+    // this replaced in style.css) with the same rigor — real .tag-chip
+    // markup, real longest-label text for whichever state is being
+    // measured — but automated and re-run live instead of hand-measured
+    // once and hardcoded.
+    function measureTagPageHeight(tagPage) {
+        if (!tagPage.length) return 0;
+
+        const scratch = document.createElement('div');
+        scratch.className = 'filter-drawer';
+        scratch.style.cssText = 'visibility: hidden; position: fixed; top: -9999px; left: 0; transform: none; transition: none; max-height: none; pointer-events: none;';
+
+        const body = document.createElement('div');
+        body.className = 'filter-drawer-body';
+
+        const page = document.createElement('div');
+        page.className = 'filter-drawer-secondary-page';
+
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display: flex; flex-wrap: wrap; gap: var(--space-2); align-content: flex-start;';
+
+        tagPage.forEach(({ label }) => {
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip';
+            btn.type = 'button';
+            btn.textContent = label;
+            const countSpan = document.createElement('span');
+            countSpan.className = 'chip-count';
+            btn.appendChild(countSpan);
+            grid.appendChild(btn);
+        });
+
+        page.appendChild(grid);
+        body.appendChild(page);
+        scratch.appendChild(body);
+        document.body.appendChild(scratch);
+
+        const height = grid.offsetHeight;
+        scratch.remove();
+        return height;
+    }
+
+    // Computes, across every reachable primary-filter state (All, Work,
+    // Thoughts — not just whichever is active right now), the tallest
+    // single secondary-tag page and the most pages any one state would
+    // need. A user can switch primary filters without closing the drawer,
+    // so the reserved height/pagination-nav decision must already account
+    // for whichever state they land on, not be re-derived only when they
+    // arrive there. Sets --drawer-secondary-height (consumed by
+    // .filter-drawer-secondary-page and
+    // .filter-drawer--tags-active #filter-drawer-active-chips in
+    // style.css, replacing their old static 109px) and toggles
+    // .filter-drawer--no-pagination (real display: none removal of
+    // .filter-drawer-page-nav when no reachable state ever needs more
+    // than one page — see style.css — vs. the existing
+    // .filter-drawer-page-nav[hidden] → visibility: hidden pattern, left
+    // untouched, for when some state does).
+    //
+    // Called from render() (already runs on primary-filter change and on
+    // the entries array first loading — Change 4's other two triggers)
+    // and from the drawer-open MutationObserver below — cheap enough (a
+    // handful of off-screen chip buttons per call) to just always re-run
+    // rather than gate precisely to those exact moments.
+    function updateDrawerSecondaryMetrics() {
+        if (!filterDrawerEl || !drawerChipsEl) return;
+
+        let maxHeight = 0;
+        let maxPageCount = 1;
+
+        [null, 'work', 'thoughts'].forEach(type => {
+            const stateEntries = type ? allEntries.filter(e => e.type === type) : allEntries;
+            const pages = paginateTags(getUniqueSortedTags(stateEntries));
+            maxPageCount = Math.max(maxPageCount, pages.length);
+            pages.forEach(page => {
+                maxHeight = Math.max(maxHeight, measureTagPageHeight(page));
+            });
+        });
+
+        filterDrawerEl.style.setProperty('--drawer-secondary-height', `${maxHeight}px`);
+        filterDrawerEl.classList.toggle('filter-drawer--no-pagination', maxPageCount <= 1);
     }
 
     // Filter + sort the full entry list
@@ -1424,6 +1543,15 @@ function initArchive(filterDrawer) {
             btn.classList.toggle('tag-chip--zero-count', count === 0);
         });
 
+        // Recomputes the drawer's reserved secondary-tag height and the
+        // page-nav display: none decision across every reachable primary
+        // state — covers this render()'s own trigger (primary-filter
+        // change) and the entries-array-just-loaded trigger (the fetch
+        // callback below also calls render()); see
+        // updateDrawerSecondaryMetrics() above for the third trigger
+        // (drawer open).
+        updateDrawerSecondaryMetrics();
+
         // Filter Drawer secondary tags — paginated 6 per page (already
         // alphabetically sorted; zero-count tags already excluded above) —
         // same drawer, same pagination, at every breakpoint now.
@@ -1587,6 +1715,24 @@ function initArchive(filterDrawer) {
 
     // Referenced by render()'s pagination block above (.filter-drawer--tags-active toggle).
     const filterDrawerEl = document.getElementById('filter-drawer');
+
+    // Drawer-open trigger for updateDrawerSecondaryMetrics() (Change 4's
+    // third trigger, alongside render()'s own two above). Not a change to
+    // openDrawer()/closeDrawer() themselves (initFilterDrawer(), a
+    // separate closure with no access to allEntries/drawerChipsEl) —
+    // observing the [hidden] attribute they already toggle is decoupled
+    // from that function entirely. Needed despite updateDrawerSecondaryMetrics()
+    // measuring via its own off-screen scratch node (unaffected by the
+    // real drawer's own hidden state): simply opening the drawer with no
+    // other state change (e.g. the viewport was resized while it was
+    // closed, which never calls render() on its own) would otherwise keep
+    // showing whichever measurement was last taken instead of one current
+    // to today's viewport.
+    if (filterDrawerEl) {
+        new MutationObserver(() => {
+            if (!filterDrawerEl.hidden) updateDrawerSecondaryMetrics();
+        }).observe(filterDrawerEl, { attributes: true, attributeFilter: ['hidden'] });
+    }
 
     function doReset() {
         activeType = null;
