@@ -3251,7 +3251,7 @@ footer p {
 .archive-results {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-10);
     padding: var(--space-6) 0;
 }
 
