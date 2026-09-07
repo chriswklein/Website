@@ -1197,6 +1197,17 @@ pre code {
     outline-offset: 3px;
 }
 
+/* [hidden]'s own UA-stylesheet display: none loses to this class's
+   display: flex at equal specificity — same reason
+   .filter-drawer-page-nav[hidden]/.action-rail-clear[hidden] need this
+   explicit override elsewhere in this file. Scoped to [hidden] only, so
+   real Contact/Resume/Email/LinkedIn .contact-icon-btn instances
+   (never given the attribute) are unaffected — only Home's two
+   decorative bug/wrench icons currently carry it. */
+.contact-icon-btn[hidden] {
+    display: none;
+}
+
 /* ================================
    LAYOUT — CONTAINER (utility)
 ================================ */
