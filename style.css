@@ -786,6 +786,15 @@ pre code {
     background-size: cover;
     background-position: center;
     background-color: var(--card-image-bg);
+    /* .card-image sits flush against .card's own top corners, so it needs
+       its own matching radius there — .card's overflow: clip +
+       overflow-clip-margin (see .card's comment) doesn't reliably clip
+       this flush-edge child to the rounded corner once a clip margin is
+       in play, leaving the image's square corners visible on top of the
+       border on hover. Bottom corners don't need this: .card-image never
+       reaches them. */
+    border-top-left-radius: var(--card-radius);
+    border-top-right-radius: var(--card-radius);
 }
 
 .card-content {
