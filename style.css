@@ -1082,13 +1082,24 @@ pre code {
    token but was reading too generous here). Mobile gets its own
    min-height: 100svh override below (see MOBILE section) so the hero
    is the sole first-screen block there. */
+/* Horizontal padding (was 0): matches .page-grid/.container's own
+   var(--space-8) padding — without it, .home-hero-title/-subtitle's new
+   max-width: var(--max-content) (below) only actually binds above 1264px
+   (1200px content + 2x32px padding); at any narrower width down to
+   mobile's own breakpoint, max-width alone doesn't reach the cap, so the
+   title/subtitle would still render up to 64px wider than
+   #featured-work-heading — confirmed via direct measurement at 1024px
+   before this was added. Mobile's own padding override below
+   (var(--space-4), matching page-grid's own mobile padding) already
+   replaces this value entirely at that breakpoint, so this is additive
+   only at tablet/desktop. */
 .home-hero {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: var(--space-6);
-    padding: var(--space-24) 0;
+    padding: var(--space-24) var(--space-8);
 }
 
 .home-hero-icons {
@@ -1137,15 +1148,39 @@ pre code {
    CSS of its own, so these icons now render exactly like a real
    Contact/Resume/Email/LinkedIn button. */
 
+/* max-width: this title had no width constraint at all, so it rendered
+   as wide as its own text demanded — confirmed via direct measurement
+   to reach 1592px, ~196px past the actual content column (where
+   #featured-work-heading and the Featured Work cards below it sit).
+   That real content column isn't .page-grid's own 1200px box — it's
+   1200px minus .page-grid's own --space-8 padding on each side (the
+   same padding .home-hero now carries too, above), so matching it here
+   means subtracting that same padding, not just capping at
+   --max-content directly (confirmed by direct measurement: capping at
+   the full --max-content alone left this ~32px wider than
+   #featured-work-heading at every width past the mobile breakpoint,
+   where .home-hero's own padding switches to --space-4 and this
+   max-width stops binding entirely, well under any viewport it could
+   matter at). Centering comes from .home-hero's own
+   align-items: center, so no margin: auto needed here. */
 .home-hero-title {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+    max-width: calc(var(--max-content) - (var(--space-8) * 2));
 }
 
+/* max-width: was previously constrained only incidentally, by the
+   sitewide p { max-width: 65ch } rule (~892px at this font-size) —
+   narrower than the real content column already, so not the overflow
+   the title had, but still not tied to the site's actual content-width
+   standard the way this asks for. Same calc as .home-hero-title, above,
+   and for the same reason — matches #featured-work-heading's real
+   column, not .page-grid's own wider outer box. */
 .home-hero-subtitle {
     font-size: var(--font-size-xl);
     line-height: var(--line-height-relaxed);
+    max-width: calc(var(--max-content) - (var(--space-8) * 2));
 }
 
 .home-hero-scroll {
@@ -3489,6 +3524,18 @@ footer p {
        assumed. */
     .archive-results {
         padding-top: 76px;
+    }
+
+    /* Matches .page-grid's own tablet-only padding reduction (--space-8 ->
+       --space-6, see .page-grid's max-width: 1023px rule) — without this,
+       .home-hero-title/-subtitle's alignment to #featured-work-heading
+       (style.css, home-hero-title's own comment) holds everywhere except
+       this exact 768-1023px range, where .page-grid narrows its own
+       padding but .home-hero's base --space-8 doesn't follow — confirmed
+       via direct measurement at 768px (an 8px mismatch, exactly the
+       --space-8/--space-6 delta) before this was added. */
+    .home-hero {
+        padding: var(--space-24) var(--space-6);
     }
 }
 
