@@ -307,6 +307,26 @@ function initTocRail() {
 
     const main = document.getElementById('main-content');
 
+    // A keyboard user tabbing from the top of the page otherwise has to
+    // pass through every heading link in the rail/panel (both always
+    // built here, just CSS-hidden depending on breakpoint — see the
+    // comment on this function) before ever reaching real page content,
+    // since both surfaces are inserted right before <main> (below).
+    // This link — reusing the sitewide .skip-link pattern verbatim
+    // (style.css, "ACCESSIBILITY UTILITIES"), not a new one — jumps past
+    // that list straight to headings[0]: the first heading the ToC itself
+    // links to, not the page's own h1 title, since bypassing "the ToC"
+    // means landing in the body content it indexes. tabindex="-1" makes
+    // that one heading a valid fragment-focus target without adding it
+    // to the normal Tab sequence — the ToC's real heading rows deliberately
+    // stay non-tab-stops, only their <a> rows are (see anatomy above);
+    // this doesn't change that.
+    headings[0].setAttribute('tabindex', '-1');
+    const tocSkipLink = document.createElement('a');
+    tocSkipLink.className = 'skip-link';
+    tocSkipLink.href = `#${headings[0].id}`;
+    tocSkipLink.textContent = 'Skip Table of Contents';
+
     // --- Desktop rail (>=1440px) ---------------------------------------
     const rail = document.createElement('nav');
     rail.className = 'toc-rail';
@@ -344,6 +364,7 @@ function initTocRail() {
     const railLinks = buildTocLinks(headings, railList);
     rail.append(railLabel, railList);
     document.body.insertBefore(rail, main);
+    document.body.insertBefore(tocSkipLink, rail);
 
     // Anchors the rail's fixed top offset to .standard-page-banner's real
     // bottom edge, not the page's fixed chrome. The banner's rendered

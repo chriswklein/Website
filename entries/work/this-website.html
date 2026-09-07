@@ -182,10 +182,8 @@
                     <li>Standard Page Template - for case studies</li>
                 </ul>
 
-                </p>I decided on accessible Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
-
-                <!-- image -->
-                
+                </p>I decided on Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
+             
                 </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or even removing a feature after testing.</p>
 
                 </p>As a result of just having the basics - the site has taken longer than I wanted. I would see and reproduce a bug, and those bugs might have user experience issues that needed new solutions designed and tested. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
@@ -197,7 +195,7 @@
                 </p>The Archive is made of multiple key components:</p>
 
                 <!-- image -->
-
+                
                 <ul>
                     <li>The Database</li>
                     <li>Entries and their Tags</li>
@@ -220,41 +218,45 @@
                 </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
 
                 <!-- image -->
+                <img src="/assets/images/entries/work/this-website/search-intentional-design.png" alt="Text" width="800" height="450" loading="lazy">
 
                 </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
 
-                <!-- image -->
+                
 
                 </p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
 
-                <!-- image -->
+                
 
                 </p>As I picked out a good cabbage in the vegitable isle, it's sprinkler spritzed my face with cold water, and barely managed to wash away the embarressment I felt for forgetting something I see every single day.</p>  
                 
                 </p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
 
                 </p>As I tested, I saw the major issues I knew would be present.</p>
-                                
-                </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
+
 
                 <!-- image -->
+                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.png" alt="Text" width="800" height="450" loading="lazy">
+                                
+                </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
                 
                 </p>Issue #2: Search fields Auto-zoom when active. Not only was the virtual keyboard resulting in a loss of space, a further loss of space was the resulting in a Zoom in on the Archives Body. If a user searched, the entries would be illegable.</p> 
 
-                <!-- image -->
                 
                 </p>While I fought for a day to redesign variants of the current implementations - I ultimatley made the decision to feature flag search until I find a cleaner solution and I had other issues to solve, features to implement, and bugs to fix. I went for another walk later that day to let it all go and trust myself enough to figure it out another day.</p>
 
-                <!-- image -->
+                
 
                 <h3 id="filters">Filters</h3>
                 </p>After removing the field, I was able to retain the structure and instead of a search field, I replaced it with text indicating the purpose of the drawer.</p>
 
-                <!-- image -->
                 
                 </p>As I anticipated tag growth, I made sure the drawer would scale. Pagination was built into the drawer to ensure the user could parse the potential plethora of tags. If the user wants to Filter by a specific Primary Tag - the applicable entries with associated secondary tags will display, and the unrelated tags will be hidden.</p>
 
                 </p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
+
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/filter-implementation.png" alt="Text" width="800" height="450" loading="lazy">
 
 
                 <h2 id="contents">Contents</h2>

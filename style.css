@@ -751,7 +751,23 @@ pre code {
     background-color: var(--card-bg);
     border: var(--border-width-thin) solid var(--card-border);
     border-radius: var(--card-radius);
-    overflow: hidden;
+    /* overflow: clip (not hidden) + overflow-clip-margin: this is what
+       clips .card-image to the card's rounded corners, but .link-cta's
+       own box (its touch-target padding/negative-margin pair, below)
+       already sits flush against — and, vertically, slightly past — this
+       boundary, so the sitewide :focus-visible ring's default +5px
+       (outline + offset) has no room and gets clipped. overflow-clip-margin
+       pushes the clip boundary itself outward by --space-3 without
+       changing any box's geometry — .card-content, .card-image, and
+       .card-block-link (inset: 0, positioned against this same padding
+       edge) all stay pixel-identical to before. Kept as an outward ring
+       everywhere per Chris's decision — no per-component inward-offset
+       exceptions — the padding-based alternative was rejected here since
+       adding real padding to .card would also inset .card-image and
+       shrink .card-block-link's full-card click coverage, both of which
+       overflow-clip-margin avoids entirely. */
+    overflow: clip;
+    overflow-clip-margin: var(--space-3);
     position: relative;
     transition: border-color var(--duration-base) var(--ease-out);
 }
@@ -865,13 +881,13 @@ pre code {
     border-radius: var(--card-radius);
 }
 
-/* .card has overflow: hidden, which would clip a standard positive-offset
-   focus ring on a link that spans the full card — inset offset keeps the
-   ring visible within that clipped boundary. */
-.card-block-link:focus-visible {
-    outline: var(--border-width-medium) solid var(--color-interactive-focus);
-    outline-offset: -3px;
-}
+/* No :focus-visible override here (there used to be one, with an inward
+   offset to dodge .card's clip boundary — see .card's own
+   overflow-clip-margin comment above for that fix, now applied at the
+   root cause instead): .card-block-link is aria-hidden="true" and
+   tabindex="-1" (above), so it can never actually receive focus and this
+   selector could never match. Removed as genuinely dead code, not left
+   in place — confirmed unreachable, not merely unused. */
 
 /* ================================
    INLINE LINK
@@ -1855,6 +1871,23 @@ footer p {
    component's own border colour, and the sitewide "emphasized border"
    token per DESIGN-SYSTEM.md §1.4); track reuses --color-background-subtle
    (the sitewide "recessed surface" token, §1.2) — no new colour values. */
+/* padding (was 0): every row is width: 100% of this list, so with zero
+   padding each row's own box sits flush against this list's edges — the
+   list itself (not .toc-rail, its padded parent) is what actually scrolls
+   and clips (overflow-y: auto, below), so a row's default outward
+   :focus-visible ring (+5px: outline + offset) had nowhere to render and
+   got clipped. This isn't only the first/last row: any row can land
+   flush against this box's top or bottom edge once the list is scrolled,
+   and (confirmed by direct measurement) every row shares the same
+   left/right edges regardless of scroll position — so padding on all
+   four sides, not just top/bottom, is what actually keeps the ring fully
+   visible on every row at every scroll position. Kept as the sitewide
+   outward ring per Chris's decision — no inward-offset exceptions — so
+   the clearance has to live here instead. This does shrink the list's
+   own usable scroll height slightly inside .toc-rail's unchanged
+   max-height cap; see the Floating ToC spec revision notes for the
+   measured effect on the longest live entry's clipped-next-item
+   affordance. */
 .toc-rail-list {
     display: flex;
     flex-direction: column;
@@ -1862,7 +1895,7 @@ footer p {
     min-height: 0;
     gap: var(--space-2);
     margin: 0;
-    padding: 0;
+    padding: var(--space-2);
     list-style: none;
     overflow-y: auto;
     scrollbar-width: thin;
