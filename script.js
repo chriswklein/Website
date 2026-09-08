@@ -2070,6 +2070,15 @@ function initImageViewer() {
         ].filter(Boolean);
     }
 
+    // "…/foo.png" or "…/foo.webp" -> "…/foo-full.webp" — the -full variant
+    // is always .webp regardless of the thumbnail's own extension (see
+    // scripts/build-images.js), so this replaces whatever extension is
+    // there rather than assuming .webp on both sides.
+    function deriveFullSrc(thumbSrc) {
+        const dot = thumbSrc.lastIndexOf('.');
+        return dot === -1 ? thumbSrc : `${thumbSrc.slice(0, dot)}-full.webp`;
+    }
+
     function applyTransform() {
         enlargedImg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
     }
@@ -2143,8 +2152,21 @@ function initImageViewer() {
     function showImageAt(index) {
         currentIndex = index;
         const img = images[currentIndex];
+        const thumbSrc = img.src;
 
-        enlargedImg.src = img.src;
+        // Requests the high-res -full.webp variant (scripts/build-images.js)
+        // derived from the thumbnail's own src — no per-<img> data attribute
+        // to add/maintain. onerror falls back to the thumbnail automatically
+        // for any image that doesn't have a -full variant yet, so nothing
+        // breaks for images not yet processed by that script. Set before
+        // assigning the new src (not after) so a same-tick failure — e.g. a
+        // request the browser resolves as a network error before yielding
+        // back to this function — still has a handler in place to catch it.
+        enlargedImg.onerror = () => {
+            enlargedImg.onerror = null; // one retry only — no loop if the thumbnail itself ever fails to load
+            enlargedImg.src = thumbSrc;
+        };
+        enlargedImg.src = deriveFullSrc(thumbSrc);
         enlargedImg.alt = img.alt;
         // Accessible name reuses the image's own real alt text — no new
         // invented copy. Empty-alt fallback is defensive only: every real
