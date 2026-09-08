@@ -1794,6 +1794,18 @@ footer p {
     margin-bottom: var(--space-6);
 }
 
+/* Thought entries drop the banner+caption (2026-09-08) — without it,
+   .breadcrumb's own margin-bottom (--space-6) alone left the title in a
+   cramped jump straight off the breadcrumb row. Adds the same --space-8
+   this file already uses as its standard section-break gap (hr, dot
+   dividers, .standard-page-details) so a bannerless entry keeps
+   comparable breathing room above the title. Scoped to
+   .standard-page--no-banner so Work entries (still bannered) are
+   unaffected. */
+.standard-page--no-banner .standard-page-title {
+    margin-top: var(--space-8);
+}
+
 /* ================================
    STANDARD PAGE — DETAILS CARD
    Left-aligned label/value rows: Employer, Role, Timeline, Tools on Work
@@ -1821,6 +1833,18 @@ footer p {
     display: flex;
     align-items: center;
     gap: var(--space-4);
+}
+
+/* [hidden]'s own UA-stylesheet display: none loses to this class's
+   display: flex at equal specificity — same reason .contact-icon-btn[hidden]/
+   .filter-drawer-page-nav[hidden]/.action-rail-clear[hidden] need this
+   explicit override elsewhere in this file. Scoped to [hidden] only, so a
+   visible Published row (never given the attribute) is unaffected — only
+   Thought entries' Updated row currently carries it, hidden by default
+   per Chris's request (2026-09-08); remove the `hidden` attribute from
+   that row's markup on a specific entry to show it again. */
+.standard-page-details-row[hidden] {
+    display: none;
 }
 
 /* font-size-sm + font-weight-medium — the same "card body copy" scale

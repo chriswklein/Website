@@ -18,7 +18,7 @@
     <div id="nav-placeholder"></div>
 
     <main id="main-content">
-        <div class="standard-page">
+        <div class="standard-page standard-page--no-banner">
 
             <!-- Breadcrumb -->
             <nav aria-label="Breadcrumb" class="breadcrumb">
@@ -32,10 +32,6 @@
                     </li>
                 </ol>
             </nav>
-
-            <!-- Banner Image -->
-            <div class="standard-page-banner" role="img" aria-hidden="true"></div>
-            <p class="standard-page-caption">Caption describing the banner image.</p>
 
             <!-- Title -->
             <h1 class="standard-page-title">{Title}</h1>
@@ -51,7 +47,7 @@
                     <span class="standard-page-details-label">Published</span>
                     <span class="standard-page-details-value"><time datetime="{YYYY-MM-DD}">{Month DD, YYYY}</time></span>
                 </div>
-                <div class="standard-page-details-row">
+                <div class="standard-page-details-row" hidden>
                     <span class="standard-page-details-label">Updated</span>
                     <span class="standard-page-details-value"><time datetime="{YYYY-MM-DD}">{Month DD, YYYY}</time></span>
                 </div>

@@ -24,14 +24,15 @@
     "imageAlt": "A dark, dot-patterned background with the stacked words \"scalable,\" \"accessible,\" \"performant,\" and a strikethrough \"basic\" replaced by \"website\""
   },
   {
-    "id": "thrilling-beginnings",
+    "id": "read-me",
     "type": "thoughts",
     "author": "Christopher Klein",
-    "title": "Code and Conduct",
+    "title": "Read Me",
+    "blockLinkLabel": "Read Me",
     "excerpt": "A quick welcome and a brief overview of my ethics in the new frontier of software development with LLM's.",
     "tags": ["Web Development"],
     "date": "2026-06-20",
-    "url": "/entries/thoughts/code-and-conduct.html",
+    "url": "/entries/thoughts/read-me.html",
     "image": "/assets/images/entries/thoughts/thrilling-beginnings/thrilling-banner.png",
     "imageAlt": "A small collection of everyday objects arranged on a wooden surface — a brass bolt, a pocket notebook, a stylus, and a desk timer"
   },
