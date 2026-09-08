@@ -1574,6 +1574,178 @@ footer p {
     margin-bottom: 0;
 }
 
+/* Click-to-zoom trigger — wraps each .standard-page-content img (see
+   initImageViewer(), script.js). A real <button>, not a click handler on
+   the img itself, so it's keyboard-focusable and reachable by Tab.
+   margin-bottom moved here from .standard-page-content img (zeroed below,
+   same technique .standard-page-content figure img above already uses to
+   move that margin onto the figure instead) so wrapping in a button
+   doesn't change the visible gap between images. */
+.image-zoom-trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    /* transparent, not 0 — reserves the same border-box space the
+       hover/focus-visible border below fills, so its appearance doesn't
+       shift the image by the border's own width. */
+    border: var(--border-width-thin) solid transparent;
+    border-radius: var(--border-radius-md);
+    background: none;
+    margin-bottom: var(--space-6);
+    cursor: zoom-in;
+    text-align: left;
+    transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+/* Same dark teal token already used for this exact kind of hover/focus
+   border elsewhere (code blocks' --color-code-border, tooltips'
+   --color-tooltip-border, .tag/.tag-chip hover) — not a new colour
+   relationship. Both selectors together (not hover alone, as .tag does
+   it) per spec: keyboard users get the same visible affordance mouse
+   users get, not just the generic focus outline. */
+.image-zoom-trigger:hover,
+.image-zoom-trigger:focus-visible {
+    border-color: var(--color-accent-primary);
+}
+
+.image-zoom-trigger img {
+    margin-bottom: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+    .image-zoom-trigger:hover img {
+        opacity: 0.9;
+    }
+}
+
+/* ================================
+   STANDARD PAGE — IMAGE VIEWER (click-to-zoom)
+   Phase 1: static enlarged image only, no pan/zoom/gestures/navigation.
+   Mechanics (inert background, dialog semantics, trapFocus()) are the
+   same accessible-modal pattern as the Filter Drawer (2c) and Table of
+   Contents Panel above — only this section's own trigger/content markup
+   is new. See initImageViewer(), script.js.
+================================ */
+
+/* Scrim — unlike .archive-scrim/.toc-panel-scrim (which stay invisible;
+   their background content remains relevant while open), this one
+   actually dims: the viewer's whole purpose is focusing attention on one
+   enlarged image, not coexisting with visible background content. */
+.image-viewer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 269;
+    background-color: var(--color-background-base);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.image-viewer-scrim--open {
+    /* 0.85 — Chris's explicit call, consistency over the dimming
+       trade-off. Note this doesn't create identical rendered behaviour
+       across all three dialogs: confirmed via direct inspection that
+       .archive-scrim/.toc-panel-scrim's own --open states stay at
+       opacity: 0 (invisible hit-area only — see those rules), not 0.85,
+       so this is a one-off number match to this dialog alone, not a
+       shared token/class reused from them. At this lower value, bright
+       body content behind the scrim (e.g. the Table of Contents rail's
+       own colourful thumbnail cards) visibly bleeds through — confirmed
+       via direct testing, a known and accepted trade-off, not a bug. */
+    opacity: 0.85;
+    pointer-events: auto;
+}
+
+.image-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 270;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.image-viewer--open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.image-viewer-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: var(--border-radius-md);
+    /* Phase 2: transform: translate()/scale() is how zoom/pan are applied
+       (script.js). touch-action: none stops the browser's own native
+       pinch-zoom/scroll from intercepting touch gestures before they reach
+       the pointer event handlers that implement pinch-to-zoom/drag-pan. */
+    touch-action: none;
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+/* Suppresses the transform transition during a live drag/pinch (toggled in
+   script.js) — the image should track the pointer 1:1 with no lag; the
+   transition is only wanted for discrete, button/keyboard-driven changes. */
+.image-viewer-image--interacting {
+    transition: none;
+}
+
+.image-viewer-image--zoomed {
+    cursor: grab;
+}
+
+.image-viewer-image--zoomed.image-viewer-image--interacting {
+    cursor: grabbing;
+}
+
+/* Close button — same chrome as the Filter Drawer's own Clear button
+   (.btn .action-rail-clear: touch-target-sized square, .tag-chip-x "×"
+   glyph), just pinned to the viewer's own top-right corner instead of the
+   floating action rail's position. */
+.image-viewer-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+}
+
+/* Prev/Next — same .btn.action-rail-clear chrome as Close, vertically
+   centred at the same corner inset (var(--space-4)) Close uses, just on
+   the left/right edges instead of a corner. Only created (script.js) when
+   the entry has 2+ images, so these never exist in the DOM at all on a
+   0- or 1-image entry — no CSS visibility toggle needed for that case. */
+.image-viewer-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.image-viewer-nav--prev {
+    left: var(--space-4);
+}
+
+.image-viewer-nav--next {
+    right: var(--space-4);
+}
+
+/* Zoom controls — grouped bottom-centre, same gap token
+   .action-rail-group already uses between its own buttons, so the pairing
+   reads as one consistent "grouped controls" convention sitewide. */
+.image-viewer-zoom-controls {
+    position: absolute;
+    bottom: var(--space-4);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-3);
+}
+
 /* Video embed — aspect-ratio governs display size; the iframe's own
    width/height attributes are a fallback for browsers without
    aspect-ratio support only, and are overridden here. */

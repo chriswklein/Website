@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initBackToTop();
     initShareButtons();
     autoplayUnlessReducedMotion('.video-demo video');
+    initImageViewer();
     const filterDrawer = initFilterDrawer();
     initArchive(filterDrawer);
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
@@ -1928,4 +1929,433 @@ function initArchive(filterDrawer) {
             }
         })
         .catch(err => console.error('Error loading archive-entries.json:', err));
+}
+
+// Image viewer (click-to-zoom) — Phase 1 shipped a static enlarged image
+// only; Phase 2 adds pan/zoom and next/prev navigation on the same shell.
+// No-ops on any page without .standard-page-content images (Archive, Home,
+// About). Reuses the Filter Drawer/ToC Panel's own accessible-modal
+// mechanics — inert background, dialog semantics, trapFocus() — rather than
+// a new dialog technique; only the trigger and dialog content are new.
+// Vanilla JS only, per REFERENCE.md — no pan/zoom library, hand-rolled.
+// Depends on: trapFocus()
+function initImageViewer() {
+    const images = [...document.querySelectorAll('.standard-page-content img')];
+    if (!images.length) return;
+
+    const scrim = document.createElement('div');
+    scrim.className = 'image-viewer-scrim';
+    scrim.setAttribute('aria-hidden', 'true');
+    scrim.hidden = true;
+
+    const viewer = document.createElement('div');
+    viewer.className = 'image-viewer';
+    viewer.setAttribute('role', 'dialog');
+    viewer.setAttribute('aria-modal', 'true');
+    viewer.hidden = true;
+    viewer.setAttribute('inert', '');
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn action-rail-clear image-viewer-close';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">×</span>';
+
+    // Announces the current image on every showImageAt() call — aria-label
+    // changing on an already-focused element (Next/Prev, or the dialog
+    // itself) isn't announced on its own, so Next/Prev navigation was
+    // otherwise silent to screen reader users. Same .sr-only + aria-live
+    // "status text" pattern as #filter-drawer-page-status (archive.html) —
+    // a plain <p>, no tabindex, so it's naturally excluded from
+    // trapFocus()'s FOCUSABLE selector without any extra handling.
+    const liveStatus = document.createElement('p');
+    liveStatus.className = 'sr-only';
+    liveStatus.setAttribute('aria-live', 'polite');
+
+    const enlargedImg = document.createElement('img');
+    enlargedImg.className = 'image-viewer-image';
+
+    const zoomControls = document.createElement('div');
+    zoomControls.className = 'image-viewer-zoom-controls';
+
+    const zoomOutBtn = document.createElement('button');
+    zoomOutBtn.type = 'button';
+    zoomOutBtn.className = 'btn action-rail-clear';
+    zoomOutBtn.setAttribute('aria-label', 'Zoom out');
+    zoomOutBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">−</span>';
+
+    const zoomInBtn = document.createElement('button');
+    zoomInBtn.type = 'button';
+    zoomInBtn.className = 'btn action-rail-clear';
+    zoomInBtn.setAttribute('aria-label', 'Zoom in');
+    zoomInBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">+</span>';
+
+    zoomControls.append(zoomOutBtn, zoomInBtn);
+
+    // Prev/Next only exist at all when there are 2+ images — a 0- or
+    // 1-image entry never gets these in the DOM, rather than creating and
+    // CSS-hiding them (0-image entries already return above with no viewer
+    // at all; this covers the 1-image case the same way).
+    let prevBtn = null;
+    let nextBtn = null;
+    if (images.length > 1) {
+        prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'btn action-rail-clear image-viewer-nav image-viewer-nav--prev';
+        prevBtn.setAttribute('aria-label', 'Previous image');
+        prevBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">‹</span>';
+
+        nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'btn action-rail-clear image-viewer-nav image-viewer-nav--next';
+        nextBtn.setAttribute('aria-label', 'Next image');
+        nextBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">›</span>';
+    }
+
+    viewer.append(closeBtn, liveStatus, enlargedImg, zoomControls);
+    if (prevBtn) viewer.append(prevBtn, nextBtn);
+
+    const main = document.getElementById('main-content');
+    document.body.insertBefore(scrim, main);
+    document.body.insertBefore(viewer, main);
+
+    let removeTrapFocus = null;
+    let openerBtn = null;
+    let savedScrollY = 0;
+    let currentIndex = 0;
+
+    // Zoom/pan state. ZOOM_MIN is fit-to-view (the Phase 1 baseline) — there
+    // is no "zoom out past fit" since there's no more image to reveal.
+    const ZOOM_MIN = 1;
+    const ZOOM_MAX = 4;
+    const ZOOM_STEP = 0.5;
+    const PAN_STEP = 40; // px per arrow-key press (WCAG 2.5.7 drag alternative)
+    let zoomLevel = ZOOM_MIN;
+    let panX = 0;
+    let panY = 0;
+
+    // Same lockBodyScroll()/unlockBodyScroll() technique as
+    // initFilterDrawer() and initTocRail() above — a third private
+    // instance, not a shared function, for the same reason already
+    // documented on the ToC Panel's own copy (Rule 3a covers reusing a
+    // pattern, not literally sharing closures across unrelated components).
+    function lockBodyScroll() {
+        savedScrollY = window.scrollY;
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.classList.add('body-scroll-locked');
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('body-scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+    }
+
+    // Elements to inert while the viewer is open. Unlike getTocInertTargets()
+    // above, this must inert .toc-rail explicitly: the ToC Panel only ever
+    // opens at breakpoints where the rail is already display: none (CSS
+    // gate, <1440px), but the image viewer opens at every breakpoint,
+    // including desktop (>=1440px) where .toc-rail is a real, visible
+    // sidebar of focusable links sitting outside #main-content.
+    function getInertTargets() {
+        return [
+            document.getElementById('nav-placeholder'),
+            document.getElementById('main-content'),
+            document.querySelector('.toc-rail'),
+            document.querySelector('.action-rail-group'),
+            document.getElementById('theme-toggle'),
+            document.querySelector('.toast'),
+            document.querySelector('.tab-bar'),
+            document.getElementById('footer-placeholder'),
+        ].filter(Boolean);
+    }
+
+    function applyTransform() {
+        enlargedImg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+    }
+
+    // Keeps a panned image's visible edge from crossing the fit-to-view
+    // frame's edge — transform: scale() doesn't change layout size, so
+    // offsetWidth/Height always reflect the fit-to-view (1x) box regardless
+    // of the current zoomLevel, making them a stable basis for this math.
+    function clampPan() {
+        const maxX = Math.max(0, (enlargedImg.offsetWidth * zoomLevel - enlargedImg.offsetWidth) / 2);
+        const maxY = Math.max(0, (enlargedImg.offsetHeight * zoomLevel - enlargedImg.offsetHeight) / 2);
+        panX = Math.min(maxX, Math.max(-maxX, panX));
+        panY = Math.min(maxY, Math.max(-maxY, panY));
+    }
+
+    function updateZoomButtons() {
+        zoomOutBtn.disabled = zoomLevel <= ZOOM_MIN;
+        zoomInBtn.disabled = zoomLevel >= ZOOM_MAX;
+    }
+
+    // Prev/Next visibly disable while zoomed — the non-keyboard-dependent
+    // signal that ArrowLeft/Right are currently panning, not navigating
+    // (see handleKeydown's zoom-gated scheme below).
+    function updateNavButtons() {
+        if (!prevBtn) return;
+        const zoomed = zoomLevel > ZOOM_MIN;
+        prevBtn.disabled = zoomed;
+        nextBtn.disabled = zoomed;
+    }
+
+    function setZoom(next) {
+        zoomLevel = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, next));
+        enlargedImg.classList.toggle('image-viewer-image--zoomed', zoomLevel > ZOOM_MIN);
+        clampPan();
+        applyTransform();
+        updateZoomButtons();
+        updateNavButtons();
+    }
+
+    function zoomBy(delta) {
+        setZoom(zoomLevel + delta);
+    }
+
+    function setPan(x, y) {
+        panX = x;
+        panY = y;
+        clampPan();
+        applyTransform();
+    }
+
+    function resetZoom() {
+        zoomLevel = ZOOM_MIN;
+        panX = 0;
+        panY = 0;
+        enlargedImg.classList.remove('image-viewer-image--zoomed');
+        applyTransform();
+        updateZoomButtons();
+        updateNavButtons();
+    }
+
+    function setInteracting(active) {
+        enlargedImg.classList.toggle('image-viewer-image--interacting', active);
+    }
+
+    // Content-swap only: no lockBodyScroll(), inert-toggling, focus-trap
+    // setup, or open transition here — those are open/close-lifecycle
+    // concerns openViewer()/closeViewer() already own, and re-running them
+    // on every navigate would be wrong (e.g. double-adding the keydown
+    // listener). Also doesn't touch focus, so clicking Next/Prev (or
+    // ArrowRight/Left at fit-to-view) leaves focus exactly where it was.
+    function showImageAt(index) {
+        currentIndex = index;
+        const img = images[currentIndex];
+
+        enlargedImg.src = img.src;
+        enlargedImg.alt = img.alt;
+        // Accessible name reuses the image's own real alt text — no new
+        // invented copy. Empty-alt fallback is defensive only: every real
+        // .standard-page-content image currently has real alt text.
+        viewer.setAttribute('aria-label', img.alt || 'Image viewer');
+        liveStatus.textContent = `Image ${currentIndex + 1} of ${images.length}: ${img.alt || 'untitled'}`;
+
+        // Keeps focus-return-on-close targeting the trigger that matches
+        // what's actually on screen, not wherever the dialog was originally
+        // opened from — correct after navigating away from the opening image.
+        openerBtn = img.closest('.image-zoom-trigger');
+
+        resetZoom();
+    }
+
+    function navigate(direction) {
+        if (!prevBtn) return;
+        // Wrap-around (last → first, first → last) — the more common
+        // convention among lightbox/gallery UIs (matches PhotoSwipe,
+        // Fancybox, Lightbox2 defaults) versus disabling at the ends; also
+        // means Prev/Next only ever disable for one reason (zoomed), not two.
+        showImageAt((currentIndex + direction + images.length) % images.length);
+    }
+
+    function openViewer(img) {
+        lockBodyScroll();
+        showImageAt(images.indexOf(img));
+
+        viewer.removeAttribute('inert');
+        viewer.hidden = false;
+        scrim.hidden = false;
+        requestAnimationFrame(() => {
+            viewer.classList.add('image-viewer--open');
+            scrim.classList.add('image-viewer-scrim--open');
+        });
+
+        // Inert all page content outside the viewer — prevents Tab from
+        // reaching background content the scrim already blocks from clicks.
+        getInertTargets().forEach(el => el.setAttribute('inert', ''));
+
+        requestAnimationFrame(() => closeBtn.focus());
+
+        removeTrapFocus = trapFocus(viewer);
+        document.addEventListener('keydown', handleKeydown);
+    }
+
+    function closeViewer() {
+        unlockBodyScroll();
+        viewer.setAttribute('inert', '');
+        viewer.classList.remove('image-viewer--open');
+        scrim.classList.remove('image-viewer-scrim--open');
+
+        if (removeTrapFocus) {
+            removeTrapFocus();
+            removeTrapFocus = null;
+        }
+        document.removeEventListener('keydown', handleKeydown);
+
+        // Remove inert before returning focus so the opener can receive it
+        getInertTargets().forEach(el => el.removeAttribute('inert'));
+
+        viewer.addEventListener('transitionend', () => {
+            viewer.hidden = true;
+            scrim.hidden = true;
+            enlargedImg.src = '';
+        }, { once: true });
+
+        if (openerBtn) openerBtn.focus({ preventScroll: true });
+    }
+
+    // Escape closes; zoom-gated arrow scheme (Phase 2 spec, Option A):
+    // zoomed past fit-to-view, arrows pan (WCAG 2.5.7 drag alternative); at
+    // fit-to-view, Left/Right navigate instead. +/- (and the unshifted
+    // "="/"_" keys sharing those physical keys) zoom, independent of pointer
+    // input (WCAG 2.5.1 pinch alternative).
+    function handleKeydown(event) {
+        if (event.key === 'Escape') {
+            closeViewer();
+            return;
+        }
+
+        const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+        if (zoomLevel > ZOOM_MIN && arrowKeys.includes(event.key)) {
+            event.preventDefault();
+            const dx = event.key === 'ArrowLeft' ? PAN_STEP : event.key === 'ArrowRight' ? -PAN_STEP : 0;
+            const dy = event.key === 'ArrowUp' ? PAN_STEP : event.key === 'ArrowDown' ? -PAN_STEP : 0;
+            setPan(panX + dx, panY + dy);
+            return;
+        }
+
+        if (zoomLevel === ZOOM_MIN && prevBtn && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+            event.preventDefault();
+            navigate(event.key === 'ArrowLeft' ? -1 : 1);
+            return;
+        }
+
+        if (event.key === '+' || event.key === '=') {
+            event.preventDefault();
+            zoomBy(ZOOM_STEP);
+        } else if (event.key === '-' || event.key === '_') {
+            event.preventDefault();
+            zoomBy(-ZOOM_STEP);
+        }
+    }
+
+    closeBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    closeBtn.addEventListener('click', closeViewer);
+    scrim.addEventListener('click', closeViewer);
+
+    zoomOutBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    zoomOutBtn.addEventListener('click', () => zoomBy(-ZOOM_STEP));
+    zoomInBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    zoomInBtn.addEventListener('click', () => zoomBy(ZOOM_STEP));
+
+    if (prevBtn) {
+        prevBtn.addEventListener('mousedown', (e) => e.preventDefault());
+        prevBtn.addEventListener('click', () => navigate(-1));
+        nextBtn.addEventListener('mousedown', (e) => e.preventDefault());
+        nextBtn.addEventListener('click', () => navigate(1));
+    }
+
+    // Scroll-wheel zoom — scoped to the image itself, not the whole dialog,
+    // so wheeling over Close/Prev/Next/zoom buttons never triggers a zoom.
+    // { passive: false } is required for preventDefault() to have any
+    // effect (stops the gesture being treated as an attempted page scroll).
+    enlargedImg.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        zoomBy(e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP);
+    }, { passive: false });
+
+    // Pointer-drag panning (single pointer, only once zoomed) and
+    // pinch-to-zoom (two pointers, any zoom level — this is how a touch
+    // user reaches zoomed-in in the first place, so it isn't gated behind
+    // zoomLevel > 1 the way single-pointer drag-pan is). A pinch that
+    // starts while a single-pointer drag is already in progress takes over
+    // from it the instant the second pointer lands.
+    const activePointers = new Map();
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0, dragStartPanX = 0, dragStartPanY = 0;
+    let pinchStartDistance = 0;
+    let pinchStartZoom = ZOOM_MIN;
+
+    function pointerDistance(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    enlargedImg.addEventListener('pointerdown', (e) => {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        // Wrapped: throws (NotFoundError) for a pointerId the browser has no
+        // active session for — confirmed via direct testing, not assumed.
+        // Capture is a nice-to-have (keeps pointermove firing off-element
+        // during a fast drag); losing it shouldn't also abort the pinch/drag
+        // state setup below, which is the actually load-bearing part.
+        try { enlargedImg.setPointerCapture(e.pointerId); } catch (err) { /* no-op */ }
+
+        if (activePointers.size === 2) {
+            isDragging = false;
+            const [a, b] = [...activePointers.values()];
+            pinchStartDistance = pointerDistance(a, b);
+            pinchStartZoom = zoomLevel;
+            setInteracting(true);
+        } else if (activePointers.size === 1 && zoomLevel > ZOOM_MIN) {
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragStartPanX = panX;
+            dragStartPanY = panY;
+            setInteracting(true);
+        }
+    });
+
+    enlargedImg.addEventListener('pointermove', (e) => {
+        if (!activePointers.has(e.pointerId)) return;
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (activePointers.size === 2) {
+            const [a, b] = [...activePointers.values()];
+            const distance = pointerDistance(a, b);
+            if (pinchStartDistance > 0) setZoom(pinchStartZoom * (distance / pinchStartDistance));
+            return;
+        }
+
+        if (isDragging) {
+            setPan(dragStartPanX + (e.clientX - dragStartX), dragStartPanY + (e.clientY - dragStartY));
+        }
+    });
+
+    function releasePointer(e) {
+        activePointers.delete(e.pointerId);
+        isDragging = false;
+        if (activePointers.size === 0) setInteracting(false);
+    }
+    enlargedImg.addEventListener('pointerup', releasePointer);
+    enlargedImg.addEventListener('pointercancel', releasePointer);
+
+    images.forEach(img => {
+        const trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'image-zoom-trigger';
+
+        // Accessible name composes naturally from this label + the img's
+        // own alt (unchanged) via subtree text — "View larger image: {alt}" —
+        // rather than an aria-label that would need to duplicate the alt text.
+        const label = document.createElement('span');
+        label.className = 'sr-only';
+        label.textContent = 'View larger image: ';
+
+        img.parentNode.insertBefore(trigger, img);
+        trigger.append(label, img);
+
+        trigger.addEventListener('mousedown', (e) => e.preventDefault());
+        trigger.addEventListener('click', () => openViewer(img));
+    });
 }
