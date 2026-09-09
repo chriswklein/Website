@@ -1228,16 +1228,24 @@ pre code {
     margin-top: var(--space-6);
 }
 
+/* Icon + visible label side by side, replacing the previous fixed 80px
+   icon-only square (now auto-width via horizontal padding instead). Gap
+   and label typography match .btn/.action-rail-trigger's own established
+   "icon beside label" convention (Rule 3a) rather than a new value. */
 .contact-icon-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 80px;
+    gap: var(--space-2);
     height: 80px;
+    padding: 0 var(--space-5);
     background-color: var(--color-background-surface);
     border: var(--border-width-thin) solid var(--color-border-default);
     border-radius: var(--border-radius-md);
     color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    text-decoration: none;
     transition: border-color var(--duration-fast) var(--ease-out),
                 color var(--duration-fast) var(--ease-out);
 }
@@ -3112,7 +3120,7 @@ footer p {
 /* Static, non-interactive — replaces the old search field's slot in Row 1
    without any of its interactive styling (no border/background/focus
    ring). display: inline-flex (was block + text-align: center) lays the
-   new tag.svg icon and the text side by side; the surrounding grid's own
+   new filter.svg icon and the text side by side; the surrounding grid's own
    centering (see .filter-drawer-controls above) still centers this whole
    auto-width column regardless, so true-centre behaviour is unchanged. */
 .filter-drawer-label {
@@ -3221,7 +3229,7 @@ footer p {
     outline-offset: 3px;
 }
 
-/* Archive's Filter trigger (tag.svg) and the Entry-page Contents/ToC
+/* Archive's Filter trigger (filter.svg) and the Entry-page Contents/ToC
    trigger (content.svg, script.js) both reuse .action-rail-trigger
    verbatim (Rule 3a) — same shared icon class, same --icon-size-md token
    Section 24/25's .link-inline-icon/.link-cta-icon already established
@@ -3949,7 +3957,6 @@ footer p {
     }
 
     .contact-icon-btn {
-        width: 64px;
         height: 64px;
     }
 

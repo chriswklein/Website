@@ -35,7 +35,7 @@
             </nav>
 
             <!-- Banner Image -->
-            <div class="standard-page-banner" role="img" aria-hidden="true" style="background-image: url('/assets/images/entries/work/this-website/this-website-banner.png');"></div>
+            <div class="standard-page-banner" role="img" aria-hidden="true" style="background-image: url('/assets/images/entries/work/this-website/this-website-banner.webp');"></div>
             <p class="standard-page-caption">Scalable, Accessible, Performant: ingredients for this website</p>
 
             <!-- Title -->
@@ -45,6 +45,7 @@
             <div class="standard-page-details-tags">
                 <a href="/archive.html?tag=user-experience" class="tag" aria-label="Filter by User Experience">User Experience</a>
                 <a href="/archive.html?tag=web-development" class="tag" aria-label="Filter by Web Development">Web Development</a>
+                <a href="/archive.html?tag=ai" class="tag" aria-label="Filter by AI">AI</a>
             </div>
 
             <!-- Project Details -->
@@ -218,7 +219,7 @@
                 </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-intentional-design.png" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-intentional-design.webp" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
 
                 </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
 
@@ -238,7 +239,7 @@
 
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.png" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.webp" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
                                 
                 </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
                 
@@ -258,17 +259,17 @@
                 </p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/filter-implementation.png" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/filter-implementation.webp" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
 
 
-                <h2 id="contents">Contents</h2>
+                <h2 id="contents">Table of Contents</h2>
                 <p>The next major implementation, was the Floating and Collapsable Table of Contents.</p>
 
-                <p>When I had a Squarespace, this type of feature was gated behind a paywall. I had searched for templates but no luck. Then when I found a script some other squarespace user wrote - I was restricted as Code Injection was of course that higher tier. So this became a must for me as I wanted to the viewers of any entry to feel like they could navigate up and down the page with ease.</p>
+                <p>When I had a Squarespace, I wanted this feature but I was restricted from using a script another Squarespace user had written to provide one for my site, as Code Injection was of course in a higher paid tier. This became a must for this site as I now had full control. I wanted to the viewers of any entry to feel like they could navigate up and down the page with ease.</p>
 
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/Table-of-contents.png" alt="diagram of the table of contents through device breakpoints. Left Mobile, Center Tablet, and Right Desktop" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/Table-of-contents.webp" alt="diagram of the table of contents through device breakpoints. Left Mobile, Center Tablet, and Right Desktop" width="800" height="450" loading="lazy">
                 
 
                 <!-- Dot divider -->
@@ -281,27 +282,54 @@
                     
                 </p>As it stands right now, my site has the following accessibility implemented:</p>
 
+                <h3 id="vision">Vision</h3>
 
                 <ul>
-                    <li>Visual / Contrast right now sits at....</li>
-                    <li>Motion is Reduced</li>
-                    <li>Keyboard & Focus navigation has logical paths for each of the pages and focus rings to indicate position</li>
-                    <li>Screen Reader was tested using NVDA</li>
-                    <li>All images have Alt Text and Buttons have Aria Labels</li>
+                    <li>Alt text describing actual image content on every image sitewide</li>
+                    <li>WCAG AA color contrast on all text, verified across every page</li>
+                    <li>Visible focus outline on every interactive element, including images and cards</li>
                 </ul>
 
-                <p>Here are the Results of Accessibility Tests I ran it through:</p>
-                <!-- image -->
+                <h3 id="motor">Motor</h3>
+
+                <ul>
+                    <li>100% keyboard operable. Every feature, including the pinch/zoom/pan image viewer, works without a mouse (WCAG 2.5.1, 2.5.7)</li>
+                    <li>No feature requires a precise drag or multi-touch gesture. Every gesture has a button or key equivalent</li>
+                    <li>Skip-navigation link past the Table of Contents, straight to article content</li>
+                </ul>
+
+                <h3 id="cognitive">Cognitive</h3>
+
+                <ul>
+                    <li>Reduced-motion respected sitewide. If a users device requests less motion, every animation and transition turns off automatically</li>
+                    <li>Consistent heading structure and unique link labeling on every page</li>
+                </ul>
+
+                <h3 id="hearing">Hearing</h3>
+
+                <ul>
+                    <li>No audio or video content currently exists on the site, but when I add, this will get addressed.</li>
+                </ul>
 
                 </p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
+
+
+                <h2 id="performance">Performance</h2>
+                <p>Performance was crucial for me. I've seen many websites over the years be so flashy it hurts and I just click out of it instantly. Between ads and images - I wanted my site to be as fast as I could make it.</p>
+
+                <ul>
+                    <li>Lighthouse Accessibility: 100 across every page</li>
+                    <li>WAVE: 9.9/10, 0 errors - Im working through Warnings right now related to redundant links</li>
+                    <li>Reduced Image weight by compressing pngs to webp format. Thumbnails are compressed low res for fast lazy loads, and then when you enlarge the image, they bump up to higher resolution.</li>
+                    <li>Mobile load speed: 7.9s → 4.7s</li>
+                </ul>
+        
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="the-future">The Future</h2>
                 <p>Next up for me is to take a web break to work on new projects. Stay tuned y’all!</p>
-
-                <!-- image -->
 
             </div>
 
@@ -320,11 +348,8 @@
                 <section aria-labelledby="contact-heading">
                     <h2 id="contact-heading" class="section-heading">Want to work together? Contact me!</h2>
                     <div class="contact-buttons">
-                        <a href="/assets/docs/Christopher-Klein-QA-UX-Resume.pdf"
-                           class="contact-icon-btn"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           aria-label="Resume (opens in new tab)">
+                        <a href="/about.html"
+                           class="contact-icon-btn">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                                 <g opacity="0.9">
                                     <path d="M12 12.6764C13.1432 12.6764 14.2393 13.1309 15.0477 13.9393C15.8561 14.7477 16.3105 15.8437 16.3105 16.987H7.68945C7.68945 15.8437 8.14392 14.7477 8.95231 13.9393C9.76069 13.1309 10.8568 12.6764 12 12.6764Z" fill="currentColor"/>
@@ -332,15 +357,16 @@
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M20 5V21L19.9951 21.1025C19.9438 21.6067 19.5177 22 19 22H5L4.89746 21.9951C4.42703 21.9472 4.05278 21.573 4.00488 21.1025L4 21V3C4 2.44772 4.44772 2 5 2H17L20 5ZM5 21H19V5.41406L16.5859 3H5V21Z" fill="currentColor"/>
                                 </g>
                             </svg>
+                            <span>About</span>
                         </a>
                         <a href="mailto:christopherwalterklein@gmail.com"
-                           class="contact-icon-btn"
-                           aria-label="Email">
+                           class="contact-icon-btn">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                                 <g opacity="0.9">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M16.0194 2.75679C16.4817 2.54918 17.0354 2.72154 17.2942 3.16986L22.2942 11.8301C22.5531 12.2784 22.4255 12.8441 22.0146 13.1406L21.9282 13.1961L8.0718 21.1961C7.62348 21.455 7.05779 21.3274 6.76127 20.9165L6.70577 20.8301L1.70577 12.1699C1.42963 11.6916 1.59351 11.08 2.0718 10.8038L15.9282 2.80383L16.0194 2.75679ZM7.5718 20.3301L9.55757 19.1836L10.9879 13.8427L2.90334 12.2441L7.5718 20.3301ZM14.1011 12.0454L19.4424 13.4766L21.4282 12.3301L16.7597 4.24411L14.1011 12.0454ZM10.7822 18.4766L18.2178 14.1836L13.7782 12.994L13.614 13.4791C13.4524 13.9532 12.9654 14.2344 12.4739 14.1373L11.9709 14.0375L10.7822 18.4766ZM12.668 13.1569L15.7711 4.04925L3.22893 11.2905L12.668 13.1569Z" fill="currentColor"/>
                                 </g>
                             </svg>
+                            <span>Email</span>
                         </a>
                         <a href="https://www.linkedin.com/in/crzdev/"
                            class="contact-icon-btn"
@@ -351,6 +377,7 @@
                                 <path d="M19.1065 19.6728V27.0944H15.5461V14.257H18.9394V16.5219H19.0898C19.374 15.7753 19.8504 15.1847 20.519 14.7501C21.1876 14.3099 21.9983 14.0898 22.9511 14.0898C23.8425 14.0898 24.6198 14.2848 25.2828 14.6749C25.9459 15.0649 26.4613 15.6221 26.829 16.3464C27.1968 17.0652 27.3806 17.9232 27.3806 18.9206V27.0944H23.8203V19.5558C23.8258 18.7701 23.6252 18.1572 23.2185 17.7171C22.8118 17.2713 22.2518 17.0485 21.5386 17.0485C21.0594 17.0485 20.636 17.1515 20.2682 17.3577C19.9061 17.5638 19.6219 17.8647 19.4158 18.2603C19.2152 18.6503 19.1121 19.1212 19.1065 19.6728Z" fill="currentColor"/>
                                 <path d="M9.13372 27.0944V14.257H12.6941V27.0944H9.13372ZM10.9223 12.6022C10.3929 12.6022 9.93885 12.4267 9.55997 12.0756C9.18666 11.719 9 11.2928 9 10.7969C9 10.3066 9.18666 9.88592 9.55997 9.53489C9.93885 9.1783 10.3929 9 10.9223 9C11.4516 9 11.9029 9.1783 12.2762 9.53489C12.6551 9.88592 12.8445 10.3066 12.8445 10.7969C12.8445 11.2928 12.6551 11.719 12.2762 12.0756C11.9029 12.4267 11.4516 12.6022 10.9223 12.6022Z" fill="currentColor"/>
                             </svg>
+                            <span>LinkedIn</span>
                         </a>
                     </div>
                 </section>

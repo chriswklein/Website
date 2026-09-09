@@ -486,7 +486,7 @@ function initTocRail() {
     // Matches Archive's Filter trigger icon markup exactly (same
     // .action-rail-trigger-icon class, same inline-SVG convention every
     // icon on this site already uses — see style.css) — content.svg's
-    // real source path data, not tag.svg's, since this trigger opens the
+    // real source path data, not filter.svg's, since this trigger opens the
     // Table of Contents rather than the tag filter.
     trigger.insertAdjacentHTML('afterbegin',
         '<svg class="action-rail-trigger-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
