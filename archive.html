@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse and filter Christopher Klein's Work and Thoughts entries by tag, type, or search: a searchable archive of case studies and articles.">
+    <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
+    <title>Archive — Christopher Klein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/fav/fav-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/fav/fav-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/fav/fav-180.png">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="nav-placeholder"></div>
+
+    <!-- Archive filter header — scrolls away with page -->
+    <div class="archive-sticky-header" id="archive-sticky-header">
+        <div class="container">
+
+            <!-- Title row -->
+            <div class="archive-title-row">
+                <h1 class="archive-title" id="archive-title">Archive</h1>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Floating action rail group — fixed at the viewport edge; the one persistent
+         filter entry point, visible at every scroll position, at all three breakpoints.
+         External Clear only renders while a filter is active (see script.js render()),
+         and hides along with the rest of the group whenever the drawer is open. -->
+    <div class="action-rail-group action-rail-group--visible" id="action-rail-group">
+
+        <button class="archive-clear-btn btn action-rail-clear" type="button" hidden aria-label="Clear filters">
+            <span class="tag-chip-x" aria-hidden="true">×</span>
+        </button>
+
+        <!-- Filters trigger — opens Filter Drawer -->
+        <button class="action-rail-trigger" type="button"
+                aria-controls="filter-drawer"
+                aria-haspopup="dialog"
+                aria-expanded="false"
+                aria-label="Open Filters">
+            <svg class="action-rail-trigger-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                <g opacity="0.9">
+                    <path d="M4 4.75H20C20.1381 4.75 20.25 4.86193 20.25 5V5.62402C20.25 5.68455 20.2283 5.7435 20.1885 5.78906L13.6826 13.2236C13.4037 13.5426 13.25 13.9522 13.25 14.376V20.5566C13.25 20.7312 13.0755 20.8523 12.9121 20.791L10.9121 20.041C10.8146 20.0044 10.75 19.9108 10.75 19.8066V14.376C10.75 13.9522 10.5963 13.5426 10.3174 13.2236L3.81152 5.78906C3.77168 5.7435 3.75 5.68455 3.75 5.62402V5C3.75 4.86193 3.86193 4.75 4 4.75Z" fill="currentColor" stroke="currentColor" stroke-width="1.5"/>
+                </g>
+            </svg>
+            <span class="trigger-label">Filters</span>
+            <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
+        </button>
+
+    </div>
+
+    <!-- Scrim — dims page content while drawer is open; clicking closes the drawer -->
+    <div class="archive-scrim" id="archive-scrim" aria-hidden="true" hidden></div>
+
+    <!-- Filter drawer — unified bottom sheet, available on all breakpoints -->
+    <div class="filter-drawer" id="filter-drawer"
+         role="dialog" aria-modal="true" aria-label="Filter"
+         hidden inert>
+        <div class="filter-drawer-body">
+
+            <!-- Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right) -->
+            <div class="filter-drawer-controls">
+                <button class="archive-clear-btn btn" type="button" disabled>Clear</button>
+                <p class="filter-drawer-label">
+                    <svg class="filter-drawer-label-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                        <g opacity="0.9">
+                            <path d="M4 4.75H20C20.1381 4.75 20.25 4.86193 20.25 5V5.62402C20.25 5.68455 20.2283 5.7435 20.1885 5.78906L13.6826 13.2236C13.4037 13.5426 13.25 13.9522 13.25 14.376V20.5566C13.25 20.7312 13.0755 20.8523 12.9121 20.791L10.9121 20.041C10.8146 20.0044 10.75 19.9108 10.75 19.8066V14.376C10.75 13.9522 10.5963 13.5426 10.3174 13.2236L3.81152 5.78906C3.77168 5.7435 3.75 5.68455 3.75 5.62402V5C3.75 4.86193 3.86193 4.75 4 4.75Z" fill="currentColor" stroke="currentColor" stroke-width="1.5"/>
+                        </g>
+                    </svg>
+                    Filter
+                </p>
+                <button class="filter-drawer-trigger" type="button"
+                        aria-expanded="false"
+                        aria-controls="filter-drawer"
+                        aria-haspopup="dialog">
+                    <span class="trigger-label">Filters</span>
+                    <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
+                </button>
+            </div>
+
+            <!-- Row 2: Primary type chips -->
+            <div class="filter-drawer-primary-chips" role="group" aria-label="Filter by type">
+                <button class="tag-chip" type="button"
+                        data-filter-type="work" data-label="Work"
+                        aria-pressed="false">Work<span class="chip-count" aria-hidden="true"></span></button>
+                <button class="tag-chip" type="button"
+                        data-filter-type="thoughts" data-label="Thoughts"
+                        aria-pressed="false">Thoughts<span class="chip-count" aria-hidden="true"></span></button>
+            </div>
+
+            <!-- Active secondary filters row — collapses to zero height when empty;
+                 keeps an active tag visible regardless of scroll position or the
+                 +N-more collapse state of the full list below -->
+            <div class="archive-active-chips" id="filter-drawer-active-chips"></div>
+
+            <!-- Row 3: Secondary tag chips, paginated 6 per page — same drawer,
+                 same pagination, at all three breakpoints now. Fixed min-height
+                 on the page container keeps the drawer's size stable across
+                 pages with different tag counts/label lengths, populated by
+                 initArchive(). -->
+            <div class="filter-drawer-secondary-page">
+                <div id="filter-drawer-chips"></div>
+            </div>
+            <div class="filter-drawer-page-nav" id="filter-drawer-page-nav" hidden>
+                <button type="button" class="filter-drawer-page-btn filter-drawer-page-prev"
+                        aria-label="Previous page of tags">Previous</button>
+                <div class="filter-drawer-page-dots" id="filter-drawer-page-dots"></div>
+                <button type="button" class="filter-drawer-page-btn filter-drawer-page-next"
+                        aria-label="Next page of tags">Next</button>
+            </div>
+            <p class="sr-only" id="filter-drawer-page-status" aria-live="polite"></p>
+
+        </div>
+    </div>
+
+    <main id="main-content">
+        <div class="container">
+
+            <!-- Visually-hidden heading closes the h1 -> h3 level-skip the results
+                 grid's card titles would otherwise create (Home avoids this via its
+                 visible "Featured Work"/"Thoughts" h2 section headings; Archive's
+                 single filterable list has no equivalent visible section title, so
+                 this reuses the sitewide .sr-only pattern instead of inventing one). -->
+            <h2 class="sr-only" id="archive-results-heading">Results</h2>
+
+            <!-- Entry count (left) and sort toggle (right) — between header and results grid -->
+            <div class="archive-sort-count-row">
+                <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+                <button class="archive-sort-toggle" type="button">Latest ↑</button>
+            </div>
+
+            <!-- Cards populated by initArchive() — all entries matching the
+                 current filter state render on load, no cap -->
+            <div class="archive-results" id="archive-results"></div>
+
+            <div class="back-to-top-row">
+                <button class="back-to-top" aria-label="Back to top">
+                    <span>Back to Top</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <div role="status" aria-live="polite" class="toast">URL copied to clipboard!</div>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="/index.html" class="tab-bar-item">
+            <span>Home</span>
+        </a>
+        <a href="/archive.html" class="tab-bar-item">
+            <span>Archive</span>
+        </a>
+        <a href="/about.html" class="tab-bar-item">
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="footer-placeholder"></div>
+    <script src="/script.js"></script>
+</body>
+</html>

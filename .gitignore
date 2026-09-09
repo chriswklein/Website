@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Playwright MCP session snapshots (ephemeral, not meant to be committed)
+.playwright-mcp/
+
+# Raw image exports for scripts/build-images.js — source material for the
+# built assets/images/ WebP files, not something the deployed site ships.
+raw-exports/

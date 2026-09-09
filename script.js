@@ -1,0 +1,2389 @@
+// Inject shared components, then wire up behaviour that depends on them
+document.addEventListener('DOMContentLoaded', () => {
+    loadComponent('nav-placeholder', '/nav.html', () => {
+        initNav();
+        setActiveNavLink();
+        // Deferred until nav.html is actually injected: the sticky header
+        // it contains is what scroll-margin-top clears, and initTocRail()
+        // both measures heading positions and (if the URL loaded with a
+        // #hash) re-corrects the browser's native fragment scroll, which
+        // fires before this fetch resolves and so lands short of real
+        // clearance — confirmed via direct measurement, not assumed.
+        initTocRail();
+    });
+    loadComponent('footer-placeholder', '/footer.html');
+    setActiveTabBar();
+    initBackToTop();
+    initShareButtons();
+    autoplayUnlessReducedMotion('.video-demo video');
+    initImageViewer();
+    const filterDrawer = initFilterDrawer();
+    initArchive(filterDrawer);
+    // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
+});
+
+function loadComponent(placeholderId, file, callback) {
+    const placeholder = document.getElementById(placeholderId);
+    if (!placeholder) return;
+
+    fetch(file)
+        .then(response => response.text())
+        .then(html => {
+            placeholder.innerHTML = html;
+            if (callback) callback();
+        })
+        .catch(error => console.error(`Error loading ${file}:`, error));
+}
+
+// Mobile nav toggle — guarded since hamburger is hidden on mobile (tab bar replaces it)
+function initNav() {
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-links');
+    if (!navToggle || !navMenu) return;
+
+    navToggle.addEventListener('click', () => {
+        const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+        navToggle.setAttribute('aria-expanded', !isOpen);
+        navMenu.classList.toggle('is-open');
+        navToggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navToggle.setAttribute('aria-expanded', 'false');
+            navMenu.classList.remove('is-open');
+            navToggle.setAttribute('aria-label', 'Open navigation menu');
+        });
+    });
+}
+
+// Set aria-current="page" on the injected desktop nav link matching the current page
+function setActiveNavLink() {
+    const currentPath = window.location.pathname + window.location.search;
+    const normalizedPath = currentPath === '/' ? '/index.html' : currentPath;
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        if (link.getAttribute('href') === normalizedPath) {
+            link.setAttribute('aria-current', 'page');
+        } else {
+            link.removeAttribute('aria-current');
+        }
+    });
+}
+
+// Set aria-current="page" on the static tab bar item matching the current page
+function setActiveTabBar() {
+    const currentPath = window.location.pathname + window.location.search;
+    const normalizedPath = currentPath === '/' ? '/index.html' : currentPath;
+
+    document.querySelectorAll('.tab-bar-item').forEach(item => {
+        if (item.getAttribute('href') === normalizedPath) {
+            item.setAttribute('aria-current', 'page');
+        } else {
+            item.removeAttribute('aria-current');
+        }
+    });
+}
+
+// Creates the floating rail button, wires theme toggle, persists to localStorage
+function initThemeToggle() {
+    const btn = document.createElement('button');
+    btn.id = 'theme-toggle';
+    btn.className = 'theme-toggle-rail';
+    btn.type = 'button';
+    btn.textContent = '◑';
+    document.body.appendChild(btn);
+    btn.classList.add('theme-toggle-rail--visible');
+
+    function syncButton() {
+        const isTeal = document.documentElement.getAttribute('data-theme') === 'teal';
+        btn.setAttribute('aria-label', isTeal ? 'Switch to gold theme' : 'Switch to teal theme');
+    }
+
+    syncButton();
+
+    btn.addEventListener('click', () => {
+        const isTeal = document.documentElement.getAttribute('data-theme') === 'teal';
+        if (isTeal) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.removeItem('theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'teal');
+            localStorage.setItem('theme', 'teal');
+        }
+        syncButton();
+    });
+}
+
+// Dismiss any visible tooltip when Escape is pressed
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+
+    const openTooltip = document.querySelector('.tooltip-wrapper:focus-within');
+    if (openTooltip) {
+        document.activeElement.blur();
+    }
+});
+
+// Share button — copies current page URL to clipboard, shows toast confirmation
+function initShareButtons() {
+    const buttons = document.querySelectorAll('.share-btn');
+    const toast = document.querySelector('.toast');
+    if (!buttons.length) return;
+
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const originalLabel = button.getAttribute('aria-label');
+                button.setAttribute('aria-label', 'URL copied to clipboard!');
+
+                if (toast) {
+                    toast.classList.add('toast--visible');
+                }
+
+                setTimeout(() => {
+                    button.setAttribute('aria-label', originalLabel);
+                    if (toast) {
+                        toast.classList.remove('toast--visible');
+                    }
+                }, 2000);
+            }).catch(() => {
+                // Clipboard write failed silently — no fallback needed
+            });
+        });
+    });
+}
+
+// Shared by .back-to-top's own button and both ToC "Back to Top" surfaces
+// (the rail/panel row, the standalone mobile/tablet trigger) — one
+// implementation of the scroll behavior + prefers-reduced-motion check,
+// not a separately-implemented copy per surface.
+function scrollToTop() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+}
+
+// Reusable for any future autoplay-capable media, not just .video-demo.
+// The CSS reduced-motion block (bottom of style.css) only kills
+// transitions/animations — it has no effect on <video> autoplay, so
+// looping demo clips need this JS-level check instead. When set, the
+// video is left alone: it shows its required poster with native controls,
+// requiring an explicit user action to play.
+function autoplayUnlessReducedMotion(selector) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    document.querySelectorAll(selector).forEach(video => {
+        video.setAttribute('autoplay', '');
+        video.play().catch(() => {});
+    });
+}
+
+// Back to Top button
+function initBackToTop() {
+    const button = document.querySelector('.back-to-top');
+    if (!button) return;
+
+    window.addEventListener('scroll', () => {
+        // Skip while any scroll-lock (.body-scroll-locked — shared by the
+        // ToC panel and the Archive Filter Drawer, see lockBodyScroll() in
+        // each) is active: position: fixed on <body> makes window.scrollY
+        // read 0 regardless of the real, visually frozen scroll position,
+        // so this would otherwise read a corrupted 0 and hide the button —
+        // confirmed via direct DOM inspection, not assumed: opening the ToC
+        // panel deep in an entry stripped this button's own --visible class
+        // immediately, with no scrolling having actually happened. True
+        // scroll position can't change while locked, so there's nothing to
+        // recompute here until the lock lifts.
+        if (document.body.classList.contains('body-scroll-locked')) return;
+        button.classList.toggle('back-to-top--visible', window.scrollY > 400);
+    });
+
+    button.addEventListener('click', scrollToTop);
+}
+
+// Matches the NEW-ENTRY-PROCESS.md heading-id convention exactly (strip
+// punctuation first, then collapse whitespace/hyphen runs to one hyphen) —
+// not the local slugify() inside initArchive below, which is tag-specific
+// and produces doubled hyphens on input like "Research & Discovery".
+function slugifyHeading(text) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/[\s-]+/g, '-');
+}
+
+// Walks .standard-page-content's H2/H3s in document order and assigns a
+// generated id to any heading that doesn't already have one (every entry
+// today is hand-authored per NEW-ENTRY-PROCESS.md, so this is a safety net
+// for future entries, not something that changes current pages). Existing
+// ids — hand-authored or already generated — are never overwritten, and
+// collisions get a numeric suffix. Returns the full heading list so
+// initTocRail() doesn't need to re-discover it.
+function getTocHeadings() {
+    const content = document.querySelector('.standard-page-content');
+    if (!content) return [];
+
+    const headings = Array.from(content.querySelectorAll('h2, h3'));
+    const usedIds = new Set(headings.filter(h => h.id).map(h => h.id));
+
+    headings.forEach(heading => {
+        if (heading.id) return;
+        const base = slugifyHeading(heading.textContent) || 'section';
+        let id = base;
+        let suffix = 2;
+        while (usedIds.has(id)) {
+            id = `${base}-${suffix}`;
+            suffix++;
+        }
+        heading.id = id;
+        usedIds.add(id);
+    });
+
+    return headings;
+}
+
+// Builds one <li><a class="toc-rail-link"> per heading into `container`,
+// H3s getting the --sub indent modifier. Shared by the desktop rail and
+// the <1440px panel so the two never carry two different copies of this
+// markup-building logic — only their outer containers differ.
+function buildTocLinks(headings, container) {
+    return headings.map(heading => {
+        const item = document.createElement('li');
+        if (heading.tagName === 'H3') item.className = 'toc-rail-item--sub';
+
+        const link = document.createElement('a');
+        link.className = 'toc-rail-link';
+        link.href = `#${heading.id}`;
+        link.textContent = heading.textContent;
+
+        item.appendChild(link);
+        container.appendChild(item);
+        return link;
+    });
+}
+
+// Prepends a "Back to Top" row to `container`, ahead of the real heading
+// rows buildTocLinks() adds — same .toc-rail-link row treatment (Rule 3a:
+// reuse the shape, not a parallel row style) via a <button> instead of an
+// <a> (there's no #heading to navigate to, just an action), so it needs
+// font-family: inherit and cursor: pointer added to .toc-rail-link itself
+// (style.css) — harmless for the existing <a> rows, which already got
+// both for free from the browser. Deliberately NOT built by
+// buildTocLinks() and NOT added to the railLinks/panelLinks arrays
+// updateActiveState() tracks: those arrays are exactly what drives both
+// the active-heading toggle (matched by href, which this button has none
+// of) and the badge's total count (headings.length, untouched) — keeping
+// this row out of them is what makes "never active, never counted"
+// automatic rather than a special case to maintain. aria-label matches
+// .back-to-top's own exact wording (initBackToTop() above) so both routes
+// to the same action announce identically, distinct from a real heading
+// row's own accessible name (its heading text).
+function buildBackToTopRow(container) {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'toc-rail-link';
+    button.textContent = 'Back to Top';
+    button.setAttribute('aria-label', 'Back to top');
+    button.addEventListener('click', scrollToTop);
+    item.appendChild(button);
+    container.appendChild(item);
+    return button;
+}
+
+// Desktop rail (CSS shows it only at >=1440px) plus the <1440px trigger +
+// anchored panel (Prompt B) — built together from one shared heading list
+// and one shared scrollspy pass, so current-heading tracking never runs
+// twice or drifts between the two surfaces. Nothing here is gated behind
+// viewport width in JS: both surfaces are always built and scrollspy
+// always runs; CSS alone decides which surface is actually visible at a
+// given width (mirror-image display:none/block pairs — see style.css),
+// so the position badge can read live state even when the rail itself is
+// hidden. Inserted right after the skip link so both are reachable early
+// in tab order, not after the whole page's content.
+function initTocRail() {
+    const headings = getTocHeadings();
+    if (!headings.length) return;
+
+    const main = document.getElementById('main-content');
+
+    // A keyboard user tabbing from the top of the page otherwise has to
+    // pass through every heading link in the rail/panel (both always
+    // built here, just CSS-hidden depending on breakpoint — see the
+    // comment on this function) before ever reaching real page content,
+    // since both surfaces are inserted right before <main> (below).
+    // This link — reusing the sitewide .skip-link pattern verbatim
+    // (style.css, "ACCESSIBILITY UTILITIES"), not a new one — jumps past
+    // that list straight to headings[0]: the first heading the ToC itself
+    // links to, not the page's own h1 title, since bypassing "the ToC"
+    // means landing in the body content it indexes. tabindex="-1" makes
+    // that one heading a valid fragment-focus target without adding it
+    // to the normal Tab sequence — the ToC's real heading rows deliberately
+    // stay non-tab-stops, only their <a> rows are (see anatomy above);
+    // this doesn't change that.
+    headings[0].setAttribute('tabindex', '-1');
+    const tocSkipLink = document.createElement('a');
+    tocSkipLink.className = 'skip-link';
+    tocSkipLink.href = `#${headings[0].id}`;
+    tocSkipLink.textContent = 'Skip Table of Contents';
+
+    // --- Desktop rail (>=1440px) ---------------------------------------
+    const rail = document.createElement('nav');
+    rail.className = 'toc-rail';
+    rail.setAttribute('aria-label', 'Table of contents');
+
+    // Shared by both .toc-panel-label instances below (this rail's own and
+    // the <1440px panel's, further down) — same content.svg icon as the
+    // trigger button above, decorative (the adjacent text already carries
+    // the label, doubly so once aria-hidden is set on the whole <p> below).
+    const TOC_LABEL_ICON_HTML =
+        '<svg class="toc-panel-label-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
+        '<g opacity="0.9">' +
+        '<path d="M6 19C6 19.5523 5.55228 20 5 20H3C2.44772 20 2 19.5523 2 19V17C2 16.4477 2.44772 16 3 16H5C5.55228 16 6 16.4477 6 17V19Z" fill="currentColor"/>' +
+        '<path d="M22 20H8V16H22V20Z" fill="currentColor"/>' +
+        '<path d="M6 13C6 13.5523 5.55228 14 5 14H3C2.44772 14 2 13.5523 2 13V11C2 10.4477 2.44772 10 3 10H5C5.55228 10 6 10.4477 6 11V13Z" fill="currentColor"/>' +
+        '<path d="M22 14H8V10H22V14Z" fill="currentColor"/>' +
+        '<path d="M6 7C6 7.55228 5.55228 8 5 8H3C2.44772 8 2 7.55228 2 7V5C2 4.44772 2.44772 4 3 4H5C5.55228 4 6 4.44772 6 5V7Z" fill="currentColor"/>' +
+        '<path d="M22 8H8V4H22V8Z" fill="currentColor"/>' +
+        '</g></svg>';
+
+    // Reuses .toc-panel-label verbatim (Rule 3a) — same class the </1440px
+    // panel's own label already uses, same reasoning for aria-hidden
+    // (redundant with the <nav>'s own aria-label once announced as a
+    // landmark — visible for sighted users only), not a new parallel
+    // class for what's visually and semantically the same element.
+    const railLabel = document.createElement('p');
+    railLabel.className = 'toc-panel-label';
+    railLabel.textContent = 'Table of Contents';
+    railLabel.setAttribute('aria-hidden', 'true');
+    railLabel.insertAdjacentHTML('afterbegin', TOC_LABEL_ICON_HTML);
+
+    const railList = document.createElement('ul');
+    railList.className = 'toc-rail-list';
+    buildBackToTopRow(railList);
+    const railLinks = buildTocLinks(headings, railList);
+    rail.append(railLabel, railList);
+    document.body.insertBefore(rail, main);
+    document.body.insertBefore(tocSkipLink, rail);
+
+    // Anchors the rail's fixed top offset to .breadcrumb's real top edge —
+    // flush, no gap, per Chris's decision that the rail should line up
+    // with the breadcrumb row rather than sit lower next to body copy
+    // (previously anchored to .standard-page-banner's bottom edge + a
+    // --space-8 gap instead; moved up by roughly a banner's height plus
+    // that gap as a result). The breadcrumb is present on every entry
+    // (unlike the banner, which some earlier code here defended against
+    // missing) and its own top position doesn't depend on anything below
+    // it either, so this still lands on the same pixel across entries at
+    // a given width. Recomputed on resize (nav height and .standard-page's
+    // own layout are stable across scroll, but not necessarily across a
+    // resize-driven reflow); not on scroll — this sets a fixed starting
+    // point, it doesn't track the breadcrumb as the page scrolls (the
+    // rail is position: fixed and stays put once positioned, same as
+    // before this change). If an entry has no breadcrumb, --toc-rail-top
+    // is simply never set and CSS's own var(--toc-rail-top, <fallback>)
+    // takes over — that fallback (--space-16 + --space-8, the sticky
+    // nav's own height plus main's own padding-top) already approximates
+    // the breadcrumb's real pre-JS position, confirmed by direct
+    // measurement, so it needed no change alongside this anchor swap.
+    function updateRailTop() {
+        const breadcrumb = document.querySelector('.breadcrumb');
+        if (!breadcrumb) return;
+        const top = breadcrumb.getBoundingClientRect().top + window.scrollY;
+        rail.style.setProperty('--toc-rail-top', `${top}px`);
+    }
+
+    // Anchors the rail's left edge to .standard-page-content's real
+    // rendered right edge (this is position: fixed, so a viewport-relative
+    // rect needs no scrollY correction the way updateRailTop()'s vertical
+    // measurement does — horizontal position doesn't move on vertical
+    // scroll). Replaces a pure-CSS `50% + 32.5ch` estimate that depended
+    // on 'ch' resolving against whichever font is active when the browser
+    // evaluates it — this entry's font (Noto Sans, loaded async via
+    // display: swap) briefly isn't, and real iPad landscape testing showed
+    // the rail collapse to a near-unusable width even though re-deriving
+    // the same arithmetic against this browser's own metrics at matching
+    // viewports never reproduced a collapse — font-metric drift between
+    // the fallback and loaded font, not the formula's arithmetic, is the
+    // most likely cause. Measuring the column's actual box sidesteps that
+    // dependency entirely. Recomputed on resize (the column's fixed 65ch
+    // width means its centred right edge still shifts as the viewport
+    // widens) and once fonts finish loading, since a font swap can change
+    // the column's own rendered width (also 'ch'-based) after this first
+    // runs.
+    // Gap widened from --space-6 (24px) to --space-16 (64px) per Chris's
+    // decision to move the rail noticeably further right, closer to the
+    // viewport edge — same "measure the real content-column edge, add a
+    // token gap" mechanism as before, just a larger token on it, not a
+    // switch to a viewport-relative (e.g. --max-content-based) position.
+    function updateRailLeft() {
+        const content = document.querySelector('.standard-page-content');
+        if (!content) return;
+        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-16'));
+        const left = content.getBoundingClientRect().right + gap;
+        rail.style.setProperty('--toc-rail-left', `${left}px`);
+    }
+
+    updateRailTop();
+    updateRailLeft();
+    window.addEventListener('resize', updateRailTop);
+    window.addEventListener('resize', updateRailLeft);
+    // Only --toc-rail-left, not --toc-rail-top, needs a font-load re-run:
+    // the banner's height (top's own basis) comes from aspect-ratio and
+    // viewport width alone, not font metrics — see updateRailTop()'s own
+    // comment — but .standard-page-content's rendered width is 'ch'-based,
+    // so its right edge can still shift once the swap completes.
+    //
+    // Two separate Font Loading API signals, not just `.ready` — real
+    // iPad testing found the rail's width still changing well after
+    // load, specifically the first time the user scrolled, which doesn't
+    // fit a value that's simply wrong-once-then-static; `.ready` is
+    // documented as unreliable on WebKit (can resolve before the visual
+    // swap actually commits), which would explain a stale measurement
+    // surviving past that promise resolving — the eventual correction
+    // then only ever arriving via the *next* thing that happens to fire
+    // a 'resize' event, which on iOS/iPadOS Safari includes the dynamic
+    // toolbar collapsing on first scroll. Not confirmed on a real device
+    // in this environment (Playwright here has no WebKit engine — see
+    // memory), so this is a defensive hardening against a plausible,
+    // well-documented failure mode, not a guaranteed fix: 'loadingdone'
+    // is a second, independently-implemented Font Loading API signal
+    // that doesn't share `.ready`'s specific quirk, fired every time a
+    // batch of font loads completes — calling updateRailLeft() again
+    // here is a harmless no-op once metrics are already correct.
+    if (document.fonts) {
+        if (document.fonts.ready) document.fonts.ready.then(updateRailLeft);
+        document.fonts.addEventListener('loadingdone', updateRailLeft);
+    }
+
+    // --- <1440px trigger + anchored panel (Prompt B) --------------------
+    // Trigger reuses .action-rail-group/.action-rail-trigger/
+    // .action-rail-badge verbatim (Rule 3a) — same position, shape and
+    // badge treatment as Archive's Filter trigger. The two never coexist
+    // on the same page (Filter trigger only exists on archive.html, this
+    // only on Standard Page entries), so sharing the literal classes
+    // carries no collision risk. .toc-trigger-group is an additional
+    // class, not a replacement — it only overrides display (see
+    // style.css) to invert the breakpoint versus Archive's own always-
+    // visible use of the same base classes; show/hide *within* that range
+    // is scroll-threshold driven (matching .back-to-top's own mechanism,
+    // via .action-rail-group--visible, the same modifier class Archive's
+    // trigger already uses) rather than Archive's drawer-open-state
+    // toggle, since this trigger has no drawer-open state of its own to
+    // key off.
+    const triggerGroup = document.createElement('div');
+    triggerGroup.className = 'action-rail-group toc-trigger-group';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'action-rail-trigger';
+    trigger.id = 'toc-trigger';
+    trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', 'toc-panel');
+    trigger.setAttribute('aria-haspopup', 'true');
+
+    // Matches Archive's Filter trigger icon markup exactly (same
+    // .action-rail-trigger-icon class, same inline-SVG convention every
+    // icon on this site already uses — see style.css) — content.svg's
+    // real source path data, not filter.svg's, since this trigger opens the
+    // Table of Contents rather than the tag filter.
+    trigger.insertAdjacentHTML('afterbegin',
+        '<svg class="action-rail-trigger-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
+        '<g opacity="0.9">' +
+        '<path d="M6 19C6 19.5523 5.55228 20 5 20H3C2.44772 20 2 19.5523 2 19V17C2 16.4477 2.44772 16 3 16H5C5.55228 16 6 16.4477 6 17V19Z" fill="currentColor"/>' +
+        '<path d="M22 20H8V16H22V20Z" fill="currentColor"/>' +
+        '<path d="M6 13C6 13.5523 5.55228 14 5 14H3C2.44772 14 2 13.5523 2 13V11C2 10.4477 2.44772 10 3 10H5C5.55228 10 6 10.4477 6 11V13Z" fill="currentColor"/>' +
+        '<path d="M22 14H8V10H22V14Z" fill="currentColor"/>' +
+        '<path d="M6 7C6 7.55228 5.55228 8 5 8H3C2.44772 8 2 7.55228 2 7V5C2 4.44772 2.44772 4 3 4H5C5.55228 4 6 4.44772 6 5V7Z" fill="currentColor"/>' +
+        '<path d="M22 8H8V4H22V8Z" fill="currentColor"/>' +
+        '</g></svg>');
+
+    const triggerLabel = document.createElement('span');
+    triggerLabel.className = 'trigger-label';
+    triggerLabel.textContent = 'Contents';
+
+    // aria-hidden: the count is announced via the trigger's own aria-label
+    // instead (updated in updateActiveState() below) so it isn't announced
+    // twice — matching the "heading X of Y" wording asked for, without a
+    // second accessible node nested inside the button's own accessible name.
+    const badge = document.createElement('span');
+    badge.className = 'action-rail-badge';
+    badge.setAttribute('aria-hidden', 'true');
+
+    trigger.append(triggerLabel, badge);
+    triggerGroup.appendChild(trigger);
+    document.body.insertBefore(triggerGroup, main);
+
+    // Same scroll-threshold value as .back-to-top's own (initBackToTop()
+    // above) — not approximated.
+    window.addEventListener('scroll', () => {
+        triggerGroup.classList.toggle('action-rail-group--visible', window.scrollY > 400);
+    }, { passive: true });
+
+    // Panel: <nav>, same landmark type and aria-label as the desktop rail
+    // (this is the same navigational content, just rendered differently
+    // per breakpoint) — not role="dialog": the Filter Drawer's own
+    // role="dialog" belongs to that specific full-screen sheet; this is a
+    // small anchored popover, same category of thing as the Desktop
+    // Filter Panel it's modelled on, which doesn't carry dialog semantics
+    // either.
+    //
+    // Outside-close now matches the real Filter Drawer pattern exactly
+    // (scrim + body-scroll-lock + inert), not the lighter document-click-
+    // listener version this shipped with initially — that version let a
+    // background click both close the panel AND activate whatever was
+    // underneath it, since a listener alone (without stopping the event)
+    // can observe a click but not catch it. A real scrim element with
+    // pointer-events: auto while open intercepts the click itself, so
+    // nothing beneath it ever receives it.
+    const panel = document.createElement('nav');
+    panel.className = 'toc-panel';
+    panel.id = 'toc-panel';
+    panel.setAttribute('aria-label', 'Table of contents');
+    panel.hidden = true;
+
+    // aria-hidden: redundant with the <nav>'s own aria-label above once
+    // announced as a landmark — visible for sighted users only.
+    const panelLabel = document.createElement('p');
+    panelLabel.className = 'toc-panel-label';
+    panelLabel.textContent = 'Table of Contents';
+    panelLabel.setAttribute('aria-hidden', 'true');
+    panelLabel.insertAdjacentHTML('afterbegin', TOC_LABEL_ICON_HTML);
+
+    const panelList = document.createElement('ul');
+    panelList.className = 'toc-panel-list';
+    // Reuses .toc-rail-link (Rule 3a) — the click-to-close listener below
+    // already keys off that class generically, so this row closes the
+    // panel via the exact same path a real heading row does, with no
+    // special-casing needed for it here.
+    buildBackToTopRow(panelList);
+    const panelLinks = buildTocLinks(headings, panelList);
+
+    panel.append(panelLabel, panelList);
+
+    const scrim = document.createElement('div');
+    scrim.className = 'toc-panel-scrim';
+    scrim.setAttribute('aria-hidden', 'true');
+    scrim.hidden = true;
+
+    document.body.insertBefore(scrim, main);
+    document.body.insertBefore(panel, main);
+
+    let removeTrapFocus = null;
+    let savedScrollY = 0;
+
+    // Same technique as initFilterDrawer()'s lockBodyScroll()/
+    // unlockBodyScroll() (script.js, above) — position: fixed rather than
+    // overflow: hidden, which is known to leak scroll on iOS Safari — and
+    // the same .body-scroll-locked class. Not calling into
+    // initFilterDrawer() itself: that closure is private to Archive
+    // (initFilterDrawer() no-ops entirely on Entry pages — there's no
+    // #filter-drawer element here to find), so this is a second instance
+    // of the same technique, not a shared one — Rule 3a covers reusing a
+    // value/pattern, not literally sharing unrelated closures across
+    // unrelated components.
+    function lockBodyScroll() {
+        savedScrollY = window.scrollY;
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.classList.add('body-scroll-locked');
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('body-scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+    }
+
+    // Elements to inert while the panel is open — prevents Tab from
+    // reaching background content the scrim already blocks from clicks.
+    // .toc-trigger-group isn't included: it's hidden via the
+    // action-rail-group--visible toggle below, which already removes it
+    // from focus order and the accessibility tree on its own (visibility:
+    // hidden), so inerting it too would be redundant.
+    function getTocInertTargets() {
+        return [
+            document.getElementById('nav-placeholder'),
+            document.getElementById('main-content'),
+            document.querySelector('.toast'),
+            document.querySelector('.tab-bar'),
+            document.getElementById('footer-placeholder'),
+        ].filter(Boolean);
+    }
+
+    // Closes the panel the moment the underlying page scrolls, per spec —
+    // without this, the trigger's own scroll-threshold listener (above,
+    // shared with .back-to-top) has no idea the panel is open and re-shows
+    // itself the instant background scroll crosses 400px again, visually
+    // overlapping the still-open panel (confirmed via direct reproduction:
+    // openPanel()'s one-time class removal only holds until the next
+    // scroll event re-evaluates that unrelated listener). Reuses window's
+    // native 'scroll' event rather than separate wheel/touchmove/keydown
+    // listeners — confirmed via direct testing that .toc-panel's own
+    // internal overflow-y: auto scroll (the height-cap fix's scrollable
+    // region) never reaches this listener: element-level scroll events
+    // don't bubble, and only a capture-phase listener on window would see
+    // them despite that — this one is bubble-phase (no `capture`), same as
+    // the trigger's own existing scroll listener above, so it only ever
+    // fires for genuine page scroll. openScrollY + the small tolerance
+    // below guards against closing on imperceptible sub-pixel jitter (e.g.
+    // the first frame of a touch momentum scroll) rather than a real,
+    // intentional scroll.
+    let openScrollY = 0;
+    function handlePanelScroll() {
+        if (Math.abs(window.scrollY - openScrollY) > 2) closePanel({ returnFocus: false });
+    }
+
+    function openPanel() {
+        scrim.removeAttribute('hidden');
+        panel.hidden = false;
+        requestAnimationFrame(() => {
+            panel.classList.add('toc-panel--open');
+            scrim.classList.add('toc-panel-scrim--open');
+        });
+        trigger.setAttribute('aria-expanded', 'true');
+        trigger.setAttribute('aria-label', 'Close table of contents');
+
+        getTocInertTargets().forEach(el => el.setAttribute('inert', ''));
+
+        // Same visibility mechanism the scroll-threshold show/hide above
+        // already uses (.action-rail-group--visible) — one hide method for
+        // the trigger, not two. Mirrors exactly how initFilterDrawer()'s
+        // openDrawer() hides Archive's own .action-rail-group while its
+        // drawer is open (script.js, above).
+        triggerGroup.classList.remove('action-rail-group--visible');
+
+        removeTrapFocus = trapFocus(panel);
+        document.addEventListener('keydown', handlePanelEscape);
+
+        // Attached here (not once at init) and removed in closePanel() below
+        // so it's only ever live while the panel is actually open — confirmed
+        // via direct testing that opening the panel itself (focus-shift,
+        // trapFocus, inert, the transition) never fires a spurious window
+        // scroll event, so no extra delay is needed before attaching.
+        openScrollY = window.scrollY;
+        window.addEventListener('scroll', handlePanelScroll, { passive: true });
+
+        const firstLink = panelList.querySelector('.toc-rail-link');
+        // preventScroll: true — firstLink is inside a position: fixed
+        // panel, always on-screen regardless of scrollY, so the browser's
+        // default scroll-into-view on focus is not just unneeded but
+        // actively wrong here — confirmed via testing, not assumed: without
+        // it, focusing the link scrolled the whole page back to top.
+        if (firstLink) requestAnimationFrame(() => firstLink.focus({ preventScroll: true }));
+    }
+
+    function closePanel({ returnFocus = true } = {}) {
+        panel.classList.remove('toc-panel--open');
+        scrim.classList.remove('toc-panel-scrim--open');
+        trigger.setAttribute('aria-expanded', 'false');
+        updateActiveState();
+
+        if (removeTrapFocus) {
+            removeTrapFocus();
+            removeTrapFocus = null;
+        }
+        document.removeEventListener('keydown', handlePanelEscape);
+        window.removeEventListener('scroll', handlePanelScroll);
+
+        getTocInertTargets().forEach(el => el.removeAttribute('inert'));
+
+        // Restore trigger visibility synchronously, BEFORE trigger.focus()
+        // below — not inside the transitionend callback further down,
+        // which fires later. A still visibility: hidden element silently
+        // refuses .focus(), which would reintroduce the exact keyboard-
+        // accessibility regression already fixed once on the Filter
+        // Drawer's own trigger (see closeDrawer()'s identical comment,
+        // above) — same root cause, same fix: disable the transition just
+        // for this one change so it applies instantly and deterministically
+        // (confirmed via testing, not assumed), then restore it immediately
+        // via a forced reflow.
+        triggerGroup.classList.add('action-rail-group--instant');
+        triggerGroup.classList.add('action-rail-group--visible');
+        void triggerGroup.offsetHeight; // forces the instant change to commit before re-enabling the transition
+        triggerGroup.classList.remove('action-rail-group--instant');
+
+        panel.addEventListener('transitionend', () => {
+            panel.hidden = true;
+            scrim.setAttribute('hidden', '');
+        }, { once: true });
+
+        // preventScroll: true — trigger is fixed-position, always on-screen
+        // regardless of scrollY, so no scroll-into-view is ever needed.
+        if (returnFocus) trigger.focus({ preventScroll: true });
+    }
+
+    function handlePanelEscape(event) {
+        if (event.key === 'Escape') closePanel();
+    }
+
+    trigger.addEventListener('mousedown', (e) => e.preventDefault());
+    trigger.addEventListener('click', () => {
+        if (panel.hidden) openPanel();
+        else closePanel();
+    });
+
+    scrim.addEventListener('click', () => closePanel({ returnFocus: false }));
+
+    // Selecting a heading closes the panel (per spec) without returning
+    // focus to the trigger — the clicked link's own default navigation
+    // (scroll + browser's native fragment-focus behavior) already moves
+    // focus meaningfully, so pulling it back to the trigger would fight
+    // that instead of helping it.
+    panelList.addEventListener('click', (event) => {
+        if (event.target.closest('.toc-rail-link')) closePanel({ returnFocus: false });
+    });
+
+    // --- Shared scrollspy -------------------------------------------------
+    // Threshold read from the heading's own computed scroll-margin-top
+    // (style.css) rather than a duplicated magic number, so the two never
+    // drift out of sync.
+    const threshold = parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 0;
+
+    function updateActiveState() {
+        // Skip entirely while the panel's scroll-lock is active (see
+        // lockBodyScroll() below): position: fixed on <body> is what makes
+        // the lock work, but as a side effect it also collapses
+        // document.documentElement.scrollHeight to just the viewport's own
+        // height and makes window.scrollY read 0, regardless of the real
+        // (visually frozen) scroll position — confirmed via direct
+        // measurement, not assumed: scrollHeight dropped from ~10669 to
+        // exactly innerHeight the instant the lock class was applied. Any
+        // scroll/resize event that fires while locked (confirmed one does
+        // fire immediately on lock, in addition to whatever a live device-
+        // preset resize drag produces) would otherwise recompute against
+        // those corrupted values and wrongly force the LAST heading active
+        // no matter the true scroll position. There's nothing to recompute
+        // here anyway while locked — true scroll position cannot change
+        // until unlockBodyScroll() runs, and closePanel() already calls
+        // updateActiveState() once explicitly right after that happens.
+        if (document.body.classList.contains('body-scroll-locked')) return;
+
+        // +1px tolerance absorbs sub-pixel rendering (header's real height
+        // is a fractional 64.6667px — see NAVIGATION section, style.css) so
+        // a heading landed on via anchor jump doesn't miss its own
+        // threshold by a fraction of a pixel and leave the previous
+        // heading highlighted instead — confirmed via direct #anchor
+        // navigation, not assumed.
+        //
+        // atBottom special-case: the last heading's own threshold-crossing
+        // check below can be permanently unreachable, not just late. Every
+        // entry ends in the same shared footer block (Share/More Work,
+        // contact section, Back to Top, copyright) below the final
+        // heading; whenever that trailing content is shorter than the
+        // viewport, the document runs out of scrollable room before the
+        // last heading's top can ever reach the threshold line, so the
+        // loop below would leave the second-to-last heading active no
+        // matter how far the user scrolls — confirmed via direct
+        // measurement (heading.getBoundingClientRect().top at max
+        // scrollY was still ~192px, well past the ~80px threshold, on
+        // both a short and a long entry), not assumed. Scrolled to the
+        // document's actual bottom, the last heading is unambiguously the
+        // current one regardless of where its top sits.
+        const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+        let currentIndex = 0;
+        if (atBottom) {
+            currentIndex = headings.length - 1;
+        } else {
+            for (let i = 0; i < headings.length; i++) {
+                if (headings[i].getBoundingClientRect().top <= threshold + 1) {
+                    currentIndex = i;
+                } else {
+                    break;
+                }
+            }
+        }
+        const current = headings[currentIndex];
+
+        [railLinks, panelLinks].forEach(links => {
+            links.forEach(link => {
+                const isActive = link.getAttribute('href') === `#${current.id}`;
+                link.classList.toggle('toc-rail-link--active', isActive);
+                if (isActive) {
+                    link.setAttribute('aria-current', 'true');
+                } else {
+                    link.removeAttribute('aria-current');
+                }
+            });
+        });
+
+        badge.textContent = `${currentIndex + 1}/${headings.length}`;
+        // Only while closed — while open the label says "Close table of
+        // contents" instead (set in openPanel()); background scroll can
+        // still move the badge/position while the panel is open (no
+        // scroll-lock), but the trigger's own accessible name doesn't
+        // need to chase that in real time the way the visible badge does.
+        if (trigger.getAttribute('aria-expanded') !== 'true') {
+            trigger.setAttribute('aria-label', `Table of contents, heading ${currentIndex + 1} of ${headings.length}`);
+        }
+    }
+
+    window.addEventListener('scroll', updateActiveState, { passive: true });
+    window.addEventListener('resize', updateActiveState);
+
+    // Re-lands on the URL's own #hash now that the header's real height is
+    // known, correcting the browser's earlier native fragment scroll (see
+    // comment at the call site in the DOMContentLoaded handler above).
+    if (location.hash) {
+        const target = document.getElementById(location.hash.slice(1));
+        if (target && headings.includes(target)) {
+            target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+    }
+
+    updateActiveState();
+}
+
+// Traps keyboard focus within element while open.
+// Returns a cleanup function that removes the listener.
+function trapFocus(element) {
+    const FOCUSABLE = [
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])'
+    ].join(', ');
+
+    function handler(event) {
+        if (event.key !== 'Tab') return;
+
+        const focusable = [...element.querySelectorAll(FOCUSABLE)];
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey) {
+            if (document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
+    }
+
+    element.addEventListener('keydown', handler);
+    return () => element.removeEventListener('keydown', handler);
+}
+
+// Filter drawer — all triggers via [aria-controls="filter-drawer"].
+// Works for .action-rail-trigger (the floating trigger, always visible, all
+// breakpoints) and the drawer's own internal .filter-drawer-trigger (Close).
+// Depends on: trapFocus()
+function initFilterDrawer() {
+    const drawer = document.getElementById('filter-drawer');
+    if (!drawer) return;
+
+    const scrim = document.getElementById('archive-scrim');
+    const allTriggers = document.querySelectorAll('[aria-controls="filter-drawer"]');
+    let removeTrapFocus = null;
+    let openerBtn = null;
+    let savedScrollY = 0;
+
+    // Locks background scroll while the drawer is open — inert blocks click/
+    // focus/AT interaction on background content, but has no effect on
+    // document-level scroll, so touch-drag and wheel gestures over the scrim
+    // would otherwise still scroll the page underneath.
+    function lockBodyScroll() {
+        savedScrollY = window.scrollY;
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.classList.add('body-scroll-locked');
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('body-scroll-locked');
+        document.body.style.top = '';
+        // behavior: 'instant' — html has scroll-behavior: smooth sitewide
+        // (for the Back to Top button and anchor jumps), which window.scrollTo
+        // inherits by default. Confirmed via testing, not assumed: without
+        // an explicit override this restore animates over several hundred ms
+        // instead of jumping immediately, which is exactly backwards for a
+        // state restoration — the user should land back exactly where they
+        // were with no perceptible motion, not watch the page scroll past
+        // everything in between. This surfaced as a real, visible bug only
+        // on long scroll distances (the animation takes longer to finish, so
+        // a fixed-delay check samples it mid-flight); short distances looked
+        // fine only because the animation had time to complete unnoticed.
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+    }
+
+    // Elements to inert while the drawer is open — prevents focus leaking to duplicate controls
+    function getInertTargets() {
+        return [
+            document.getElementById('archive-sticky-header'),
+            document.querySelector('.action-rail-group'),
+            document.getElementById('theme-toggle'),
+            document.getElementById('main-content'),
+            document.querySelector('.toast'),
+            document.querySelector('.tab-bar'),
+            document.getElementById('nav-placeholder'),
+            document.getElementById('footer-placeholder'),
+        ].filter(Boolean);
+    }
+
+    function updateTriggerLabels(isOpen) {
+        allTriggers.forEach(t => {
+            const labelSpan = t.querySelector('.trigger-label');
+            if (labelSpan) labelSpan.textContent = isOpen ? 'Close' : 'Filters';
+            if (t.classList.contains('action-rail-trigger')) {
+                // Matches the visible .trigger-label text's exact case ("Filters") —
+                // WCAG 2.5.3 (Label in Name) requires the visible text to appear
+                // verbatim in the accessible name; the prior lowercase "filters"
+                // failed axe/Lighthouse's label-content-name-mismatch check.
+                t.setAttribute('aria-label', isOpen ? 'Close Filters' : 'Open Filters');
+            }
+        });
+    }
+
+    function openDrawer(opener) {
+        openerBtn = opener;
+        lockBodyScroll();
+        drawer.removeAttribute('inert');
+        drawer.removeAttribute('hidden');
+        if (scrim) scrim.removeAttribute('hidden');
+        requestAnimationFrame(() => {
+            drawer.classList.add('filter-drawer--open');
+            if (scrim) scrim.classList.add('archive-scrim--open');
+        });
+        allTriggers.forEach(t => t.setAttribute('aria-expanded', 'true'));
+        updateTriggerLabels(true);
+
+        // Inert all page content outside the drawer — prevents Tab from reaching duplicate controls
+        getInertTargets().forEach(el => el.setAttribute('inert', ''));
+        const railGrp = document.querySelector('.action-rail-group');
+        if (railGrp) railGrp.classList.remove('action-rail-group--visible');
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) themeToggle.classList.remove('theme-toggle-rail--visible');
+
+        // Clear (when enabled — e.g. arriving with a filter already active)
+        // is the natural first stop; otherwise land on the first primary chip.
+        const firstFocusable =
+            drawer.querySelector('.archive-clear-btn:not([disabled])') ||
+            drawer.querySelector('.filter-drawer-primary-chips button:not([disabled])') ||
+            drawer.querySelector('button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (firstFocusable) {
+            requestAnimationFrame(() => firstFocusable.focus());
+        }
+
+        removeTrapFocus = trapFocus(drawer);
+        document.addEventListener('keydown', handleEscape);
+    }
+
+    function closeDrawer() {
+        unlockBodyScroll();
+        drawer.setAttribute('inert', '');
+        drawer.classList.remove('filter-drawer--open');
+        if (scrim) scrim.classList.remove('archive-scrim--open');
+        allTriggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+        updateTriggerLabels(false);
+
+        if (removeTrapFocus) {
+            removeTrapFocus();
+            removeTrapFocus = null;
+        }
+        document.removeEventListener('keydown', handleEscape);
+
+        // Remove inert before returning focus so the opener can receive it
+        getInertTargets().forEach(el => el.removeAttribute('inert'));
+
+        // Restore rail group visibility synchronously, BEFORE the
+        // openerBtn.focus() call below — not inside the transitionend
+        // callback, which fires later. openerBtn is frequently this same
+        // rail trigger now (the only opener at every breakpoint). The rail
+        // is always shown while the drawer is closed (see .action-rail-group
+        // in style.css) — unconditional now, no scroll-position check needed.
+        //
+        // visibility is a discrete-animatable property: switching it to
+        // "visible" only takes effect once the browser commits to starting
+        // the transition, which — confirmed by testing, not assumed — does
+        // NOT reliably happen within a single requestAnimationFrame under
+        // real page load (this element's transition competes with the
+        // drawer's own simultaneous close transition). A still-hidden
+        // element silently refuses .focus(), leaving focus stuck wherever
+        // it was until the drawer's hidden attribute lands later and force-
+        // blurs it to <body>. Fix: disable the transition just for this one
+        // change so it applies instantly and deterministically, then
+        // restore it immediately after via a forced reflow — same
+        // instant-then-re-enable technique used whenever a transitioned
+        // property needs to change without animating.
+        const railGrp = document.querySelector('.action-rail-group');
+        if (railGrp) {
+            railGrp.classList.add('action-rail-group--instant');
+            railGrp.classList.add('action-rail-group--visible');
+            void railGrp.offsetHeight; // force the instant change to commit before re-enabling the transition
+            railGrp.classList.remove('action-rail-group--instant');
+        }
+
+        drawer.addEventListener('transitionend', () => {
+            drawer.setAttribute('hidden', '');
+            if (scrim) scrim.setAttribute('hidden', '');
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) themeToggle.classList.add('theme-toggle-rail--visible');
+        }, { once: true });
+
+        // preventScroll: true — focus() defaults to scrolling its target
+        // into view if the browser doesn't already consider it visible,
+        // which can fight with the scroll position unlockBodyScroll() just
+        // restored above. openerBtn is fixed-position (always on-screen
+        // regardless of scrollY), so no scroll-into-view is ever actually
+        // needed here.
+        if (openerBtn) openerBtn.focus({ preventScroll: true });
+    }
+
+    function handleEscape(event) {
+        if (event.key === 'Escape') closeDrawer();
+    }
+
+    allTriggers.forEach(btn => {
+        // Prevents mousedown from blurring whatever currently has focus
+        // before the click lands — defensive against any focus-driven
+        // layout shift moving this button out from under the cursor
+        // between mousedown and mouseup.
+        btn.addEventListener('mousedown', (e) => e.preventDefault());
+
+        btn.addEventListener('click', () => {
+            if (drawer.hidden) openDrawer(btn);
+            else closeDrawer();
+        });
+    });
+
+    if (scrim) {
+        scrim.addEventListener('click', closeDrawer);
+    }
+
+    return { openDrawer, closeDrawer };
+}
+
+// Archive page — fetch manifest, build chips, filter, sort, paginate, sync URL
+function initArchive(filterDrawer) {
+    const resultsEl        = document.getElementById('archive-results');
+    if (!resultsEl) return;
+
+    // Skeleton placeholder cards — shown immediately, before the
+    // data/archive-entries.json fetch below resolves, so the results grid
+    // has real reserved height instead of the near-empty div that
+    // previously caused Archive's ~1.0 CLS (confirmed via Lighthouse's
+    // cls-culprits-insight: the entire shift traced to <main> itself,
+    // i.e. the results grid popping in from nothing). aria-hidden since
+    // these are decorative loading state, not real content. Removed for
+    // free the moment the first real render() call runs its own
+    // resultsEl.innerHTML = '' (below) — no separate cleanup needed.
+    function buildSkeletonCard() {
+        const card = document.createElement('div');
+        card.className = 'card card--feature card--skeleton';
+        card.setAttribute('aria-hidden', 'true');
+        card.innerHTML = `
+            <div class="card-image"></div>
+            <div class="card-content">
+                <div class="skeleton-line skeleton-line--title"></div>
+                <div class="skeleton-line skeleton-line--meta"></div>
+                <div class="skeleton-line skeleton-line--excerpt"></div>
+                <div class="skeleton-line skeleton-line--excerpt-short"></div>
+            </div>`;
+        return card;
+    }
+    const SKELETON_CARD_COUNT = 3;
+    for (let i = 0; i < SKELETON_CARD_COUNT; i++) {
+        resultsEl.appendChild(buildSkeletonCard());
+    }
+
+    const titleEl          = document.getElementById('archive-title');
+    const countEl          = document.getElementById('archive-count');
+    const primaryChips     = document.querySelectorAll('[data-filter-type]');
+    const drawerActiveChipsEl = document.getElementById('filter-drawer-active-chips');
+    const drawerChipsEl    = document.getElementById('filter-drawer-chips');
+    const drawerPrimaryChipsEl = document.querySelector('.filter-drawer-primary-chips');
+    const pageNavEl        = document.getElementById('filter-drawer-page-nav');
+    const pageDotsEl       = document.getElementById('filter-drawer-page-dots');
+    const pagePrevBtn      = document.querySelector('.filter-drawer-page-prev');
+    const pageNextBtn      = document.querySelector('.filter-drawer-page-next');
+    const pageStatusEl     = document.getElementById('filter-drawer-page-status');
+    const SECONDARY_PAGE_SIZE = 12;
+
+    // State
+    let allEntries         = [];
+    let activeType         = null;
+    const activeSecondary  = new Set();
+    let currentSort        = 'latest';
+    let currentQuery       = '';
+    let secondaryPage      = 0; // Filter Drawer paginated secondary tags, 0-indexed
+    // The grid page the user was on right before any secondary tag went
+    // active (see .filter-drawer--tags-active in style.css) — restored when
+    // the last active tag is cleared, so the grid reappears on the same
+    // page rather than resetting to page 1. wasSecondaryActive tracks the
+    // 0→N / N→0 transition itself, since that's the only moment this
+    // should be captured or restored (not on every render while one or
+    // more tags stay active).
+    let secondaryPageBeforeActive = 0;
+    let wasSecondaryActive = false;
+
+    // Current page count for the drawer's secondary tag pagination, derived
+    // from the actual (already zero-count-filtered) visible tag count —
+    // recomputed on demand rather than cached, since active filters change
+    // which tags are non-zero-count from one render to the next.
+    function getDrawerSecondaryPageCount() {
+        if (!drawerChipsEl) return 1;
+        const visibleCount = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')]
+            .filter(btn => !btn.classList.contains('tag-chip--zero-count')).length;
+        return Math.max(1, Math.ceil(visibleCount / SECONDARY_PAGE_SIZE));
+    }
+
+    // Read initial URL params
+    const params = new URLSearchParams(window.location.search);
+    const typeParam = params.get('type');
+    const tagParam  = params.get('tag');
+    if (typeParam === 'work' || typeParam === 'thoughts') activeType = typeParam;
+    // tagParam is validated against real tag data once the manifest is fetched
+    // (below) — adding it here, before allEntries exists, would let any stale
+    // or arbitrary URL value become a permanent zero-match filter.
+
+    // Utilities
+    function slugify(str) {
+        return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    function formatDate(iso) {
+        const [y, m, d] = iso.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
+
+    function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Shared by buildSecondaryChips() and the drawer height/pagination
+    // measurement below (updateDrawerSecondaryMetrics()) — same
+    // dedupe-by-slug + alphabetical sort in one place, so the measured
+    // chip set can never drift from what actually renders.
+    function getUniqueSortedTags(entries) {
+        const seen = new Set();
+        const tags = [];
+        entries.forEach(e => (e.tags || []).forEach(t => {
+            const slug = slugify(t);
+            if (!seen.has(slug)) { seen.add(slug); tags.push({ label: t, slug }); }
+        }));
+        tags.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+        return tags;
+    }
+
+    // Build secondary tag chips into the Filter Drawer — the one shared
+    // pool of secondary tags at every breakpoint now, paginated 6 per page
+    // (see the pagination block in render() and the Previous/Next/dots
+    // wiring below).
+    function buildSecondaryChips(entries) {
+        if (!drawerChipsEl) return;
+
+        const tags = getUniqueSortedTags(entries);
+
+        drawerChipsEl.innerHTML = '';
+        tags.forEach(({ label, slug }) => {
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip';
+            btn.type = 'button';
+            btn.dataset.filterTag = slug;
+            btn.dataset.label = label;
+            btn.setAttribute('aria-pressed', 'false');
+            btn.textContent = label;
+            const countSpan = document.createElement('span');
+            countSpan.className = 'chip-count';
+            countSpan.setAttribute('aria-hidden', 'true');
+            btn.appendChild(countSpan);
+            btn.addEventListener('click', () => {
+                if (activeSecondary.has(slug)) {
+                    activeSecondary.delete(slug);
+                } else {
+                    activeSecondary.add(slug);
+                }
+                render();
+            });
+            drawerChipsEl.appendChild(btn);
+        });
+    }
+
+    // Splits an already-sorted tag list into SECONDARY_PAGE_SIZE-sized
+    // pages — same chunking getDrawerSecondaryPageCount() assumes for
+    // whichever primary state is currently active, generalised here so
+    // updateDrawerSecondaryMetrics() below can walk every reachable state.
+    // Always returns at least one (possibly empty) page, matching
+    // getDrawerSecondaryPageCount()'s own Math.max(1, ...) floor.
+    function paginateTags(tags) {
+        const pages = [];
+        for (let i = 0; i < tags.length; i += SECONDARY_PAGE_SIZE) {
+            pages.push(tags.slice(i, i + SECONDARY_PAGE_SIZE));
+        }
+        return pages.length ? pages : [[]];
+    }
+
+    // Builds one off-screen replica of the real drawer's secondary-tag
+    // grid, measures its real rendered height, then removes it. Reuses
+    // .filter-drawer/.filter-drawer-body/.filter-drawer-secondary-page's
+    // real classes (not a copy of their rules) so the responsive width
+    // chain (full-bleed mobile, max-content-capped + centred >=768px —
+    // see .filter-drawer in style.css) is pixel-identical to the live
+    // drawer at whatever viewport this runs at. Can't reuse
+    // #filter-drawer-chips itself (id selector, and this is a detached
+    // scratch node — a duplicate id risks colliding with the real one),
+    // so its handful of layout properties are reproduced by value
+    // instead. visibility: hidden, not display: none or [hidden] — the
+    // real drawer's own [hidden] is display: none, under which no
+    // descendant can wrap text or report a non-zero height at all, which
+    // is exactly why this measures a separate off-screen node rather than
+    // the live (possibly currently-closed) drawer. Replaces the original
+    // 109px value's one-time manual derivation (see the removed comment
+    // this replaced in style.css) with the same rigor — real .tag-chip
+    // markup, real longest-label text for whichever state is being
+    // measured — but automated and re-run live instead of hand-measured
+    // once and hardcoded.
+    function measureTagPageHeight(tagPage) {
+        if (!tagPage.length) return 0;
+
+        const scratch = document.createElement('div');
+        scratch.className = 'filter-drawer';
+        scratch.style.cssText = 'visibility: hidden; position: fixed; top: -9999px; left: 0; transform: none; transition: none; max-height: none; pointer-events: none;';
+
+        const body = document.createElement('div');
+        body.className = 'filter-drawer-body';
+
+        const page = document.createElement('div');
+        page.className = 'filter-drawer-secondary-page';
+
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display: flex; flex-wrap: wrap; gap: var(--space-2); align-content: flex-start;';
+
+        tagPage.forEach(({ label }) => {
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip';
+            btn.type = 'button';
+            btn.textContent = label;
+            const countSpan = document.createElement('span');
+            countSpan.className = 'chip-count';
+            btn.appendChild(countSpan);
+            grid.appendChild(btn);
+        });
+
+        page.appendChild(grid);
+        body.appendChild(page);
+        scratch.appendChild(body);
+        document.body.appendChild(scratch);
+
+        const height = grid.offsetHeight;
+        scratch.remove();
+        return height;
+    }
+
+    // Computes, across every reachable primary-filter state (All, Work,
+    // Thoughts — not just whichever is active right now), the tallest
+    // single secondary-tag page and the most pages any one state would
+    // need. A user can switch primary filters without closing the drawer,
+    // so the reserved height/pagination-nav decision must already account
+    // for whichever state they land on, not be re-derived only when they
+    // arrive there. Sets --drawer-secondary-height (consumed by
+    // .filter-drawer-secondary-page and
+    // .filter-drawer--tags-active #filter-drawer-active-chips in
+    // style.css, replacing their old static 109px) and toggles
+    // .filter-drawer--no-pagination (real display: none removal of
+    // .filter-drawer-page-nav when no reachable state ever needs more
+    // than one page — see style.css — vs. the existing
+    // .filter-drawer-page-nav[hidden] → visibility: hidden pattern, left
+    // untouched, for when some state does).
+    //
+    // Called from render() (already runs on primary-filter change and on
+    // the entries array first loading — Change 4's other two triggers)
+    // and from the drawer-open MutationObserver below — cheap enough (a
+    // handful of off-screen chip buttons per call) to just always re-run
+    // rather than gate precisely to those exact moments.
+    function updateDrawerSecondaryMetrics() {
+        if (!filterDrawerEl || !drawerChipsEl) return;
+
+        let maxHeight = 0;
+        let maxPageCount = 1;
+
+        [null, 'work', 'thoughts'].forEach(type => {
+            const stateEntries = type ? allEntries.filter(e => e.type === type) : allEntries;
+            const pages = paginateTags(getUniqueSortedTags(stateEntries));
+            maxPageCount = Math.max(maxPageCount, pages.length);
+            pages.forEach(page => {
+                maxHeight = Math.max(maxHeight, measureTagPageHeight(page));
+            });
+        });
+
+        filterDrawerEl.style.setProperty('--drawer-secondary-height', `${maxHeight}px`);
+        filterDrawerEl.classList.toggle('filter-drawer--no-pagination', maxPageCount <= 1);
+    }
+
+    // Filter + sort the full entry list
+    function getFiltered() {
+        return allEntries
+            .filter(e => {
+                if (activeType && e.type !== activeType) return false;
+                if (activeSecondary.size) {
+                    const slugs = (e.tags || []).map(slugify);
+                    if (![...activeSecondary].some(s => slugs.includes(s))) return false;
+                }
+                if (currentQuery) {
+                    const text = [e.title, e.excerpt, ...(e.tags || [])].join(' ').toLowerCase();
+                    if (!text.includes(currentQuery)) return false;
+                }
+                return true;
+            })
+            .sort((a, b) => {
+                const da = new Date(a.date).getTime();
+                const db = new Date(b.date).getTime();
+                return currentSort === 'latest' ? db - da : da - db;
+            });
+    }
+
+    // Build a card article element from a manifest entry
+    function buildCard(entry) {
+        const article = document.createElement('article');
+        article.className = entry.type === 'work' ? 'card card--feature' : 'card card--thought';
+
+        const url        = entry.url || '#';
+        const date       = formatDate(entry.date);
+        const ctaText    = entry.type === 'work' ? 'View' : 'Read';
+        // blockLinkLabel override: manifest escape hatch for the rare title
+        // where "{ctaText} {title}" reads redundant (e.g. "Read Read Me" for
+        // the "Read Me" entry) — general convention unchanged for every
+        // entry that doesn't set this field.
+        const blockLinkLabel = entry.blockLinkLabel
+            ? escapeHTML(entry.blockLinkLabel)
+            : `${ctaText} ${escapeHTML(entry.title)}`;
+        const linkCtaText = entry.type === 'work' ? 'View this work' : 'View this thought';
+        const linkCtaLabel = `${escapeHTML(entry.title)} — ${linkCtaText}`;
+        const linkCtaIcon = `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                </svg>`;
+
+        // Card-preview tags: plain, non-interactive teal text, comma-
+        // separated in a single span — not the real .tag filter links
+        // used on entry pages/Archive. No href, no focusability. See
+        // style.css ".card-tag" and REFERENCE.md's Unused Assets section
+        // for how this was decoupled from .tag.
+        const tagsHTML = (entry.tags && entry.tags.length)
+            ? `<span class="card-tag">${(entry.tags.map(escapeHTML)).join(', ')}</span>`
+            : '';
+
+        const imageHTML = entry.type === 'work'
+            ? `<div class="card-image" role="presentation"></div>`
+            : '';
+
+        // Date row — both Work and Thought Entry cards
+        const dateHTML = `<p class="card-date">${date}</p>`;
+
+        article.innerHTML = `
+            <a href="${escapeHTML(url)}" class="card-block-link" aria-label="${blockLinkLabel}" aria-hidden="true" tabindex="-1"></a>
+            ${imageHTML}
+            <div class="card-content">
+                <h3 class="card-title" data-searchable>${escapeHTML(entry.title)}</h3>
+                ${dateHTML}
+                <div class="card-tags">${tagsHTML}</div>
+                <p class="card-excerpt">${escapeHTML(entry.excerpt || '')}</p>
+                <a href="${escapeHTML(url)}" class="link-cta" aria-label="${linkCtaLabel}">
+                    ${linkCtaText}
+                    ${linkCtaIcon}
+                </a>
+            </div>`;
+
+        // Set background image via JS (not an inline HTML style attribute)
+        if (entry.type === 'work' && entry.image) {
+            const imgDiv = article.querySelector('.card-image');
+            if (imgDiv) imgDiv.style.backgroundImage = `url('${entry.image}')`;
+        }
+
+        return article;
+    }
+
+    // Moves focus to a secondary tag's chip after it's deactivated via its
+    // × in the active-chips row, matched by its stable slug — not a
+    // captured DOM reference, since the render() this runs after just
+    // rebuilt this active-chips row from scratch (destroying the × button
+    // that was just clicked/activated) and may also have re-paginated the
+    // pool this chip lives in. Without this, no explicit focus target
+    // survives the deactivation, so focus silently falls to document.body
+    // — confirmed via real click AND real keyboard (Tab to the × button,
+    // Enter) testing, not assumed: document.activeElement reads as <body>
+    // immediately after, and the *next* Tab press lands on whichever chip
+    // happens to be first in DOM order on whatever page is showing —
+    // exactly the "different, unrelated tag" symptom reported.
+    //
+    // Single shared pool now (#filter-drawer-chips, paginated 6 per page) at
+    // every breakpoint.
+    function focusDeactivatedSecondaryTag(slug) {
+        const poolEl = drawerChipsEl;
+        if (!poolEl) return;
+
+        let chip = poolEl.querySelector(`[data-filter-tag="${slug}"]`);
+        if (!chip) return;
+
+        // secondaryPageBeforeActive (above) restores the page the user was
+        // on before the FIRST tag went active, not necessarily where THIS
+        // tag sits — with more than one tag cycled through active state
+        // those can diverge. If the restored page doesn't actually show
+        // this tag, jump to its real page using the same alphabetical-index
+        // math the initial ?tag= URL arrival uses (see fetch().then()
+        // below), then re-render before focusing, so the focus call fires
+        // once that page is actually showing.
+        if (chip.classList.contains('tag-chip--collapsed')) {
+            const visibleTags = [...poolEl.querySelectorAll('[data-filter-tag]')]
+                .filter(b => !b.classList.contains('tag-chip--zero-count'));
+            const idx = visibleTags.indexOf(chip);
+            if (idx !== -1) {
+                secondaryPage = Math.floor(idx / SECONDARY_PAGE_SIZE);
+                render();
+                chip = poolEl.querySelector(`[data-filter-tag="${slug}"]`);
+            }
+        }
+
+        if (chip && chip.offsetParent !== null) {
+            chip.focus();
+            return;
+        }
+
+        // Chip still isn't visible — its own zero-count-hidden state changed
+        // as a side effect of the deactivation (its count doesn't depend on
+        // activeSecondary, but it can already have been 0 while active if
+        // activeType/currentQuery excluded it — the active-chips row shows
+        // it regardless of zero-count, unlike the main pool).
+        if (activeSecondary.size > 0) {
+            // Other tags are still active — the pool/pagination stays
+            // hidden (.filter-drawer--tags-active), so the active-chips row
+            // itself (always visible whenever any tag is active) is the
+            // reachable, contextually relevant fallback.
+            const firstActive = drawerActiveChipsEl ? drawerActiveChipsEl.querySelector('.tag-chip') : null;
+            if (firstActive) { firstActive.focus(); return; }
+        } else {
+            // This was the last active tag and the pool is visible again
+            // (.filter-drawer--tags-active just came off) — first visible
+            // chip on the now-current page.
+            const firstVisible = poolEl.querySelector('[data-filter-tag]:not(.tag-chip--collapsed):not(.tag-chip--zero-count)');
+            if (firstVisible) { firstVisible.focus(); return; }
+        }
+
+        // Last resort — pagination Previous, gated on actual visibility:
+        // .filter-drawer-page-nav[hidden] uses visibility: hidden, not
+        // display: none, specifically to stay out of the tab order (see
+        // style.css) — a .focus() call on anything inside it while hidden
+        // is a silent no-op, confirmed, not assumed.
+        if (pageNavEl && !pageNavEl.hidden && pagePrevBtn) {
+            pagePrevBtn.focus();
+        }
+    }
+
+    // Update active secondary chips row (shown above secondary list)
+    function updateActiveChipsRow() {
+        if (!drawerActiveChipsEl) return;
+        const container = drawerActiveChipsEl;
+        container.innerHTML = '';
+        container.classList.toggle('is-active', activeSecondary.size > 0);
+        activeSecondary.forEach(slug => {
+            const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
+            const label = sourceBtn ? sourceBtn.dataset.label : slug;
+            const btn = document.createElement('button');
+            btn.className = 'tag-chip tag-chip--active';
+            btn.type = 'button';
+            btn.setAttribute('aria-pressed', 'true');
+            btn.setAttribute('aria-label', `Remove ${label} filter`);
+            const x = document.createElement('span');
+            x.className = 'tag-chip-x';
+            x.setAttribute('aria-hidden', 'true');
+            x.textContent = '×';
+            btn.textContent = label;
+            btn.appendChild(x);
+            btn.addEventListener('click', () => {
+                activeSecondary.delete(slug);
+                render();
+                focusDeactivatedSecondaryTag(slug);
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    // Entry count for a type chip given current secondary + query filters
+    function getChipCountForType(type) {
+        return allEntries.filter(e => {
+            if (e.type !== type) return false;
+            if (activeSecondary.size) {
+                const slugs = (e.tags || []).map(slugify);
+                if (![...activeSecondary].some(s => slugs.includes(s))) return false;
+            }
+            if (currentQuery) {
+                const text = [e.title, e.excerpt, ...(e.tags || [])].join(' ').toLowerCase();
+                if (!text.includes(currentQuery)) return false;
+            }
+            return true;
+        }).length;
+    }
+
+    // Entry count for a tag chip given current type + query filters
+    function getChipCountForTag(slug) {
+        return allEntries.filter(e => {
+            if (activeType && e.type !== activeType) return false;
+            const slugs = (e.tags || []).map(slugify);
+            if (!slugs.includes(slug)) return false;
+            if (currentQuery) {
+                const text = [e.title, e.excerpt, ...(e.tags || [])].join(' ').toLowerCase();
+                if (!text.includes(currentQuery)) return false;
+            }
+            return true;
+        }).length;
+    }
+
+    // Shared class/aria/× state for a tag-chip button — single source of truth
+    // for the primary-chip and secondary-chip render loops below.
+    // isDuplicateOfActiveRow: true for chips living in the full secondary
+    // list (#filter-drawer-chips), where an active tag is already shown
+    // separately in the active-chips row (#filter-drawer-active-chips) —
+    // that duplicate must render Dim, not Active, so only the true
+    // active-chips-row instance ever shows the Active state for a given
+    // slug. aria-pressed/×/aria-label stay driven by the real isActive value
+    // regardless of this distinction, since the underlying toggle state
+    // (and its removability) is unchanged — only the visual Active/Dim
+    // classing differs for the duplicate.
+    function applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow = false }) {
+        const dimAsDuplicate = isDuplicateOfActiveRow && isActive;
+        const showAsActive = isActive && !dimAsDuplicate;
+        const showAsDim = dimAsDuplicate || (!isActive && anyActive);
+
+        btn.classList.toggle('tag-chip--active', showAsActive);
+        btn.classList.toggle('tag-chip--dim', showAsDim);
+        btn.setAttribute('aria-pressed', String(isActive));
+
+        const existingX = btn.querySelector('.tag-chip-x');
+        if (isActive && !existingX) {
+            const x = document.createElement('span');
+            x.className = 'tag-chip-x';
+            x.setAttribute('aria-hidden', 'true');
+            x.textContent = '×';
+            btn.appendChild(x);
+        } else if (!isActive && existingX) {
+            existingX.remove();
+        }
+
+        if (isActive) btn.setAttribute('aria-label', `Remove ${btn.dataset.label} filter`);
+        else           btn.removeAttribute('aria-label');
+    }
+
+    // Main render — updates all UI from current state
+    function render() {
+        const filtered = getFiltered();
+
+        // Title
+        if (titleEl) {
+            if (activeType === 'work')         titleEl.textContent = 'Archive / Work';
+            else if (activeType === 'thoughts') titleEl.textContent = 'Archive / Thoughts';
+            else                                titleEl.textContent = 'Archive';
+        }
+
+        // Count (aria-live polite) — "All" when the filtered set equals the
+        // full unfiltered entry list (covers the 0-active-filters case, and
+        // correctly falls back to the real number if search text narrows
+        // results even with 0 chip filters active).
+        if (countEl) {
+            const displayCount = filtered.length === allEntries.length ? 'All' : filtered.length;
+            const entriesWord  = filtered.length === 1 ? 'Entry' : 'Entries';
+            countEl.innerHTML = `Showing <span class="archive-count-value">${displayCount}</span> ${entriesWord}`;
+        }
+
+        // Primary type chips
+        primaryChips.forEach(btn => {
+            const type     = btn.dataset.filterType;
+            const isActive = activeType === type;
+            const anyActive = activeType !== null;
+            applyChipState(btn, { isActive, anyActive });
+            const typeCountEl = btn.querySelector('.chip-count');
+            if (typeCountEl) typeCountEl.textContent = ` ${getChipCountForType(type)}`;
+        });
+
+        // Sort toggle — update text to reflect current sort direction
+        document.querySelectorAll('.archive-sort-toggle').forEach(btn => {
+            btn.textContent = currentSort === 'latest' ? 'Latest ↑' : 'Earliest ↓';
+        });
+
+        // Update all trigger badges (header trigger + floating rail trigger) from shared state
+        const filterCount = (activeType ? 1 : 0) + activeSecondary.size;
+        document.querySelectorAll('.action-rail-badge').forEach(badgeEl => {
+            badgeEl.textContent = filterCount;
+            badgeEl.hidden = filterCount === 0;
+        });
+
+        // Enable Clear buttons when either search text or a filter is active —
+        // disabled only when both are empty. Previously checked filterCount
+        // alone, so typing search text with no filter active left Clear
+        // wrongly disabled even though there was something to clear.
+        document.querySelectorAll('.archive-clear-btn').forEach(btn => {
+            btn.disabled = filterCount === 0 && currentQuery.length === 0;
+        });
+
+        // External Clear (floating action rail) — no empty-state Clear
+        // button, unlike the header/drawer instances above which stay
+        // present but disabled. Rendered only while a filter is active;
+        // hides along with the rest of .action-rail-group while the drawer
+        // is open (openDrawer()/closeDrawer() toggle the whole group).
+        const railClearBtn = document.querySelector('.action-rail-clear');
+        if (railClearBtn) railClearBtn.hidden = filterCount === 0;
+
+        // Secondary tag chips (drawer — the one shared pool at every breakpoint)
+        document.querySelectorAll('[data-filter-tag]').forEach(btn => {
+            const slug     = btn.dataset.filterTag;
+            const isActive = activeSecondary.has(slug);
+            const anyActive = activeSecondary.size > 0;
+            const isDuplicateOfActiveRow = !!btn.closest('#filter-drawer-chips');
+            applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow });
+            const count = getChipCountForTag(slug);
+            const tagCountEl = btn.querySelector('.chip-count');
+            if (tagCountEl) tagCountEl.textContent = ` ${count}`;
+            btn.classList.toggle('tag-chip--zero-count', count === 0);
+        });
+
+        // Recomputes the drawer's reserved secondary-tag height and the
+        // page-nav display: none decision across every reachable primary
+        // state — covers this render()'s own trigger (primary-filter
+        // change) and the entries-array-just-loaded trigger (the fetch
+        // callback below also calls render()); see
+        // updateDrawerSecondaryMetrics() above for the third trigger
+        // (drawer open).
+        updateDrawerSecondaryMetrics();
+
+        // Filter Drawer secondary tags — paginated 6 per page (already
+        // alphabetically sorted; zero-count tags already excluded above) —
+        // same drawer, same pagination, at every breakpoint now.
+        if (drawerChipsEl) {
+            // One or more secondary tags active — collapse the grid +
+            // pagination in favour of #filter-drawer-active-chips alone
+            // (see .filter-drawer--tags-active in style.css), which already
+            // shows every active tag with its own working × removal; no
+            // second copy of that UI is built here. Capture secondaryPage
+            // exactly once on the 0→N transition (not on every render while
+            // active, which would keep overwriting it with pages the user
+            // never actually chose), and restore it once on the N→0
+            // transition, so clearing the last active tag returns the grid
+            // to the page the user was browsing before, not page 1.
+            const hasActiveSecondary = activeSecondary.size > 0;
+            if (hasActiveSecondary && !wasSecondaryActive) {
+                secondaryPageBeforeActive = secondaryPage;
+            } else if (!hasActiveSecondary && wasSecondaryActive) {
+                secondaryPage = secondaryPageBeforeActive;
+            }
+            wasSecondaryActive = hasActiveSecondary;
+            if (filterDrawerEl) filterDrawerEl.classList.toggle('filter-drawer--tags-active', hasActiveSecondary);
+
+            const visibleTags = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')]
+                .filter(btn => !btn.classList.contains('tag-chip--zero-count'));
+            const pageCount = getDrawerSecondaryPageCount();
+            if (secondaryPage >= pageCount) secondaryPage = pageCount - 1;
+            if (secondaryPage < 0) secondaryPage = 0;
+            const pageStart = secondaryPage * SECONDARY_PAGE_SIZE;
+            const pageEnd = pageStart + SECONDARY_PAGE_SIZE;
+
+            visibleTags.forEach((btn, i) => {
+                btn.classList.toggle('tag-chip--collapsed', i < pageStart || i >= pageEnd);
+            });
+
+            // Space still reserved when hidden (see the [hidden] rule in
+            // style.css) — hidden whenever there's nothing to paginate
+            // through (pageCount <= 1) or a tag is active (no grid showing
+            // in that state regardless of the underlying pageCount).
+            if (pageNavEl) pageNavEl.hidden = pageCount <= 1 || hasActiveSecondary;
+
+            if (pageDotsEl) {
+                // Rebuild only when the page count actually changes — avoids
+                // destroying/recreating dot buttons (and any focus on them)
+                // every render for no reason.
+                if (pageDotsEl.children.length !== pageCount) {
+                    pageDotsEl.innerHTML = '';
+                    for (let p = 0; p < pageCount; p++) {
+                        const dot = document.createElement('button');
+                        dot.type = 'button';
+                        dot.className = 'filter-drawer-page-dot';
+                        dot.setAttribute('aria-label', `Page ${p + 1}`);
+                        dot.addEventListener('click', () => {
+                            secondaryPage = p;
+                            render();
+                        });
+                        pageDotsEl.appendChild(dot);
+                    }
+                }
+                [...pageDotsEl.children].forEach((dot, p) => {
+                    dot.setAttribute('aria-current', String(p === secondaryPage));
+                });
+            }
+
+            // Empty (not "Page 1 of 1") when there's nothing to paginate —
+            // an aria-live region announcing pagination that doesn't exist
+            // reads as noise to screen reader users.
+            if (pageStatusEl) {
+                pageStatusEl.textContent = pageCount > 1 ? `Page ${secondaryPage + 1} of ${pageCount}` : '';
+            }
+        }
+
+        updateActiveChipsRow();
+
+        // Results — all entries matching the current filter state, no cap
+        resultsEl.innerHTML = '';
+        if (filtered.length === 0) {
+            resultsEl.appendChild(buildEmptyState());
+        } else {
+            filtered.forEach(e => resultsEl.appendChild(buildCard(e)));
+        }
+    }
+
+    // No-results empty state — mascot + friendly message + a Clear Filters
+    // button wired to the same doReset() every other Clear control uses
+    // (defined below; safe to reference here — function declarations are
+    // hoisted, and render() only ever executes after the full module body,
+    // doReset included, has run once).
+    function buildEmptyState() {
+        const wrap = document.createElement('div');
+        wrap.className = 'archive-empty';
+
+        const img = document.createElement('img');
+        img.className = 'archive-empty-image';
+        img.src = '/assets/images/entries/no-entries/no-entries.png';
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        img.width = 300;
+        img.height = 300;
+        img.loading = 'lazy';
+        wrap.appendChild(img);
+
+        const content = document.createElement('div');
+        content.className = 'archive-empty-content';
+
+        const msg = document.createElement('p');
+        msg.className = 'archive-empty-message';
+        msg.textContent = 'Nothing to see here!';
+        content.appendChild(msg);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'archive-clear-btn btn archive-empty-clear-btn';
+        btn.textContent = 'Clear Filters!';
+        btn.addEventListener('click', doReset);
+        content.appendChild(btn);
+
+        wrap.appendChild(content);
+        return wrap;
+    }
+
+    // Wire primary type chips (exclusive toggle — replace, not stack)
+    primaryChips.forEach(btn => {
+        btn.dataset.label = btn.textContent.trim();
+        btn.addEventListener('click', () => {
+            const type = btn.dataset.filterType;
+            activeType = activeType === type ? null : type;
+            const url = new URL(window.location.href);
+            if (activeType) url.searchParams.set('type', activeType);
+            else            url.searchParams.delete('type');
+            window.history.replaceState({}, '', url.toString());
+            render();
+        });
+    });
+
+    // Wire sort toggles — single button flips between latest and earliest
+    document.querySelectorAll('.archive-sort-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentSort = currentSort === 'latest' ? 'earliest' : 'latest';
+            render();
+        });
+    });
+
+    // Wire Filter Drawer secondary-tag pagination Previous/Next — cycles at
+    // both ends (Previous on page 1 wraps to the last page, Next on the
+    // last page wraps to page 1).
+    if (pagePrevBtn) {
+        pagePrevBtn.addEventListener('click', () => {
+            const pageCount = getDrawerSecondaryPageCount();
+            secondaryPage = (secondaryPage - 1 + pageCount) % pageCount;
+            render();
+        });
+    }
+    if (pageNextBtn) {
+        pageNextBtn.addEventListener('click', () => {
+            const pageCount = getDrawerSecondaryPageCount();
+            secondaryPage = (secondaryPage + 1) % pageCount;
+            render();
+        });
+    }
+
+    // Referenced by render()'s pagination block above (.filter-drawer--tags-active toggle).
+    const filterDrawerEl = document.getElementById('filter-drawer');
+
+    // Drawer-open trigger for updateDrawerSecondaryMetrics() (Change 4's
+    // third trigger, alongside render()'s own two above). Not a change to
+    // openDrawer()/closeDrawer() themselves (initFilterDrawer(), a
+    // separate closure with no access to allEntries/drawerChipsEl) —
+    // observing the [hidden] attribute they already toggle is decoupled
+    // from that function entirely. Needed despite updateDrawerSecondaryMetrics()
+    // measuring via its own off-screen scratch node (unaffected by the
+    // real drawer's own hidden state): simply opening the drawer with no
+    // other state change (e.g. the viewport was resized while it was
+    // closed, which never calls render() on its own) would otherwise keep
+    // showing whichever measurement was last taken instead of one current
+    // to today's viewport.
+    if (filterDrawerEl) {
+        new MutationObserver(() => {
+            if (!filterDrawerEl.hidden) updateDrawerSecondaryMetrics();
+        }).observe(filterDrawerEl, { attributes: true, attributeFilter: ['hidden'] });
+    }
+
+    function doReset() {
+        activeType = null;
+        activeSecondary.clear();
+        currentQuery = '';
+        currentSort = 'latest';
+        secondaryPage = 0;
+        // Full reset, not a single-tag removal — land back on page 1 like
+        // secondaryPage above, not wherever the user was before their most
+        // recent tag went active.
+        secondaryPageBeforeActive = 0;
+        wasSecondaryActive = false;
+        const url = new URL(window.location.href);
+        url.searchParams.delete('type');
+        window.history.replaceState({}, '', url.toString());
+        render();
+    }
+
+    // Wire clear buttons (header, drawer, and floating external instance)
+    document.querySelectorAll('.archive-clear-btn').forEach(btn => {
+        // Same fix as the drawer's Close/Filters trigger (see
+        // initFilterDrawer) — prevents mousedown from shifting focus/layout
+        // before the click lands.
+        btn.addEventListener('mousedown', (e) => e.preventDefault());
+        btn.addEventListener('click', doReset);
+    });
+
+    // The floating action rail is visible by default at every breakpoint
+    // now (see .action-rail-group in style.css) — no scroll-position
+    // watcher needed. openDrawer()/closeDrawer() (initFilterDrawer above)
+    // are what toggle it off/on, on drawer open/close.
+
+    // Fetch manifest and initialise
+    fetch('/data/archive-entries.json')
+        .then(r => r.json())
+        .then(entries => {
+            // Reversible "published" flag (added 2026-09-07): absent/true
+            // means visible, "published": false means hidden from every
+            // Archive consumer below — grid, primary/secondary tag counts,
+            // secondary tag chip existence, and ?tag= URL validation all
+            // read from this one filtered array, not the raw fetch result,
+            // so a single field flip here is the only place this needs to
+            // be enforced. The pages themselves stay reachable by direct
+            // URL — this filters Archive's data source, not the site.
+            entries = entries.filter(e => e.published !== false);
+            allEntries = entries;
+
+            // Validate the ?tag= URL param now that real tag data exists —
+            // an unrecognised slug (stale/renamed tag, typo, hand-edited URL)
+            // is treated as if no tag param was given, rather than silently
+            // becoming a permanent zero-match filter with a phantom active chip.
+            let arrivedViaValidTag = false;
+            if (tagParam) {
+                const validTagSlugs = new Set();
+                entries.forEach(e => (e.tags || []).forEach(t => validTagSlugs.add(slugify(t))));
+                if (validTagSlugs.has(tagParam)) {
+                    activeSecondary.add(tagParam);
+                    arrivedViaValidTag = true;
+                }
+            }
+
+            buildSecondaryChips(entries);
+
+            // Filter Drawer (mobile/tablet) arrival state — arriving via a
+            // topic tag link keeps the drawer closed (see below), but lands
+            // its secondary-tag pagination on whichever page contains the
+            // active tag, computed from its position in the same
+            // alphabetically sorted list buildSecondaryChips() just
+            // rendered — so opening the drawer manually shows the active
+            // tag immediately, no Next-clicking required.
+            if (arrivedViaValidTag && drawerChipsEl) {
+                const allSecondaryBtns = [...drawerChipsEl.querySelectorAll('[data-filter-tag]')];
+                const idx = allSecondaryBtns.findIndex(btn => btn.dataset.filterTag === tagParam);
+                if (idx !== -1) secondaryPage = Math.floor(idx / SECONDARY_PAGE_SIZE);
+            }
+
+            render();
+
+            // Filter Drawer arrival state, scoped to mobile/tablet only —
+            // pre-existing behaviour, unchanged by the desktop inline-filters
+            // removal. Scenario 2 only: arrived via a "View more Work/
+            // Thoughts" style link (?type= present, no ?tag=) — open the
+            // drawer on arrival with that primary filter already active.
+            // Direct navigation (no params) and tag-link arrivals
+            // (Scenario 3, handled above) stay closed. Desktop arrivals via
+            // the same link now show the same active-filter state (badge
+            // count, filtered results) without auto-opening the drawer to
+            // reveal it — worth a follow-up look, out of scope here.
+            const isDrawerBreakpoint = !window.matchMedia('(min-width: 1024px)').matches;
+            if (isDrawerBreakpoint && filterDrawer && activeType && !arrivedViaValidTag) {
+                // The floating rail trigger is the only opener now, at every
+                // breakpoint — target it explicitly rather than the first
+                // generic [aria-controls="filter-drawer"] match, which would
+                // resolve to the header's hidden instance and silently fail
+                // to receive focus back when the drawer closes.
+                const opener = document.querySelector('.action-rail-trigger');
+                filterDrawer.openDrawer(opener);
+            }
+        })
+        .catch(err => console.error('Error loading archive-entries.json:', err));
+}
+
+// Image viewer (click-to-zoom) — Phase 1 shipped a static enlarged image
+// only; Phase 2 adds pan/zoom and next/prev navigation on the same shell.
+// No-ops on any page without .standard-page-content images (Archive, Home,
+// About). Reuses the Filter Drawer/ToC Panel's own accessible-modal
+// mechanics — inert background, dialog semantics, trapFocus() — rather than
+// a new dialog technique; only the trigger and dialog content are new.
+// Vanilla JS only, per REFERENCE.md — no pan/zoom library, hand-rolled.
+// Depends on: trapFocus()
+function initImageViewer() {
+    const images = [...document.querySelectorAll('.standard-page-content img')];
+    if (!images.length) return;
+
+    const scrim = document.createElement('div');
+    scrim.className = 'image-viewer-scrim';
+    scrim.setAttribute('aria-hidden', 'true');
+    scrim.hidden = true;
+
+    const viewer = document.createElement('div');
+    viewer.className = 'image-viewer';
+    viewer.setAttribute('role', 'dialog');
+    viewer.setAttribute('aria-modal', 'true');
+    viewer.hidden = true;
+    viewer.setAttribute('inert', '');
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn action-rail-clear image-viewer-close';
+    closeBtn.setAttribute('aria-label', 'Close');
+    closeBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">×</span>';
+
+    // Announces the current image on every showImageAt() call — aria-label
+    // changing on an already-focused element (Next/Prev, or the dialog
+    // itself) isn't announced on its own, so Next/Prev navigation was
+    // otherwise silent to screen reader users. Same .sr-only + aria-live
+    // "status text" pattern as #filter-drawer-page-status (archive.html) —
+    // a plain <p>, no tabindex, so it's naturally excluded from
+    // trapFocus()'s FOCUSABLE selector without any extra handling.
+    const liveStatus = document.createElement('p');
+    liveStatus.className = 'sr-only';
+    liveStatus.setAttribute('aria-live', 'polite');
+
+    const enlargedImg = document.createElement('img');
+    enlargedImg.className = 'image-viewer-image';
+
+    const zoomControls = document.createElement('div');
+    zoomControls.className = 'image-viewer-zoom-controls';
+
+    const zoomOutBtn = document.createElement('button');
+    zoomOutBtn.type = 'button';
+    zoomOutBtn.className = 'btn action-rail-clear';
+    zoomOutBtn.setAttribute('aria-label', 'Zoom out');
+    zoomOutBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">−</span>';
+
+    const zoomInBtn = document.createElement('button');
+    zoomInBtn.type = 'button';
+    zoomInBtn.className = 'btn action-rail-clear';
+    zoomInBtn.setAttribute('aria-label', 'Zoom in');
+    zoomInBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">+</span>';
+
+    zoomControls.append(zoomOutBtn, zoomInBtn);
+
+    // Prev/Next only exist at all when there are 2+ images — a 0- or
+    // 1-image entry never gets these in the DOM, rather than creating and
+    // CSS-hiding them (0-image entries already return above with no viewer
+    // at all; this covers the 1-image case the same way).
+    let prevBtn = null;
+    let nextBtn = null;
+    if (images.length > 1) {
+        prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'btn action-rail-clear image-viewer-nav image-viewer-nav--prev';
+        prevBtn.setAttribute('aria-label', 'Previous image');
+        prevBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">‹</span>';
+
+        nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'btn action-rail-clear image-viewer-nav image-viewer-nav--next';
+        nextBtn.setAttribute('aria-label', 'Next image');
+        nextBtn.innerHTML = '<span class="tag-chip-x" aria-hidden="true">›</span>';
+    }
+
+    viewer.append(closeBtn, liveStatus, enlargedImg, zoomControls);
+    if (prevBtn) viewer.append(prevBtn, nextBtn);
+
+    const main = document.getElementById('main-content');
+    document.body.insertBefore(scrim, main);
+    document.body.insertBefore(viewer, main);
+
+    let removeTrapFocus = null;
+    let openerBtn = null;
+    let savedScrollY = 0;
+    let currentIndex = 0;
+
+    // Zoom/pan state. ZOOM_MIN is fit-to-view (the Phase 1 baseline) — there
+    // is no "zoom out past fit" since there's no more image to reveal.
+    const ZOOM_MIN = 1;
+    const ZOOM_MAX = 4;
+    const ZOOM_STEP = 0.5;
+    const PAN_STEP = 40; // px per arrow-key press (WCAG 2.5.7 drag alternative)
+    let zoomLevel = ZOOM_MIN;
+    let panX = 0;
+    let panY = 0;
+
+    // Same lockBodyScroll()/unlockBodyScroll() technique as
+    // initFilterDrawer() and initTocRail() above — a third private
+    // instance, not a shared function, for the same reason already
+    // documented on the ToC Panel's own copy (Rule 3a covers reusing a
+    // pattern, not literally sharing closures across unrelated components).
+    function lockBodyScroll() {
+        savedScrollY = window.scrollY;
+        document.body.style.top = `-${savedScrollY}px`;
+        document.body.classList.add('body-scroll-locked');
+    }
+
+    function unlockBodyScroll() {
+        document.body.classList.remove('body-scroll-locked');
+        document.body.style.top = '';
+        window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
+    }
+
+    // Elements to inert while the viewer is open. Unlike getTocInertTargets()
+    // above, this must inert .toc-rail explicitly: the ToC Panel only ever
+    // opens at breakpoints where the rail is already display: none (CSS
+    // gate, <1440px), but the image viewer opens at every breakpoint,
+    // including desktop (>=1440px) where .toc-rail is a real, visible
+    // sidebar of focusable links sitting outside #main-content.
+    function getInertTargets() {
+        return [
+            document.getElementById('nav-placeholder'),
+            document.getElementById('main-content'),
+            document.querySelector('.toc-rail'),
+            document.querySelector('.action-rail-group'),
+            document.getElementById('theme-toggle'),
+            document.querySelector('.toast'),
+            document.querySelector('.tab-bar'),
+            document.getElementById('footer-placeholder'),
+        ].filter(Boolean);
+    }
+
+    // "…/foo.png" or "…/foo.webp" -> "…/foo-full.webp" — the -full variant
+    // is always .webp regardless of the thumbnail's own extension (see
+    // scripts/build-images.js), so this replaces whatever extension is
+    // there rather than assuming .webp on both sides.
+    function deriveFullSrc(thumbSrc) {
+        const dot = thumbSrc.lastIndexOf('.');
+        return dot === -1 ? thumbSrc : `${thumbSrc.slice(0, dot)}-full.webp`;
+    }
+
+    function applyTransform() {
+        enlargedImg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+    }
+
+    // Keeps a panned image's visible edge from crossing the fit-to-view
+    // frame's edge — transform: scale() doesn't change layout size, so
+    // offsetWidth/Height always reflect the fit-to-view (1x) box regardless
+    // of the current zoomLevel, making them a stable basis for this math.
+    function clampPan() {
+        const maxX = Math.max(0, (enlargedImg.offsetWidth * zoomLevel - enlargedImg.offsetWidth) / 2);
+        const maxY = Math.max(0, (enlargedImg.offsetHeight * zoomLevel - enlargedImg.offsetHeight) / 2);
+        panX = Math.min(maxX, Math.max(-maxX, panX));
+        panY = Math.min(maxY, Math.max(-maxY, panY));
+    }
+
+    function updateZoomButtons() {
+        zoomOutBtn.disabled = zoomLevel <= ZOOM_MIN;
+        zoomInBtn.disabled = zoomLevel >= ZOOM_MAX;
+    }
+
+    // Prev/Next visibly disable while zoomed — the non-keyboard-dependent
+    // signal that ArrowLeft/Right are currently panning, not navigating
+    // (see handleKeydown's zoom-gated scheme below).
+    function updateNavButtons() {
+        if (!prevBtn) return;
+        const zoomed = zoomLevel > ZOOM_MIN;
+        prevBtn.disabled = zoomed;
+        nextBtn.disabled = zoomed;
+    }
+
+    function setZoom(next) {
+        zoomLevel = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, next));
+        enlargedImg.classList.toggle('image-viewer-image--zoomed', zoomLevel > ZOOM_MIN);
+        clampPan();
+        applyTransform();
+        updateZoomButtons();
+        updateNavButtons();
+    }
+
+    function zoomBy(delta) {
+        setZoom(zoomLevel + delta);
+    }
+
+    function setPan(x, y) {
+        panX = x;
+        panY = y;
+        clampPan();
+        applyTransform();
+    }
+
+    function resetZoom() {
+        zoomLevel = ZOOM_MIN;
+        panX = 0;
+        panY = 0;
+        enlargedImg.classList.remove('image-viewer-image--zoomed');
+        applyTransform();
+        updateZoomButtons();
+        updateNavButtons();
+    }
+
+    function setInteracting(active) {
+        enlargedImg.classList.toggle('image-viewer-image--interacting', active);
+    }
+
+    // Content-swap only: no lockBodyScroll(), inert-toggling, focus-trap
+    // setup, or open transition here — those are open/close-lifecycle
+    // concerns openViewer()/closeViewer() already own, and re-running them
+    // on every navigate would be wrong (e.g. double-adding the keydown
+    // listener). Also doesn't touch focus, so clicking Next/Prev (or
+    // ArrowRight/Left at fit-to-view) leaves focus exactly where it was.
+    function showImageAt(index) {
+        currentIndex = index;
+        const img = images[currentIndex];
+        const thumbSrc = img.src;
+
+        // Requests the high-res -full.webp variant (scripts/build-images.js)
+        // derived from the thumbnail's own src — no per-<img> data attribute
+        // to add/maintain. onerror falls back to the thumbnail automatically
+        // for any image that doesn't have a -full variant yet, so nothing
+        // breaks for images not yet processed by that script. Set before
+        // assigning the new src (not after) so a same-tick failure — e.g. a
+        // request the browser resolves as a network error before yielding
+        // back to this function — still has a handler in place to catch it.
+        enlargedImg.onerror = () => {
+            enlargedImg.onerror = null; // one retry only — no loop if the thumbnail itself ever fails to load
+            enlargedImg.src = thumbSrc;
+        };
+        enlargedImg.src = deriveFullSrc(thumbSrc);
+        enlargedImg.alt = img.alt;
+        // Accessible name reuses the image's own real alt text — no new
+        // invented copy. Empty-alt fallback is defensive only: every real
+        // .standard-page-content image currently has real alt text.
+        viewer.setAttribute('aria-label', img.alt || 'Image viewer');
+        liveStatus.textContent = `Image ${currentIndex + 1} of ${images.length}: ${img.alt || 'untitled'}`;
+
+        // Keeps focus-return-on-close targeting the trigger that matches
+        // what's actually on screen, not wherever the dialog was originally
+        // opened from — correct after navigating away from the opening image.
+        openerBtn = img.closest('.image-zoom-trigger');
+
+        resetZoom();
+    }
+
+    function navigate(direction) {
+        if (!prevBtn) return;
+        // Wrap-around (last → first, first → last) — the more common
+        // convention among lightbox/gallery UIs (matches PhotoSwipe,
+        // Fancybox, Lightbox2 defaults) versus disabling at the ends; also
+        // means Prev/Next only ever disable for one reason (zoomed), not two.
+        showImageAt((currentIndex + direction + images.length) % images.length);
+    }
+
+    function openViewer(img) {
+        lockBodyScroll();
+        showImageAt(images.indexOf(img));
+
+        viewer.removeAttribute('inert');
+        viewer.hidden = false;
+        scrim.hidden = false;
+        requestAnimationFrame(() => {
+            viewer.classList.add('image-viewer--open');
+            scrim.classList.add('image-viewer-scrim--open');
+        });
+
+        // Inert all page content outside the viewer — prevents Tab from
+        // reaching background content the scrim already blocks from clicks.
+        getInertTargets().forEach(el => el.setAttribute('inert', ''));
+
+        requestAnimationFrame(() => closeBtn.focus());
+
+        removeTrapFocus = trapFocus(viewer);
+        document.addEventListener('keydown', handleKeydown);
+    }
+
+    function closeViewer() {
+        unlockBodyScroll();
+        viewer.setAttribute('inert', '');
+        viewer.classList.remove('image-viewer--open');
+        scrim.classList.remove('image-viewer-scrim--open');
+
+        if (removeTrapFocus) {
+            removeTrapFocus();
+            removeTrapFocus = null;
+        }
+        document.removeEventListener('keydown', handleKeydown);
+
+        // Remove inert before returning focus so the opener can receive it
+        getInertTargets().forEach(el => el.removeAttribute('inert'));
+
+        viewer.addEventListener('transitionend', () => {
+            viewer.hidden = true;
+            scrim.hidden = true;
+            enlargedImg.src = '';
+        }, { once: true });
+
+        if (openerBtn) openerBtn.focus({ preventScroll: true });
+    }
+
+    // Escape closes; zoom-gated arrow scheme (Phase 2 spec, Option A):
+    // zoomed past fit-to-view, arrows pan (WCAG 2.5.7 drag alternative); at
+    // fit-to-view, Left/Right navigate instead. +/- (and the unshifted
+    // "="/"_" keys sharing those physical keys) zoom, independent of pointer
+    // input (WCAG 2.5.1 pinch alternative).
+    function handleKeydown(event) {
+        if (event.key === 'Escape') {
+            closeViewer();
+            return;
+        }
+
+        const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+        if (zoomLevel > ZOOM_MIN && arrowKeys.includes(event.key)) {
+            event.preventDefault();
+            const dx = event.key === 'ArrowLeft' ? PAN_STEP : event.key === 'ArrowRight' ? -PAN_STEP : 0;
+            const dy = event.key === 'ArrowUp' ? PAN_STEP : event.key === 'ArrowDown' ? -PAN_STEP : 0;
+            setPan(panX + dx, panY + dy);
+            return;
+        }
+
+        if (zoomLevel === ZOOM_MIN && prevBtn && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+            event.preventDefault();
+            navigate(event.key === 'ArrowLeft' ? -1 : 1);
+            return;
+        }
+
+        if (event.key === '+' || event.key === '=') {
+            event.preventDefault();
+            zoomBy(ZOOM_STEP);
+        } else if (event.key === '-' || event.key === '_') {
+            event.preventDefault();
+            zoomBy(-ZOOM_STEP);
+        }
+    }
+
+    closeBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    closeBtn.addEventListener('click', closeViewer);
+    scrim.addEventListener('click', closeViewer);
+
+    zoomOutBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    zoomOutBtn.addEventListener('click', () => zoomBy(-ZOOM_STEP));
+    zoomInBtn.addEventListener('mousedown', (e) => e.preventDefault());
+    zoomInBtn.addEventListener('click', () => zoomBy(ZOOM_STEP));
+
+    if (prevBtn) {
+        prevBtn.addEventListener('mousedown', (e) => e.preventDefault());
+        prevBtn.addEventListener('click', () => navigate(-1));
+        nextBtn.addEventListener('mousedown', (e) => e.preventDefault());
+        nextBtn.addEventListener('click', () => navigate(1));
+    }
+
+    // Scroll-wheel zoom — scoped to the image itself, not the whole dialog,
+    // so wheeling over Close/Prev/Next/zoom buttons never triggers a zoom.
+    // { passive: false } is required for preventDefault() to have any
+    // effect (stops the gesture being treated as an attempted page scroll).
+    enlargedImg.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        zoomBy(e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP);
+    }, { passive: false });
+
+    // Pointer-drag panning (single pointer, only once zoomed) and
+    // pinch-to-zoom (two pointers, any zoom level — this is how a touch
+    // user reaches zoomed-in in the first place, so it isn't gated behind
+    // zoomLevel > 1 the way single-pointer drag-pan is). A pinch that
+    // starts while a single-pointer drag is already in progress takes over
+    // from it the instant the second pointer lands.
+    const activePointers = new Map();
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0, dragStartPanX = 0, dragStartPanY = 0;
+    let pinchStartDistance = 0;
+    let pinchStartZoom = ZOOM_MIN;
+
+    function pointerDistance(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    enlargedImg.addEventListener('pointerdown', (e) => {
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        // Wrapped: throws (NotFoundError) for a pointerId the browser has no
+        // active session for — confirmed via direct testing, not assumed.
+        // Capture is a nice-to-have (keeps pointermove firing off-element
+        // during a fast drag); losing it shouldn't also abort the pinch/drag
+        // state setup below, which is the actually load-bearing part.
+        try { enlargedImg.setPointerCapture(e.pointerId); } catch (err) { /* no-op */ }
+
+        if (activePointers.size === 2) {
+            isDragging = false;
+            const [a, b] = [...activePointers.values()];
+            pinchStartDistance = pointerDistance(a, b);
+            pinchStartZoom = zoomLevel;
+            setInteracting(true);
+        } else if (activePointers.size === 1 && zoomLevel > ZOOM_MIN) {
+            isDragging = true;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            dragStartPanX = panX;
+            dragStartPanY = panY;
+            setInteracting(true);
+        }
+    });
+
+    enlargedImg.addEventListener('pointermove', (e) => {
+        if (!activePointers.has(e.pointerId)) return;
+        activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (activePointers.size === 2) {
+            const [a, b] = [...activePointers.values()];
+            const distance = pointerDistance(a, b);
+            if (pinchStartDistance > 0) setZoom(pinchStartZoom * (distance / pinchStartDistance));
+            return;
+        }
+
+        if (isDragging) {
+            setPan(dragStartPanX + (e.clientX - dragStartX), dragStartPanY + (e.clientY - dragStartY));
+        }
+    });
+
+    function releasePointer(e) {
+        activePointers.delete(e.pointerId);
+        isDragging = false;
+        if (activePointers.size === 0) setInteracting(false);
+    }
+    enlargedImg.addEventListener('pointerup', releasePointer);
+    enlargedImg.addEventListener('pointercancel', releasePointer);
+
+    images.forEach(img => {
+        const trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'image-zoom-trigger';
+
+        // Accessible name composes naturally from this label + the img's
+        // own alt (unchanged) via subtree text — "View larger image: {alt}" —
+        // rather than an aria-label that would need to duplicate the alt text.
+        const label = document.createElement('span');
+        label.className = 'sr-only';
+        label.textContent = 'View larger image: ';
+
+        img.parentNode.insertBefore(trigger, img);
+        trigger.append(label, img);
+
+        trigger.addEventListener('mousedown', (e) => e.preventDefault());
+        trigger.addEventListener('click', () => openViewer(img));
+    });
+}

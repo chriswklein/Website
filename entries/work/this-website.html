@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="With Claude and Claude Code, Christopher Klein built this site to leave Squarespace, learn web development and AI workflows, and implement accessibility.">
+    <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
+    <title>This Website — Work — Christopher Klein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/fav/fav-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/fav/fav-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/fav/fav-180.png">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="nav-placeholder"></div>
+
+    <main id="main-content">
+        <div class="standard-page">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="breadcrumb">
+                <ol class="breadcrumb-list">
+                    <li class="breadcrumb-item">
+                        <a href="/archive.html?type=work">Work</a>
+                        <span aria-hidden="true" class="breadcrumb-separator">›</span>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span aria-current="page">This Website</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Banner Image -->
+            <div class="standard-page-banner" role="img" aria-hidden="true" style="background-image: url('/assets/images/entries/work/this-website/this-website-banner.webp');"></div>
+            <p class="standard-page-caption">Scalable, Accessible, Performant: ingredients for this website</p>
+
+            <!-- Title -->
+            <h1 class="standard-page-title">This Website</h1>
+
+            <!-- Tags -->
+            <div class="standard-page-details-tags">
+                <a href="/archive.html?tag=user-experience" class="tag" aria-label="Filter by User Experience">User Experience</a>
+                <a href="/archive.html?tag=web-development" class="tag" aria-label="Filter by Web Development">Web Development</a>
+                <a href="/archive.html?tag=ai" class="tag" aria-label="Filter by AI">AI</a>
+            </div>
+
+            <!-- Project Details -->
+            <div class="standard-page-details">
+                <div class="standard-page-details-row">
+                    <span class="standard-page-details-label">Role</span>
+                    <span class="standard-page-details-value">Designer / Developer</span>
+                </div>
+                <div class="standard-page-details-row">
+                    <span class="standard-page-details-label">Timeline</span>
+                    <span class="standard-page-details-value">June 2026 – Present</span>
+                </div>
+                <div class="standard-page-details-row">
+                    <span class="standard-page-details-label">Tools</span>
+                    <span class="standard-page-details-value">Netlify, Git, Claude, Claude Code, HTML, CSS, Javascript</span>
+                </div>
+            </div>
+
+            <!-- Body Content -->
+            <div class="standard-page-content">
+                
+                <h2 id="overview">Overview</h2>
+                <p>For the past 3 months, I sought to eliminate my dependency for Squarespace as a platform for my portfolio, as I've utilized the service on and off for many years but it was never what I truely wanted.</p>
+                
+                
+                <p>Problem #1: Squarespace is an expensive recoccuring charge and specific features are gated behind a more expensive tier.</p>
+
+                <p>Problem #2: I don't know much about web development</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+
+                <h2 id="solution">Solution</h2>
+                <p>Solution #1: Replace Squarespace subscription with Anthropic subscription to establish a workflow Claude and utilize Claude Code to construct the portfolio which reflects my designs via Figma, of which will reflect my design principles.</p>
+
+                <p>Solution #2: Have fun in the process, and learn through fun.</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                
+                <h2 id="foundations">.LANG-ing the Foundations</h2>
+                <p>Not being a web-head by trade, I knew I was going to get myself caught in the sticky webbing of setup. I spent time inquiring about scalability, performance, and accessibility principles with Claude in order to establish specification documents and the technical stack we would use.</p>
+         
+               
+                <h3 id="core-principles">Core Principles</h3>
+                <ul>
+                    <li>No frameworks, no build tools, no subscriptions</li>
+                    <li>Accessible by default — WCAG AA minimum on every decision</li>
+                    <li>Localization-ready from the start using Noto Sans</li>
+                    <li>Performant — static files only</li>
+                    <li>Scope-disciplined — ship simple, iterate later</li>
+                </ul>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h3 id="tech-stack">Specs and Stack</h3>
+                
+                <div class="table-wrap" tabindex="0" aria-label="Specs and Stack table, scrollable horizontally">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Layer</th>
+                                <th scope="col">Tool</th>
+                                <th scope="col">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Design</td>
+                                <td>Figma</td>
+                                <td>Utilize MCP to provide bridge between Figma and Claude Code</td>
+                            </tr>
+                            <tr>
+                                <td>Code Editor</td>
+                                <td>VS Studio</td>
+                                <td>With Live Server extension for local preview</td>
+                            </tr>
+                            <tr>
+                                <td>Version Control</td>
+                                <td>GitHub</td>
+                                <td>Repository to ensure safe iteration, and reference for project for Claude Code</td>
+                            </tr>
+                            <tr>
+                                <td>Infrastructure</td>
+                                <td>HTML, CSS, JavaScript</td>
+                                <td>Plain — no frameworks or preprocessors</td>
+                            </tr>
+                            <tr>
+                                <td>Hosting</td>
+                                <td>Netlify</td>
+                                <td>Free tier and allows multiple environments to test and secure release</td>
+                            </tr>
+                            <tr>
+                                <td>Testing</td>
+                                <td>Playwright</td>
+                                <td>Integrate automated testing</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h3 id="markdown">Markdown Files</h3>
+                
+                </p>In earlier LLM expirements, I ran into slight hallucinations and or the models would infer and do thier own thing without guidance. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
+                
+                </p>First step was to get out of singular chats and established a project within Claude and creating the Markdown (MD) files which would provide the support pillars.</p> 
+                
+                </p>The MD’s would grow over the months, adding methods to avoid the afformentioned issues, build development and process guardrails, contain best practices to avoid wasting tokens on specific tasks I could easily check myself, archive changes overtime, and note design intent.</p>
+
+                </p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
+
+                <ul>
+                    <li>REFERENCE.md for project decisions and session handoffs</li>
+                    <li>DESIGN-SYSTEM.md for design tokens</li>
+                    <li>COMPONENTS.md for component specs</li>
+                    <li>PROMPT-GUIDE.md to control what context got loaded per task type</li>
+                </ul>
+
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h3 id="Information-Architecture">Information Architecture</h3>
+              
+                <p>My initial goal was to build the following:</p>
+
+                <ul>
+                    <li>Home Page - containing selected work</li>
+                    <li>About - containing more about me and my resume</li>
+                    <li>Standard Page Template - for case studies</li>
+                </ul>
+
+                </p>I decided on Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
+             
+                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or even removing a feature after testing.</p>
+
+                </p>As a result of just having the basics - the site has taken longer than I wanted. I would see and reproduce a bug, and those bugs might have user experience issues that needed new solutions designed and tested. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h2 id="archive">The Archive</h2>
+                </p>The Archive is made of multiple key components:</p>
+
+                <!-- image -->
+                
+                <ul>
+                    <li>The Database</li>
+                    <li>Entries and their Tags</li>
+                    <li>Search</li>
+                    <li>Filter Drawer</li>
+                </ul>
+
+                <h3 id="lean-database">The Database</h3>
+                </p>To get around using a more complicated content manager, I opted for a lean singular static Json file. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundrens or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
+
+
+                <h3 id="entries-and-tags">Entries and Tags</h3>
+                </p>Each entry contains a Hidden Primary 'Type' Tag (Work, Thoughts, etc.) - as well as Secondary 'Topic' Tags (Quality Assurance, User Experience, etc.) While the Primary Tags are hidden on the Entry Pages and their representative Card on the Archive - they both can be utilized by a user by accessing the Filter Drawer.</p>
+
+
+                <h3 id="search">Search</h3>
+                <p>While search is fully functional, it is currently dormant on the Archive. The reason for this is due to how I initially implemented the Search across devices.</p>
+
+                </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
+
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/search-intentional-design.webp" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
+
+                </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
+
+                
+
+                </p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
+
+
+                </p>As I picked out a good cabbage in the vegitable isle, it's sprinkler spritzed my face with cold water, and barely managed to wash away the embarressment I felt for forgetting something I see every single day.</p> 
+                
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/atla-cabbages.png" alt="The infamous Cabbage vendor from Avatar the Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
+                
+                </p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
+
+                </p>As I tested, I saw the major issues I knew would be present.</p>
+
+
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.webp" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
+                                
+                </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
+                
+                </p>Issue #2: Search fields Auto-zoom when active. Not only was the virtual keyboard resulting in a loss of space, a further loss of space was the resulting in a Zoom in on the Archives Body. If a user searched, the entries would be illegable.</p> 
+
+                
+                </p>While I fought for a day to redesign variants of the current implementations - I ultimatley made the decision to feature flag search until I find a cleaner solution and I had other issues to solve, features to implement, and bugs to fix. I went for another walk later that day to let it all go and trust myself enough to figure it out another day.</p>
+
+                
+
+                <h3 id="filters">Filters</h3>
+                </p>After removing the field, I was able to retain the structure and instead of a search field, I replaced it with text indicating the purpose of the drawer.</p>
+
+                
+                </p>As I anticipated tag growth, I made sure the drawer would scale. Pagination was built into the drawer to ensure the user could parse the potential plethora of tags. If the user wants to Filter by a specific Primary Tag - the applicable entries with associated secondary tags will display, and the unrelated tags will be hidden.</p>
+
+                </p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
+
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/filter-implementation.webp" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
+
+
+                <h2 id="contents">Table of Contents</h2>
+                <p>The next major implementation, was the Floating and Collapsable Table of Contents.</p>
+
+                <p>When I had a Squarespace, I wanted this feature but I was restricted from using a script another Squarespace user had written to provide one for my site, as Code Injection was of course in a higher paid tier. This became a must for this site as I now had full control. I wanted to the viewers of any entry to feel like they could navigate up and down the page with ease.</p>
+
+
+                <!-- image -->
+                <img src="/assets/images/entries/work/this-website/Table-of-contents.webp" alt="diagram of the table of contents through device breakpoints. Left Mobile, Center Tablet, and Right Desktop" width="800" height="450" loading="lazy">
+                
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h2 id="accessibility">Accessibility</h2>
+                <!-- image -->
+
+                <p>Last but not least, is one of the Core Principles of the site: Accessibility.</p>
+                    
+                </p>As it stands right now, my site has the following accessibility implemented:</p>
+
+                <h3 id="vision">Vision</h3>
+
+                <ul>
+                    <li>Alt text describing actual image content on every image sitewide</li>
+                    <li>WCAG AA color contrast on all text, verified across every page</li>
+                    <li>Visible focus outline on every interactive element, including images and cards</li>
+                </ul>
+
+                <h3 id="motor">Motor</h3>
+
+                <ul>
+                    <li>100% keyboard operable. Every feature, including the pinch/zoom/pan image viewer, works without a mouse (WCAG 2.5.1, 2.5.7)</li>
+                    <li>No feature requires a precise drag or multi-touch gesture. Every gesture has a button or key equivalent</li>
+                    <li>Skip-navigation link past the Table of Contents, straight to article content</li>
+                </ul>
+
+                <h3 id="cognitive">Cognitive</h3>
+
+                <ul>
+                    <li>Reduced-motion respected sitewide. If a users device requests less motion, every animation and transition turns off automatically</li>
+                    <li>Consistent heading structure and unique link labeling on every page</li>
+                </ul>
+
+                <h3 id="hearing">Hearing</h3>
+
+                <ul>
+                    <li>No audio or video content currently exists on the site, but when I add, this will get addressed.</li>
+                </ul>
+
+                </p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
+
+
+                <h2 id="performance">Performance</h2>
+                <p>Performance was crucial for me. I've seen many websites over the years be so flashy it hurts and I just click out of it instantly. Between ads and images - I wanted my site to be as fast as I could make it.</p>
+
+                <ul>
+                    <li>Lighthouse Accessibility: 100 across every page</li>
+                    <li>WAVE: 9.9/10, 0 errors - Im working through Warnings right now related to redundant links</li>
+                    <li>Reduced Image weight by compressing pngs to webp format. Thumbnails are compressed low res for fast lazy loads, and then when you enlarge the image, they bump up to higher resolution.</li>
+                    <li>Mobile load speed: 7.9s → 4.7s</li>
+                </ul>
+        
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <h2 id="the-future">The Future</h2>
+                <p>Next up for me is to take a web break to work on new projects. Stay tuned y’all!</p>
+
+            </div>
+
+            <!-- Divider + Footer -->
+            <hr class="standard-page-divider">
+
+            <div class="standard-page-footer">
+                <div class="standard-page-footer-actions">
+                    <button class="share-btn btn btn--ghost" aria-label="Copy link to clipboard">Share</button>
+                    <a href="/archive.html?type=work" class="btn btn--ghost">More Work<span class="sr-only"> — view more entries in the Work section</span></a>
+                </div>
+
+                <!-- Dot divider -->
+                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+                <section aria-labelledby="contact-heading">
+                    <h2 id="contact-heading" class="section-heading">Want to work together? Contact me!</h2>
+                    <div class="contact-buttons">
+                        <a href="/about.html"
+                           class="contact-icon-btn">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                <g opacity="0.9">
+                                    <path d="M12 12.6764C13.1432 12.6764 14.2393 13.1309 15.0477 13.9393C15.8561 14.7477 16.3105 15.8437 16.3105 16.987H7.68945C7.68945 15.8437 8.14392 14.7477 8.95231 13.9393C9.76069 13.1309 10.8568 12.6764 12 12.6764Z" fill="currentColor"/>
+                                    <path d="M12 6.92903C13.5871 6.92903 14.8737 8.21563 14.8737 9.80273C14.8737 11.3898 13.5871 12.6764 12 12.6764C10.4129 12.6764 9.1263 11.3898 9.1263 9.80273C9.1263 8.21563 10.4129 6.92903 12 6.92903Z" fill="currentColor"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M20 5V21L19.9951 21.1025C19.9438 21.6067 19.5177 22 19 22H5L4.89746 21.9951C4.42703 21.9472 4.05278 21.573 4.00488 21.1025L4 21V3C4 2.44772 4.44772 2 5 2H17L20 5ZM5 21H19V5.41406L16.5859 3H5V21Z" fill="currentColor"/>
+                                </g>
+                            </svg>
+                            <span>About</span>
+                        </a>
+                        <a href="mailto:christopherwalterklein@gmail.com"
+                           class="contact-icon-btn">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                <g opacity="0.9">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M16.0194 2.75679C16.4817 2.54918 17.0354 2.72154 17.2942 3.16986L22.2942 11.8301C22.5531 12.2784 22.4255 12.8441 22.0146 13.1406L21.9282 13.1961L8.0718 21.1961C7.62348 21.455 7.05779 21.3274 6.76127 20.9165L6.70577 20.8301L1.70577 12.1699C1.42963 11.6916 1.59351 11.08 2.0718 10.8038L15.9282 2.80383L16.0194 2.75679ZM7.5718 20.3301L9.55757 19.1836L10.9879 13.8427L2.90334 12.2441L7.5718 20.3301ZM14.1011 12.0454L19.4424 13.4766L21.4282 12.3301L16.7597 4.24411L14.1011 12.0454ZM10.7822 18.4766L18.2178 14.1836L13.7782 12.994L13.614 13.4791C13.4524 13.9532 12.9654 14.2344 12.4739 14.1373L11.9709 14.0375L10.7822 18.4766ZM12.668 13.1569L15.7711 4.04925L3.22893 11.2905L12.668 13.1569Z" fill="currentColor"/>
+                                </g>
+                            </svg>
+                            <span>Email</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/crzdev/"
+                           class="contact-icon-btn"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           aria-label="LinkedIn (opens in new tab)">
+                            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                                <path d="M19.1065 19.6728V27.0944H15.5461V14.257H18.9394V16.5219H19.0898C19.374 15.7753 19.8504 15.1847 20.519 14.7501C21.1876 14.3099 21.9983 14.0898 22.9511 14.0898C23.8425 14.0898 24.6198 14.2848 25.2828 14.6749C25.9459 15.0649 26.4613 15.6221 26.829 16.3464C27.1968 17.0652 27.3806 17.9232 27.3806 18.9206V27.0944H23.8203V19.5558C23.8258 18.7701 23.6252 18.1572 23.2185 17.7171C22.8118 17.2713 22.2518 17.0485 21.5386 17.0485C21.0594 17.0485 20.636 17.1515 20.2682 17.3577C19.9061 17.5638 19.6219 17.8647 19.4158 18.2603C19.2152 18.6503 19.1121 19.1212 19.1065 19.6728Z" fill="currentColor"/>
+                                <path d="M9.13372 27.0944V14.257H12.6941V27.0944H9.13372ZM10.9223 12.6022C10.3929 12.6022 9.93885 12.4267 9.55997 12.0756C9.18666 11.719 9 11.2928 9 10.7969C9 10.3066 9.18666 9.88592 9.55997 9.53489C9.93885 9.1783 10.3929 9 10.9223 9C11.4516 9 11.9029 9.1783 12.2762 9.53489C12.6551 9.88592 12.8445 10.3066 12.8445 10.7969C12.8445 11.2928 12.6551 11.719 12.2762 12.0756C11.9029 12.4267 11.4516 12.6022 10.9223 12.6022Z" fill="currentColor"/>
+                            </svg>
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Back to Top -->
+            <div class="back-to-top-row">
+                <button class="back-to-top" aria-label="Back to top">
+                    <span>Back to Top</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast notification for share button -->
+    <div role="status" aria-live="polite" class="toast">URL copied to clipboard!</div>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="/index.html" class="tab-bar-item">
+            <span>Home</span>
+        </a>
+        <a href="/archive.html" class="tab-bar-item">
+            <span>Archive</span>
+        </a>
+        <a href="/about.html" class="tab-bar-item">
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="footer-placeholder"></div>
+    <script src="/script.js"></script>
+</body>
+</html>

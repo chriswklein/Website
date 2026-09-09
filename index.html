@@ -3,16 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crzdev</title>
+    <meta name="description" content="QA Analyst and UX Designer for games and the tools that make them. Christopher Klein has 13 years in game development, owning test strategy and tools.">
+    <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
+    <script>/* hero-vh-lock: reads window.innerHeight ONCE at load and pins it as --hero-vh-locked, so the mobile hero's height is a JS-computed constant rather than a live viewport unit (100dvh, then 100svh, both still recalculated inconsistently across iOS WKWebView-based browsers — Brave/Edge specifically — during the toolbar's show/hide animation, causing a scroll-time jitter neither CSS-only fix resolved). Runs AFTER the viewport meta tag above (not before, as in an earlier pass) — reading window.innerHeight before the browser has processed width=device-width can return the engine's default/fallback layout viewport instead of the final device-scaled one, which was the confirmed cause of a large stray gap in .home-hero on a prior round. Deliberately NOT kept live via a resize/orientationchange listener — see style.css's .home-hero mobile rule and DESIGN-SYSTEM.md §3.2 for the full reasoning; a stale value after a real device rotation is an accepted tradeoff, not an oversight. Home-only: this page's own script, not the shared flash-prevention snippet other pages also carry verbatim. */document.documentElement.style.setProperty('--hero-vh-locked', window.innerHeight + 'px');</script>
+    <title>Home — Christopher Klein</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/fav/fav-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/fav/fav-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/fav/fav-180.png">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <main>
-    <div class="container">
-        <h1>Your Name</h1>
-        <p>A short sentence about who you are and what you do.</p>
-    </div>
-</main>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div id="nav-placeholder"></div>
+
+    <main id="main-content">
+
+        <!-- Hero -->
+        <section class="home-hero">
+            <div class="home-hero-icons">
+                <!-- Bug/wrench decorative icons hidden 2026-09-07 (per-request,
+                     not deleted — see .contact-icon-btn[hidden] in style.css).
+                     Inert markup: plain divs, no href/click handler, icon
+                     itself already aria-hidden. -->
+                <div class="contact-icon-btn" hidden>
+                    <svg class="home-hero-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                        <g opacity="0.9">
+                            <path d="M14.2483 2C14.6279 2 14.9417 2.29706 14.9914 2.68247L14.9982 2.78961V3.58145C14.9982 4.24764 14.8023 4.86565 14.4679 5.37512C15.8627 5.87857 16.8862 7.22631 16.9893 8.83967L17.2448 8.83975C18.4872 8.83434 19.4903 7.7694 19.4852 6.46114L19.479 4.89708C19.4773 4.46099 19.8116 4.10601 20.2257 4.1042C20.6399 4.10241 20.977 4.45446 20.9787 4.89055L20.9849 6.45462C20.9931 8.56471 19.4278 10.295 17.45 10.4126L17.2355 10.419L16.9979 10.4183V11.9997L21.2501 12.0003C21.6298 12.0003 21.9435 12.2973 21.9932 12.6828L22 12.79C22 13.1897 21.7179 13.5201 21.3519 13.5723L21.2501 13.5796H16.9983L16.9979 15.6846L17.2355 15.6852L17.45 15.6915C19.3619 15.8052 20.8884 17.4259 20.9805 19.4399L20.9849 19.6496L20.9787 21.2136C20.977 21.6497 20.6399 22.0018 20.2257 22C19.8461 21.9983 19.5335 21.6999 19.4854 21.3143L19.479 21.2071L19.4852 19.6431C19.4901 18.3893 18.5691 17.359 17.3987 17.2705L17.2448 17.2644L16.7692 17.2643C16.1323 19.4004 14.2373 20.9498 11.9986 20.9498C9.75989 20.9498 7.86487 19.4004 7.228 17.2643L6.74007 17.2644C5.49761 17.2698 4.49457 18.3348 4.4997 19.6431L4.50584 21.2071C4.50756 21.6432 4.17321 21.9982 3.75905 22C3.3449 22.0018 3.00778 21.6497 3.00607 21.2136L2.99986 19.6496C2.99164 17.5394 4.557 15.8091 6.53477 15.6915L6.74937 15.6852L6.9993 15.6846V13.5789L2.7499 13.5796C2.37025 13.5796 2.0565 13.2825 2.00685 12.8971L2 12.79C2 12.3902 2.28211 12.0598 2.64814 12.0075L2.7499 12.0003L6.9993 11.9997V10.4183L6.74934 10.419L6.53473 10.4126C4.62289 10.2989 3.09643 8.67827 3.00424 6.66431L2.99986 6.4546L3.00603 4.89055C3.00775 4.45446 3.34487 4.1024 3.75902 4.1042C4.13866 4.10585 4.45125 4.40428 4.49938 4.7899L4.50581 4.89708L4.49967 6.46113C4.49475 7.71489 5.41574 8.74517 6.58603 8.83361L6.74004 8.83974L7.00787 8.83967C7.11099 7.22631 8.13458 5.87857 9.5303 5.37383C9.23216 4.92211 9.04427 4.38362 9.0062 3.80164L8.99902 3.58145V2.78961C8.99902 2.35353 9.33476 2 9.74892 2C10.1286 2 10.4423 2.29706 10.492 2.68247L10.4988 2.78961V3.58145C10.4988 4.45363 11.1703 5.16067 11.9986 5.16067C12.7782 5.16067 13.4188 4.53437 13.4915 3.73354L13.4984 3.58145V2.78961C13.4984 2.35353 13.8341 2 14.2483 2Z" fill="currentColor"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="home-hero-image">
+                    <img src="/assets/images/profile/christopher-klein.webp" alt="Christopher Klein" width="300" height="300">
+                </div>
+                <div class="contact-icon-btn" hidden>
+                    <svg class="home-hero-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                        <g opacity="0.9">
+                            <path d="M20.3519 11.6861C19.5586 12.481 18.5473 13.0228 17.446 13.2431C16.3447 13.4633 15.2028 13.3521 14.1648 12.9234L7.40276 21.072C6.16534 22.3093 4.16548 22.3093 2.92806 21.072C1.69065 19.8347 1.69065 17.8351 2.92806 16.6103L11.0775 9.83638C10.2276 7.77422 10.64 5.32463 12.3149 3.6499C13.9148 2.05017 16.2147 1.62524 18.2145 2.32512L14.6023 5.93703L18.127 9.46144L21.7018 5.87454C22.3642 7.84921 21.9268 10.1113 20.3519 11.6861ZM4.26547 19.7347C4.76544 20.2222 5.56538 20.2222 6.05285 19.7347C6.55281 19.2348 6.55281 18.435 6.05285 17.9475C5.56538 17.4476 4.76544 17.4476 4.26547 17.9475C4.03112 18.1859 3.8998 18.5069 3.8998 18.8411C3.8998 19.1754 4.03112 19.4963 4.26547 19.7347Z" fill="currentColor"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="home-hero-title">
+                <span>QA Analyst and UX Designer for games and the tools that make them</span>
+            </h1>
+            <p class="home-hero-subtitle"><a href="/about.html">Christopher Klein</a> has 13 years within game development owning test strategy for large and small projects and features, and designing tools for development.</p>
+            <a href="#featured-work-heading" class="home-hero-scroll" aria-label="Scroll to content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <path d="M6 9l6 6 6-6"/>
+                </svg>
+            </a>
+        </section>
+
+        <div class="page-grid">
+
+            <!-- Featured Work -->
+            <section aria-labelledby="featured-work-heading">
+                <h2 id="featured-work-heading" class="section-heading">Featured Work</h2>
+
+                <!-- Featured Work — 1 col mobile, 2 col tablet and desktop -->
+                <div class="card-row card-row--two">
+                    <article class="card card--feature">
+                        <a href="/entries/work/this-website.html" class="card-block-link" aria-label="View This Website" aria-hidden="true" tabindex="-1"></a>
+                        <div class="card-image" role="presentation" style="background-image: url('/assets/images/entries/work/this-website/this-website-banner.png');"></div>
+                        <div class="card-content">
+                            <h3 class="card-title">This Website</h3>
+                            <p class="card-date">September 8, 2026</p>
+                            <div class="card-tags">
+                                <span class="card-tag">User Experience, Web Development, AI</span>
+                            </div>
+                            <p class="card-excerpt">Removing Squarespace from my life and learning web development principles.</p>
+                            <a href="/entries/work/this-website.html" class="link-cta" aria-label="This Website — View this work">
+                                View this work
+                                <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="card card--feature">
+                        <a href="/entries/work/star-engine.html" class="card-block-link" aria-label="View Star Engine" aria-hidden="true" tabindex="-1"></a>
+                        <div class="card-image" role="presentation" style="background-image: url('/assets/images/entries/work/star-engine/StarEngine-banner.png');"></div>
+                        <div class="card-content">
+                            <h3 class="card-title">Star Engine</h3>
+                            <p class="card-date">October 1, 2023</p>
+                            <div class="card-tags">
+                                <span class="card-tag">User Experience, Software Tools, Quality Assurance</span>
+                            </div>
+                            <p class="card-excerpt">At Cloud Imperium Games I translated developer grievances into bug fixes and delivered improvements to their tools.</p>
+                            <a href="/entries/work/star-engine.html" class="link-cta" aria-label="Star Engine — View this work">
+                                View this work
+                                <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="section-footer">
+                    <a href="/archive.html?type=work" class="btn btn--ghost btn--cta">View more work<span class="sr-only"> in the Work section</span></a>
+                </div>
+
+            </section>
+            <!-- Dot divider -->
+<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+            <!-- Thoughts -->
+            <section aria-labelledby="thoughts-heading">
+                <h2 id="thoughts-heading" class="section-heading">Thoughts</h2>
+
+                <!-- First thought — full width — sole Featured Thought card -->
+                <div class="card-row card-row--full">
+                    <article class="card card--thought">
+                        <a href="/entries/thoughts/read-me.html" class="card-block-link" aria-label="Read Me" aria-hidden="true" tabindex="-1"></a>
+                        <div class="card-content">
+                            <h3 class="card-title">Read Me</h3>
+                            <p class="card-date">September 8, 2026</p>
+                            <div class="card-tags"><span class="card-tag">Web Development, AI</span>
+                            </div>
+                            <p class="card-excerpt">A quick welcome and a brief overview of my ethics in the new frontier of software development with LLM's.</p>
+                            <a href="/entries/thoughts/read-me.html" class="link-cta" aria-label="Read Me — View this thought">
+                                View this thought
+                                <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                    <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="section-footer">
+                    <a href="/archive.html?type=thoughts" class="btn btn--ghost btn--cta">Read more thoughts<span class="sr-only"> in the Thoughts section</span></a>
+                </div>
+            </section>
+            <!-- Dot divider -->
+<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+            <!-- Recommendations -->
+            <section>
+                <h2 class="section-heading">Nice Words</h2>
+                <div class="about-recommendations">
+                    <blockquote class="about-recommendation">
+                        <p>Chris is the kind of Senior QA every team hopes to have - passionate about UI/UX, deeply invested in tools design, and always thinking about how to make things better for the people using them. I worked closely with him on the Systems team while leading embedded QA and managing external testing support. His attention to usability, combined with strong testing instincts, helped streamline test documentation, reduce inefficiencies, and increase overall quality. He's thoughtful, reliable, and a true partner in delivering great player experiences. I'd highly recommend him.</p>
+                        <cite>— Hector Melendres, QA Manager</cite>
+                    </blockquote>
+                    <blockquote class="about-recommendation">
+                        <p>It was a pleasure working with Chris. He is always eager to learn new skills and pro-actively proposes major tool improvements and potential new workflows. Iteratively working together with Chris on new tools feels seamlessly and is a lot of fun. He was always a highly valuable part of the team and respected across the board. His fast way to adapt, his always positive attitude and his grow into the UX designer position over the years was really impressive.</p>
+                        <cite>— Sascha Hoba, Senior Lead Development Tools Programmer</cite>
+                    </blockquote>
+                </div>
+            </section>
+            <!-- Dot divider -->
+<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+
+            <!-- Contact -->
+            <section aria-labelledby="contact-heading">
+                <h2 id="contact-heading" class="section-heading">Want to work together? Contact me!</h2>
+                <div class="contact-buttons">
+                    <a href="/about.html"
+                       class="contact-icon-btn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                            <g opacity="0.9">
+                                <path d="M12 12.6764C13.1432 12.6764 14.2393 13.1309 15.0477 13.9393C15.8561 14.7477 16.3105 15.8437 16.3105 16.987H7.68945C7.68945 15.8437 8.14392 14.7477 8.95231 13.9393C9.76069 13.1309 10.8568 12.6764 12 12.6764Z" fill="currentColor"/>
+                                <path d="M12 6.92903C13.5871 6.92903 14.8737 8.21563 14.8737 9.80273C14.8737 11.3898 13.5871 12.6764 12 12.6764C10.4129 12.6764 9.1263 11.3898 9.1263 9.80273C9.1263 8.21563 10.4129 6.92903 12 6.92903Z" fill="currentColor"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M20 5V21L19.9951 21.1025C19.9438 21.6067 19.5177 22 19 22H5L4.89746 21.9951C4.42703 21.9472 4.05278 21.573 4.00488 21.1025L4 21V3C4 2.44772 4.44772 2 5 2H17L20 5ZM5 21H19V5.41406L16.5859 3H5V21Z" fill="currentColor"/>
+                            </g>
+                        </svg>
+                        <span>About</span>
+                    </a>
+                    <a href="mailto:christopherwalterklein@gmail.com"
+                       class="contact-icon-btn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                            <g opacity="0.9">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.0194 2.75679C16.4817 2.54918 17.0354 2.72154 17.2942 3.16986L22.2942 11.8301C22.5531 12.2784 22.4255 12.8441 22.0146 13.1406L21.9282 13.1961L8.0718 21.1961C7.62348 21.455 7.05779 21.3274 6.76127 20.9165L6.70577 20.8301L1.70577 12.1699C1.42963 11.6916 1.59351 11.08 2.0718 10.8038L15.9282 2.80383L16.0194 2.75679ZM7.5718 20.3301L9.55757 19.1836L10.9879 13.8427L2.90334 12.2441L7.5718 20.3301ZM14.1011 12.0454L19.4424 13.4766L21.4282 12.3301L16.7597 4.24411L14.1011 12.0454ZM10.7822 18.4766L18.2178 14.1836L13.7782 12.994L13.614 13.4791C13.4524 13.9532 12.9654 14.2344 12.4739 14.1373L11.9709 14.0375L10.7822 18.4766ZM12.668 13.1569L15.7711 4.04925L3.22893 11.2905L12.668 13.1569Z" fill="currentColor"/>
+                            </g>
+                        </svg>
+                        <span>Email</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/crzdev/"
+                       class="contact-icon-btn"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       aria-label="LinkedIn (opens in new tab)">
+                        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                            <path d="M19.1065 19.6728V27.0944H15.5461V14.257H18.9394V16.5219H19.0898C19.374 15.7753 19.8504 15.1847 20.519 14.7501C21.1876 14.3099 21.9983 14.0898 22.9511 14.0898C23.8425 14.0898 24.6198 14.2848 25.2828 14.6749C25.9459 15.0649 26.4613 15.6221 26.829 16.3464C27.1968 17.0652 27.3806 17.9232 27.3806 18.9206V27.0944H23.8203V19.5558C23.8258 18.7701 23.6252 18.1572 23.2185 17.7171C22.8118 17.2713 22.2518 17.0485 21.5386 17.0485C21.0594 17.0485 20.636 17.1515 20.2682 17.3577C19.9061 17.5638 19.6219 17.8647 19.4158 18.2603C19.2152 18.6503 19.1121 19.1212 19.1065 19.6728Z" fill="currentColor"/>
+                            <path d="M9.13372 27.0944V14.257H12.6941V27.0944H9.13372ZM10.9223 12.6022C10.3929 12.6022 9.93885 12.4267 9.55997 12.0756C9.18666 11.719 9 11.2928 9 10.7969C9 10.3066 9.18666 9.88592 9.55997 9.53489C9.93885 9.1783 10.3929 9 10.9223 9C11.4516 9 11.9029 9.1783 12.2762 9.53489C12.6551 9.88592 12.8445 10.3066 12.8445 10.7969C12.8445 11.2928 12.6551 11.719 12.2762 12.0756C11.9029 12.4267 11.4516 12.6022 10.9223 12.6022Z" fill="currentColor"/>
+                        </svg>
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Back to Top -->
+            <div class="back-to-top-row">
+                <button class="back-to-top" aria-label="Back to top">
+                    <span>Back to Top</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <nav class="tab-bar" aria-label="Mobile navigation">
+        <a href="/index.html" class="tab-bar-item">
+            <span>Home</span>
+        </a>
+        <a href="/archive.html" class="tab-bar-item">
+            <span>Archive</span>
+        </a>
+        <a href="/about.html" class="tab-bar-item">
+            <span>About</span>
+        </a>
+    </nav>
+
+    <div id="footer-placeholder"></div>
+    <script src="/script.js"></script>
 </body>
 </html>

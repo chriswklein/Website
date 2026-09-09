@@ -11,69 +11,176 @@
    ROOT TOKENS
 ================================ */
 :root {
-    /* Colours */
+    /* ---- Colour: Background ---- */
     --color-background-base: #111111;
     --color-background-surface: #1A1A1A;
     --color-background-subtle: #2A2A2A;
 
+    /* ---- Colour: Text ---- */
     --color-text-primary: #F5F5F5;
     --color-text-secondary: #AAAAAA;
+    --color-text-tertiary: #888888;
     --color-text-disabled: #666666;
+    --color-text-inverse: #111111;
 
+    /* ---- Colour: Border ---- */
     --color-border-default: #2A2A2A;
     --color-border-strong: #666666;
 
+    /* ---- Colour: Interactive ---- */
     --color-interactive-default: #F5F5F5;
     --color-interactive-hover: #CCCCCC;
+    --color-interactive-active: #FFFFFF;
     --color-interactive-focus: #FFFFFF;
+    --color-interactive-disabled: #666666;
 
-    /* Typography */
+    /* ---- Colour: Accent — Teal (live default) ---- */
+    --color-accent-primary: #00BAA5;
+    --color-accent-primary-text: #00E5CB;
+
+    /* ---- Colour: Accent — Pink ---- */
+    --color-accent-quote: #A9407C;
+    --color-accent-quote-text: #FF60BB;
+
+    /* ---- Colour: Semantic — Components ---- */
+    --color-link: var(--color-accent-primary-text);
+    --color-link-hover: var(--color-accent-primary);
+    --color-divider-accent: var(--color-accent-primary);
+    --color-quote-border: var(--color-accent-quote);
+    --color-code-bg: var(--color-background-subtle);
+    --color-code-border: var(--color-accent-primary);
+    --color-tooltip-bg: var(--color-background-surface);
+    --color-tooltip-border: var(--color-accent-primary);
+    --color-tooltip-text: var(--color-text-primary);
+
+    /* ---- Colour: Background Pattern (theme-agnostic) ---- */
+    --pattern-dot-color: rgba(255, 255, 255, 0.05);
+    --pattern-dot-size: 1.5px;
+    --pattern-dot-spacing: var(--space-6);
+
+    /* ---- Typography: Family ---- */
     --font-family-base: 'Noto Sans', sans-serif;
 
-    --font-size-xs: 12px;
-    --font-size-sm: 14px;
-    --font-size-base: 16px;
-    --font-size-md: 18px;
-    --font-size-lg: 20px;
-    --font-size-xl: 24px;
-    --font-size-2xl: 30px;
-    --font-size-3xl: 36px;
-    --font-size-4xl: 48px;
+    /* ---- Typography: Size ---- */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-md: 1.125rem;
+    --font-size-lg: 1.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 1.875rem;
+    --font-size-3xl: 2.25rem;
+    --font-size-4xl: 3rem;
+    --font-size-5xl: 3.75rem;
 
+    /* ---- Typography: Weight ---- */
     --font-weight-regular: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
+    /* ---- Typography: Line Height ---- */
     --line-height-tight: 1.2;
     --line-height-snug: 1.3;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.6;
     --line-height-loose: 1.75;
 
-    /* Spacing */
+    /* ---- Typography: Letter Spacing ---- */
+    --letter-spacing-tight: -0.02em;
+    --letter-spacing-normal: 0em;
+    --letter-spacing-wide: 0.04em;
+    --letter-spacing-widest: 0.08em;
+
+    /* ---- Typography: Paragraph Spacing ---- */
+    --paragraph-spacing-sm: 12px;
+    --paragraph-spacing-base: 16px;
+    --paragraph-spacing-md: 24px;
+    --paragraph-spacing-lg: 32px;
+
+    /* ---- Spacing ---- */
+    --space-0: 0px;
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
     --space-4: 16px;
+    --space-5: 20px;
     --space-6: 24px;
     --space-8: 32px;
     --space-10: 40px;
     --space-12: 48px;
     --space-16: 64px;
     --space-20: 80px;
+    --space-24: 96px;
+    --space-32: 128px;
 
-    /* Layout */
+    /* ---- Layout ---- */
     --max-content: 1200px;
+    --card-image-column-width: 42%;
+    --toc-rail-width: 240px;
+
+    /* ---- Border Radius ---- */
+    --border-radius-none: 0px;
     --border-radius-sm: 4px;
     --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-full: 9999px;
+
+    /* ---- Border Width ---- */
+    --border-width-thin: 1px;
+    --border-width-medium: 2px;
+    --border-width-thick: 4px;
+
+    /* ---- Elevation ---- */
+    --elevation-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --elevation-md: 0 4px 12px rgba(0,0,0,0.5);
+    --elevation-lg: 0 8px 24px rgba(0,0,0,0.6);
+    --elevation-xl: 0 16px 48px rgba(0,0,0,0.7);
+
+    /* ---- Motion: Duration ---- */
+    --duration-instant: 0ms;
+    --duration-fast: 100ms;
+    --duration-base: 200ms;
+    --duration-slow: 350ms;
+    --duration-slower: 500ms;
+
+    /* ---- Motion: Easing ---- */
+    --ease-linear: linear;
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ---- Accessibility ---- */
+    --touch-target-minimum: 44px;
+    --touch-target-comfortable: 48px;
+
+    /* ---- Icon Size ---- */
+    --icon-size-xs: 0.75rem;
+    --icon-size-sm: 0.875rem;
+    --icon-size-md: 1rem;
+    --icon-size-lg: 1.25rem;
+}
+
+/* ================================
+   TEAL THEME OVERRIDE
+================================ */
+[data-theme="teal"] {
+    --color-accent-primary: #00BAA5;
+    --color-accent-primary-text: #00E5CB;
+}
+
+/* ================================
+   GOLD THEME OVERRIDE (dormant — toggle UI disabled pending Action Rail)
+================================ */
+[data-theme="gold"] {
+    --color-accent-primary: #BA8200;
+    --color-accent-primary-text: #E5A000;
 }
 
 /* ================================
    BASE STYLES
 ================================ */
 html {
-    font-size: 16px;
     scroll-behavior: smooth;
 }
 
@@ -84,15 +191,66 @@ body {
     line-height: var(--line-height-relaxed);
     color: var(--color-text-primary);
     background-color: var(--color-background-base);
+    background-image: radial-gradient(circle, var(--pattern-dot-color) var(--pattern-dot-size), transparent var(--pattern-dot-size));
+    background-size: var(--pattern-dot-spacing) var(--pattern-dot-spacing);
     -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+main {
+    flex: 1;
+    padding-top: var(--space-8);
+}
+
+footer {
+    margin-top: auto;
 }
 
 /* ================================
    FOCUS STYLES (Accessibility)
 ================================ */
 :focus-visible {
-    outline: 2px solid var(--color-interactive-focus);
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
     outline-offset: 3px;
+}
+
+/* ================================
+   ACCESSIBILITY UTILITIES
+================================ */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    z-index: 9999;
+    padding: var(--space-3) var(--space-5);
+    background-color: var(--color-background-surface);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    top: 0;
 }
 
 /* ================================
@@ -104,7 +262,7 @@ h1, h2, h3, h4 {
     color: var(--color-text-primary);
 }
 
-h1 { font-size: var(--font-size-4xl); }
+h1 { font-size: var(--font-size-4xl); letter-spacing: var(--letter-spacing-tight); }
 h2 { font-size: var(--font-size-2xl); line-height: var(--line-height-snug); }
 h3 { font-size: var(--font-size-xl);  line-height: var(--line-height-snug); font-weight: var(--font-weight-semibold); }
 h4 { font-size: var(--font-size-lg);  line-height: var(--line-height-normal); font-weight: var(--font-weight-semibold); }
@@ -114,14 +272,3355 @@ p {
     color: var(--color-text-primary);
 }
 
+ul, ol {
+    max-width: 65ch;
+    color: var(--color-text-primary);
+}
+
 /* ================================
-   LAYOUT
+   LINKS
+================================ */
+a {
+    color: var(--color-link);
+    text-decoration: underline;
+    transition: color var(--duration-base) var(--ease-out);
+}
+
+a:hover {
+    color: var(--color-link-hover);
+}
+
+/* ================================
+   DIVIDER (HR)
+================================ */
+hr {
+    border: none;
+    border-top: var(--border-width-thin) solid var(--color-divider-accent);
+    margin: var(--space-8) 0;
+}
+
+.divider--dots {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    width: 100%;
+    height: var(--space-3);
+    margin: var(--space-8) auto;
+}
+
+.divider--dots::before,
+.divider--dots::after {
+    content: '';
+    display: block;
+    width: var(--space-1);
+    height: var(--space-1);
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-accent-primary);
+    flex-shrink: 0;
+}
+
+.divider--dots span {
+    display: block;
+    width: var(--space-1);
+    height: var(--space-1);
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-accent-primary);
+    flex-shrink: 0;
+}
+
+/* ================================
+   BLOCKQUOTE
+================================ */
+blockquote {
+    border-left: var(--border-width-thick) solid var(--color-quote-border);
+    background-color: var(--color-background-surface);
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+    padding: var(--space-4) var(--space-5);
+    font-style: italic;
+}
+
+blockquote cite {
+    display: block;
+    margin-top: var(--space-2);
+    font-style: normal;
+    color: var(--color-text-secondary);
+}
+
+/* ================================
+   CODE / PRE
+================================ */
+code,
+pre {
+    background-color: var(--color-code-bg);
+    border-left: var(--border-width-thick) solid var(--color-code-border);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: var(--font-size-sm);
+}
+
+code {
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--border-radius-sm);
+}
+
+pre {
+    padding: var(--space-4) var(--space-5);
+    border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+    overflow-x: auto;
+}
+
+/* ================================
+   CODE WRAPPER — horizontal scroll container
+   Same root cause and fix pattern as .table-wrap (2026-09-03): a long,
+   unbroken code line (white-space: pre, never wrapped — wrapping would
+   break code formatting/readability, the wrong tradeoff here) can push a
+   block wider than its container without a dedicated scroll container,
+   silently expanding window.innerWidth on a narrow screen instead of
+   producing a scrollbar. overflow-x: auto is kept directly on `pre` too
+   as a defensive fallback (unlike .table-wrap, this one isn't provably
+   broken on its own — <pre> is a normal block box, not the historically
+   inconsistent <table> box type) but .code-wrap is the primary, reliable
+   fix: confirmed via testing that on design-system.html, pre's own
+   overflow-x: auto alone did not stop window.innerWidth from expanding.
+   Not table-layout's problem, so no table-layout-equivalent to avoid here
+   — just wrap any <pre> that might overflow its container.
+================================ */
+.code-wrap {
+    overflow-x: auto;
+    margin: var(--space-6) 0;
+}
+
+.code-wrap pre {
+    margin: 0;
+}
+
+pre code {
+    background: none;
+    border-left: none;
+    padding: 0;
+}
+
+/* ================================
+   TAGS
+================================ */
+.tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-wide);
+    line-height: var(--line-height-normal);
+    border-radius: var(--border-radius-lg);
+    border: var(--border-width-thin) solid var(--color-accent-primary);
+    background: transparent;
+    color: var(--color-accent-primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.tag:hover {
+    background-color: var(--color-background-subtle);
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary-text);
+    text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+}
+
+.tag:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* ================================
+   TAG-CHIP
+================================ */
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-wide);
+    line-height: var(--line-height-normal);
+    border-radius: var(--border-radius-lg);
+    border: var(--border-width-thin) solid var(--color-accent-primary);
+    background: transparent;
+    color: var(--color-accent-primary);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.tag-chip:hover {
+    background-color: var(--color-background-subtle);
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary-text);
+    text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+}
+
+.tag-chip:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+.tag-chip--active {
+    border: var(--border-width-medium) solid var(--color-accent-primary-text);
+    background-color: var(--color-background-surface);
+    color: var(--color-accent-primary-text);
+    text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+}
+
+.tag-chip--active:hover {
+    background-color: var(--color-background-surface);
+    border-color: var(--color-accent-primary-text);
+    color: var(--color-accent-primary-text);
+    text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+}
+
+.tag-chip-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-base);
+    line-height: 1;
+    pointer-events: none;
+}
+
+.tag-chip--dim {
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    background-color: var(--color-background-subtle);
+    color: var(--color-text-disabled);
+    font-weight: var(--font-weight-regular);
+}
+
+.tag-chip--dim:hover {
+    background-color: var(--color-background-subtle);
+    border-color: var(--color-border-strong);
+    color: var(--color-text-disabled);
+    font-weight: var(--font-weight-regular);
+}
+
+.tag-chip--zero-count {
+    display: none;
+}
+
+/* Hides tags outside the current page of the Filter Drawer's paginated
+   secondary tag list (mobile/tablet) — see .filter-drawer-secondary-page. */
+.tag-chip--collapsed {
+    display: none;
+}
+
+/* ================================
+   BUTTON
+================================ */
+.btn {
+    --btn-bg:             var(--color-background-subtle);
+    --btn-bg-hover:       var(--color-border-strong);
+    --btn-bg-active:      var(--color-border-default);
+    --btn-border:         var(--color-border-strong);
+    --btn-border-hover:   var(--color-interactive-hover);
+    --btn-border-focus:   var(--color-interactive-focus);
+    --btn-text:           var(--color-text-primary);
+    --btn-text-hover:     var(--color-interactive-default);
+    --btn-text-disabled:  var(--color-text-disabled);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-5);
+    background-color: var(--btn-bg);
+    border: var(--border-width-thin) solid var(--btn-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--btn-text);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+/* hover: hover — scoped to genuine hover-capable pointers (mouse/trackpad).
+   Touch devices have no way to "un-hover": a tap latches :hover on the
+   tapped element and nothing ever fires to clear it (no mouse-leave event
+   exists on touch). On a disabled button that stale :hover collides with
+   .btn:disabled's text color below — both resolve to the same #666666
+   (--color-border-strong / --color-text-disabled), rendering the label
+   invisible. Confirmed via real-device testing (iPhone SE2): Clear's label
+   vanished after a successful clear, reproducing exactly this collision.
+   pointer-events: none on :disabled already stops *future* hover
+   hit-testing, but can't retroactively clear a :hover a tap already
+   latched before the button became disabled — this media query removes
+   the possibility at the source instead, for every .btn sitewide. */
+@media (hover: hover) {
+    .btn:hover {
+        background-color: var(--btn-bg-hover);
+        border-color: var(--btn-border-hover);
+        color: var(--btn-text-hover);
+    }
+}
+
+.btn:active {
+    background-color: var(--btn-bg-active);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+    color: var(--btn-text-disabled);
+    cursor: not-allowed;
+    /* Disabled is non-interactive — it shouldn't show interactive hover
+       feedback at all, which is misleading on its own, but here it's also
+       a real contrast bug: confirmed via testing that :hover still matches
+       a disabled button, and --btn-bg-hover (--color-border-strong,
+       #666666) is the exact same value as --btn-text-disabled
+       (--color-text-disabled, #666666) — hovering a disabled button made
+       its text and background identical, 1:1 contrast, fully invisible.
+       pointer-events: none suppresses :hover matching entirely while
+       disabled, fixing both issues at once. */
+    pointer-events: none;
+}
+
+.btn--ghost {
+    --btn-bg:     transparent;
+    --btn-border: var(--color-border-strong);
+    --btn-text:   var(--color-text-primary);
+}
+
+/* "View more Work" / "Read more Thoughts" — borrows the Contact/Resume/
+   LinkedIn/Email icon buttons' colour and hover treatment (surface
+   background, default border, teal border+text on hover) while keeping
+   this button's own full-width pill shape and visible label — not their
+   fixed 80x80 icon-only square, which wouldn't fit a text CTA. */
+.btn--cta {
+    --btn-bg:     var(--color-background-surface);
+    --btn-border: var(--color-border-default);
+    --btn-text:   var(--color-text-primary);
+}
+
+@media (hover: hover) {
+    .btn--cta:hover {
+        --btn-bg-hover:     var(--color-background-surface);
+        --btn-border-hover: var(--color-accent-primary-text);
+        --btn-text-hover:   var(--color-accent-primary-text);
+    }
+}
+
+/* Share button — auto-width, not full-width like .btn default */
+.share-btn {
+    width: auto;
+    align-self: center;
+}
+
+/* ================================
+   TOOLTIP
+================================ */
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: var(--space-2);
+    background-color: var(--color-tooltip-bg);
+    border: var(--border-width-thin) solid var(--color-tooltip-border);
+    border-radius: var(--border-radius-md);
+    color: var(--color-tooltip-text);
+    font-size: var(--font-size-sm);
+    padding: var(--space-2) var(--space-3);
+    max-width: 240px;
+    z-index: 100;
+    white-space: normal;
+    box-shadow: var(--elevation-md);
+}
+
+.tooltip-wrapper:hover .tooltip,
+.tooltip-wrapper:focus-within .tooltip {
+    display: block;
+}
+
+@media (hover: none) {
+    .tooltip {
+        display: none !important;
+    }
+}
+
+/* ================================
+   TOAST
+================================ */
+.toast {
+    position: fixed;
+    bottom: var(--space-8);
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--space-4));
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-accent-primary);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    padding: var(--space-2) var(--space-4);
+    box-shadow: var(--elevation-md);
+    z-index: 300;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--duration-base) var(--ease-out),
+                visibility var(--duration-base) var(--ease-out),
+                transform var(--duration-base) var(--ease-out);
+}
+
+.toast--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ================================
+   BREADCRUMB
+================================ */
+.breadcrumb {
+    margin-bottom: var(--space-6);
+}
+
+.breadcrumb-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.breadcrumb-item a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--color-text-primary);
+}
+
+.breadcrumb-separator {
+    color: var(--color-text-secondary);
+}
+
+.breadcrumb-item span[aria-current="page"] {
+    color: var(--color-text-primary);
+}
+
+/* ================================
+   CARD
+================================ */
+.card {
+    --card-bg:              var(--color-background-surface);
+    --card-border:          var(--color-border-default);
+    --card-border-hover:    var(--color-border-strong);
+    --card-radius:          var(--border-radius-md);
+    --card-padding:         var(--space-6);
+    --card-image-bg:        var(--color-background-subtle);
+    --card-block-link-z:    1;
+
+    background-color: var(--card-bg);
+    border: var(--border-width-thin) solid var(--card-border);
+    border-radius: var(--card-radius);
+    /* overflow: clip (not hidden) + overflow-clip-margin: this is what
+       clips .card-image to the card's rounded corners, but .link-cta's
+       own box (its touch-target padding/negative-margin pair, below)
+       already sits flush against — and, vertically, slightly past — this
+       boundary, so the sitewide :focus-visible ring's default +5px
+       (outline + offset) has no room and gets clipped. overflow-clip-margin
+       pushes the clip boundary itself outward by --space-3 without
+       changing any box's geometry — .card-content, .card-image, and
+       .card-block-link (inset: 0, positioned against this same padding
+       edge) all stay pixel-identical to before. Kept as an outward ring
+       everywhere per Chris's decision — no per-component inward-offset
+       exceptions — the padding-based alternative was rejected here since
+       adding real padding to .card would also inset .card-image and
+       shrink .card-block-link's full-card click coverage, both of which
+       overflow-clip-margin avoids entirely. */
+    overflow: clip;
+    overflow-clip-margin: var(--space-3);
+    position: relative;
+    transition: border-color var(--duration-base) var(--ease-out);
+}
+
+/* Hover — teal border + solid non-blurred drop-shadow lift, whole card
+   including the image column where present (image carries no separate
+   border of its own, so it inherits this same treatment automatically). */
+.card:hover {
+    border-color: var(--color-accent-primary-text);
+    box-shadow: 0 var(--space-1) 0 var(--color-accent-primary);
+}
+
+.card-image {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--card-image-bg);
+    /* .card-image sits flush against .card's own top corners, so it needs
+       its own matching radius there — .card's overflow: clip +
+       overflow-clip-margin (see .card's comment) doesn't reliably clip
+       this flush-edge child to the rounded corner once a clip margin is
+       in play, leaving the image's square corners visible on top of the
+       border on hover. Bottom corners don't need this: .card-image never
+       reaches them. */
+    border-top-left-radius: var(--card-radius);
+    border-top-right-radius: var(--card-radius);
+}
+
+.card-content {
+    padding: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.card p {
+    max-width: none;
+}
+
+/* Excerpt — 2-line clamp. Full text stays in the DOM for screen readers;
+   only the visual display is capped. */
+.card-excerpt {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-tags {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+/* Card-preview tags — plain, non-interactive teal text. Not the real
+   .tag filter component (untouched, see "## TAGS" above) — this is a
+   separate class specifically so entry-page/Archive-filter tags keep
+   their pill/link styling and behaviour unchanged. No border, background,
+   or hover/focus state, since these are plain <span>s, not links. */
+.card-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-accent-primary-text);
+}
+
+/* Title row — type icon + title on the left, open-link icon on the
+   right. Shared by Work Entry and Thought Entry cards. Icons sized at
+   --space-10 (40px) per spec. */
+.card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.card-title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.card-type-icon {
+    width: var(--space-10);
+    height: var(--space-10);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+}
+
+.card-link-icon {
+    width: var(--space-10);
+    height: var(--space-10);
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.card:hover .card-link-icon {
+    color: var(--color-accent-primary-text);
+}
+
+/* Sole card link — no separate View/Read button. Covers the full card,
+   carries the real accessible name, and is the card's only keyboard
+   focus stop (see aria-label on the element itself, set per entry).
+   Tags remain independent real links above it (z-index: 3, unaffected)
+   — this doesn't nest anchors since tags sit as .card-tags's own
+   siblings, not descendants of this link. */
+.card-block-link {
+    position: absolute;
+    inset: 0;
+    z-index: var(--card-block-link-z);
+    border-radius: var(--card-radius);
+}
+
+/* No :focus-visible override here (there used to be one, with an inward
+   offset to dodge .card's clip boundary — see .card's own
+   overflow-clip-margin comment above for that fix, now applied at the
+   root cause instead): .card-block-link is aria-hidden="true" and
+   tabindex="-1" (above), so it can never actually receive focus and this
+   selector could never match. Removed as genuinely dead code, not left
+   in place — confirmed unreachable, not merely unused. */
+
+/* ================================
+   INLINE LINK
+   For links embedded mid-sentence in body copy (hero, entry body text).
+   Underlined at rest (not hover-only) so it reads as a link without
+   relying on colour alone. No touch-target padding — WCAG 2.5.5 exempts
+   inline links within a block of text from the 44px minimum.
+================================ */
+.link-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-link);
+    text-decoration: underline;
+    font-style: normal;
+}
+
+.link-inline:hover {
+    color: var(--color-link-hover);
+}
+
+.link-inline-icon {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+    flex-shrink: 0;
+}
+
+/* ================================
+   CTA LINK
+   Replaces .card-block-link as the real, visible, keyboard-focusable
+   link on cards (see .card-block-link's aria-hidden/tabindex=-1 above).
+   Underlined text link, not a button — no border/background/chrome —
+   but padded to meet the 44px touch target since it isn't sitting
+   inline in a line of surrounding text the way .link-inline does.
+================================ */
+.link-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-2);
+    margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+    color: var(--color-link);
+    text-decoration: underline;
+    font-style: normal;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.link-cta:hover {
+    color: var(--color-link-hover);
+}
+
+.link-cta-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+/* Sits above .card-block-link (z-index 1) so it stays the real,
+   clickable/focusable link once the block-link is aria-hidden +
+   tabindex=-1. Scoped to card usage only — .link-cta itself carries no
+   z-index so it can be reused outside a stacking-context card body. */
+.card-content .link-cta {
+    position: relative;
+    z-index: 2;
+}
+
+/* Date row — Thought Entry cards only. Reuses the tag/meta text size
+   (--font-size-sm) but the more muted tertiary tier, distinct from
+   description text's secondary tier. */
+.card-date {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    line-height: var(--line-height-loose);
+    max-width: none;
+}
+
+/* Thought cards — no image, otherwise identical single-column content
+   flow to Feature (no separate icon column any more — the type icon now
+   lives in .card-title-row like Work Entry's). */
+.card--thought .card-image {
+    display: none;
+}
+
+/* Profile card */
+.card--profile {
+    --card-profile-name-size:       var(--font-size-2xl);
+    --card-profile-name-weight:     var(--font-weight-bold);
+    --card-profile-caption-size:    var(--font-size-xs);
+    --card-profile-caption-color:   var(--color-text-secondary);
+
+    overflow: visible;
+}
+
+.card--profile .card-image {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: var(--border-radius-md);
+}
+
+.card--profile .card-image img {
+    width: 100%;
+    height: auto;
+}
+
+.card-image-caption {
+    font-size: var(--card-profile-caption-size, var(--font-size-xs));
+    color: var(--card-profile-caption-color, var(--color-text-secondary));
+    line-height: var(--line-height-loose);
+    padding: var(--space-2) var(--card-padding);
+    max-width: none;
+}
+
+.card-profile-name {
+    font-size: var(--card-profile-name-size);
+    font-weight: var(--card-profile-name-weight);
+    line-height: var(--line-height-snug);
+}
+
+.card-profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+/* ================================
+   PAGE GRID
+================================ */
+.page-grid {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+.card-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+}
+
+.card-row--two {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+}
+
+.card-row--full {
+    grid-template-columns: 1fr;
+}
+
+/* Spacing between consecutive card-rows within a section */
+.card-row + .card-row {
+    margin-top: var(--space-2);
+}
+
+.section-heading {
+    text-align: center;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+}
+
+/* scroll-margin-top: var(--space-16) (64px) matches the sticky header's
+   real measured height (.site-nav .container height: 64px) at every
+   breakpoint, + var(--space-4) breathing room — same clearance fix
+   already applied to .standard-page-content h2/h3 anchors — so the hero
+   chevron's #featured-work-heading jump lands the heading clear of the
+   fixed nav instead of underneath it. */
+#featured-work-heading {
+    scroll-margin-top: calc(var(--space-16) + var(--space-4));
+}
+
+.section-footer {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: var(--space-4);
+}
+
+/* ================================
+   HOME HERO
+   Desktop/tablet: natural height, --space-24 vertical padding (one
+   token step down from --space-32, reduced per Chris's request —
+   --space-32 remains the documented "Hero and banner vertical padding"
+   token but was reading too generous here). Mobile gets its own
+   min-height: 100svh override below (see MOBILE section) so the hero
+   is the sole first-screen block there. */
+/* Horizontal padding (was 0): matches .page-grid/.container's own
+   var(--space-8) padding — without it, .home-hero-title/-subtitle's new
+   max-width: var(--max-content) (below) only actually binds above 1264px
+   (1200px content + 2x32px padding); at any narrower width down to
+   mobile's own breakpoint, max-width alone doesn't reach the cap, so the
+   title/subtitle would still render up to 64px wider than
+   #featured-work-heading — confirmed via direct measurement at 1024px
+   before this was added. Mobile's own padding override below
+   (var(--space-4), matching page-grid's own mobile padding) already
+   replaces this value entirely at that breakpoint, so this is additive
+   only at tablet/desktop. */
+.home-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-6);
+    padding: var(--space-24) var(--space-8);
+}
+
+.home-hero-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+}
+
+/* Mobile/tablet — tighter gap between the icon containers and the
+   portrait than desktop's --space-8. */
+@media (max-width: 1023px) {
+    .home-hero-icons {
+        gap: var(--space-4);
+    }
+}
+
+.home-hero-image {
+    flex-shrink: 0;
+}
+
+/* Explicit width: 100%/height: auto here rather than relying on the
+   sitewide img { max-width: 100% } rule alone — belt-and-suspenders
+   against the <img>'s own width="300" height="300" attributes (kept
+   intentionally, per DESIGN-SYSTEM.md §11.7's CLS-prevention
+   requirement) winning in any rendering path where max-width alone
+   doesn't reliably beat them. Confirmed max-width alone already works
+   correctly in Chromium (measured 120px matching the clamp), but this
+   makes the override explicit rather than implicit. */
+.home-hero-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-full);
+}
+
+/* Icons sit beside the image again (not overlapping it) — each one
+   wrapped in the existing .contact-icon-btn class directly in the HTML
+   (background, border, radius, sizing, AND colour all reused verbatim
+   from that component, nothing redeclared here). .home-hero-icon
+   previously forced color: teal directly on the svg, which overrode
+   .contact-icon-btn's real default (text-primary, shifting to teal
+   only on hover) since a property set directly on an element always
+   wins over an inherited one, regardless of selector specificity. That
+   override is removed — the class stays as a markup hook only, with no
+   CSS of its own, so these icons now render exactly like a real
+   Contact/Resume/Email/LinkedIn button. */
+
+/* max-width: this title had no width constraint at all, so it rendered
+   as wide as its own text demanded — confirmed via direct measurement
+   to reach 1592px, ~196px past the actual content column (where
+   #featured-work-heading and the Featured Work cards below it sit).
+   That real content column isn't .page-grid's own 1200px box — it's
+   1200px minus .page-grid's own --space-8 padding on each side (the
+   same padding .home-hero now carries too, above), so matching it here
+   means subtracting that same padding, not just capping at
+   --max-content directly (confirmed by direct measurement: capping at
+   the full --max-content alone left this ~32px wider than
+   #featured-work-heading at every width past the mobile breakpoint,
+   where .home-hero's own padding switches to --space-4 and this
+   max-width stops binding entirely, well under any viewport it could
+   matter at). Centering comes from .home-hero's own
+   align-items: center, so no margin: auto needed here. */
+.home-hero-title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    max-width: calc(var(--max-content) - (var(--space-8) * 2));
+}
+
+/* max-width: was previously constrained only incidentally, by the
+   sitewide p { max-width: 65ch } rule (~892px at this font-size) —
+   narrower than the real content column already, so not the overflow
+   the title had, but still not tied to the site's actual content-width
+   standard the way this asks for. Same calc as .home-hero-title, above,
+   and for the same reason — matches #featured-work-heading's real
+   column, not .page-grid's own wider outer box. */
+.home-hero-subtitle {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-relaxed);
+    max-width: calc(var(--max-content) - (var(--space-8) * 2));
+}
+
+.home-hero-scroll {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--touch-target-comfortable);
+    height: var(--touch-target-comfortable);
+    color: var(--color-text-secondary);
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+    .home-hero-scroll:hover {
+        color: var(--color-accent-primary-text);
+    }
+}
+
+.home-hero-scroll:focus-visible {
+    color: var(--color-accent-primary-text);
+}
+
+.home-hero-scroll svg {
+    width: var(--font-size-2xl);
+    height: var(--font-size-2xl);
+}
+
+/* ================================
+   CONTACT BUTTONS (Home)
+================================ */
+.contact-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+}
+
+/* Icon + visible label side by side, replacing the previous fixed 80px
+   icon-only square (now auto-width via horizontal padding instead). Gap
+   and label typography match .btn/.action-rail-trigger's own established
+   "icon beside label" convention (Rule 3a) rather than a new value. */
+.contact-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 80px;
+    padding: 0 var(--space-5);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-default);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.contact-icon-btn svg {
+    width: 36px;
+    height: 36px;
+}
+
+.contact-icon-btn:hover {
+    border-color: var(--color-accent-primary-text);
+    color: var(--color-accent-primary-text);
+}
+
+.contact-icon-btn:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* [hidden]'s own UA-stylesheet display: none loses to this class's
+   display: flex at equal specificity — same reason
+   .filter-drawer-page-nav[hidden]/.action-rail-clear[hidden] need this
+   explicit override elsewhere in this file. Scoped to [hidden] only, so
+   real Contact/Resume/Email/LinkedIn .contact-icon-btn instances
+   (never given the attribute) are unaffected — only Home's two
+   decorative bug/wrench icons currently carry it. */
+.contact-icon-btn[hidden] {
+    display: none;
+}
+
+/* ================================
+   LAYOUT — CONTAINER (utility)
 ================================ */
 .container {
     width: 100%;
     max-width: var(--max-content);
     margin: 0 auto;
     padding: 0 var(--space-8);
+}
+
+/* ================================
+   BACK TO TOP
+================================ */
+.back-to-top {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-3) var(--space-5);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out),
+                visibility var(--duration-base) var(--ease-out),
+                background-color var(--duration-fast) var(--ease-out);
+}
+
+.back-to-top--visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.back-to-top:hover {
+    background-color: var(--color-background-subtle);
+}
+
+.back-to-top-row {
+    text-align: center;
+    padding: var(--space-8) 0;
+}
+
+/* ================================
+   MOBILE TAB BAR
+================================ */
+.tab-bar {
+    display: none;
+}
+
+.tab-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-width: var(--touch-target-minimum);
+    min-height: var(--touch-target-minimum);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-widest);
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.tab-bar-item[aria-current="page"],
+.tab-bar-item.is-active {
+    color: var(--color-interactive-default);
+}
+
+/* ================================
+   NAVIGATION
+================================ */
+/* Fixes position: sticky silently failing on <header> below — confirmed via
+   testing, not assumed. #nav-placeholder is a plain block div injected by
+   script.js's fetch(); as a flex item of body (display: flex; flex-direction:
+   column), it collapses to header's own height (~65px), leaving header's
+   sticky positioning zero room to move within its own snugly-fitted parent —
+   the classic "sticky doesn't work because its containing block is exactly
+   its own size" gotcha. display: contents removes the wrapper from the box
+   model entirely so header becomes body's real flex item, with the full
+   remaining space available to stick within. */
+#nav-placeholder {
+    display: contents;
+}
+
+/* Reserves the injected <header>'s own real rendered height (~65px — the
+   same figure already used in the comment above for this exact
+   measurement, not a newly derived value) before nav.html's fetch
+   resolves, so <main> and everything below it renders in its final
+   position from first paint instead of shifting down once the real
+   header lands — confirmed as the sitewide (not Archive-specific) half
+   of Archive's CLS investigation, claude/2026-09-07-archive-cls-root-
+   cause-spec.md. content on a pseudo-element still generates a real box
+   and participates in body's flex layout as body's actual child, even
+   though display: contents suppresses a box for #nav-placeholder itself
+   — so this doesn't reintroduce the sticky-positioning bug that rule
+   exists to fix (confirmed: header's position: sticky still has its own
+   containing block, untouched by this). :empty is what removes the
+   reservation automatically the instant nav.html's real content lands
+   (no longer empty) — no JS change needed, and no risk of double-
+   counting height once the real header exists alongside it. Disabled at
+   <768px (see MOBILE section) since header itself is display: none
+   there — reserving space nothing will ever use would introduce a new,
+   opposite-direction shift once nav injects, not prevent one. */
+#nav-placeholder:empty::before {
+    content: '';
+    display: block;
+    height: 65px;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-background-base);
+    border-bottom: var(--border-width-thin) solid var(--color-border-default);
+}
+
+.site-nav .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 64px;
+    gap: var(--space-1);
+}
+
+.nav-logo {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    letter-spacing: var(--letter-spacing-wide);
+    line-height: var(--line-height-normal);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-20);
+    list-style: none;
+}
+
+.nav-links a {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    letter-spacing: var(--letter-spacing-widest);
+    transition: color var(--duration-fast) var(--ease-out);
+}
+
+.nav-links a:hover,
+.nav-links a:focus-visible {
+    color: var(--color-text-primary);
+}
+
+.nav-links a[aria-current="page"] {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Desktop and landscape-tablet — logo shown, left of nav links (not
+   stacked above). This project's breakpoints are width-only with no
+   orientation query anywhere else in the codebase; real landscape-tablet
+   widths already land at >=1024px here, so "desktop and landscape-tablet"
+   maps directly onto the existing min-width: 1024px breakpoint rather
+   than introducing a new orientation axis. Portrait-tablet (768-1023px)
+   and mobile hide the logo entirely — see .nav-logo display:none in the
+   TABLET and MOBILE sections below. */
+@media (min-width: 1024px) {
+    .site-nav .container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+/* ================================
+   THEME TOGGLE RAIL
+   Slot 1 of the future Vertical Action Rail — always visible, same gutter
+   math as .action-rail-group, fixed one slot above the Filters trigger.
+================================ */
+.theme-toggle-rail {
+    position: fixed;
+    right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+    top: calc(50% - var(--touch-target-minimum) - var(--space-8));
+    transform: translateY(-50%);
+    z-index: 260;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-target-minimum);
+    min-height: var(--touch-target-minimum);
+    padding: var(--space-3);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-full);
+    cursor: pointer;
+    box-shadow: var(--elevation-md);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.theme-toggle-rail--visible {
+    display: inline-flex;
+}
+
+.theme-toggle-rail:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.theme-toggle-rail:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* ================================
+   FOOTER
+================================ */
+footer {
+    border-top: var(--border-width-thin) solid var(--color-border-default);
+    padding: var(--space-8) 0;
+    text-align: center;
+}
+
+footer p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    max-width: none;
+}
+
+/* ================================
+   STANDARD PAGE
+================================ */
+.standard-page {
+    width: 100%;
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--space-8);
+}
+
+/* Reverted 2026-08-19 (round 2): round 1 capped this at max-width: 65ch to
+   line up with the text column beneath it. Reverted per direct review —
+   the banner is meant to span .standard-page's full width (up to
+   --max-content, 1200px), wider than the 65ch text column, same as before
+   round 1. Text column components (.standard-page-content,
+   .standard-page-divider) keep their own 65ch cap unchanged — only this
+   banner reverts. */
+.standard-page-banner {
+    width: 100%;
+    aspect-ratio: 3 / 1;
+    background-color: var(--color-background-subtle);
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-4);
+}
+
+/* Revised 2026-08-19 (round 2): the 8/18 build used font-size-md (18px,
+   the Figma "Body-18" spec) here, which read too large next to the site's
+   established caption scale. Now uses DESIGN-SYSTEM.md §2.7's documented
+   "caption" assembled style (font-size-sm + font-weight-medium +
+   line-height-loose + letter-spacing-wide) — the sanctioned style for
+   "Image captions, timestamps, metadata" — instead of a one-off value. */
+.standard-page-caption {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
+    text-align: center;
+    margin-bottom: var(--space-8);
+    line-height: var(--line-height-loose);
+    letter-spacing: var(--letter-spacing-wide);
+    max-width: none;
+}
+
+.standard-page-content img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-6);
+}
+
+.standard-page-content figure {
+    margin: 0;
+    margin-bottom: var(--space-6);
+}
+
+.standard-page-content figure img {
+    margin-bottom: 0;
+}
+
+/* Click-to-zoom trigger — wraps each .standard-page-content img (see
+   initImageViewer(), script.js). A real <button>, not a click handler on
+   the img itself, so it's keyboard-focusable and reachable by Tab.
+   margin-bottom moved here from .standard-page-content img (zeroed below,
+   same technique .standard-page-content figure img above already uses to
+   move that margin onto the figure instead) so wrapping in a button
+   doesn't change the visible gap between images. */
+.image-zoom-trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    /* transparent, not 0 — reserves the same border-box space the
+       hover/focus-visible border below fills, so its appearance doesn't
+       shift the image by the border's own width. */
+    border: var(--border-width-thin) solid transparent;
+    border-radius: var(--border-radius-md);
+    background: none;
+    margin-bottom: var(--space-6);
+    cursor: zoom-in;
+    text-align: left;
+    transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+/* Same dark teal token already used for this exact kind of hover/focus
+   border elsewhere (code blocks' --color-code-border, tooltips'
+   --color-tooltip-border, .tag/.tag-chip hover) — not a new colour
+   relationship. Both selectors together (not hover alone, as .tag does
+   it) per spec: keyboard users get the same visible affordance mouse
+   users get, not just the generic focus outline. */
+.image-zoom-trigger:hover,
+.image-zoom-trigger:focus-visible {
+    border-color: var(--color-accent-primary);
+}
+
+.image-zoom-trigger img {
+    margin-bottom: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+    .image-zoom-trigger:hover img {
+        opacity: 0.9;
+    }
+}
+
+/* ================================
+   STANDARD PAGE — IMAGE VIEWER (click-to-zoom)
+   Phase 1: static enlarged image only, no pan/zoom/gestures/navigation.
+   Mechanics (inert background, dialog semantics, trapFocus()) are the
+   same accessible-modal pattern as the Filter Drawer (2c) and Table of
+   Contents Panel above — only this section's own trigger/content markup
+   is new. See initImageViewer(), script.js.
+================================ */
+
+/* Scrim — unlike .archive-scrim/.toc-panel-scrim (which stay invisible;
+   their background content remains relevant while open), this one
+   actually dims: the viewer's whole purpose is focusing attention on one
+   enlarged image, not coexisting with visible background content. */
+.image-viewer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 269;
+    background-color: var(--color-background-base);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.image-viewer-scrim--open {
+    /* 0.85 — Chris's explicit call, consistency over the dimming
+       trade-off. Note this doesn't create identical rendered behaviour
+       across all three dialogs: confirmed via direct inspection that
+       .archive-scrim/.toc-panel-scrim's own --open states stay at
+       opacity: 0 (invisible hit-area only — see those rules), not 0.85,
+       so this is a one-off number match to this dialog alone, not a
+       shared token/class reused from them. At this lower value, bright
+       body content behind the scrim (e.g. the Table of Contents rail's
+       own colourful thumbnail cards) visibly bleeds through — confirmed
+       via direct testing, a known and accepted trade-off, not a bug. */
+    opacity: 0.85;
+    pointer-events: auto;
+}
+
+.image-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 270;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.image-viewer--open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.image-viewer-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: var(--border-radius-md);
+    /* Phase 2: transform: translate()/scale() is how zoom/pan are applied
+       (script.js). touch-action: none stops the browser's own native
+       pinch-zoom/scroll from intercepting touch gestures before they reach
+       the pointer event handlers that implement pinch-to-zoom/drag-pan. */
+    touch-action: none;
+    transition: transform var(--duration-fast) var(--ease-out);
+}
+
+/* Suppresses the transform transition during a live drag/pinch (toggled in
+   script.js) — the image should track the pointer 1:1 with no lag; the
+   transition is only wanted for discrete, button/keyboard-driven changes. */
+.image-viewer-image--interacting {
+    transition: none;
+}
+
+.image-viewer-image--zoomed {
+    cursor: grab;
+}
+
+.image-viewer-image--zoomed.image-viewer-image--interacting {
+    cursor: grabbing;
+}
+
+/* Close button — same chrome as the Filter Drawer's own Clear button
+   (.btn .action-rail-clear: touch-target-sized square, .tag-chip-x "×"
+   glyph), just pinned to the viewer's own top-right corner instead of the
+   floating action rail's position. */
+.image-viewer-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+}
+
+/* Prev/Next — same .btn.action-rail-clear chrome as Close, vertically
+   centred at the same corner inset (var(--space-4)) Close uses, just on
+   the left/right edges instead of a corner. Only created (script.js) when
+   the entry has 2+ images, so these never exist in the DOM at all on a
+   0- or 1-image entry — no CSS visibility toggle needed for that case. */
+.image-viewer-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.image-viewer-nav--prev {
+    left: var(--space-4);
+}
+
+.image-viewer-nav--next {
+    right: var(--space-4);
+}
+
+/* Zoom controls — grouped bottom-centre, same gap token
+   .action-rail-group already uses between its own buttons, so the pairing
+   reads as one consistent "grouped controls" convention sitewide. */
+.image-viewer-zoom-controls {
+    position: absolute;
+    bottom: var(--space-4);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-3);
+}
+
+/* Video embed — aspect-ratio governs display size; the iframe's own
+   width/height attributes are a fallback for browsers without
+   aspect-ratio support only, and are overridden here. */
+.video-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+}
+
+.video-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Video demo — local UI/bug-demo clips (GIF replacement). No aspect-ratio
+   wrapper: unlike .video-embed's fixed 16:9, these recordings vary in
+   shape (square, portrait mobile capture, etc.), so sizing comes from the
+   <video>'s own width/height attributes — same CLS-prevention pattern as
+   img (DESIGN-SYSTEM.md §11.7/§11.9) — constrained to the column. */
+.video-demo {
+    max-width: 100%;
+    margin-bottom: var(--space-6);
+}
+
+.video-demo video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+}
+
+.standard-page-title {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+/* Thought entries drop the banner+caption (2026-09-08) — without it,
+   .breadcrumb's own margin-bottom (--space-6) alone left the title in a
+   cramped jump straight off the breadcrumb row. Adds the same --space-8
+   this file already uses as its standard section-break gap (hr, dot
+   dividers, .standard-page-details) so a bannerless entry keeps
+   comparable breathing room above the title. Scoped to
+   .standard-page--no-banner so Work entries (still bannered) are
+   unaffected. */
+.standard-page--no-banner .standard-page-title {
+    margin-top: var(--space-8);
+}
+
+/* ================================
+   STANDARD PAGE — DETAILS CARD
+   Left-aligned label/value rows: Employer, Role, Timeline, Tools on Work
+   entries; Published, Updated on Thoughts entries. Row columns use
+   flex-grow ratios (1:2), not a hardcoded pixel width, to approximate the
+   Figma label-column proportion while staying fluid — no existing
+   sitewide label/value column pattern to reuse instead (see grep of
+   .about-history-meta, doesn't match).
+   Tags moved out to their own standalone row above this card as of
+   revision round 3 (2026-08-19) — see .standard-page-details-tags below.
+================================ */
+.standard-page-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 65ch;
+    margin: 0 auto var(--space-8);
+    padding: var(--space-2);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-default);
+    border-radius: var(--border-radius-md);
+}
+
+.standard-page-details-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+/* [hidden]'s own UA-stylesheet display: none loses to this class's
+   display: flex at equal specificity — same reason .contact-icon-btn[hidden]/
+   .filter-drawer-page-nav[hidden]/.action-rail-clear[hidden] need this
+   explicit override elsewhere in this file. Scoped to [hidden] only, so a
+   visible Published row (never given the attribute) is unaffected — only
+   Thought entries' Updated row currently carries it, hidden by default
+   per Chris's request (2026-09-08); remove the `hidden` attribute from
+   that row's markup on a specific entry to show it again. */
+.standard-page-details-row[hidden] {
+    display: none;
+}
+
+/* font-size-sm + font-weight-medium — the same "card body copy" scale
+   .card-meta already uses for the Archive/Home card date-author line, not
+   the H3/Body-20-derived sizing from the original Figma spec. */
+.standard-page-details-label {
+    flex: 1;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-secondary);
+}
+
+.standard-page-details-value {
+    flex: 2;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+}
+
+/* Revision round 3 (2026-08-19): relocated from a labelled row inside
+   .standard-page-details to a standalone, label-less row between the
+   title and the Details card. flex: 2 dropped — that sized it against a
+   sibling label column (flex: 1) inside .standard-page-details-row, which
+   no longer applies here. flex-wrap + gap are unchanged, reused as-is.
+   max-width: 65ch + centred margin match .standard-page-details' own
+   rendered width (the same 65ch cap .standard-page-content /
+   .standard-page-divider already use), not the wider banner/.standard-page
+   width. */
+.standard-page-details-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    max-width: 65ch;
+    margin: 0 auto var(--space-6);
+}
+
+/* ================================
+   STANDARD PAGE — FOOTER
+   Share + More Work/Thoughts actions, then the "want to work together?"
+   contact section reused verbatim from about.html.
+================================ */
+.standard-page-footer {
+    max-width: 65ch;
+    margin: 0 auto;
+}
+
+.standard-page-footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+/* flex: 1 — same fix already documented on .filter-drawer-page-btn for the
+   identical problem (two ghost buttons of differing label length in one
+   row that must render at matching size): splits the row evenly instead
+   of each button sizing to its own text, which is what made Share (5
+   chars) and More Work/More Thoughts (9-13 chars) render at different
+   widths. align-self: stretch overrides .share-btn's own align-self:
+   center (still needed as-is for its other, column-layout usage on the
+   not-yet-migrated entries) so both buttons compute the same height too. */
+.standard-page-footer-actions .btn {
+    flex: 1;
+    align-self: stretch;
+}
+
+.standard-page-divider {
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
+}
+
+.standard-page-content {
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+/* scroll-margin-top: var(--space-16) (64px) matches the sticky header/
+   fixed tab bar's real measured height at every breakpoint (see NAVIGATION
+   and MOBILE TAB BAR sections), + var(--space-4) breathing room — so a
+   heading anchor jump (or the ToC rail's own scrollspy links below) lands
+   the heading clear of that fixed chrome instead of underneath it, same
+   class of fix already applied elsewhere on this site for fixed/sticky
+   clearance. */
+.standard-page-content h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-4);
+    scroll-margin-top: calc(var(--space-16) + var(--space-4));
+}
+
+.standard-page-content h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-snug);
+    color: var(--color-text-primary);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    scroll-margin-top: calc(var(--space-16) + var(--space-4));
+}
+
+.standard-page-content p {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-6);
+    max-width: 65ch;
+}
+
+.standard-page-content ul,
+.standard-page-content ol {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+    list-style-position: outside;
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-6);
+    max-width: 65ch;
+}
+
+.standard-page-content li {
+    margin-bottom: var(--space-2);
+}
+
+/* Unordered-list bullets only, matching the same teal token links/tags
+   already use — no existing ::marker rule anywhere else in the file to
+   conflict with (confirmed via grep). Scoped to ul specifically, not the
+   shared .standard-page-content ul, ol base rule above: ol currently has
+   no real consumer anywhere in entry content (confirmed via repo-wide
+   search), so leaving its numeral markers at the default text color is
+   flagged, not assumed correct — matching bullets to teal but leaving
+   numerals white would be a visible inconsistency the moment a real
+   ordered list is ever added. */
+.standard-page-content ul li::marker {
+    color: var(--color-accent-primary-text);
+}
+
+.standard-page-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* ================================
+   TABLE WRAPPER — horizontal scroll container
+   Confirmed fix (2026-09-03 diagnostic): overflow-x: auto set directly on
+   a <table> element (the previous approach, immediately below) does not
+   reliably constrain the table's own auto-layout computed width — with
+   enough cell content, the table's preferred width won this fight instead
+   of being clipped/scrolled, which silently expanded window.innerWidth
+   past the true 375px viewport on a narrow screen rather than producing
+   a scrollbar. A separate wrapping block-level element with its own
+   overflow-x: auto reliably contains that width instead, since overflow
+   on non-table boxes doesn't share the same cross-engine inconsistency.
+   table-layout: fixed is deliberately not used alongside this — it would
+   force equal-width columns and change how existing tables look; this
+   wrapper alone is sufficient and preserves natural column proportions.
+   Reusable anywhere a <table> is used, not just Standard Page entries.
+================================ */
+.table-wrap {
+    overflow-x: auto;
+}
+
+.standard-page-content .table-wrap {
+    width: 100%;
+    max-width: 65ch;
+    margin-bottom: var(--space-6);
+}
+
+.standard-page-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.standard-page-content th {
+    text-align: left;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-width-medium) solid var(--color-border-strong);
+}
+
+.standard-page-content td {
+    text-align: left;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-primary);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-width-thin) solid var(--color-border-default);
+}
+
+.standard-page-content tr:last-child td {
+    border-bottom: none;
+}
+
+/* ================================
+   STANDARD PAGE — TABLE OF CONTENTS RAIL
+   Desktop-only (min-width: 1440px — deliberately narrower than this
+   site's usual 1024px desktop floor: Chris decided iPad, any orientation
+   or model including the 1366px-wide 12.9" Pro, should never get the
+   rail's permanently-docked treatment at all — he's explicitly fine with
+   the panel's overlap-on-open there instead, since it gives back more
+   usable space than a width-constrained sidebar could at these sizes.
+   1440px puts every real iPad width (1024–1366px) on the panel side of
+   the line), always visible, no trigger/collapse —
+   built entirely by initTocRail() (script.js) on any page with
+   .standard-page-content; no hand-authored markup lives in any entry's
+   HTML. Tablet/mobile render nothing (separate trigger + panel pattern,
+   not built here).
+================================ */
+/* top: --toc-rail-top is set by initTocRail() (script.js) to .breadcrumb's
+   real top edge, flush — no gap — so the rail lines up with the
+   breadcrumb row instead of sitting lower next to body copy (previously
+   anchored to .standard-page-banner's bottom edge + a --space-8 gap; see
+   script.js's updateRailTop() for the full history). Fallback (pre-JS, or
+   an entry with no breadcrumb) is --space-16 + --space-8 — the sticky
+   nav's own height plus main's own padding-top, which is exactly what
+   places the breadcrumb's real top edge pre-JS, confirmed by direct
+   measurement — so this value needed no change alongside the anchor
+   swap. */
+.toc-rail {
+    display: none;
+    position: fixed;
+    top: var(--toc-rail-top, calc(var(--space-16) + var(--space-8)));
+    z-index: 10;
+}
+
+@media (min-width: 1440px) {
+    /* --toc-rail-left: set by initTocRail() (script.js) to the real
+       rendered right edge of .standard-page-content (the 65ch text
+       column) + a gap (--space-16, widened from --space-6 per Chris's
+       decision to move the rail noticeably further right, closer to the
+       viewport edge — see updateRailLeft()'s own comment in script.js),
+       the same "measure the real DOM, don't derive it" approach
+       --toc-rail-top already uses for the vertical axis (see
+       updateRailTop() and its comment there). The var()'s own fallback
+       (50% of the viewport, this is position: fixed, + 32.5ch — half the
+       column's own 65ch width — + the same --space-16 gap, kept in sync
+       with the live JS value above so the rail doesn't visibly jump
+       further right once JS takes over) is pure CSS for the pre-JS
+       case only; it depends on 'ch' resolving against the *currently
+       active* font, which made it fragile as the live formula — Noto
+       Sans loads async (display: swap; see the <link> in each entry's
+       <head>) so the page briefly renders in a fallback font with
+       different glyph metrics, and this custom property didn't reliably
+       reflow once the swap completed (confirmed real-iPad landscape
+       testing showed the rail collapsed to a near-unusable width; re-
+       deriving the same math against Chromium's own metrics at matching
+       viewports never produced a collapse there, and a follow-up session
+       found the width could still change again specifically on the
+       user's first scroll — see updateRailLeft()'s own comment in
+       script.js for the current best explanation, since this MCP
+       environment has no WebKit engine to confirm directly against.
+       Measuring the column's actual box sidesteps the 'ch'/font-timing
+       dependency entirely: correct regardless of which font is active
+       when it runs). width still falls back via min() to whatever room
+       is actually left before the viewport's right edge — at 1440px
+       (this breakpoint's own new floor, moved up from 1024px so no real
+       iPad width ever gets the rail — see this section's top comment)
+       the full --toc-rail-width already fits with room to spare
+       (confirmed by direct measurement: 240px, unclamped, at 1440px and
+       every wider width tested), so this min() no longer binds at any
+       width the rail actually renders at today — kept as a safety net
+       against a narrower future floor or a wider --toc-rail-width, not
+       because it's load-bearing right now. */
+    .toc-rail {
+        display: flex;
+        flex-direction: column;
+        left: var(--toc-rail-left, calc(50% + 32.5ch + var(--space-16)));
+        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left, calc(50% + 32.5ch + var(--space-16))) - var(--space-6)));
+        /* max-height/chrome moved here from .toc-rail-list below, now that
+           the list has a label sibling above it inside this same card —
+           mirrors .toc-panel's own architecture (outer element carries
+           the card chrome + height cap, inner list is layout-only) so the
+           label reads as part of one unified card instead of a floating
+           line above a separately-bordered box. Formula itself is
+           unchanged from the one .toc-rail-list used to carry: self-
+           adjusts to whatever room exists between --toc-rail-top and a
+           bottom-of-viewport margin. This already recomputes correctly
+           against the breadcrumb-anchored --toc-rail-top (moved up from
+           the old banner-anchored one, see updateRailTop() in script.js)
+           with no formula change needed — it reads the same live custom
+           property either way, so a smaller top offset automatically
+           yields a taller max-height, confirmed by direct measurement
+           rather than assumed. */
+        max-height: calc(100vh - var(--toc-rail-top, calc(var(--space-16) + var(--space-8))) - var(--space-16));
+        padding: var(--space-3);
+        background-color: var(--color-background-surface);
+        border: var(--border-width-thin) solid var(--color-border-strong);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--elevation-md);
+    }
+}
+
+/* flex: 1 1 auto + min-height: 0 lets this shrink below its own content
+   size inside .toc-rail's flex column so max-height (above, on the
+   parent now) actually constrains it instead of the list pushing the
+   card taller than its cap — standard flex-scroll-child pattern.
+   Overflow scrolls internally with the next item deliberately clipped
+   mid-row (no fade/gradient — would read as a rendering glitch on this
+   two-tone palette) so it reads as "there's more, scroll".
+   scrollbar-width/scrollbar-color (Firefox) and the ::-webkit-scrollbar*
+   rules below (Chrome/Edge/Safari) restyle the internal scrollbar this
+   overflow produces — left at browser default it renders as a stark,
+   full-size light grey bar with arrow buttons, badly out of place against
+   this dark two-tone palette. Thumb reuses --color-border-strong (this
+   component's own border colour, and the sitewide "emphasized border"
+   token per DESIGN-SYSTEM.md §1.4); track reuses --color-background-subtle
+   (the sitewide "recessed surface" token, §1.2) — no new colour values. */
+/* padding (was 0): every row is width: 100% of this list, so with zero
+   padding each row's own box sits flush against this list's edges — the
+   list itself (not .toc-rail, its padded parent) is what actually scrolls
+   and clips (overflow-y: auto, below), so a row's default outward
+   :focus-visible ring (+5px: outline + offset) had nowhere to render and
+   got clipped. This isn't only the first/last row: any row can land
+   flush against this box's top or bottom edge once the list is scrolled,
+   and (confirmed by direct measurement) every row shares the same
+   left/right edges regardless of scroll position — so padding on all
+   four sides, not just top/bottom, is what actually keeps the ring fully
+   visible on every row at every scroll position. Kept as the sitewide
+   outward ring per Chris's decision — no inward-offset exceptions — so
+   the clearance has to live here instead. This does shrink the list's
+   own usable scroll height slightly inside .toc-rail's unchanged
+   max-height cap; see the Floating ToC spec revision notes for the
+   measured effect on the longest live entry's clipped-next-item
+   affordance. */
+.toc-rail-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-2);
+    list-style: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
+}
+
+.toc-rail-list::-webkit-scrollbar,
+.toc-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.toc-rail-list::-webkit-scrollbar-track,
+.toc-panel::-webkit-scrollbar-track {
+    background-color: var(--color-background-subtle);
+    border-radius: var(--border-radius-full);
+}
+
+.toc-rail-list::-webkit-scrollbar-thumb,
+.toc-panel::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: var(--border-radius-full);
+}
+
+.toc-rail-list::-webkit-scrollbar-thumb:hover,
+.toc-panel::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-secondary);
+}
+
+.toc-rail-item--sub {
+    padding-left: var(--space-4);
+}
+
+/* Inactive state reuses .action-rail-trigger/.filter-drawer-page-btn's
+   shared traits (font-size-sm, border-strong, subtle background) rather
+   than inventing a parallel style — elevation lives on .toc-rail-list
+   above (the panel as a whole), not per-item, since neither reference
+   button is a list row. font-family/cursor: this class now also renders
+   as a <button> (the "Back to Top" row — buildBackToTopRow(), script.js
+   — has no #heading to link to, so it's a button, not an <a>); real <a>
+   rows already had both for free from the browser, so adding them here
+   is a no-op for those, not a visible change. width/text-align: a
+   <button>'s intrinsic content-sized/centred defaults would otherwise
+   make it look different from the full-width, left-aligned <a> rows
+   sitting right above and below it. */
+.toc-rail-link {
+    display: block;
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    text-align: left;
+    color: var(--color-text-primary);
+    background-color: var(--color-background-subtle);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.toc-rail-link:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.toc-rail-link:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* Same active treatment as .tag-chip--active, values reused verbatim —
+   including the text-shadow "faux bold" that class relies on for its bold
+   look, since neither class sets font-weight for its active state — not a
+   new teal active colour. */
+.toc-rail-link--active,
+.toc-rail-link--active:hover {
+    border: var(--border-width-medium) solid var(--color-accent-primary-text);
+    background-color: var(--color-background-surface);
+    color: var(--color-accent-primary-text);
+    text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+}
+
+/* ================================
+   STANDARD PAGE — TABLE OF CONTENTS TRIGGER + PANEL (<1440px)
+   Covers every real iPad width in both orientations (1024–1366px) as
+   well as phone/tablet — deliberate, per Chris's decision that iPad
+   should never get the permanently-docked rail (see the rail's own
+   section comment above for the full reasoning).
+   Trigger reuses .action-rail-group/.action-rail-trigger/
+   .action-rail-badge verbatim (Rule 3a) — same classes Archive's Filter
+   trigger uses, safe to share since the two never appear on the same
+   page. .toc-trigger-group only adds the display override below, which
+   inverts .toc-rail's own breakpoint (rail: block at >=1440px, hidden
+   below; trigger/panel: the reverse) so the two surfaces never coexist.
+   Heading-list items inside the panel reuse .toc-rail-link/
+   .toc-rail-item--sub/.toc-rail-link--active verbatim too — same
+   font-size-sm treatment as the desktop rail (confirmed via direct grep,
+   not assumed), same active/inactive states, no parallel styling.
+================================ */
+.action-rail-group.toc-trigger-group {
+    display: none;
+}
+
+.toc-panel {
+    display: none;
+}
+
+@media (max-width: 1439px) {
+    .action-rail-group.toc-trigger-group {
+        display: flex;
+    }
+
+    /* :not([hidden]) rather than toggling display in script.js — this way
+       the >=1440px rule above still wins on its own regardless of the
+       hidden attribute's state, so the panel can never render at desktop
+       widths even if JS state were ever wrong. */
+    .toc-panel:not([hidden]) {
+        display: block;
+    }
+
+    /* Anchor: bottom-right corner pinned to the trigger's own resting
+       position, same technique the Desktop Filter Panel already uses for
+       .filter-drawer (see DESKTOP (min-width: 1024px) — Filter Drawer
+       becomes an anchored panel, below) — right formula reused verbatim;
+       bottom derived the same way (trigger's vertical centre, offset by
+       half its own height) but recomputed for *this* trigger's real
+       centre at this breakpoint: .action-rail-group sits at top: 50% here
+       (no override until the 767px tier below), so bottom mirrors the
+       Filter Panel's own 50vh math exactly. Width reuses --toc-rail-width
+       (the desktop rail's own width token) rather than a new value;
+       max-width clamps it against a narrow phone viewport the same way
+       the Filter Panel's own max-width does. */
+    .toc-panel {
+        position: fixed;
+        z-index: 250;
+        right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+        bottom: calc(50vh - (var(--touch-target-minimum) / 2));
+        width: var(--toc-rail-width);
+        max-width: calc(100vw - (var(--space-8) * 2));
+        /* max-height: NOT the Filter Panel's calc(100vh - (--space-8 * 2))
+           formula this shipped with (copied verbatim per Rule 3a) — that
+           value is only safe at the Filter Panel's own >=1024px breakpoint,
+           where the viewport is tall enough that content never actually
+           reaches the cap. This panel's anchor (bottom, above) sits at
+           50vh minus half the trigger's own height, so what's actually
+           free to grow into is just the gap between that bottom edge and
+           the fixed header's bottom (64px — same literal
+           .archive-sort-count-row already anchors to elsewhere), not the
+           full viewport. Left uncapped at the real anchor, the panel
+           overflowed off the top of the screen on shorter real-device
+           viewports (Safari's toolbar chrome shrinks the visible viewport
+           below the 100vh this was measured against) or, on taller ones,
+           grew tall enough to draw over the header instead of stopping
+           short of it — both confirmed via direct measurement at reduced
+           viewport heights, not assumed. --space-6 reuses the same
+           breathing-room token this panel's own `right` offset already
+           uses. */
+        max-height: calc(50vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2));
+        overflow-y: auto;
+        margin: 0;
+        padding: var(--space-3);
+        background-color: var(--color-background-surface);
+        border: var(--border-width-thin) solid var(--color-border-strong);
+        border-radius: var(--border-radius-md);
+        transform: translateY(var(--space-2)) scale(0.98);
+        transform-origin: bottom right;
+        opacity: 0;
+        transition: transform var(--duration-base) var(--ease-out),
+                    opacity var(--duration-base) var(--ease-out);
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
+    }
+
+    .toc-panel--open {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        box-shadow: var(--elevation-xl);
+    }
+}
+
+@media (max-width: 767px) {
+    /* .action-rail-group moves to top: 70% at this tier (see MOBILE
+       section, below) — bottom mirrors that same centre (100vh - 70vh =
+       30vh from the bottom) rather than the 50vh math above, so the panel
+       stays anchored to the trigger's real position instead of drifting
+       from it once the trigger itself moves. max-height mirrors the same
+       shift (70vh of headroom above the anchor instead of 50vh, same
+       header/space-6 reservation as the tier above — see that comment) so
+       the cap keeps tracking the anchor's real position at this tier too,
+       not the wider tier's now-stale one. */
+    .toc-panel {
+        bottom: calc(30vh - (var(--touch-target-minimum) / 2));
+        max-height: calc(70vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2));
+    }
+}
+
+/* display: flex (was block text) lays the new content.svg icon beside
+   the text — shared by both instances of this class (the always-visible
+   desktop rail's own label and the <1440px panel's, script.js), same as
+   the class itself is already shared between them (Rule 3a). */
+.toc-panel-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-widest);
+    color: var(--color-text-secondary);
+}
+
+.toc-panel-label-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+/* Layout only — no background/border/shadow here, unlike .toc-rail-list:
+   .toc-panel (above) already carries that chrome at the container level,
+   so putting it on the list too would double it up. */
+.toc-panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Scrim — real click-catching element, not just a document click listener:
+   values reused verbatim from .archive-scrim (the Filter Drawer's own
+   scrim — see ARCHIVE PAGE section below), a new class rather than the
+   literal one since this is a genuinely separate overlay instance (unlike
+   the trigger/badge/link classes above, a scrim's opacity/pointer-events
+   state is tied to one specific panel's open/close lifecycle, not
+   interchangeable the way a button's static shape is). opacity stays 0 in
+   both states — invisible hit-area only, no dimming — same as the Filter
+   Drawer's; pointer-events: auto on --open is what actually catches and
+   stops a background click from also reaching whatever is underneath.
+   z-index 249 — one below .toc-panel's own 250, same relative offset as
+   .archive-scrim (249) sits below .filter-drawer (250). display: none
+   unconditionally above 1439px is a hard gate independent of JS state,
+   matching .toc-panel's own belt-and-suspenders pattern. */
+.toc-panel-scrim {
+    display: none;
+}
+
+@media (max-width: 1439px) {
+    .toc-panel-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 249;
+        background-color: var(--color-background-base);
+        opacity: 0;
+        transition: opacity var(--duration-base) var(--ease-out);
+        pointer-events: none;
+    }
+
+    .toc-panel-scrim--open {
+        pointer-events: auto;
+    }
+}
+
+/* ================================
+   ABOUT PAGE
+================================ */
+.about-hero {
+    text-align: center;
+    padding: var(--space-12) 0 var(--space-8);
+    max-width: 65ch;
+    margin: 0 auto;
+}
+
+.about-hero-title {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+}
+
+.about-hero-subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    max-width: none;
+}
+
+/* Single pre-composited image (photo-real portrait + illustrated T-rex
+   side by side) — capped near its own native width (702px) so it's never
+   upscaled past source resolution; sitewide img{max-width:100%} handles
+   the responsive shrink below that on narrower viewports. */
+.about-profile-figure {
+    max-width: 700px;
+    margin: 0 auto var(--space-8);
+}
+
+.about-profile-figure img {
+    border-radius: var(--border-radius-md);
+}
+
+.about-profile-caption {
+    margin-top: var(--space-3);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-loose);
+    text-align: center;
+}
+
+.about-section {
+    max-width: 65ch;
+    margin: 0 auto var(--space-12);
+}
+
+.about-section h2 {
+    margin-bottom: var(--space-6);
+    text-align: center;
+}
+
+.about-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.about-history {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.about-history-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-bottom: var(--space-6);
+    border-bottom: var(--border-width-thin) solid var(--color-border-default);
+}
+
+.about-history-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.about-history-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-4);
+}
+
+.about-history-role {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.about-history-period {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
+/* Now a real <a> (employer link) — no colour override here on purpose,
+   so it picks up the sitewide a { color: var(--color-link); text-decoration:
+   underline; } default like every other link, instead of the old plain-text
+   teal styling. font-size-sm kept — matches the surrounding meta text
+   scale, not a link-colour concern. */
+.about-history-company {
+    font-size: var(--font-size-sm);
+}
+
+/* Freelance entry — plain text, not a link (was a leftover
+   #contact-heading reuse from an earlier session). Overrides the
+   sitewide a { color: var(--color-link) } this class would otherwise
+   inherit, matching surrounding paragraph text instead. */
+.about-history-company--static {
+    color: var(--color-text-primary);
+}
+
+.about-recommendations {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+/* Desktop only — two-column grid, mirroring .card-row--two's own pattern
+   (display: grid, grid-template-columns: 1fr 1fr) and reusing the same
+   var(--space-6) gap already set above rather than a separate value.
+   Mobile/tablet keep the flex-column default untouched. Grid's own
+   auto-placement handles an odd testimonial count gracefully with no
+   extra rule needed — a trailing odd item simply sits alone on its own
+   row instead of stretching or leaving a broken gap. */
+@media (min-width: 1024px) {
+    .about-recommendations {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.about-recommendation cite {
+    display: block;
+    margin-top: var(--space-3);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-style: normal;
+}
+
+.about-contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+/* About page responsive */
+@media (max-width: 1023px) {
+    .about-hero-title {
+        font-size: var(--font-size-3xl);
+    }
+}
+
+@media (max-width: 767px) {
+    .about-hero-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    .about-history-meta {
+        flex-direction: column;
+        gap: var(--space-1);
+    }
+}
+
+/* ================================
+   DESKTOP (min-width: 1024px) — Profile card wide layout
+================================ */
+@media (min-width: 1024px) {
+    .card--profile {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+    }
+
+    .card--profile .card-image {
+        width: auto;
+        min-width: unset;
+        max-width: unset;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-6);
+        gap: var(--space-1);
+        margin: 0;
+        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+        background-color: var(--color-background-surface);
+    }
+
+    .card--profile .card-image img {
+        width: 300px;
+        height: 300px;
+        flex-shrink: 0;
+        object-fit: cover;
+        border-radius: var(--border-radius-lg);
+        display: block;
+    }
+
+    .card--profile .card-image-caption {
+        width: 300px;
+        max-width: 300px;
+        font-size: var(--font-size-xs);
+        line-height: var(--line-height-loose);
+        font-style: italic;
+        font-weight: var(--font-weight-regular);
+        color: var(--color-text-secondary);
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        align-self: stretch;
+    }
+
+    .card--profile .card-content {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--space-4);
+    }
+}
+
+/* ================================
+   TABLET RANGE (768px–1023px) — Profile card wide layout (narrower image column)
+================================ */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .card--profile {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0;
+        padding: 0;
+    }
+
+    .card--profile .card-image {
+        width: 220px;
+        min-width: 220px;
+        max-width: 220px;
+        height: auto;
+        aspect-ratio: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-4);
+        gap: var(--space-1);
+        margin: 0;
+        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+        background-color: var(--color-background-surface);
+    }
+
+    .card--profile .card-image img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: var(--border-radius-md);
+        display: block;
+    }
+
+    .card--profile .card-image-caption {
+        font-size: var(--font-size-xs);
+        font-style: italic;
+        color: var(--color-text-secondary);
+        text-align: center;
+        line-height: var(--line-height-loose);
+        padding: 0;
+        margin: 0;
+    }
+
+    .card--profile .card-content {
+        flex: 1;
+        min-width: 0;
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--space-3);
+    }
+}
+
+/* ================================
+   FEATURE CARD — horizontal layout, formerly tablet/desktop (768px+)
+   DORMANT — commented out, not deleted, per Chris's explicit request.
+   Work cards now use one vertical-stack layout (image full-width on top,
+   content below) at every breakpoint, matching mobile's structure and
+   unifying Home/Archive. See REFERENCE.md "Unused Assets / Dormant Code"
+   for --card-image-column-width, which only fed this block.
+================================ */
+/*
+@media (min-width: 768px) {
+    .card--feature {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    .card--feature .card-image {
+        flex: 0 0 var(--card-image-column-width);
+        width: var(--card-image-column-width);
+        aspect-ratio: auto;
+    }
+
+    .card--feature .card-content {
+        flex: 1;
+        min-width: 0;
+    }
+}
+*/
+
+/* ================================
+   ARCHIVE HEADER
+================================ */
+.archive-header {
+    margin-bottom: var(--space-8);
+}
+
+.archive-header-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.filter-drawer-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-target-minimum);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-text-primary);
+    background-color: var(--color-background-subtle);
+    border: var(--border-width-thin) solid var(--color-border-default);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.filter-drawer-trigger:hover {
+    border-color: var(--color-border-strong);
+}
+
+.filter-drawer-trigger:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* ================================
+   FILTER DRAWER
+================================ */
+.filter-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 250;
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+    background-color: var(--color-background-surface);
+    /* --color-border-strong, not --color-border-default — the drawer sits
+       on the exact same --color-background-surface token as cards, so a
+       card positioned directly behind the drawer's top edge left the
+       seam ambiguous once the scrim stopped dimming behind it (that
+       incidental contrast is gone now, see .archive-scrim below). A
+       stronger border plus the shadow below together read as one
+       "lifted" edge rather than competing signals. */
+    border-top: var(--border-width-thin) solid var(--color-border-strong);
+    transform: translateY(100%);
+    transition: transform var(--duration-base) var(--ease-out);
+}
+
+.filter-drawer--open {
+    transform: translateY(0);
+    /* Not a plain var(--elevation-md) reference — that token is
+       "0 4px 12px rgba(0,0,0,0.5)", a downward offset meant for
+       elements sitting on the page (md/DESIGN-SYSTEM.md §7). This
+       element is position: fixed; bottom: 0 — a downward shadow would
+       cast off the bottom of the viewport and never render. Vertical
+       offset flipped to negative so the shadow lands where the ambiguity
+       actually is, at the top edge; blur/spread/colour kept identical to
+       --elevation-md so it stays inside the existing token family
+       rather than inventing a new rgba value. Scoped to --open specifically (moved off the unconditional base
+       .filter-drawer rule) — at rest, translateY(100%) moves a
+       bottom: 0 fixed box down by exactly its own height, which always
+       lands the box's top edge (and this shadow's blur, which extends
+       above that edge) right at the viewport's bottom boundary,
+       regardless of the drawer's actual height. That put a faint but
+       real shadow sliver at the screen's bottom edge at all times,
+       closed or not, since position: fixed means scrolling never moves
+       it out of the way. Confirmed via the transform's own geometry, not
+       assumed — border-top above is a hairline at the exact box edge
+       with no blur to bleed past it, so it doesn't have this problem and
+       stays on the unconditional rule. */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Desktop/tablet: capped to the same content width as the rest of the page
+   and centred, instead of spanning the full viewport edge-to-edge — left/
+   right stay 0 above, so max-width + auto margins is what actually does the
+   capping/centring, the same technique .archive-sort-count-row already uses
+   for its own fixed-position row. Mobile keeps the full-bleed left:0/right:0
+   from the base rule untouched. */
+@media (min-width: 768px) {
+    .filter-drawer {
+        max-width: var(--max-content);
+        margin: 0 auto;
+    }
+}
+
+.filter-drawer-body {
+    min-height: 0;
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0);
+}
+
+/* Holds the current page of secondary tags (12 per page, paginated via
+   initArchive() — same pagination at every breakpoint now, no separate
+   unbounded desktop list; today's real 8 tags all fit on page 1, no
+   pagination controls shown). No longer scrollable (was overflow-y: auto
+   pre-pagination) — content isn't unbounded within a page, so the old
+   scroll container and its focus-ring clip-clearance padding/negative-
+   margin trick are both gone: nothing here clips anymore (confirmed —
+   neither this element nor any ancestor up to .filter-drawer sets a
+   non-visible overflow), so rings need no special-casing. flex: 1 (no
+   max-height) means it grows rather than clips if content needs more room.
+
+   --drawer-secondary-height (2026-09-07) replaced a hardcoded min-height:
+   109px here — a one-time manual measurement (3 rows of .tag-chip content
+   against a specific tag set, at a specific breakpoint, for a since-
+   changed SECONDARY_PAGE_SIZE) that had already drifted stale once
+   (never re-verified for 12-per-page) and would drift again the moment
+   the real tag pool changed size, as it did 2026-09-07 when the
+   "published" flag hid two entries down to 4 real secondary tags — a
+   3-row reservation for a pool that now only ever wraps to 1. It's set by
+   updateDrawerSecondaryMetrics() (script.js) via real off-screen DOM
+   measurement of the tallest secondary-tag page across every reachable
+   primary-filter state (All/Work/Thoughts), recomputed on drawer open,
+   primary-filter change, and whenever the entries array changes — so it
+   can never go stale the way a hardcoded value did. No fallback value
+   here deliberately: JS sets this before the drawer can ever actually be
+   seen open (see script.js), so an unset var() simply resolves to this
+   property's own initial value (auto) for the imperceptible instant
+   before that first run. */
+.filter-drawer-secondary-page {
+    flex: 1;
+    min-height: var(--drawer-secondary-height);
+}
+
+/* Active-secondary-tag collapsed state — see .filter-drawer--tags-active
+   below. Hidden outright (display: none, not just emptied) rather than
+   left as a zero-content flex item, so it stops competing for flex-grow
+   space against #filter-drawer-active-chips, which takes over the same
+   --drawer-secondary-height reserved slot in this state. */
+.filter-drawer--tags-active .filter-drawer-secondary-page {
+    display: none;
+}
+
+/* When one or more secondary tags are active, the grid + pagination below
+   are pure duplication of what this row already shows (each active tag
+   highlighted in the grid AND listed here) — so in that state this row
+   replaces the grid entirely instead of sitting above it, at every
+   breakpoint (one shared .filter-drawer, reached the same way everywhere
+   now via the floating action rail trigger). margin-top: 0 (overriding
+   .archive-active-chips' own var(--space-3) below) removes the gap this
+   row would otherwise have as a "pinned row above the grid", now that
+   it's taking the grid's old place instead. */
+.filter-drawer--tags-active #filter-drawer-active-chips {
+    margin-top: 0;
+    align-content: flex-start;
+    flex: 1;
+}
+
+/* Reproduces .filter-drawer-secondary-page's exact
+   --drawer-secondary-height reserved footprint (see that rule above), so
+   total drawer height is identical whether that slot is filled by the
+   tag grid or by this row (confirmed via measurement; required so
+   entering/exiting this state causes zero visual shift in the bottom
+   sheet's fixed-height layout). Unlike the grid (naturally capped at
+   SECONDARY_PAGE_SIZE tags per page), simultaneously active tags aren't
+   bounded by pagination, so this can't rely on content happening to fit —
+   overflow-y: auto caps it hard at this height regardless of how many
+   tags are active, same idea as .filter-drawer-scroll's own
+   internal-scroll pattern elsewhere in this component. scrollbar-gutter:
+   stable keeps a scrollbar appearing (many tags) from shifting chip
+   layout width versus a scrollbar-free render (few tags). Applies at
+   every breakpoint — the drawer is the same fixed-height bottom sheet
+   everywhere now, not just mobile/tablet. */
+.filter-drawer--tags-active #filter-drawer-active-chips {
+    min-height: var(--drawer-secondary-height);
+    max-height: var(--drawer-secondary-height);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+/* Previous — page dots — Next, one row. Dots sit in the flexible middle
+   slot (.filter-drawer-page-dots below gets flex: 1 and centres its own
+   content), so the buttons stay fixed at each end regardless of how many
+   dots the current tag count produces. */
+.filter-drawer-page-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+/* visibility: hidden, not display: none — a single-page state (e.g. a
+   primary filter narrowing the secondary tag pool to one page) hides this
+   row via the hidden attribute, but display: none would drop it out of
+   flow entirely, shrinking the whole drawer by this row's height every
+   time pagination isn't needed. That's the real source of the drawer
+   visibly resizing when a primary filter narrows the tag pool —
+   .filter-drawer-secondary-page's own min-height (above) already holds
+   correctly on its own; this row was the actual gap. visibility: hidden
+   keeps the box (and its height) in flow while still correctly removing
+   it from the tab order and the accessibility tree — no separate
+   aria-hidden/tabindex handling needed, unlike opacity alone. */
+.filter-drawer-page-nav[hidden] {
+    visibility: hidden;
+}
+
+/* Real display: none removal (2026-09-07) — distinct from the [hidden]
+   rule above, which intentionally keeps this row's height reserved for
+   whichever primary state the user is CURRENTLY on, because a different
+   reachable state might still need pagination. This class only ever gets
+   set when updateDrawerSecondaryMetrics() (script.js) finds that NO
+   reachable state (All/Work/Thoughts) needs more than one page — restores
+   the original pre-pagination behaviour (no reserved row at all) for
+   exactly that case, e.g. today's real 4-tag pool. The two rules don't
+   conflict: display and visibility are independent properties, and
+   display: none wins the box entirely regardless of visibility's value. */
+.filter-drawer--no-pagination .filter-drawer-page-nav {
+    display: none;
+}
+
+/* flex-shrink: 0 (not flex: 1) — Previous/Next stay sized to their own
+   label content at each end of the row now that dots fill the middle,
+   rather than stretching to split the row's full width between just the
+   two of them like the old two-button row did. */
+.filter-drawer-page-btn {
+    flex-shrink: 0;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    font-family: inherit;
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-text-primary);
+    background-color: var(--color-background-subtle);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    min-height: var(--touch-target-minimum);
+    white-space: nowrap;
+    text-align: center;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.filter-drawer-page-btn:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.filter-drawer-page-btn:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+.filter-drawer-page-dots {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+/* Visual dot stays small (8px, 10px active) via content-box sizing +
+   background-clip — the padding around it is an invisible, larger hit area
+   without inflating the dot's own appearance. aria-current drives a size
+   *and* colour change together, so current-page state never relies on
+   colour alone (REFERENCE.md's accessibility standard). */
+.filter-drawer-page-dot {
+    display: inline-flex;
+    box-sizing: content-box;
+    width: 8px;
+    height: 8px;
+    padding: var(--space-2);
+    border: none;
+    border-radius: var(--border-radius-full);
+    background-color: var(--color-border-strong);
+    background-clip: content-box;
+    cursor: pointer;
+}
+
+.filter-drawer-page-dot[aria-current="true"] {
+    width: 10px;
+    height: 10px;
+    background-color: var(--color-accent-primary-text);
+}
+
+.filter-drawer-page-dot:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* Filter drawer — Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right).
+   Grid, not flex — Clear (44px icon square) and the Close trigger (wider,
+   padded text + badge) are different widths, so flex: 1 on the label alone
+   only fills the leftover space between two unequal flanks; it doesn't
+   centre the label relative to the row itself. The standard fix: two equal
+   1fr side columns (their content — Clear left-aligned via justify-self:
+   start, Close right-aligned via justify-self: end — never has to match
+   width) force the auto-sized centre column to sit at the row's true
+   midpoint, regardless of how unequal the two flanking buttons are. */
+.filter-drawer-controls {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-2);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-width-thin) solid var(--color-border-default);
+    margin-bottom: var(--space-4);
+}
+
+.filter-drawer-controls .archive-clear-btn {
+    justify-self: start;
+}
+
+.filter-drawer-controls .filter-drawer-trigger {
+    justify-self: end;
+}
+
+/* Static, non-interactive — replaces the old search field's slot in Row 1
+   without any of its interactive styling (no border/background/focus
+   ring). display: inline-flex (was block + text-align: center) lays the
+   new filter.svg icon and the text side by side; the surrounding grid's own
+   centering (see .filter-drawer-controls above) still centers this whole
+   auto-width column regardless, so true-centre behaviour is unchanged. */
+.filter-drawer-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-width: 0;
+    white-space: nowrap;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-text-secondary);
+}
+
+.filter-drawer-label-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+.filter-drawer-primary-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--border-width-thin) solid var(--color-border-default);
+    margin-bottom: var(--space-4);
+}
+
+#filter-drawer-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-content: flex-start;
+}
+
+/* Floating action rail group — fixed position container for the Filters
+   trigger and (while a filter is active) the external Clear button.
+   Visible by default (markup carries --visible from the start — see
+   archive.html) at every scroll position, at all three breakpoints;
+   openDrawer()/closeDrawer() (script.js) are what toggle it off/on now,
+   not scroll position. Same opacity/visibility show/hide pattern as
+   .back-to-top (not display) so that toggle can transition smoothly — the
+   sitewide prefers-reduced-motion rule (bottom of file) already shortens
+   this transition-duration to near-instant when that's set, same as every
+   other transition on the site. */
+.action-rail-group {
+    position: fixed;
+    right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 260;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--duration-base) var(--ease-out),
+                visibility var(--duration-base) var(--ease-out);
+}
+
+.action-rail-group--visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Applied briefly by closeDrawer() (script.js) so a visibility change can
+   commit instantly instead of waiting on the transition above — needed
+   because focus is returned to this same element immediately afterward,
+   and visibility: hidden elements silently refuse .focus() until the
+   browser has actually committed the "now visible" state. */
+.action-rail-group--instant {
+    transition: none;
+}
+
+/* Floating action rail trigger — visual styles; position inherited from group */
+.action-rail-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-full);
+    cursor: pointer;
+    min-height: var(--touch-target-minimum);
+    box-shadow: var(--elevation-md);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.action-rail-trigger:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.action-rail-trigger:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* Archive's Filter trigger (filter.svg) and the Entry-page Contents/ToC
+   trigger (content.svg, script.js) both reuse .action-rail-trigger
+   verbatim (Rule 3a) — same shared icon class, same --icon-size-md token
+   Section 24/25's .link-inline-icon/.link-cta-icon already established
+   for "small icon beside text," not a new size. */
+.action-rail-trigger-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
+}
+
+/* Mobile ("Mobile-Btn" in the Figma mockups) — icon + badge only, text
+   visually hidden but still screen-reader-readable. Reproduces .sr-only's
+   own technique by value (Rule 3a) rather than toggling that class via
+   JS, since .sr-only itself has no breakpoint variant and this only ever
+   applies below 768px — the same real mobile tier .action-rail-group's
+   own top: 70% override already uses (MOBILE section, below). Padding
+   drops from the pill shape's asymmetric var(--space-3) var(--space-5)
+   to equal var(--space-3) on all sides, and min-width matches
+   min-height's existing --touch-target-minimum — both existed only to
+   accommodate/center wide text content that's no longer visible; without
+   them the button reads as a lopsided pill instead of a compact
+   icon-button square. */
+@media (max-width: 767px) {
+    .action-rail-trigger {
+        padding: var(--space-3);
+        min-width: var(--touch-target-minimum);
+        justify-content: center;
+    }
+
+    .action-rail-trigger .trigger-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+}
+
+.action-rail-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 var(--space-1);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-inverse);
+    background-color: var(--color-accent-primary);
+    border-radius: var(--border-radius-full);
+    line-height: 1;
+}
+
+/* .archive-clear-btn/.btn both set display: inline-flex, which beats the
+   [hidden] attribute's own UA-stylesheet display: none — same reason
+   .archive-search-clear[hidden] needed this override before it was
+   removed. Only renders while a filter is active (script.js render()
+   toggles the hidden attribute directly) — no empty-state Clear button. */
+.action-rail-clear[hidden] {
+    display: none;
+}
+
+/* Scrim — invisible hit-area behind drawer, not a visual dimming layer.
+   opacity stays 0 in both states so filtered results stay fully visible
+   behind the open drawer; pointer-events: auto on --open is what keeps
+   tap-outside-to-dismiss working, independent of opacity. */
+.archive-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 249;
+    background-color: var(--color-background-base);
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+    pointer-events: none;
+}
+
+.archive-scrim--open {
+    opacity: 0;
+    pointer-events: auto;
+}
+
+/* Body scroll lock — applied to <body> while the Filter Drawer is open.
+   Uses position: fixed rather than overflow: hidden, which is known to leak
+   scroll on iOS Safari. `top` is set inline via JS to the negative of the
+   saved scroll offset — that value is inherently dynamic per open, so it
+   can't live in this static rule. */
+.body-scroll-locked {
+    position: fixed;
+    left: 0;
+    right: 0;
+}
+
+/* ================================
+   DESKTOP (min-width: 1024px) — Filter Drawer becomes an anchored panel
+================================ */
+/* Reuses every internal drawer class as-is (controls row, primary chips,
+   active-chips row, secondary chip pagination) — only the outer
+   .filter-drawer box's position, dimensions, motion and elevation change
+   here; no new colour values anywhere in this block (Rule 3a/Rule 6).
+   Anchor: bottom-right corner is pinned to .action-rail-group's own resting
+   position — same `right` formula reused verbatim, and `bottom` derived
+   from the same --touch-target-minimum the trigger's own height is built
+   from (top: 50%, height == --touch-target-minimum, so its bottom edge
+   sits at 50vh - (--touch-target-minimum / 2) from the viewport bottom).
+   Because width/height stay intrinsic to content while that corner stays
+   fixed, the panel naturally grows upward and leftward as more tags render
+   (8 today, up to 12 before .filter-drawer-page-nav appears) — no JS
+   position calculation needed. Mobile/tablet keep the bottom-sheet rules
+   above completely untouched; this query only fires at 1024px+.
+   No scrim/backdrop change needed — .archive-scrim already renders at
+   opacity: 0 unconditionally (invisible click-outside hit-area only, see
+   above), so "no dimmed scrim" already holds true at every breakpoint.
+   Dismiss (Close button, click-outside via the scrim, Escape) and the
+   floating trigger's own hide-while-open behaviour are both already
+   breakpoint-agnostic in script.js's openDrawer()/closeDrawer() — nothing
+   to change there either. */
+@media (min-width: 1024px) {
+    .filter-drawer {
+        top: auto;
+        left: auto;
+        right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+        bottom: calc(50vh - (var(--touch-target-minimum) / 2));
+        width: 632px;
+        max-width: calc(100vw - (var(--space-8) * 2));
+        max-height: calc(100vh - (var(--space-8) * 2));
+        margin: 0;
+        overflow-y: auto;
+        border: var(--border-width-thin) solid var(--color-border-strong);
+        border-radius: var(--border-radius-md);
+        transform: translateY(var(--space-2)) scale(0.98);
+        transform-origin: bottom right;
+        opacity: 0;
+        transition: transform var(--duration-base) var(--ease-out),
+                    opacity var(--duration-base) var(--ease-out);
+    }
+
+    .filter-drawer--open {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        box-shadow: var(--elevation-xl);
+    }
+}
+
+/* ================================
+   ARCHIVE PAGE
+================================ */
+/* No background/border at any breakpoint — blends into the page background,
+   no divider anywhere. The floating action rail is the one persistent
+   filter entry point now, so this header has no visible content left
+   beyond the sr-only title, and collapses to zero height rather than
+   showing empty padding-driven space. */
+.archive-sticky-header {
+    padding: 0;
+}
+
+/* All breakpoints — main's sitewide padding-top (breathing room below the
+   nav) is redundant on this page everywhere, not just desktop. On desktop
+   the header's own padding/chips content owns that transition instead. On
+   mobile/tablet, .archive-results' own padding-top (140px mobile, 76px
+   tablet — see max-width: 1023px below) already fully accounts for
+   whatever clearance isn't already free from document flow. Stacking
+   main's generic padding-top on top of that produced 80px/97px of pure
+   dead space above the first result card. Previously scoped to
+   min-width: 1024px only, back when mobile/tablet still relied on main's
+   padding-top for nav clearance; no longer true now that .archive-results
+   owns that clearance directly. */
+.archive-sticky-header ~ main {
+    padding-top: 0;
+}
+
+.archive-title-row {
+    margin-bottom: 0;
+}
+
+/* "Archive" h1 stays in the DOM (one h1 per page, real heading for screen
+   readers/semantic structure) but is visually hidden at every breakpoint —
+   same technique as the .sr-only utility, applied here directly since the
+   title is never shown regardless of viewport width. */
+.archive-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Entry count (left) + sort toggle (right) — between archive header and results grid */
+.archive-sort-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+}
+
+.archive-count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-normal);
+    max-width: none;
+}
+
+.archive-count-value {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-accent-primary-text);
+}
+
+.archive-clear-btn {
+    width: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* External floating Clear — filled (plain .btn, not .btn--ghost) so it
+   reads as a solid control against the page rather than the transparent
+   ghost style, which didn't register as an overlaying element on tablet/
+   mobile. Icon-only: collapses .btn's wide text padding down to a square
+   touch target, sized/centred the same way .theme-toggle-rail's icon-only
+   rail button already is. The × glyph itself reuses .tag-chip-x — the same
+   icon already used for tag/chip removal elsewhere in this drawer — rather
+   than introducing a new icon source. aria-label carries the label that
+   used to be visible text. */
+.action-rail-clear {
+    width: var(--touch-target-minimum);
+    min-width: var(--touch-target-minimum);
+    height: var(--touch-target-minimum);
+    padding: 0;
+}
+
+.action-rail-clear .tag-chip-x {
+    font-size: var(--font-size-md);
+}
+
+/* No disabled rule of its own — .btn:disabled above already gives the
+   correct result (documented in md/COMPONENTS.md's Button spec: solid
+   background/border retained, only text dims to --color-text-disabled).
+   This button previously added its own opacity: 0.4 on top of that, which
+   faded the whole button — background included — toward the page's own
+   near-black backdrop, reading as a transparent/ghost button despite never
+   actually using a transparent background-color. Removed rather than
+   tuned to a different opacity value, since .btn:disabled's own approach
+   already reuses the sitewide convention correctly. */
+
+/* Per-chip entry count badge — hidden from display; the count is still
+   computed and written into this span every render() (used elsewhere for
+   zero-count chip hiding), just not shown to the user. */
+.chip-count {
+    display: none;
+    font-size: var(--font-size-xs);
+    margin-left: var(--space-1);
+    opacity: 0.75;
+}
+
+.archive-sort-toggle {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-wide);
+    color: var(--color-text-primary);
+    background-color: var(--color-background-subtle);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    min-height: var(--touch-target-minimum);
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
+}
+
+.archive-sort-toggle:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+}
+
+.archive-sort-toggle:focus-visible {
+    outline: var(--border-width-medium) solid var(--color-interactive-focus);
+    outline-offset: 3px;
+}
+
+/* Shared by the drawer's own primary chips (.filter-drawer-primary-chips
+   handles their row layout separately) — this class only styles the
+   active-secondary-tags row, #filter-drawer-active-chips, kept collapsed
+   to zero height until a tag is active. */
+.archive-active-chips {
+    display: none;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.archive-active-chips.is-active {
+    display: flex;
+}
+
+.archive-results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    padding: var(--space-6) 0;
+}
+
+/* Skeleton placeholder cards — built by buildSkeletonCard() (script.js)
+   and inserted into #archive-results immediately on page load, before
+   the data/archive-entries.json fetch resolves. Confirmed via Lighthouse
+   (cls-culprits-insight) that the near-empty results div was the entire
+   cause of Archive's ~1.0 CLS: real cards popping in with no reserved
+   height shifted the whole page at once. Reuses .card/.card-image/
+   .card-content as-is (same border, radius, aspect-ratio, padding as a
+   real card) so the reserved height genuinely matches — only the inner
+   "bone" rectangles are new. render()'s own resultsEl.innerHTML = ''
+   clears these the moment the first real render() call happens, so
+   there's no separate removal step to keep in sync here. */
+.card--skeleton .card-image,
+.card--skeleton .skeleton-line {
+    background-color: var(--color-background-subtle);
+    animation: skeleton-pulse calc(var(--duration-slower) * 3) var(--ease-in-out) infinite;
+}
+
+.skeleton-line {
+    height: var(--space-4);
+    border-radius: var(--border-radius-sm);
+}
+
+.skeleton-line--title {
+    width: 60%;
+    height: var(--space-5);
+}
+
+.skeleton-line--meta {
+    width: 35%;
+    height: var(--space-3);
+}
+
+.skeleton-line--excerpt-short {
+    width: 70%;
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* No-results empty state — desktop default: mascot beside message + Clear
+   Filters button, row layout. Tablet (max-width: 1023px below) keeps the
+   row but scales it down; mobile (max-width: 767px below) switches to a
+   vertical stack — the only breakpoint narrow enough to need one. Neither
+   tablet's nor desktop's exact sizing was pre-mocked (no Figma frame for
+   either); both are adapted from existing spacing/type tokens rather than
+   invented values — flagged for review in the build report. */
+.archive-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: var(--space-16) var(--space-8);
+    text-align: left;
+    max-width: none;
+}
+
+.archive-empty-image {
+    width: 240px;
+    height: 240px;
+    flex-shrink: 0;
+}
+
+.archive-empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.archive-empty-message {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    max-width: none;
+}
+
+.archive-empty-clear-btn {
+    width: auto;
 }
 
 /* ================================
@@ -139,13 +3638,330 @@ p {
 }
 
 /* ================================
-   MOBILE
+   TABLET (max-width: 1023px) — single column collapse
 ================================ */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
+    /* Portrait-tablet — nav logo hidden (see the min-width: 1024px block
+       above); mobile below hides the whole header anyway, so this is a
+       no-op there, not a separate rule. */
+    .nav-logo {
+        display: none;
+    }
+
+    /* Tablet — same row layout as desktop, scaled down; a smaller version of
+       the same idea rather than mobile's stack or desktop's full size.
+       Mobile (max-width: 767px below) overrides this further to a stack. */
+    .archive-empty {
+        gap: var(--space-6);
+        padding: var(--space-10) var(--space-6);
+    }
+
+    .archive-empty-image {
+        width: 180px;
+        height: 180px;
+    }
+
+    .page-grid {
+        padding: 0 var(--space-6);
+    }
+
+    .standard-page {
+        padding: 0 var(--space-6);
+    }
+
+    .standard-page-title {
+        font-size: var(--font-size-3xl);
+    }
+
+    .card--profile {
+        position: static;
+    }
+
+    /* position: fixed, not sticky — the row must be locked in place from
+       the very first frame with no in-flow scroll-along period, which
+       sticky can't do (it stays in normal flow and only locks once
+       scrolled to its threshold). top: 64px matches the fixed tab bar's
+       (mobile) / sticky header's (tablet) own height, confirmed by
+       font-loaded measurement, not assumed — both are 64px, so one value
+       covers this shared mobile+tablet block. left/right/max-width/margin
+       replicate .container's own centering, since a fixed element no
+       longer inherits it from being .container's in-flow child; padding
+       matches .container's own horizontal padding (var(--space-8) here,
+       overridden to var(--space-4) at max-width: 767px below) so the row's
+       content lines up with the results grid beneath it. Opaque background
+       (the same token body's own background uses, not a new one) so result
+       cards don't visually bleed through as they scroll beneath it; a
+       small explicit z-index keeps it reliably above those cards without
+       approaching the nav's (200) or the floating action-rail group's
+       (260) layers. */
+    .archive-sort-count-row {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        max-width: var(--max-content);
+        margin: 0 auto;
+        padding: var(--space-4) var(--space-8);
+        z-index: 10;
+        background-color: var(--color-background-base);
+    }
+
+    /* Row is removed from document flow by position: fixed above, so the
+       results grid needs its own clearance added back — sized to (nav
+       height + row's own rendered height), both confirmed by font-loaded
+       measurement: 64px + 76px = 140px. Tablet's own override below uses
+       just the row's 76px, not nav+row — header stays in normal document
+       flow there (position: sticky, not fixed), so its height is already
+       accounted for by flow alone; adding it again here would double-count
+       it. */
+    .archive-results {
+        padding-top: 140px;
+    }
+}
+
+/* Tablet uses the sticky <header> (not the fixed tab bar mobile gets below).
+   header previously had no explicit height or box-sizing: border-box, so
+   its rendered height was derived from flex/font-metric distribution
+   instead of a fixed value — confirmed via DevTools Computed panel to
+   render as a fractional 64.6667px with a 0.666667px border-bottom, not
+   the clean 64px/1px assumed elsewhere. Giving header an explicit height
+   fixes this at the source: box-sizing: border-box (already the sitewide
+   default, redeclared here for clarity) absorbs the border-bottom inside
+   the 64px box instead of adding on top of it, so header's rendered
+   height becomes a fixed, predictable 64px under all conditions — no
+   longer sensitive to font metrics or flex distribution, and no longer
+   drifting under DPR/zoom scaling since there's no fractional math left
+   to be affected. 64px matches the mobile tab bar exactly, so
+   .archive-sort-count-row no longer needs a tablet-specific top override
+   below — the shared max-width: 1023px block's top: 64px now applies
+   correctly to both. */
+@media (min-width: 768px) and (max-width: 1023px) {
+    header {
+        height: 64px;
+        box-sizing: border-box;
+    }
+
+    /* Row height only (76px), NOT nav+row like mobile's 140px. header is
+       position: sticky here (not fixed like the mobile tab bar), so it
+       stays in normal document flow — its own 64px rendered height already
+       pushes main down for free. Adding the nav's height again on top of
+       that would double-count it, leaving a gap above the first card even
+       with main's padding-top zeroed. Confirmed via measurement, not
+       assumed. */
+    .archive-results {
+        padding-top: 76px;
+    }
+
+    /* Matches .page-grid's own tablet-only padding reduction (--space-8 ->
+       --space-6, see .page-grid's max-width: 1023px rule) — without this,
+       .home-hero-title/-subtitle's alignment to #featured-work-heading
+       (style.css, home-hero-title's own comment) holds everywhere except
+       this exact 768-1023px range, where .page-grid narrows its own
+       padding but .home-hero's base --space-8 doesn't follow — confirmed
+       via direct measurement at 768px (an 8px mismatch, exactly the
+       --space-8/--space-6 delta) before this was added. */
+    .home-hero {
+        padding: var(--space-24) var(--space-6);
+    }
+}
+
+/* ================================
+   MOBILE (max-width: 767px) — tab bar, footer, padding
+================================ */
+@media (max-width: 767px) {
     h1 { font-size: var(--font-size-3xl); }
-    h2 { font-size: var(--font-size-2xl); }
+
+    main {
+        padding-top: var(--space-20);
+    }
+
+    /* Featured Work collapses to one column on mobile only — tablet and
+       desktop both stay two-column (see .card-row--two's own base rule). */
+    .card-row--two {
+        grid-template-columns: 1fr;
+    }
+
+    /* Mobile only — hero is the sole first-screen block. Two CSS-unit
+       attempts here previously (100dvh, then 100svh) both still let a
+       scroll-time jitter reproduce on iOS WKWebView-based browsers
+       (Brave/Edge specifically — not Safari/Chrome), which apparently
+       handle live viewport-height changes during the toolbar's show/
+       hide animation less consistently than Safari's own native path.
+       Replaced the CSS-unit approach entirely: --hero-vh-locked is a
+       JS-computed constant (window.innerHeight read ONCE at load, see
+       the inline <script> in index.html's <head>), not a viewport unit
+       at all, so it cannot react to an in-progress toolbar animation
+       regardless of how any given browser implements dvh/svh. The
+       var()'s fallback (100svh) only matters if JS is unavailable.
+       Deliberately not kept live via resize/orientationchange — see
+       that same inline script's comment. This is a --space-* token
+       exception by necessity (a runtime pixel value, not a design-scale
+       token) — see DESIGN-SYSTEM.md §3.2. Flex-centered so leftover
+       space distributes evenly, padding clamped between existing
+       --space-* tokens rather than a fixed value. Desktop/tablet keep
+       the base rule's padding and natural (non-min-height) flow — the
+       hero may show more below it there. */
+    .home-hero {
+        min-height: var(--hero-vh-locked, 100svh);
+        justify-content: center;
+        /* Vertical clamp bounds dropped one token step (space-6->space-4,
+           space-12->space-10) to help the scroll chevron clear the fold —
+           shorthand ties top/bottom together, so this reduces both, not
+           top alone (there's no separate top-only value to trim instead). */
+        padding: clamp(var(--space-4), 6vw, var(--space-10)) var(--space-4);
+    }
+
+    /* The portrait rendered at its unclamped desktop size here (300px)
+       originally — mobile-only fluid sizing bounded by existing tokens.
+       Bounds raised again per Chris's feedback that the prior pass
+       (--space-20 to --space-32 at 28vw) still read too small.
+       --space-32 (128px) is the largest spacing token defined anywhere
+       in the system — this clamp's ceiling is already at that limit, so
+       there is no larger existing token to reach for if this still
+       isn't big enough; that would need a new token, flagged rather
+       than invented here. First pass, not pixel-final; report computed
+       size for confirmation. */
+    .home-hero-image {
+        width: clamp(var(--space-24), 32vw, var(--space-32));
+        flex-shrink: 1;
+    }
+
+    /* One step down the existing H1 type scale from mobile's default
+       3xl (36px) — first pass, report for visual confirmation. */
+    .home-hero-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    /* Mobile only — same token standard entry body paragraphs use
+       elsewhere (.standard-page-content p), not the desktop/tablet xl
+       lead-paragraph size. */
+    .home-hero-subtitle {
+        font-size: var(--font-size-base);
+    }
+
+    /* Mobile — the only breakpoint narrow enough to need a vertical stack
+       instead of tablet/desktop's row (mascot beside text). Smallest image,
+       tightest spacing, message drops from --font-size-xl to --font-size-lg. */
+    .archive-empty {
+        flex-direction: column;
+        gap: var(--space-4);
+        padding: var(--space-10) var(--space-4);
+        text-align: center;
+    }
+
+    .archive-empty-image {
+        width: 140px;
+        height: 140px;
+    }
+
+    .archive-empty-content {
+        align-items: center;
+    }
+
+    .archive-empty-message {
+        font-size: var(--font-size-lg);
+    }
+
+    /* .archive-sticky-header no longer needs its own margin-top for fixed-nav
+       clearance — it has no visible content on mobile now, so that job goes
+       back to main's own padding-top (restored to normal on mobile/tablet, see the
+       min-width: 1024px-scoped override above) — same as every other page. */
+
+    .page-grid {
+        padding: 0 var(--space-4);
+    }
 
     .container {
         padding: 0 var(--space-4);
+    }
+
+    /* Matches .container's own reduced horizontal padding above — the
+       fixed row no longer inherits it as .container's in-flow child, so
+       its own padding must be kept in sync by hand at each breakpoint. */
+    .archive-sort-count-row {
+        padding: var(--space-4);
+    }
+
+    .standard-page {
+        padding: 0 var(--space-4);
+    }
+
+    /* Contained, not full-bleed — stays inside .standard-page's own
+       padding at every breakpoint like the rest of the page, matching the
+       site's existing fluid/responsive container convention rather than
+       the previous negative-margin viewport-edge treatment. */
+    .standard-page-banner {
+        aspect-ratio: 3 / 2;
+    }
+
+    .standard-page-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    .standard-page-details-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-1);
+    }
+
+    .standard-page-footer-actions {
+        flex-direction: column;
+    }
+
+    .standard-page-footer-actions .btn {
+        width: 100%;
+    }
+
+    .card--profile .card-image {
+        background-color: transparent;
+        padding-top: var(--space-4);
+    }
+
+    /* Top tab bar replaces desktop nav on mobile */
+    header {
+        display: none;
+    }
+
+    /* header is display: none at this width (above) both before and
+       after nav.html injects, so there's nothing to reserve space for —
+       see #nav-placeholder:empty::before's own comment. */
+    #nav-placeholder:empty::before {
+        display: none;
+    }
+
+    .tab-bar {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 64px;
+        background-color: var(--color-background-surface);
+        border-bottom: var(--border-width-thin) solid var(--color-border-default);
+        justify-content: space-around;
+        align-items: center;
+        padding: var(--space-2);
+        z-index: 200;
+    }
+
+    footer {
+        display: none;
+    }
+
+    .action-rail-group {
+        top: 70%;
+    }
+
+    .theme-toggle-rail {
+        top: calc(70% - var(--touch-target-minimum) - var(--space-8));
+    }
+
+    .contact-icon-btn {
+        height: 64px;
+    }
+
+    .contact-icon-btn svg {
+        width: 28px;
+        height: 28px;
     }
 }
