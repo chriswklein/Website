@@ -68,19 +68,19 @@
             <div class="standard-page-content">
                 
                 <h2 id="overview">Overview</h2>
-                <p>For the past 3 months, I sought to eliminate my dependency for Squarespace as a platform for my portfolio, as I've utilized the service on and off for many years but it was never what I truely wanted.</p>
+                <p>For the past 3 months, I sought to eliminate my dependency on Squarespace as a platform for my portfolio, as I've utilized the service on and off for many years but it was never what I truly wanted.</p>
                 
                 
-                <p>Problem #1: Squarespace is an expensive recoccuring charge and specific features are gated behind a more expensive tier.</p>
+                <p>Problem #1: Squarespace is an expensive recurring charge and specific features are gated behind a more expensive tier.</p>
 
-                <p>Problem #2: I don't know much about web development</p>
+                <p>Problem #2: I don't know much about web development.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
 
                 <h2 id="solution">Solution</h2>
-                <p>Solution #1: Replace Squarespace subscription with Anthropic subscription to establish a workflow Claude and utilize Claude Code to construct the portfolio which reflects my designs via Figma, of which will reflect my design principles.</p>
+                <p>Solution #1: Replace my Squarespace subscription with an Anthropic subscription</p>
 
                 <p>Solution #2: Have fun in the process, and learn through fun.</p>
 
@@ -119,7 +119,7 @@
                             <tr>
                                 <td>Design</td>
                                 <td>Figma</td>
-                                <td>Utilize MCP to provide bridge between Figma and Claude Code</td>
+                                <td>Utilize MCP to provide a bridge between Figma and Claude Code</td>
                             </tr>
                             <tr>
                                 <td>Code Editor</td>
@@ -129,7 +129,7 @@
                             <tr>
                                 <td>Version Control</td>
                                 <td>GitHub</td>
-                                <td>Repository to ensure safe iteration, and reference for project for Claude Code</td>
+                                <td>Repository to ensure safe iteration</td>
                             </tr>
                             <tr>
                                 <td>Infrastructure</td>
@@ -155,13 +155,13 @@
 
                 <h3 id="markdown">Markdown Files</h3>
                 
-                </p>In earlier LLM expirements, I ran into slight hallucinations and or the models would infer and do thier own thing without guidance. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
+                <p>In earlier LLM experiments, I ran into slight hallucinations and/or the models would infer and do their own thing without guidance. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
                 
-                </p>First step was to get out of singular chats and established a project within Claude and creating the Markdown (MD) files which would provide the support pillars.</p> 
+                <p>I moved the discussion out of a singular chat and established a project. Within the project, I could ensure it contained context and documentation between chats. We created the Markdown (MD) files which would provide the support pillars.</p> 
                 
-                </p>The MD’s would grow over the months, adding methods to avoid the afformentioned issues, build development and process guardrails, contain best practices to avoid wasting tokens on specific tasks I could easily check myself, archive changes overtime, and note design intent.</p>
+                <p>The MDs would grow over the months, adding methods to avoid the aforementioned issues, build development and process guardrails, contain best practices to avoid wasting tokens on specific tasks I could easily check myself, archive changes over time, and note design intent.</p>
 
-                </p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
+                <p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
 
                 <ul>
                     <li>REFERENCE.md for project decisions and session handoffs</li>
@@ -184,17 +184,17 @@
                     <li>Standard Page Template - for case studies</li>
                 </ul>
 
-                </p>I decided on Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
+                <p>I decided on Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
              
-                </p>However, when you are developing a site that reflects your principles - you get nit picky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or even removing a feature after testing.</p>
+                <p>However, when you are developing a site that reflects your principles - you get nitpicky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or even removing a feature after testing.</p>
 
-                </p>As a result of just having the basics - the site has taken longer than I wanted. I would see and reproduce a bug, and those bugs might have user experience issues that needed new solutions designed and tested. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
+                <p>As a result of just having the basics - the site has taken longer than I wanted. I would see and reproduce a bug, and those bugs might have user experience issues that needed new solutions designed and tested. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="archive">The Archive</h2>
-                </p>The Archive is made of multiple key components:</p>
+                <p>The Archive is made of multiple key components:</p>
 
                 <!-- image -->
                 
@@ -206,66 +206,66 @@
                 </ul>
 
                 <h3 id="lean-database">The Database</h3>
-                </p>To get around using a more complicated content manager, I opted for a lean singular static Json file. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundrens or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
+                <p>To get around using a more complicated content manager, I opted for a lean singular static Json file. Every entry is referenced and Javascript fetches all entries or matches based on user search, sort and filtering. It is fast and efficient for what I need right now, but may need expansion later. As it stands, I don't have hundreds or thousands of entries to worry too much about performance but as a precaution, I made sure to implement a display cap.</p>
 
 
                 <h3 id="entries-and-tags">Entries and Tags</h3>
-                </p>Each entry contains a Hidden Primary 'Type' Tag (Work, Thoughts, etc.) - as well as Secondary 'Topic' Tags (Quality Assurance, User Experience, etc.) While the Primary Tags are hidden on the Entry Pages and their representative Card on the Archive - they both can be utilized by a user by accessing the Filter Drawer.</p>
+                <p>Each entry contains a Hidden Primary 'Type' Tag (Work, Thoughts, etc.) - as well as Secondary 'Topic' Tags (Quality Assurance, User Experience, etc.). While the Primary Tags are hidden on the Entry Pages and their representative Card on the Archive - they both can be utilized by a user by accessing the Filter Drawer.</p>
 
 
                 <h3 id="search">Search</h3>
                 <p>While search is fully functional, it is currently dormant on the Archive. The reason for this is due to how I initially implemented the Search across devices.</p>
 
-                </p>Initially on Desktop it was at the top of page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
+                <p>Initially on Desktop it was at the top of the page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/this-website/search-intentional-design.webp" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
 
-                </p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
+                <p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
 
                 
 
-                </p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
+                <p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
 
 
-                </p>As I picked out a good cabbage in the vegitable isle, it's sprinkler spritzed my face with cold water, and barely managed to wash away the embarressment I felt for forgetting something I see every single day.</p> 
+                <p>As I picked out a good cabbage in the vegetable aisle, its sprinkler spritzed my face with cold water, and barely managed to wash away the embarrassment I felt for forgetting something I see every single day.</p> 
                 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/atla-cabbages.png" alt="The infamous Cabbage vendor from Avatar the Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/atla-cabbages.png" alt="The infamous Cabbage vendor from Avatar: The Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
                 
-                </p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
+                <p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
 
-                </p>As I tested, I saw the major issues I knew would be present.</p>
+                <p>As I tested, I saw the major issues I knew would be present.</p>
 
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/this-website/search-implementation-bugs.webp" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
                                 
-                </p>Issue #1: the virtual keyboard envelopes half of the screenspace. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
+                <p>Issue #1: the virtual keyboard envelops half of the screen space. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
                 
-                </p>Issue #2: Search fields Auto-zoom when active. Not only was the virtual keyboard resulting in a loss of space, a further loss of space was the resulting in a Zoom in on the Archives Body. If a user searched, the entries would be illegable.</p> 
+                <p>Issue #2: On many mobile browsers and devices, there is an automatic zoom that triggers to ensure the user can see their input in the search field. As a result of my implementation - the entries would be further obscured</p> 
 
                 
-                </p>While I fought for a day to redesign variants of the current implementations - I ultimatley made the decision to feature flag search until I find a cleaner solution and I had other issues to solve, features to implement, and bugs to fix. I went for another walk later that day to let it all go and trust myself enough to figure it out another day.</p>
+                <p>While I fought for a day to redesign variants of the current implementations - I ultimately made the decision to feature flag search until I find a cleaner solution and I had other issues to solve, features to implement, and bugs to fix. I went for another walk later that day to let it all go and trust myself enough to figure it out another day.</p>
 
                 
 
                 <h3 id="filters">Filters</h3>
-                </p>After removing the field, I was able to retain the structure and instead of a search field, I replaced it with text indicating the purpose of the drawer.</p>
+                <p>After removing the field, I was able to retain the structure and instead of a search field, I replaced it with text indicating the purpose of the drawer.</p>
 
                 
-                </p>As I anticipated tag growth, I made sure the drawer would scale. Pagination was built into the drawer to ensure the user could parse the potential plethora of tags. If the user wants to Filter by a specific Primary Tag - the applicable entries with associated secondary tags will display, and the unrelated tags will be hidden.</p>
+                <p>As I anticipated tag growth, I made sure the drawer would scale. Pagination was built into the drawer to ensure the user could parse the potential plethora of tags. If the user wants to Filter by a specific Primary Tag - the applicable entries with associated secondary tags will display, and the unrelated tags will be hidden.</p>
 
-                </p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
+                <p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/this-website/filter-implementation.webp" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
 
 
                 <h2 id="contents">Table of Contents</h2>
-                <p>The next major implementation, was the Floating and Collapsable Table of Contents.</p>
+                <p>The next major implementation was the Floating and Collapsible Table of Contents.</p>
 
-                <p>When I had a Squarespace, I wanted this feature but I was restricted from using a script another Squarespace user had written to provide one for my site, as Code Injection was of course in a higher paid tier. This became a must for this site as I now had full control. I wanted to the viewers of any entry to feel like they could navigate up and down the page with ease.</p>
+                <p>When I had a Squarespace, I wanted this feature but I was restricted from using a script another Squarespace user had written to provide one for my site, as Code Injection was of course in a higher paid tier. This became a must for this site as I now had full control. I wanted the viewers of any entry to feel like they could navigate up and down the page with ease.</p>
 
 
                 <!-- image -->
@@ -280,7 +280,7 @@
 
                 <p>Last but not least, is one of the Core Principles of the site: Accessibility.</p>
                     
-                </p>As it stands right now, my site has the following accessibility implemented:</p>
+                <p>As it stands right now, my site has the following accessibility implemented:</p>
 
                 <h3 id="vision">Vision</h3>
 
@@ -301,7 +301,7 @@
                 <h3 id="cognitive">Cognitive</h3>
 
                 <ul>
-                    <li>Reduced-motion respected sitewide. If a users device requests less motion, every animation and transition turns off automatically</li>
+                    <li>Reduced-motion respected sitewide. If a user's device requests less motion, every animation and transition turns off automatically</li>
                     <li>Consistent heading structure and unique link labeling on every page</li>
                 </ul>
 
@@ -311,7 +311,7 @@
                     <li>No audio or video content currently exists on the site, but when I add, this will get addressed.</li>
                 </ul>
 
-                </p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
+                <p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
 
 
                 <h2 id="performance">Performance</h2>
@@ -319,7 +319,7 @@
 
                 <ul>
                     <li>Lighthouse Accessibility: 100 across every page</li>
-                    <li>WAVE: 9.9/10, 0 errors - Im working through Warnings right now related to redundant links</li>
+                    <li>WAVE: 9.9/10, 0 errors - I'm working through Warnings right now related to redundant links</li>
                     <li>Reduced Image weight by compressing pngs to webp format. Thumbnails are compressed low res for fast lazy loads, and then when you enlarge the image, they bump up to higher resolution.</li>
                     <li>Mobile load speed: 7.9s → 4.7s</li>
                 </ul>
