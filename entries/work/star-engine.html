@@ -72,24 +72,15 @@
             <div class="standard-page-content">
                 <h2 id="overview">Overview</h2>
 
-                <!-- image -->
-                <img src="/assets/images/entries/work/star-engine/StarEngine-inline.webp" alt="A Star Citizen character in a futuristic space suit and helmet, holding a glowing golden orb" width="800" height="450" loading="lazy">
-
-                <p>In 2021, I transitioned from an embedded Senior QA to the sole UX Designer within the Core Technology Group (CTG) at Cloud Imperium Games in Los Angeles. I was responsible for a few different initiatives, however my primary focus was within the Star Engine Editor - which is the software interface that contains the tools which allow over 800+ developers globally to develop Star Citizen, a massive Singleplayer and MMO space game.</p>
-
-                </p>Over the course of 3 years, I stood up the groups user research foundations, documented technical issues within workflows, updating existing tools, and lastly crafting new tools. I used my voice to echo developer commentary when they encountered bugs or had frictions with their tools and I would then synthesize those issues into action points as best I could with my team to fit their specific needs while doing our best to afford general developers.</p>
-
-                </p>On this page, I will detail a few selected projects, span my 3 years on the team. Our struggles, our wins, and some specific musings.</p>
-
-                <!-- Dot divider -->
-                <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
-
-                <h2 id="what-is-star-engine">What is the Star Engine</h2>
                 
+                <p>In 2021, I transitioned from an embedded Senior QA to the sole UX Designer within the Core Technology Group (CTG) at Cloud Imperium Games in Los Angeles. I was responsible for a few different initiatives, however my primary focus was the Star Engine Editor - which is the software interface that contains the tools which allow over 800+ developers globally to develop Star Citizen and Squadron 42.</p>
+
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-1/what-is-star-engine.webp" alt="two screenshots, left a space station in orbit - right, a picture of a space fighter pilot" width="800" height="450" loading="lazy">
 
-                <p>The Star Engine is the game engine utilized by Cloud Imperium Games to create their two main titles: “Squadron 42”, their Singleplayer title - and “Star Citizen” - their massive multiplayer title.
+                </p>Over the course of 3 years, I stood up the groups user research foundations, documented technical issues within workflows, updating existing tools, and crafted new tools alongside my team of engineers and QA. I used my voice to echo developer commentary when they encountered bugs or had frictions with their tools, later synthesizing those issues into action points as best I could to fit their specific needs while doing our best to afford general developers.</p>
+
+                </p>On this page, I will detail a few selected projects, span my 3 years on the team. Our struggles, our wins, and some specific musings.</p>
 
                 <p>If you're interested in more detail about the engine, you can read more on the <a href="https://starcitizen.tools/Star_Engine" target="_blank" rel="noopener noreferrer">Star Engine wiki page</a> or go to any of the <a href="https://www.youtube.com/@RobertsSpaceInd" target="_blank" rel="noopener noreferrer">tech talks available on YouTube.</a> </p>
 
@@ -100,7 +91,7 @@
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-3/editor-interface.webp" alt="screenshot of the Star Engine Editor's Interface" width="800" height="450" loading="lazy">
 
-                <p>While the Star Engine is one of the most impressive game engines on the planet, the interface for the Editor is notably archaic in comparison. Untidy modification over the years has left it behind especially when compared to modern game engine interfaces like Unreal, Unity and Godot.</p>
+                <p>While the Star Engine is one of the most impressive game engines on the planet, the interface for the Editor is notably archaic in comparison. Untidy modification over the years has left it behind especially when compared to modern game engine interfaces like Unreal, Unity and Godot. It is a mixture of Windows Presentation Foundation and QT, and its based on </p>
 
                 </p>While I had spent some of my spare time conceptualizing an updated aesthetic to the interface - we sadly did not get to implement them. My focus throughout was primarily in specific tools. The overhaul would have taken considerable time away from core tools and fixes.</p>
                 
@@ -181,14 +172,16 @@
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-3/editor-interface.webp" alt="Screenshot of the Star Engine Editor's interface, the same dense, non-standard layout new hires had to learn." width="800" height="450" loading="lazy">
                 
-                </p>Internal Star Engine Editor documentation was sparse and the documentation we had, was team specific documentation. Some archives were better than others, but most were decentralized in their specific team's corner of confluence.</p>
+                </p>Internal Star Engine Editor documentation was sparse and the documentation we had was team specific documentation. Some were better than others, but most were decentralized in their specific team's corner of confluence, which meant developers had to dig to get information.</p>
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-3/toolbox-help-documentation.webp" alt="Diagram of the Editor's old Help menu: it opened an outdated, poorly scaled splash screen and outdated third-party CryEngine documentation, neither useful to developers." width="800" height="450" loading="lazy">
                 
-                </p>Another much to common feeling among developers I gathered in interviews, was the lack of communication with the Editor Team. They felt cutoff and didn't know who to contact. The Editor Team was a small aperatus within the Core Technology Group and no one was really the public point of contact.</p> 
+                </p>Another much too common feeling among developers I gathered in interviews, was the lack of communication with the Editor Team. They felt cutoff and didn't know who to contact. The Editor Team was a small aperatus within the Core Technology Group and no one was really the public point of contact.</p> 
                 
-                </p>Worse than that - if they encountered bugs, crashes, or UX issues - they rarely reported, or recorded it. And that was made worse because there wasn't any obvious method to communicate these issues to the Editor Team's Engineers and QA.</p> 
+                </p>Worse than that - if they encountered bugs, crashes, or UX issues - they rarely reported or recorded it. Developers have this mindset where they MUST KEEP GOING SKIP DONT READ JUST FIND A WORKAROUND - which is bad. That was made worse because there wasn't any obvious method to triage these issues to the Editor Team's Engineers or QA.</p> 
+                
+                <h3 id="solution">Solution</h3>
 
                 </p>I saw the opportunity to create a much needed communication loop for developers:</p>
 
@@ -219,20 +212,22 @@
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h2 id="RASTAR">Base Builder Ups and Downs</h2>
+                <h2 id="base-builder">Base Builder</h2>
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-4/rastar-render.webp" alt="In-game render of a player base built with the RASTAR base-building prototype, set in a mountainous grassland." width="800" height="450" loading="lazy">
 
                 <p>Near the beginning of my joining of the Core Tech Group, I would be asked to join a prototyping team for a Base Building tool, referred to as RASTAR. It was meant to speed up the Level Design and Environments workflow for constructing spaces on planets throughout the Persistent Universe. I was responsible for both concept design and UI implementation using their internal tool called, Dataforge. This tool allows developers to create the many of our in-game classes and game objects as well as our interfaces.</p>
 
-                </p>As much fun as I was having working on a base building tool - I became overwhelmed and it was weighing on me that I was assisting with implementation on this project as well as maintaining existing Editor Team duties. Of which were arguably more important and the primary reason I was hired in the first place. My implementation was also poor. I was creating new components by scratch and not utilizing component libraries established by the UI team.</p>
+                </p>As much fun as I was having working on a base building tool - I became overwhelmed and it was weighing on me that I was assisting with implementation on this project as well as maintaining existing Editor Team duties. Of which were arguably more important and the primary reason I was hired in the first place. My implementation was also poor. I was creating new components by scratch and not utilizing component libraries established by the UI team. I decided to leave the project after discussing my issues with my lead.</p>
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-4/rastar-editor-tool.webp" alt="Screenshot of the RASTAR base-building tool's editor UI, showing its structure/element list, viewport placement preview, and Manage Elements / Add Template controls." width="800" height="450" loading="lazy">
 
-                </p>I left the project after discussing my issues with my team lead and serves as a lesson for myself to know when to say ‘no’ to a project even if it’s interesting.</p>
+                
 
                 <h3 id="outcome-rastar">Outcome</h3>
+
+                </p>As this was early on, Im glad it served me to know when to say ‘no’ to a project even if it’s interesting to avoid taking on too much to the point where all my work suffers.</p>
 
                 </p>There was however some valuable data gained for the UI and Editor team:</p>
 
@@ -305,7 +300,10 @@
 
                 <h3 id="delete-this">Delete this? Y/N</h3>
 
-                </p>In the Editor, for like 10 odd years - when users pressed the Delete key or right clicked to Delete a selection of game objects - the Delete Modal - which commonly prompts a user with “Are you sure you want to Delete (Big Red Square)? - Yes / No” - did not inform the user that the Big Red Square contains a reference to another game object.</p>
+                </p>In the Editor, for like 10 odd years - when users pressed the Delete key or right clicked to Delete a singular game object or a selection of game objects - the Delete Modal - which commonly prompts a user with “Are you sure you want to Delete (Big Red Square)? - Yes / No” - did not inform the user that the Big Red Square contains a reference to another game object.</p>
+
+                </p>Worse than that, the modal only displayed a finite amount - 9 game objects - in the list and would truncate. In the example sent to us, one developer was attempting to delete 40,000 game objects. But the modal is small, and only showed 9 of 40k. Rather insufficient, wouldn't you agree?</p>
+                
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-6/object-references-flow-comparison.webp" alt="Diagram displaying two user flows comparing states and information failures and fix proposals" width="800" height="450" loading="lazy">
@@ -314,9 +312,9 @@
                 
                 </p>“How have we managed for this long?” and “Why are we laughing about this?”</p>
                 
-                </p>which ended with us all agreeing this was high priority. We got to work straight away on the design and implementing based on the specifications presented by the Single Player Team.</p>
+                </p>It ended with us all agreeing this was high priority and we got to work straight away, investigating the feasability based on the specifications presented by the Single Player Team.</p>
 
-                <h3 id="outcome-obj-ref">Outcome</h3>
+                <h3 id="what-we-did">What we did</h3>
 
                 <ul>
                     <li>Developers we worked with had a very detailed breakdown of the problem and what they wanted in an interface as well as some core features.</li>
@@ -324,6 +322,8 @@
                     <li>We modified the existing modal and finally created a new window which would present itself if there any objects had references, and presented options for resolution.</li>
                     <li>Users can select and modify the Objects in the pending list, make their change, and go on to their next task.</li>
                 </ul>
+
+                <h3 id="outcome-obj-ref">Outcome</h3>
 
                 <!-- image -->
                 <img src="/assets/images/entries/work/star-engine/section-6/object-references-window-diagram.webp" alt="Diagram displaying a modal transitioning from different states after Deleting an Object containing references" width="800" height="450" loading="lazy">

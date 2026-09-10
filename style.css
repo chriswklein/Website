@@ -1118,44 +1118,40 @@ pre code {
     gap: var(--space-8);
 }
 
-/* Mobile/tablet — tighter gap between the icon containers and the
-   portrait than desktop's --space-8. */
+/* Mobile/tablet — tighter gap between the icon containers than
+   desktop's --space-8. Kept even though the icons are currently
+   hidden (see [hidden] override below) — this is the icons' own
+   spacing rule, not something tied to the removed hero photo, so it
+   stays ready for whenever that separate, already-tracked work
+   reactivates them. */
 @media (max-width: 1023px) {
     .home-hero-icons {
         gap: var(--space-4);
     }
 }
 
-.home-hero-image {
-    flex-shrink: 0;
+/* Hero photo removed 2026-09-10 (redundant with about.html's portrait;
+   feedback was that seeing it head-on immediately on landing was "a bit
+   much"). That left this wrapper holding only the two already-hidden
+   bug/wrench .contact-icon-btn decorative icons (hidden 2026-09-07, see
+   their own comment in index.html) — an empty flex item that would
+   otherwise still consume one of .home-hero's own gap: var(--space-6)
+   steps above the title. Hidden outright rather than left empty. Same
+   [hidden]-loses-to-author-display specificity issue as
+   .contact-icon-btn[hidden] below — this override is what actually
+   collapses it. */
+.home-hero-icons[hidden] {
+    display: none;
 }
 
-/* Explicit width: 100%/height: auto here rather than relying on the
-   sitewide img { max-width: 100% } rule alone — belt-and-suspenders
-   against the <img>'s own width="300" height="300" attributes (kept
-   intentionally, per DESIGN-SYSTEM.md §11.7's CLS-prevention
-   requirement) winning in any rendering path where max-width alone
-   doesn't reliably beat them. Confirmed max-width alone already works
-   correctly in Chromium (measured 120px matching the clamp), but this
-   makes the override explicit rather than implicit. */
-.home-hero-image img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: var(--border-radius-full);
-}
-
-/* Icons sit beside the image again (not overlapping it) — each one
-   wrapped in the existing .contact-icon-btn class directly in the HTML
-   (background, border, radius, sizing, AND colour all reused verbatim
-   from that component, nothing redeclared here). .home-hero-icon
-   previously forced color: teal directly on the svg, which overrode
-   .contact-icon-btn's real default (text-primary, shifting to teal
-   only on hover) since a property set directly on an element always
-   wins over an inherited one, regardless of selector specificity. That
-   override is removed — the class stays as a markup hook only, with no
-   CSS of its own, so these icons now render exactly like a real
-   Contact/Resume/Email/LinkedIn button. */
+/* Icons' own colour: .home-hero-icon previously forced color: teal
+   directly on the svg, which overrode .contact-icon-btn's real default
+   (text-primary, shifting to teal only on hover) since a property set
+   directly on an element always wins over an inherited one, regardless
+   of selector specificity. That override is removed — the class stays
+   as a markup hook only, with no CSS of its own, so these icons would
+   render exactly like a real Contact/Resume/Email/LinkedIn button
+   whenever they're reactivated. */
 
 /* max-width: this title had no width constraint at all, so it rendered
    as wide as its own text demanded — confirmed via direct measurement
@@ -3809,21 +3805,6 @@ footer p {
            shorthand ties top/bottom together, so this reduces both, not
            top alone (there's no separate top-only value to trim instead). */
         padding: clamp(var(--space-4), 6vw, var(--space-10)) var(--space-4);
-    }
-
-    /* The portrait rendered at its unclamped desktop size here (300px)
-       originally — mobile-only fluid sizing bounded by existing tokens.
-       Bounds raised again per Chris's feedback that the prior pass
-       (--space-20 to --space-32 at 28vw) still read too small.
-       --space-32 (128px) is the largest spacing token defined anywhere
-       in the system — this clamp's ceiling is already at that limit, so
-       there is no larger existing token to reach for if this still
-       isn't big enough; that would need a new token, flagged rather
-       than invented here. First pass, not pixel-final; report computed
-       size for confirmation. */
-    .home-hero-image {
-        width: clamp(var(--space-24), 32vw, var(--space-32));
-        flex-shrink: 1;
     }
 
     /* One step down the existing H1 type scale from mobile's default
