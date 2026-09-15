@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
 });
 
+// Fetches an HTML partial (nav.html or footer.html) and injects it into
+// a placeholder <div> already sitting in the page (#nav-placeholder,
+// #footer-placeholder). This is why nav/footer aren't duplicated in
+// every page's own HTML — every page just has an empty placeholder div,
+// and this function fills it in at load time. The optional callback
+// runs after injection, for code that needs the real nav/footer markup
+// to exist first (e.g. setActiveNavLink()).
 function loadComponent(placeholderId, file, callback) {
     const placeholder = document.getElementById(placeholderId);
     if (!placeholder) return;
@@ -1148,6 +1155,12 @@ function initArchive(filterDrawer) {
         return str.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     }
 
+    // Converts an entry's raw "YYYY-MM-DD" date (as stored in
+    // archive-entries.json) into the "Month D, YYYY" format shown on
+    // cards. Parses the pieces manually (rather than `new Date(isoString)`
+    // directly) to sidestep that string form being interpreted as UTC by
+    // some browsers, which can silently shift the displayed date by a day
+    // depending on the visitor's timezone.
     function formatDate(iso) {
         const [y, m, d] = iso.split('-').map(Number);
         return new Date(y, m - 1, d).toLocaleDateString('en-US', {
@@ -1155,6 +1168,12 @@ function initArchive(filterDrawer) {
         });
     }
 
+    // Escapes HTML-significant characters before inserting entry data
+    // (titles, excerpts — ultimately sourced from archive-entries.json)
+    // into the page via innerHTML. Without this, an entry whose title or
+    // excerpt happened to contain <, >, or & would either break the page's
+    // markup or, worse, let arbitrary HTML run — this is what prevents
+    // that, not a formatting nicety.
     function escapeHTML(str) {
         return String(str)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -2076,6 +2095,13 @@ function initImageViewer() {
         ].filter(Boolean);
     }
 
+    // The image viewer shows a higher-resolution version of whatever
+    // thumbnail was clicked, assuming every in-body image has a sibling
+    // file with the same name plus a "-full" suffix before the extension
+    // (e.g. "diagram.webp" → "diagram-full.webp") — a naming convention
+    // enforced by how images are exported/added, not something this
+    // function can verify; if a "-full" file is missing, the browser's own
+    // broken-image handling is what a visitor would see. Mechanically:
     // "…/foo.png" or "…/foo.webp" -> "…/foo-full.webp" — the -full variant
     // is always .webp regardless of the thumbnail's own extension (see
     // scripts/build-images.js), so this replaces whatever extension is

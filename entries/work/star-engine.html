@@ -338,7 +338,28 @@
                     <li>Because of this, the developers sought out the correct channels, and had a plan in motion already to tackle the issues they faced, which reduced the time it would usually take to implement.</li>
                 </ul>
 
-                <p>All in all, a very memorable project.</p>
+
+                <h3 id="update">Update</h3>
+
+                <p>Since 2023, the engineering team has continued building on the tools foundation to Warn a developer before costing the team serious time and effort. My former Technical Director and I caught up recently and he provided me with some data on the tool's use and growth since my departure:</p>
+
+                <ul>
+                    <li>Light links added as a tracked reference type, letting lighting artists check whether an object is being referenced</li>
+                    <li>A non-destructive inspection mode for viewing references without deleting, plus a right-click "Open Object References" option for faster, at-a-glance access</li>
+                    <li>Improved detection and cleanup for Trackview cinematic references</li>
+                    <li>Attached entities, AIGroup members, and area shapes now register as references</li>
+                </ul>
+
+                <p>Telemetry was added in April 2024, giving a picture of how the tool is used today:</p>
+
+                <ul>
+                    <li>1.69 million pane opens since telemetry started</li>
+                    <li>A steady 55,000–75,000 opens per month, peaking at 98,500 in a single month</li>
+                </ul>
+
+                <p><em>Caveat:</em> this only counts the pane opening, not the outcome. The Replace, Clear, and Delete All buttons aren't instrumented, so there's no "references caught" or "deletes prevented" figure - and telemetry only goes back to April 2024, so there's no pre-tool baseline either.</p>
+
+                <p>We don't have a number for incidents prevented, since that outcome was never instrumented and hard to address after the fact. But sustained, heavy use at this scale, nearly two years after I moved off the project, with the engineering team still actively extending the tool rather than replacing it - is real evidence that the underlying approach was sound and solved a lasting problem. It was one of the more significant projects I worked on at the time, and I'm glad to see it's become a lasting part of the editor's infrastructure.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>

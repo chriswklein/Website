@@ -1,6 +1,11 @@
 /* ================================
    BASE RESET
 ================================ */
+/* Removes every browser's own default spacing/box-model quirks so every
+   margin/padding/width on this site comes from a token below, never a
+   browser default nobody chose. box-sizing: border-box means a padded
+   element's declared width includes its padding/border instead of
+   growing past it — the sizing model every rule in this file assumes. */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -10,6 +15,13 @@
 /* ================================
    ROOT TOKENS
 ================================ */
+/* Every colour, size, spacing, and timing value the site uses is defined
+   once here as a CSS custom property ("token") and referenced by name
+   everywhere else — never hardcoded again below. This is what makes
+   DESIGN-SYSTEM.md's token tables and the live site the same source of
+   truth: change a value here and it updates everywhere that token is
+   used, all at once. See md/DESIGN-SYSTEM.md for what each token means
+   and when to use it. */
 :root {
     /* ---- Colour: Background ---- */
     --color-background-base: #111111;
@@ -164,6 +176,11 @@
 /* ================================
    TEAL THEME OVERRIDE
 ================================ */
+/* Teal is the site's live default accent (already set above in :root),
+   so this override exists only so an explicit data-theme="teal"
+   attribute (set by the toggle logic in script.js, currently dormant —
+   see THEME TOGGLE RAIL below) resolves to the same values as no
+   attribute at all. Harmless duplication, not dead code. */
 [data-theme="teal"] {
     --color-accent-primary: #00BAA5;
     --color-accent-primary-text: #00E5CB;
@@ -171,6 +188,12 @@
 
 /* ================================
    GOLD THEME OVERRIDE (dormant — toggle UI disabled pending Action Rail)
+   A second accent-colour option, built and contrast-verified but not
+   currently reachable by any visible UI — the toggle button that would
+   set data-theme="gold" is disabled pending a permanent home in the
+   planned Vertical Action Rail (see THEME TOGGLE RAIL below). If a
+   visitor had switched to gold before it was disabled, this rule is why
+   their saved preference still renders correctly.
 ================================ */
 [data-theme="gold"] {
     --color-accent-primary: #BA8200;
@@ -184,6 +207,17 @@ html {
     scroll-behavior: smooth;
 }
 
+/* The radial-gradient here is the sitewide dot-texture background — a
+   decorative, very low-opacity (5%) pattern, not a solid colour, sitting
+   behind every page. It's deliberately faint so it never meaningfully
+   changes the contrast of text placed over it (see md/REFERENCE.md §12
+   Visual & Contrast and md/DESIGN-SYSTEM.md §1.9/§1.11) — but because
+   it's a gradient rather than a flat colour, automated contrast-checking
+   tools (axe-core) can't always compute an exact ratio for text sitting
+   directly on body's background and mark it "needs manual review"
+   instead of pass/fail. That's a known tooling limitation, not a sign
+   of a real contrast problem — see md/DESIGN-SYSTEM.md §1.9 for the
+   manual math confirming this. */
 body {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
@@ -217,6 +251,13 @@ footer {
 /* ================================
    FOCUS STYLES (Accessibility)
 ================================ */
+/* The one focus-ring style every interactive element on the site uses,
+   so keyboard users always get the same clearly visible outline no
+   matter what they've tabbed to. :focus-visible (not :focus) means this
+   only shows for keyboard/assistive-tech focus, not for a mouse click —
+   so clicking a button doesn't draw a ring a mouse user didn't ask for,
+   while Tabbing to it still does. The 3px offset keeps the ring from
+   touching the element's own border/background at small sizes. */
 :focus-visible {
     outline: var(--border-width-medium) solid var(--color-interactive-focus);
     outline-offset: 3px;
@@ -225,6 +266,13 @@ footer {
 /* ================================
    ACCESSIBILITY UTILITIES
 ================================ */
+/* .sr-only: hides content visually while keeping it readable by screen
+   readers — used for context a sighted user doesn't need but a screen
+   reader user does (e.g. "in the Work section" appended to a "View
+   more" link). Every property here matters: display:none or
+   visibility:hidden would hide it from screen readers too, so this
+   instead shrinks the element to 1px and clips it, which screen readers
+   still announce. */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -237,6 +285,12 @@ footer {
     border: 0;
 }
 
+/* .skip-link: the "Skip to main content" link every page starts with.
+   Invisible until a keyboard user Tabs to it (top: -100% moves it off-
+   screen; :focus below brings it back), so sighted mouse users never see
+   it, but anyone navigating by keyboard can jump straight past the nav
+   to the page's real content instead of tabbing through every nav link
+   first. */
 .skip-link {
     position: absolute;
     top: -100%;
@@ -256,6 +310,11 @@ footer {
 /* ================================
    TYPOGRAPHY
 ================================ */
+/* Heading sizes step down from h1 (largest) to h4 in a fixed type scale
+   (see md/DESIGN-SYSTEM.md §2.2) — never skip a level in the HTML (e.g.
+   h1 straight to h3) even if a smaller size is wanted somewhere; that's
+   a real accessibility requirement (screen reader users navigate by
+   heading level), not just a visual choice. */
 h1, h2, h3, h4 {
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
@@ -280,6 +339,10 @@ ul, ol {
 /* ================================
    LINKS
 ================================ */
+/* Sitewide default for every plain-text link not covered by a more
+   specific component below (.tag, .link-inline, .link-cta, etc.) —
+   underlined at rest, not just on hover, so a link is identifiable
+   without relying on colour alone (WCAG 1.4.1). */
 a {
     color: var(--color-link);
     text-decoration: underline;
@@ -293,6 +356,13 @@ a:hover {
 /* ================================
    DIVIDER (HR)
 ================================ */
+/* Two different section-divider styles exist on purpose: a plain <hr>
+   (this rule) for a simple horizontal rule, and .divider--dots (below)
+   — a row of three small dots — used specifically between body sections
+   on Standard Page entries and Home. Pick whichever the surrounding
+   page already uses; they're not interchangeable variants of the same
+   component, just two separate ones that happen to serve the same
+   layout purpose. */
 hr {
     border: none;
     border-top: var(--border-width-thin) solid var(--color-divider-accent);
@@ -333,6 +403,10 @@ hr {
 /* ================================
    BLOCKQUOTE
 ================================ */
+/* Pull-quote style — left border stripe, tinted background, italic
+   body text — used for testimonials (Home's "Nice Words") and quoted
+   material inside entry body content. See COMPONENTS.md "Blockquote"
+   for the full spec. */
 blockquote {
     border-left: var(--border-width-thick) solid var(--color-quote-border);
     background-color: var(--color-background-surface);
@@ -351,6 +425,10 @@ blockquote cite {
 /* ================================
    CODE / PRE
 ================================ */
+/* Styling shared by inline `code` spans and multi-line `pre` code
+   blocks in entry body content — left border colour and background
+   distinguish code from prose at a glance. See .code-wrap below for why
+   long code lines get their own horizontal-scroll wrapper. */
 code,
 pre {
     background-color: var(--color-code-bg);
@@ -404,6 +482,12 @@ pre code {
 /* ================================
    TAGS
 ================================ */
+/* A Tag is always a real link (never plain text) to a filtered Archive
+   view — clicking "User Experience" navigates to
+   /archive.html?tag=user-experience. Used on cards and entry pages to
+   label what an entry is about. Not the same component as Tag-Chip
+   below, which looks similar but toggles a filter in place rather than
+   navigating anywhere — see COMPONENTS.md §2 vs §2b for the distinction. */
 .tag {
     display: inline-flex;
     align-items: center;
@@ -439,6 +523,13 @@ pre code {
 /* ================================
    TAG-CHIP
 ================================ */
+/* Tag-Chip looks like Tag above but behaves differently: it's a button,
+   not a link, and clicking it toggles a filter on the Archive page in
+   place (no navigation, no page reload) rather than jumping to a
+   filtered view. Used only inside the Archive's filter controls
+   (inline chips row and the Filter Drawer). The --active/--dim modifier
+   classes below reflect whether this specific filter is currently on,
+   off, or available-but-shadowed by another active filter. */
 .tag-chip {
     display: inline-flex;
     align-items: center;
@@ -522,6 +613,10 @@ pre code {
 /* ================================
    BUTTON
 ================================ */
+/* Base button style — filled background, used for primary actions
+   (Share, View Resume). .btn--ghost below is the outline-only variant
+   for secondary actions; .btn--cta and .share-btn further down are
+   small visual variants of the same base, not separate components. */
 .btn {
     --btn-bg:             var(--color-background-subtle);
     --btn-bg-hover:       var(--color-border-strong);
@@ -629,6 +724,11 @@ pre code {
 /* ================================
    TOOLTIP
 ================================ */
+/* Small hover/focus popup for supplementary context that's never
+   required to understand the page (if it were required, it'd be visible
+   text instead). Desktop only — the @media (hover: none) rule below
+   turns it off entirely on touch devices, since there's no reliable
+   "hover" gesture on a touchscreen for it to attach to. */
 .tooltip-wrapper {
     position: relative;
     display: inline-block;
@@ -667,6 +767,10 @@ pre code {
 /* ================================
    TOAST
 ================================ */
+/* Small temporary confirmation message (currently used for "URL copied
+   to clipboard!" after the Share button). Positioned fixed at the
+   bottom of the viewport, faded in/out — script.js shows it by toggling
+   .toast--visible and hides it again automatically after 2 seconds. */
 .toast {
     position: fixed;
     bottom: var(--space-8);
@@ -698,6 +802,9 @@ pre code {
 /* ================================
    BREADCRUMB
 ================================ */
+/* The "Work › Entry Title" trail at the top of every Work/Thoughts
+   entry page, showing where the current page sits in the site
+   structure and offering a link back up one level. */
 .breadcrumb {
     margin-bottom: var(--space-6);
 }
@@ -738,6 +845,13 @@ pre code {
 
 /* ================================
    CARD
+   The clickable preview tile used for both Work and Thought entries on
+   Home and the Archive — image (Work only) + title + tags + date +
+   excerpt + a "View"/"Read" link. The whole card is clickable via
+   .card-block-link below (an invisible full-card overlay for mouse
+   users); .link-cta further down is the one real, visible,
+   keyboard-focusable link inside it. See COMPONENTS.md §3 for the full
+   anatomy and why the card is split into these two separate links.
 ================================ */
 .card {
     --card-bg:              var(--color-background-surface);
@@ -1028,6 +1142,11 @@ pre code {
 /* ================================
    PAGE GRID
 ================================ */
+/* The single-column layout wrapper for Home's page sections (Featured
+   Work, Thoughts, Nice Words, Contact) — centres content, caps it at
+   --max-content width, and adds consistent vertical gaps between
+   sections. .card-row/.card-row--two below control how many columns
+   of cards appear within one of those sections. */
 .page-grid {
     width: 100%;
     max-width: var(--max-content);
@@ -1083,6 +1202,11 @@ pre code {
     margin-top: var(--space-4);
 }
 
+/* HOME HERO
+   The full-width introduction block at the top of the Home page — page
+   title (H1), one-line role summary, and a scroll-down chevron. No
+   photo (removed 2026-09-10, see .home-hero-icons[hidden] below) — just
+   text, centred. */
 /* ================================
    HOME HERO
    Desktop/tablet: natural height, --space-24 vertical padding (one
@@ -1216,6 +1340,9 @@ pre code {
 /* ================================
    CONTACT BUTTONS (Home)
 ================================ */
+/* The row of "About / Email / LinkedIn" icon buttons under the "Want to
+   work together?" heading, reused identically at the bottom of every
+   page (Home, About, and every entry's footer). */
 .contact-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -1285,6 +1412,10 @@ pre code {
 /* ================================
    BACK TO TOP
 ================================ */
+/* Floating-style button that appears after the user scrolls 400px down
+   any page (see initBackToTop() in script.js) and smooth-scrolls back
+   to the top when clicked. Starts invisible (opacity/visibility: 0) —
+   .back-to-top--visible is what script.js toggles on scroll. */
 .back-to-top {
     display: inline-flex;
     align-items: center;
@@ -1325,6 +1456,12 @@ pre code {
 /* ================================
    MOBILE TAB BAR
 ================================ */
+/* Replaces the desktop header nav entirely on mobile (<768px) — a
+   fixed row of Home/Archive/About links pinned to the top of the
+   screen instead of a hamburger menu, so primary navigation is always
+   one tap away without an extra open/close step. Hidden outright on
+   tablet/desktop; see NAVIGATION below for the header shown there
+   instead. */
 .tab-bar {
     display: none;
 }
@@ -1352,6 +1489,11 @@ pre code {
 
 /* ================================
    NAVIGATION
+   The sticky top header shown on tablet and desktop (replaced by the
+   Mobile Tab Bar above on phones) — site name/logo plus Home/Archive/
+   About links. Injected into the page from nav.html by script.js's
+   loadComponent(), not written directly into each page's HTML, so
+   there's one nav to update instead of one per page.
 ================================ */
 /* Fixes position: sticky silently failing on <header> below — confirmed via
    testing, not assumed. #nav-placeholder is a plain block div injected by
@@ -1505,6 +1647,11 @@ header {
 /* ================================
    FOOTER
 ================================ */
+/* The "© Christopher Klein" credit line shown at the bottom of every
+   page on tablet/desktop, hidden on mobile (see MOBILE section) since
+   the Tab Bar already occupies that screen real estate. Injected from
+   footer.html by script.js the same way nav.html is — see NAVIGATION
+   above. */
 footer {
     border-top: var(--border-width-thin) solid var(--color-border-default);
     padding: var(--space-8) 0;
@@ -1519,6 +1666,11 @@ footer p {
 
 /* ================================
    STANDARD PAGE
+   The shared template every Work and Thoughts entry uses: breadcrumb,
+   banner image, title, tag/detail row, then free-form body content,
+   then a footer with Share/More-entries actions and the site's contact
+   section. One template, reused for every entry rather than one-off
+   markup per page — see COMPONENTS.md §14 for the full anatomy.
 ================================ */
 .standard-page {
     width: 100%;
@@ -2462,6 +2614,10 @@ footer p {
 /* ================================
    ABOUT PAGE
 ================================ */
+/* Styles specific to about.html only — portrait figure, employment
+   history list, skills tags. Shares its outer page structure
+   (.standard-page) with entry pages above, but everything in this
+   section is About-only content, not reused elsewhere. */
 .about-hero {
     text-align: center;
     padding: var(--space-12) 0 var(--space-8);
@@ -2785,6 +2941,10 @@ footer p {
 /* ================================
    ARCHIVE HEADER
 ================================ */
+/* The controls row at the top of the Archive page — currently just the
+   Filter Drawer's trigger button; search/sort live further down in
+   ARCHIVE PAGE below. See FILTER DRAWER immediately below for the full
+   filter panel these buttons open. */
 .archive-header {
     margin-bottom: var(--space-8);
 }
@@ -3375,6 +3535,10 @@ footer p {
 
 /* ================================
    ARCHIVE PAGE
+   Layout rules specific to archive.html: the collapsed/empty sticky
+   header (filtering now happens via the floating action rail, not an
+   inline header), the visually-hidden page title, and the entry-count/
+   sort row above the results grid.
 ================================ */
 /* No background/border at any breakpoint — blends into the page background,
    no divider anywhere. The floating action rail is the one persistent
@@ -3621,6 +3785,15 @@ footer p {
 
 /* ================================
    REDUCED MOTION
+   Sitewide commitment: if the visitor's OS is set to reduce motion,
+   every CSS transition and animation on the site collapses to
+   effectively instant (0.01ms — not 0, since some browsers ignore a
+   literal 0 duration) and smooth-scrolling turns off. This is what
+   REFERENCE.md §12 (Motion) and the 2026-09 accessibility audit verify
+   — confirmed working, not just declared, by checking computed styles
+   with and without this preference emulated. Covers CSS-driven motion
+   only; JS-driven motion (autoplaying video) has its own separate check
+   — see autoplayUnlessReducedMotion() in script.js.
 ================================ */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
