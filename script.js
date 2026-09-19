@@ -251,9 +251,7 @@ function getTocHeadings() {
 }
 
 // Builds one <li><a class="toc-rail-link"> per heading into `container`,
-// H3s getting the --sub indent modifier. Shared by the desktop rail and
-// the <1440px panel so the two never carry two different copies of this
-// markup-building logic — only their outer containers differ.
+// H3s getting the --sub indent modifier.
 function buildTocLinks(headings, container) {
     return headings.map(heading => {
         const item = document.createElement('li');
@@ -277,11 +275,11 @@ function buildTocLinks(headings, container) {
 // font-family: inherit and cursor: pointer added to .toc-rail-link itself
 // (style.css) — harmless for the existing <a> rows, which already got
 // both for free from the browser. Deliberately NOT built by
-// buildTocLinks() and NOT added to the railLinks/panelLinks arrays
-// updateActiveState() tracks: those arrays are exactly what drives both
+// buildTocLinks() and NOT added to the panelLinks array
+// updateActiveState() tracks: that array is exactly what drives both
 // the active-heading toggle (matched by href, which this button has none
 // of) and the badge's total count (headings.length, untouched) — keeping
-// this row out of them is what makes "never active, never counted"
+// this row out of it is what makes "never active, never counted"
 // automatic rather than a special case to maintain. aria-label matches
 // .back-to-top's own exact wording (initBackToTop() above) so both routes
 // to the same action announce identically, distinct from a real heading
@@ -299,16 +297,12 @@ function buildBackToTopRow(container) {
     return button;
 }
 
-// Desktop rail (CSS shows it only at >=1440px) plus the <1440px trigger +
-// anchored panel (Prompt B) — built together from one shared heading list
-// and one shared scrollspy pass, so current-heading tracking never runs
-// twice or drifts between the two surfaces. Nothing here is gated behind
-// viewport width in JS: both surfaces are always built and scrollspy
-// always runs; CSS alone decides which surface is actually visible at a
-// given width (mirror-image display:none/block pairs — see style.css),
-// so the position badge can read live state even when the rail itself is
-// hidden. Inserted right after the skip link so both are reachable early
-// in tab order, not after the whole page's content.
+// Trigger + anchored panel, now the only ToC surface at every breakpoint
+// (the earlier always-visible desktop rail was removed 2026-09-18 — see
+// md/REFERENCE.md §14 — after it was found to overlap the entry's own
+// <h1>/body copy at desktop widths with no reserved gutter). Inserted
+// right after the skip link so both are reachable early in tab order,
+// not after the whole page's content.
 function initTocRail() {
     const headings = getTocHeadings();
     if (!headings.length) return;
@@ -316,10 +310,8 @@ function initTocRail() {
     const main = document.getElementById('main-content');
 
     // A keyboard user tabbing from the top of the page otherwise has to
-    // pass through every heading link in the rail/panel (both always
-    // built here, just CSS-hidden depending on breakpoint — see the
-    // comment on this function) before ever reaching real page content,
-    // since both surfaces are inserted right before <main> (below).
+    // pass through every heading link in the panel (inserted right before
+    // <main>, below) before ever reaching real page content.
     // This link — reusing the sitewide .skip-link pattern verbatim
     // (style.css, "ACCESSIBILITY UTILITIES"), not a new one — jumps past
     // that list straight to headings[0]: the first heading the ToC itself
@@ -335,15 +327,10 @@ function initTocRail() {
     tocSkipLink.href = `#${headings[0].id}`;
     tocSkipLink.textContent = 'Skip Table of Contents';
 
-    // --- Desktop rail (>=1440px) ---------------------------------------
-    const rail = document.createElement('nav');
-    rail.className = 'toc-rail';
-    rail.setAttribute('aria-label', 'Table of contents');
-
-    // Shared by both .toc-panel-label instances below (this rail's own and
-    // the <1440px panel's, further down) — same content.svg icon as the
-    // trigger button above, decorative (the adjacent text already carries
-    // the label, doubly so once aria-hidden is set on the whole <p> below).
+    // content.svg icon markup, shared by the trigger button below and the
+    // panel's own label further down — decorative (the adjacent text
+    // already carries the label, doubly so once aria-hidden is set on the
+    // label <p> below).
     const TOC_LABEL_ICON_HTML =
         '<svg class="toc-panel-label-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
         '<g opacity="0.9">' +
@@ -355,127 +342,17 @@ function initTocRail() {
         '<path d="M22 8H8V4H22V8Z" fill="currentColor"/>' +
         '</g></svg>';
 
-    // Reuses .toc-panel-label verbatim (Rule 3a) — same class the </1440px
-    // panel's own label already uses, same reasoning for aria-hidden
-    // (redundant with the <nav>'s own aria-label once announced as a
-    // landmark — visible for sighted users only), not a new parallel
-    // class for what's visually and semantically the same element.
-    const railLabel = document.createElement('p');
-    railLabel.className = 'toc-panel-label';
-    railLabel.textContent = 'Table of Contents';
-    railLabel.setAttribute('aria-hidden', 'true');
-    railLabel.insertAdjacentHTML('afterbegin', TOC_LABEL_ICON_HTML);
-
-    const railList = document.createElement('ul');
-    railList.className = 'toc-rail-list';
-    buildBackToTopRow(railList);
-    const railLinks = buildTocLinks(headings, railList);
-    rail.append(railLabel, railList);
-    document.body.insertBefore(rail, main);
-    document.body.insertBefore(tocSkipLink, rail);
-
-    // Anchors the rail's fixed top offset to .breadcrumb's real top edge —
-    // flush, no gap, per Chris's decision that the rail should line up
-    // with the breadcrumb row rather than sit lower next to body copy
-    // (previously anchored to .standard-page-banner's bottom edge + a
-    // --space-8 gap instead; moved up by roughly a banner's height plus
-    // that gap as a result). The breadcrumb is present on every entry
-    // (unlike the banner, which some earlier code here defended against
-    // missing) and its own top position doesn't depend on anything below
-    // it either, so this still lands on the same pixel across entries at
-    // a given width. Recomputed on resize (nav height and .standard-page's
-    // own layout are stable across scroll, but not necessarily across a
-    // resize-driven reflow); not on scroll — this sets a fixed starting
-    // point, it doesn't track the breadcrumb as the page scrolls (the
-    // rail is position: fixed and stays put once positioned, same as
-    // before this change). If an entry has no breadcrumb, --toc-rail-top
-    // is simply never set and CSS's own var(--toc-rail-top, <fallback>)
-    // takes over — that fallback (--space-16 + --space-8, the sticky
-    // nav's own height plus main's own padding-top) already approximates
-    // the breadcrumb's real pre-JS position, confirmed by direct
-    // measurement, so it needed no change alongside this anchor swap.
-    function updateRailTop() {
-        const breadcrumb = document.querySelector('.breadcrumb');
-        if (!breadcrumb) return;
-        const top = breadcrumb.getBoundingClientRect().top + window.scrollY;
-        rail.style.setProperty('--toc-rail-top', `${top}px`);
-    }
-
-    // Anchors the rail's left edge to .standard-page-content's real
-    // rendered right edge (this is position: fixed, so a viewport-relative
-    // rect needs no scrollY correction the way updateRailTop()'s vertical
-    // measurement does — horizontal position doesn't move on vertical
-    // scroll). Replaces a pure-CSS `50% + 32.5ch` estimate that depended
-    // on 'ch' resolving against whichever font is active when the browser
-    // evaluates it — this entry's font (Noto Sans, loaded async via
-    // display: swap) briefly isn't, and real iPad landscape testing showed
-    // the rail collapse to a near-unusable width even though re-deriving
-    // the same arithmetic against this browser's own metrics at matching
-    // viewports never reproduced a collapse — font-metric drift between
-    // the fallback and loaded font, not the formula's arithmetic, is the
-    // most likely cause. Measuring the column's actual box sidesteps that
-    // dependency entirely. Recomputed on resize (the column's fixed 65ch
-    // width means its centred right edge still shifts as the viewport
-    // widens) and once fonts finish loading, since a font swap can change
-    // the column's own rendered width (also 'ch'-based) after this first
-    // runs.
-    // Gap widened from --space-6 (24px) to --space-16 (64px) per Chris's
-    // decision to move the rail noticeably further right, closer to the
-    // viewport edge — same "measure the real content-column edge, add a
-    // token gap" mechanism as before, just a larger token on it, not a
-    // switch to a viewport-relative (e.g. --max-content-based) position.
-    function updateRailLeft() {
-        const content = document.querySelector('.standard-page-content');
-        if (!content) return;
-        const gap = parseFloat(getComputedStyle(rail).getPropertyValue('--space-16'));
-        const left = content.getBoundingClientRect().right + gap;
-        rail.style.setProperty('--toc-rail-left', `${left}px`);
-    }
-
-    updateRailTop();
-    updateRailLeft();
-    window.addEventListener('resize', updateRailTop);
-    window.addEventListener('resize', updateRailLeft);
-    // Only --toc-rail-left, not --toc-rail-top, needs a font-load re-run:
-    // the banner's height (top's own basis) comes from aspect-ratio and
-    // viewport width alone, not font metrics — see updateRailTop()'s own
-    // comment — but .standard-page-content's rendered width is 'ch'-based,
-    // so its right edge can still shift once the swap completes.
-    //
-    // Two separate Font Loading API signals, not just `.ready` — real
-    // iPad testing found the rail's width still changing well after
-    // load, specifically the first time the user scrolled, which doesn't
-    // fit a value that's simply wrong-once-then-static; `.ready` is
-    // documented as unreliable on WebKit (can resolve before the visual
-    // swap actually commits), which would explain a stale measurement
-    // surviving past that promise resolving — the eventual correction
-    // then only ever arriving via the *next* thing that happens to fire
-    // a 'resize' event, which on iOS/iPadOS Safari includes the dynamic
-    // toolbar collapsing on first scroll. Not confirmed on a real device
-    // in this environment (Playwright here has no WebKit engine — see
-    // memory), so this is a defensive hardening against a plausible,
-    // well-documented failure mode, not a guaranteed fix: 'loadingdone'
-    // is a second, independently-implemented Font Loading API signal
-    // that doesn't share `.ready`'s specific quirk, fired every time a
-    // batch of font loads completes — calling updateRailLeft() again
-    // here is a harmless no-op once metrics are already correct.
-    if (document.fonts) {
-        if (document.fonts.ready) document.fonts.ready.then(updateRailLeft);
-        document.fonts.addEventListener('loadingdone', updateRailLeft);
-    }
-
-    // --- <1440px trigger + anchored panel (Prompt B) --------------------
+    // --- Trigger + anchored panel (all breakpoints) ----------------------
     // Trigger reuses .action-rail-group/.action-rail-trigger/
     // .action-rail-badge verbatim (Rule 3a) — same position, shape and
     // badge treatment as Archive's Filter trigger. The two never coexist
     // on the same page (Filter trigger only exists on archive.html, this
     // only on Standard Page entries), so sharing the literal classes
-    // carries no collision risk. .toc-trigger-group is an additional
-    // class, not a replacement — it only overrides display (see
-    // style.css) to invert the breakpoint versus Archive's own always-
-    // visible use of the same base classes; show/hide *within* that range
-    // is scroll-threshold driven (matching .back-to-top's own mechanism,
-    // via .action-rail-group--visible, the same modifier class Archive's
+    // carries no collision risk. .toc-trigger-group carries no display
+    // override of its own — .action-rail-group's own base display: flex
+    // (style.css) already applies unconditionally; show/hide is
+    // scroll-threshold driven (matching .back-to-top's own mechanism, via
+    // .action-rail-group--visible, the same modifier class Archive's
     // trigger already uses) rather than Archive's drawer-open-state
     // toggle, since this trigger has no drawer-open state of its own to
     // key off.
@@ -521,6 +398,7 @@ function initTocRail() {
     trigger.append(triggerLabel, badge);
     triggerGroup.appendChild(trigger);
     document.body.insertBefore(triggerGroup, main);
+    document.body.insertBefore(tocSkipLink, triggerGroup);
 
     // Same scroll-threshold value as .back-to-top's own (initBackToTop()
     // above) — not approximated.
@@ -528,13 +406,11 @@ function initTocRail() {
         triggerGroup.classList.toggle('action-rail-group--visible', window.scrollY > 400);
     }, { passive: true });
 
-    // Panel: <nav>, same landmark type and aria-label as the desktop rail
-    // (this is the same navigational content, just rendered differently
-    // per breakpoint) — not role="dialog": the Filter Drawer's own
-    // role="dialog" belongs to that specific full-screen sheet; this is a
-    // small anchored popover, same category of thing as the Desktop
-    // Filter Panel it's modelled on, which doesn't carry dialog semantics
-    // either.
+    // Panel: <nav>, aria-label matches the trigger's own accessible
+    // purpose — not role="dialog": the Filter Drawer's own role="dialog"
+    // belongs to that specific full-screen sheet; this is a small
+    // anchored popover, same category of thing as the Desktop Filter
+    // Panel it's modelled on, which doesn't carry dialog semantics either.
     //
     // Outside-close now matches the real Filter Drawer pattern exactly
     // (scrim + body-scroll-lock + inert), not the lighter document-click-
@@ -802,16 +678,14 @@ function initTocRail() {
         }
         const current = headings[currentIndex];
 
-        [railLinks, panelLinks].forEach(links => {
-            links.forEach(link => {
-                const isActive = link.getAttribute('href') === `#${current.id}`;
-                link.classList.toggle('toc-rail-link--active', isActive);
-                if (isActive) {
-                    link.setAttribute('aria-current', 'true');
-                } else {
-                    link.removeAttribute('aria-current');
-                }
-            });
+        panelLinks.forEach(link => {
+            const isActive = link.getAttribute('href') === `#${current.id}`;
+            link.classList.toggle('toc-rail-link--active', isActive);
+            if (isActive) {
+                link.setAttribute('aria-current', 'true');
+            } else {
+                link.removeAttribute('aria-current');
+            }
         });
 
         badge.textContent = `${currentIndex + 1}/${headings.length}`;
@@ -2076,17 +1950,13 @@ function initImageViewer() {
         window.scrollTo({ top: savedScrollY, left: 0, behavior: 'instant' });
     }
 
-    // Elements to inert while the viewer is open. Unlike getTocInertTargets()
-    // above, this must inert .toc-rail explicitly: the ToC Panel only ever
-    // opens at breakpoints where the rail is already display: none (CSS
-    // gate, <1440px), but the image viewer opens at every breakpoint,
-    // including desktop (>=1440px) where .toc-rail is a real, visible
-    // sidebar of focusable links sitting outside #main-content.
+    // Elements to inert while the viewer is open — same list
+    // getTocInertTargets() above uses; .action-rail-group also covers the
+    // ToC trigger group here, same as it does there.
     function getInertTargets() {
         return [
             document.getElementById('nav-placeholder'),
             document.getElementById('main-content'),
-            document.querySelector('.toc-rail'),
             document.querySelector('.action-rail-group'),
             document.getElementById('theme-toggle'),
             document.querySelector('.toast'),

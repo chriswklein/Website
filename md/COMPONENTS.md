@@ -1566,99 +1566,48 @@ split the row evenly, the same fix already used sitewide for the identical
 problem on `.filter-drawer-page-btn` (Previous/Next in the Filter Drawer —
 see `## 2c. Filter Drawer`).
 
-### Table of Contents — Desktop Rail
+### Table of Contents — Trigger & Panel
 
-**CSS Classes:** `.toc-rail` (nav), `.toc-rail-list` (ul), `.toc-rail-link`
-(row — shared with the panel and with the Back to Top row), `.toc-rail-item--sub`
-(H3 indent), `.toc-rail-link--active` (current heading)
+**Removed 2026-09-18:** an earlier always-visible Desktop rail
+(`.toc-rail`, `min-width: 1440px`) shipped 2026-08-23 stood alongside
+this trigger + panel pattern, visible on Desktop only. It had no
+reserved gutter in the content column and overlapped the entry's own
+`<h1>`/body copy at Desktop widths, so it was removed outright rather
+than fixed in place — this trigger + panel pattern (previously scoped to
+`max-width: 1439px`, i.e. every real iPad width in both orientations plus
+phone) now applies unconditionally at every breakpoint, Desktop included,
+unchanged from how it already behaved below 1440px. See
+md/REFERENCE.md §14 changelog for the full decision log.
 
-Built entirely by `initTocRail()` in script.js on any entry with
-`.standard-page-content` — no hand-authored markup lives in any entry's
-HTML. Visible at `min-width: 1440px` — deliberately narrower than this
-site's usual 1024px desktop floor: Chris decided no real iPad width or
-orientation (including the 1366px-wide 12.9" Pro) should ever get the
-rail's permanently-docked treatment; the mobile/tablet panel below
-covers all of them instead.
+**CSS Classes:** `.action-rail-group.toc-trigger-group` (trigger's
+positioned wrapper), `.action-rail-trigger` (trigger button, `id="toc-trigger"`),
+`.action-rail-badge` (position count), `.toc-panel` (panel `<nav>`,
+`id="toc-panel"`), `.toc-panel-label`, `.toc-panel-list`, `.toc-panel-scrim`,
+`.toc-rail-link` (row — shared with the Back to Top row), `.toc-rail-item--sub`
+(H3 indent), `.toc-rail-link--active` (current heading) — the `.toc-rail-*`
+naming on these three predates the rail's removal and is kept as-is
+(Rule 3a: the classes themselves were never rail-specific markup, just a
+shared naming prefix), not renamed as part of this change.
 
-**Positioning, both axes measured from the real DOM, not derived:**
-- `top` (`--toc-rail-top`, set by `updateRailTop()`): `.standard-page-banner`'s
-  real bottom edge + `--space-8` gap, recomputed on resize only — not
-  scroll, this is a fixed starting point. Falls back to
-  `calc(--space-16 + --space-8)` pre-JS or on a bannerless entry.
-- `left` (`--toc-rail-left`, set by `updateRailLeft()`): `.standard-page-content`'s
-  real rendered right edge + `--space-6` gap, recomputed on resize and
-  again once `document.fonts.ready` resolves and on every
-  `document.fonts` `loadingdone` event (two separate Font Loading API
-  signals, not just one — `.ready` is documented as unreliable on
-  WebKit, resolving before the visual font swap actually commits, which
-  real iPad testing traced as the cause of the rail's width still
-  visibly changing after load). Falls back to `calc(50% + 32.5ch + --space-6)`
-  pre-JS only.
-- `width`: `min(--toc-rail-width` (`240px`) `, calc(100vw - --toc-rail-left - --space-6))`
-  — the clamp no longer binds at any width the rail actually renders at
-  today (confirmed 240px unclamped from 1440px up), kept as a safety net
-  for a narrower future floor.
-
-**Height-cap, scroll, overflow:** `.toc-rail` itself is a flex column with
-`max-height: calc(100vh - --toc-rail-top - --space-16)`; `.toc-rail-list`
-is `flex: 1 1 auto; min-height: 0; overflow-y: auto` (standard
-flex-scroll-child pattern) so the list — not the whole card — scrolls
-once content exceeds the cap. Overflow deliberately clips the next row
-mid-item (no fade/gradient) so it reads as "there's more, scroll."
-Scrollbar is restyled, not left at browser default: `scrollbar-width: thin`
-/ `scrollbar-color` (Firefox) plus `::-webkit-scrollbar*` rules (Chrome/
-Edge/Safari) — thumb `--color-border-strong`, track
-`--color-background-subtle`, both shared with the mobile/tablet panel's
-own scrollbar (same selectors, comma-joined in the real CSS, not a
-duplicated second set).
-
-**Anatomy:** `.toc-rail-list` contains one Back to Top row first
+**Anatomy:** `.toc-panel-list` contains one Back to Top row first
 (`buildBackToTopRow()` — see below), then one `<li><a class="toc-rail-link">`
 per heading in document order (H3s additionally get `.toc-rail-item--sub`
 for indent).
 
-**Scrollspy:** shared with the mobile/tablet panel — one pass,
-`updateActiveState()`, tracks scroll position directly against each
-heading's own computed `scroll-margin-top` (not `IntersectionObserver`).
-An `atBottom` special case forces the last heading active once the page
-is genuinely scrolled to its true bottom: every entry's shared footer
-block (Share/More Work, contact, Back to Top, copyright) below the final
-heading is shorter than a typical viewport, so that heading's own
-threshold-crossing check is otherwise unreachable at any scroll
-position.
+**Scrollspy:** `updateActiveState()` tracks scroll position directly
+against each heading's own computed `scroll-margin-top` (not
+`IntersectionObserver`). An `atBottom` special case forces the last
+heading active once the page is genuinely scrolled to its true bottom:
+every entry's shared footer block (Share/More Work, contact, Back to
+Top, copyright) below the final heading is shorter than a typical
+viewport, so that heading's own threshold-crossing check is otherwise
+unreachable at any scroll position.
 
 **Active/inactive styling:** inactive rows reuse `.action-rail-trigger`/
 `.filter-drawer-page-btn`'s shared traits (font-size-sm, border-strong,
 subtle background) rather than a parallel style; the active row reuses
 `.tag-chip--active`'s exact treatment verbatim, including the
 text-shadow "faux bold" neither class sets `font-weight` for.
-
-**Back to Top row:** `buildBackToTopRow()` builds a
-`<button class="toc-rail-link" aria-label="Back to top">` — a button,
-not an `<a>`, since there's no `#heading` to link to. Deliberately built
-outside `buildTocLinks()` and never added to the `railLinks`/`panelLinks`
-arrays `updateActiveState()` tracks, which is what makes "never active,
-never counted" automatic rather than a special case: the active-toggle
-loop only touches those arrays (and this button has no `href` to match
-in the first place), and the badge's `headings.length` denominator never
-includes it. Click calls the same `scrollToTop()` function `.back-to-top`
-itself uses (§12) — one implementation shared by both this row and the
-panel's own copy, not a separately-implemented scroll.
-
-Below 1440px, the trigger and panel (below) are hidden unconditionally
-via CSS — a hard gate independent of JS state, so the rail can never
-render at a width it isn't meant to even if script state were ever wrong.
-
-### Table of Contents — Mobile/Tablet Trigger & Panel
-
-**CSS Classes:** `.action-rail-group.toc-trigger-group` (trigger's
-positioned wrapper), `.action-rail-trigger` (trigger button, `id="toc-trigger"`),
-`.action-rail-badge` (position count), `.toc-panel` (panel `<nav>`,
-`id="toc-panel"`), `.toc-panel-label`, `.toc-panel-list`, `.toc-panel-scrim`
-
-Visible at `max-width: 1439px` — the exact complement of the rail's own
-`min-width: 1440px`, so the two surfaces never coexist. Covers every real
-iPad width in both orientations (1024–1366px), not just phone.
 
 **Trigger:** reuses `.action-rail-group`/`.action-rail-trigger`/
 `.action-rail-badge` verbatim from Archive's own Filter trigger (Rule
@@ -1682,34 +1631,27 @@ would otherwise reintroduce a keyboard-accessibility regression.
 **Panel positioning:** `position: fixed`, anchored bottom-right to the
 trigger's own resting position — `right: max(--space-6, (100vw - --max-content)/4)`
 (same formula the Desktop Filter Panel uses), `width: var(--toc-rail-width)`
-(`240px`, the same token the rail uses), `max-width: calc(100vw - --space-8 * 2)`.
-`bottom` is tiered: `calc(50vh - --touch-target-minimum/2)` at this
-breakpoint's own ≤1439px floor, narrowing to `calc(30vh - --touch-target-minimum/2)`
-at a separate, narrower `max-width: 767px` tier nested inside it — this
-inner bottom-anchor tiering did **not** move when the outer rail/panel
-boundary shifted from 1024px to 1440px; it's still keyed to 767px,
-confirmed by direct read rather than assumed.
+(`240px`), `max-width: calc(100vw - --space-8 * 2)`. Applies at every
+breakpoint, unconditionally. `bottom` is tiered: `calc(50vh - --touch-target-minimum/2)`
+by default, narrowing to `calc(30vh - --touch-target-minimum/2)` at a
+separate, narrower `max-width: 767px` tier nested inside it — this inner
+bottom-anchor tiering is unaffected by the outer rail's removal (2026-09-18);
+it's still keyed to 767px, confirmed by direct read rather than assumed.
 
-**Height-cap, scroll, overflow:** unlike the rail, `.toc-panel` (the
-outer `<nav>`) is itself the scroll container — there's no separate
-inner scrolling list; `.toc-panel-list` is layout-only, no chrome or
-scroll properties of its own. `max-height` is tiered the same way
-`bottom` is: `calc(50vh - 64px - --space-6 + --touch-target-minimum/2)`
-at the wider tier, `calc(70vh - 64px - --space-6 + --touch-target-minimum/2)`
-at the ≤767px tier (`64px` = the fixed header/tab-bar height reserved
-so the panel can never draw over it). `overflow-y: auto` plus the same
-restyled-scrollbar treatment the rail's own list uses — same
-`::-webkit-scrollbar*` selectors (shared, not duplicated) and its own
-`scrollbar-width: thin` / `scrollbar-color` declaration (Firefox scrollbar
-properties can't be shared via `::-webkit` pseudo-elements, so each
-scrollable element declares them, with identical values).
+**Height-cap, scroll, overflow:** `.toc-panel` (the outer `<nav>`) is
+itself the scroll container — there's no separate inner scrolling list;
+`.toc-panel-list` is layout-only, no chrome or scroll properties of its
+own. `overflow-y: auto` plus a restyled scrollbar: `::-webkit-scrollbar*`
+selectors (Chrome/Edge/Safari) and its own `scrollbar-width: thin` /
+`scrollbar-color` declaration (Firefox).
+
+**`max-height` clamp (revised 2026-09-19):** `max-height: min(clamp(--toc-panel-height-min, Nvh, --toc-panel-height-max), <header-safety calc()>)` at both tiers — `N` is `46vh` at the wider (≥768px width) tier, `60vh` at the ≤767px tier. The `<header-safety calc()>` is the same formula this shipped with (`calc(50vh - 64px - --space-6 + --touch-target-minimum/2)` wide tier, `70vh` in place of `50vh` at ≤767px; `64px` reserves the fixed header/tab-bar height so the panel can never draw over it) — investigated fresh before changing anything and confirmed this was already `vh`-relative, not a fixed px value, despite how an earlier prompt framed the problem. `--toc-panel-height-min`/`-max` (`:root`, `320px`/`768px`) are derived from `--space-32` (`calc(--space-32 * 2.5)` / `calc(--space-32 * 6)`, Rule 3a) rather than arbitrary numbers. `min()` — not `clamp()` alone — combines the two: at ordinary desktop/tablet/phone heights the header-safety `calc()` is almost always the smaller, still-binding value (unchanged behavior, confirmed via direct measurement: 384px at 1600×900, 484px at 834×1100, ~506px at 390×844 — all identical to what the pre-2026-09-19 formula alone produced), so `clamp()`'s own bounds mostly document intent rather than actively resizing anything day to day. Only past a large/4K-class viewport height does the `calc()` side's unbounded `vh` growth exceed `--toc-panel-height-max`, and `min()` picks the smaller, capped clamp value instead (confirmed 768px, not the `calc()` side's ~1014px, at 3840×2160) — modest per spec ("without trying to fill most of the available vertical space"), while still meaningfully taller than the panel's ordinary-desktop size, per the spec's own complaint that the old unbounded-but-untested large-display behavior read as disproportionate. `clamp()` alone (without the `min()` safety wrap) was rejected: its own floor would force the panel taller than the `calc()`'s real safe headroom on a short or resized window, overlapping the header — confirmed by direct arithmetic, not assumed.
 
 **Scrim:** `.toc-panel-scrim` is a real click-catching element
 (`pointer-events: auto` only while `--open`), not a document-click
 listener — a background click can never both close the panel and
-activate whatever's underneath it. `display: none` unconditionally
-above 1439px, independent of JS state — the same belt-and-suspenders
-pattern the panel itself uses.
+activate whatever's underneath it. Applies unconditionally at every
+breakpoint, same as the panel itself.
 
 **`inert`:** `getTocInertTargets()` returns `#nav-placeholder`,
 `#main-content`, `.toast`, `.tab-bar`, `#footer-placeholder` — all get
@@ -1742,10 +1684,16 @@ mechanism:
 3. **Selecting a row** — a real heading link or the Back to Top row, both sharing the `.toc-rail-link` class, so one generic click listener on `.toc-panel-list` closes on either without special-casing which was clicked. Closes without returning focus, since the row's own action (scroll, and for headings the browser's native fragment-focus) already moves focus meaningfully.
 4. **External scroll** (`handlePanelScroll()`) — closes the instant the underlying page scrolls more than a 2px tolerance from its position when the panel opened, so the trigger's own independent scroll-threshold listener never gets a chance to re-show it over a still-open panel. The listener is attached only while open (added in `openPanel()`, removed in `closePanel()`) and is bubble-phase only (no `capture`), confirmed via direct testing not to fire from the panel's own internal `overflow-y: auto` scrolling — element-level scroll events don't bubble to a bubble-phase `window` listener.
 
-**Back to Top row:** the same `buildBackToTopRow()` function the rail
-uses (Rule 3a — one implementation, not a parallel one for the panel),
-prepended as the panel's own first row ahead of the real headings.
-Selecting it both scrolls to the real top (the shared `scrollToTop()`
+**Back to Top row:** `buildBackToTopRow()` builds a
+`<button class="toc-rail-link" aria-label="Back to top">` — a button, not
+an `<a>`, since there's no `#heading` to link to. Deliberately built
+outside `buildTocLinks()` and never added to the `panelLinks` array
+`updateActiveState()` tracks, which is what makes "never active, never
+counted" automatic rather than a special case: the active-toggle loop
+only touches that array (and this button has no `href` to match in the
+first place), and the badge's `headings.length` denominator never
+includes it. Prepended as the panel's own first row ahead of the real
+headings. Selecting it both scrolls to the real top (the shared `scrollToTop()`
 function, §12) and closes the panel via the same generic
 `.toc-rail-link` click listener every other row uses — no separate close
 path written for it.
