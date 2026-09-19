@@ -130,24 +130,39 @@
     --max-content: 1200px;
     --card-image-column-width: 42%;
     --toc-rail-width: 240px;
-    /* ToC panel max-height clamp floor/ceiling (2026-09-19) — derived from
-       the largest spacing token (--space-32, 128px) rather than arbitrary
-       numbers (Rule 3a), not from --toc-rail-width (a width, unrelated
-       axis). min = 2.5x (320px) — a floor for the clamp() expression
-       itself; in practice the header-safety calc() this is min()'d
-       against (see .toc-panel's own max-height comment) is almost always
-       the smaller, binding value at ordinary/small viewport heights, so
-       this floor mostly documents intent rather than actively resizing
-       anything day to day. max = 6x (768px) — genuinely modest: well
-       under half of even a 4K-class 2160px-tall viewport, deliberately
-       short of "filling most of the available vertical space" per spec,
-       while still noticeably taller than the ~400–500px this panel
-       renders at on an ordinary 900–1200px-tall desktop window today —
-       so the panel reads as more generous specifically on the large
-       displays the spec calls out, without the old formula's unbounded
-       vh-only growth swinging past ~1000px on true 4K heights. */
+    /* ToC panel positioning (2026-09-19, revised): the panel used to be
+       anchored to the floating trigger's own fixed position (bottom-right
+       corner pinned to wherever .action-rail-group's top: 50%/70% put it),
+       which put a hard ceiling around 45–48% of viewport height on its
+       max-height regardless of how generous a vh percentage was used —
+       there was simply no more room than that between the header and the
+       trigger. Decoupled here: the panel now anchors directly below the
+       header/tab-bar instead, independent of the trigger entirely, so its
+       target height can reach the real 75–80% of viewport height the
+       current spec calls for. --toc-panel-top-offset reuses the same
+       64px literal every other fixed-chrome-height formula in this file
+       already treats as this site's header/tab-bar height (confirmed via
+       direct read of both `header` — sticky, tablet/desktop — and
+       `.tab-bar` — fixed, mobile — before changing anything: both render
+       at exactly 64px at the breakpoints where each is the visible one,
+       so one constant covers every tier, no per-breakpoint override
+       needed) plus --space-6 breathing room. This offset is a fixed
+       length, not a vh fraction, so top placement alone already
+       guarantees the panel can never overlap the header at any viewport
+       height — no trigger-relative arithmetic left to get that wrong.
+       --toc-panel-height-min/-max bound the target-height clamp (see
+       .toc-panel's own height comment) — derived from the largest
+       spacing token (--space-32, 128px) rather than arbitrary numbers
+       (Rule 3a): min = 2.5x (320px), a floor for short/resized windows;
+       max = 8x (1024px), generous enough that the clamp's own ~78vh
+       mid-point — not this ceiling — is what actually governs height at
+       every real viewport tested (2560×1300, 1920×1000, 834×1100,
+       390×844: all land at exactly 78% of their own height), while still
+       bounding growth on a hypothetically much taller window rather than
+       scaling unbounded. */
+    --toc-panel-top-offset: calc(64px + var(--space-6));
     --toc-panel-height-min: calc(var(--space-32) * 2.5);
-    --toc-panel-height-max: calc(var(--space-32) * 6);
+    --toc-panel-height-max: calc(var(--space-32) * 8);
 
     /* ---- Border Radius ---- */
     --border-radius-none: 0px;
@@ -2340,14 +2355,21 @@ footer p {
     display: block;
 }
 
-/* Anchor: bottom-right corner pinned to the trigger's own resting
-   position, same technique the Desktop Filter Panel already uses for
-   .filter-drawer (see DESKTOP (min-width: 1024px) — Filter Drawer
-   becomes an anchored panel, below) — right formula reused verbatim;
-   bottom derived the same way (trigger's vertical centre, offset by
-   half its own height): .action-rail-group sits at top: 50% by default
-   (overridden to 70% only at the 767px tier below), so bottom mirrors
-   the Filter Panel's own 50vh math exactly. Width reuses --toc-rail-width
+/* Anchor (revised 2026-09-19): position is now independent of the
+   trigger entirely — previously the bottom-right corner was pinned to
+   the trigger's own resting position (same technique the Desktop Filter
+   Panel still uses for .filter-drawer, see DESKTOP (min-width: 1024px)
+   — Filter Drawer becomes an anchored panel, below), which meant this
+   panel's max-height could never exceed roughly the gap between the
+   header and wherever .action-rail-group's top: 50%/70% happened to put
+   the trigger — a hard ceiling around 45–48% of viewport height no vh
+   percentage could get past. `top` now anchors a fixed offset
+   (--toc-panel-top-offset, :root) below the header/tab-bar instead, so
+   height is free to reach the real 75–80% target below regardless of
+   where the trigger sits. `right` is unchanged — it was never trigger-
+   derived to begin with, just the same formula the trigger's own
+   .action-rail-group happens to share (Rule 3a), coincidence not
+   coupling, so no reason to touch it. Width still reuses --toc-rail-width
    (this component's own width token) rather than a new value; max-width
    clamps it against a narrow phone viewport the same way the Filter
    Panel's own max-width does. */
@@ -2355,52 +2377,36 @@ footer p {
     position: fixed;
     z-index: 250;
     right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
-    bottom: calc(50vh - (var(--touch-target-minimum) / 2));
+    top: var(--toc-panel-top-offset);
     width: var(--toc-rail-width);
     max-width: calc(100vw - (var(--space-8) * 2));
-    /* max-height: NOT the Filter Panel's calc(100vh - (--space-8 * 2))
-       formula this shipped with (copied verbatim per Rule 3a) — that
-       value is only safe at the Filter Panel's own >=1024px breakpoint,
-       where the viewport is tall enough that content never actually
-       reaches the cap. This panel's anchor (bottom, above) sits at
-       50vh minus half the trigger's own height, so what's actually
-       free to grow into is just the gap between that bottom edge and
-       the fixed header's bottom (64px — same literal
-       .archive-sort-count-row already anchors to elsewhere), not the
-       full viewport. Left uncapped at the real anchor, the panel
-       overflowed off the top of the screen on shorter real-device
-       viewports (Safari's toolbar chrome shrinks the visible viewport
-       below the 100vh this was measured against) or, on taller ones,
-       grew tall enough to draw over the header instead of stopping
-       short of it — both confirmed via direct measurement at reduced
-       viewport heights, not assumed. --space-6 reuses the same
-       breathing-room token this panel's own `right` offset already
-       uses.
-       2026-09-19: wrapped in min() with a --toc-panel-height-min/-max
-       clamp (see :root). The calc() above already scales with vh (this
-       was never literally a fixed px value, confirmed via direct read
-       before changing anything), and at ordinary desktop heights
-       (900–1200px) it stays the binding, unchanged constraint here —
-       still a tight ~380–530px, same as before this change, since that's
-       real header-safety headroom, not something a clamp should widen.
-       What the plain calc() had no ceiling on was viewport height itself:
-       on a 4K-class ~2160px-tall display it would keep climbing toward
-       ~1000px+, "scaling with vh" but well past the modest, capped size
-       the spec calls for on large displays. clamp()'s own 46vh mid-point
-       roughly tracks the calc()'s ~50vh-minus-overhead shape at moderate
-       heights (so it rarely binds there — the calc() side still does),
-       then its --toc-panel-height-max ceiling (768px) takes over once
-       viewport height grows large enough to matter, capping growth well
-       short of "filling most of the available vertical space." clamp()
-       alone can't safely replace the calc(): its own min bound would
-       force the panel taller than the calc()'s safe headroom on a short
-       or resized window, overlapping the header. min() picks whichever
-       is smaller each time — the clamp's modest ceiling on generous
-       viewports, the calc()'s header-safe ceiling everywhere else — so
-       neither failure mode reappears. */
+    /* max-height (2026-09-19 follow-up — was briefly `height` earlier
+       today): a real `height` forced every panel to ~78vh regardless of
+       content, so a page with a short heading list rendered visible
+       empty space below its last row — not the intended "visible
+       presence that scales with viewport height," just a gap. `max-height`
+       keeps the exact same clamp/ceiling value and every property this
+       replaced (still governs at ~78vh on every ordinary viewport —
+       confirmed via direct measurement at all four verification sizes:
+       2560×1300, 1920×1000, 834×1100, 390×844), but now only acts as a
+       ceiling: a short list shrink-wraps to its own content, a long list
+       (confirmed via star-engine.html, ~20 headings) still caps at ~78vh
+       with internal scroll, unchanged from today's verified behavior.
+       min()'d against calc(100vh - top-offset - space-6) as a safety
+       ceiling: with `top` now a fixed length rather than a vh fraction,
+       this calc() alone is sufficient to guarantee no overlap with the
+       header/tab-bar and no overflow off the bottom of the viewport at
+       any height — simpler and more robust than the old trigger-relative
+       formula it replaces, which had to reason about vh fractions on
+       both the anchor and the cap. This calc() only binds on an
+       unusually short window (confirmed: at 1920×500 it narrowly wins
+       over the clamp, 388px vs 390px) or an unusually narrow-and-tall
+       one (confirmed: at 390×3000 the clamp's own --toc-panel-height-max
+       ceiling of 1024px binds well before this calc()'s ~2888px would)
+       — both correctly handled without overlapping anything. */
     max-height: min(
-        clamp(var(--toc-panel-height-min), 46vh, var(--toc-panel-height-max)),
-        calc(50vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2))
+        clamp(var(--toc-panel-height-min), 78vh, var(--toc-panel-height-max)),
+        calc(100vh - var(--toc-panel-top-offset) - var(--space-6))
     );
     overflow-y: auto;
     margin: 0;
@@ -2408,8 +2414,13 @@ footer p {
     background-color: var(--color-background-surface);
     border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--border-radius-md);
-    transform: translateY(var(--space-2)) scale(0.98);
-    transform-origin: bottom right;
+    /* translateY/transform-origin flipped to top (was bottom right) to
+       match the new top-anchored position — the panel now grows downward
+       from a fixed point below the header, so it enters by easing down
+       into place from slightly above, not up from below as it did when
+       anchored to the trigger's own bottom-right corner. */
+    transform: translateY(calc(-1 * var(--space-2))) scale(0.98);
+    transform-origin: top right;
     opacity: 0;
     transition: transform var(--duration-base) var(--ease-out),
                 opacity var(--duration-base) var(--ease-out);
@@ -2423,40 +2434,17 @@ footer p {
     box-shadow: var(--elevation-xl);
 }
 
-@media (max-width: 767px) {
-    /* .action-rail-group moves to top: 70% at this tier (see MOBILE
-       section, below) — bottom mirrors that same centre (100vh - 70vh =
-       30vh from the bottom) rather than the 50vh math above, so the panel
-       stays anchored to the trigger's real position instead of drifting
-       from it once the trigger itself moves. max-height mirrors the same
-       shift (70vh of headroom above the anchor instead of 50vh, same
-       header/space-6 reservation as the tier above — see that comment) so
-       the cap keeps tracking the anchor's real position at this tier too,
-       not the wider tier's now-stale one.
-       2026-09-19: same min()-wrapped clamp as the wider tier above (see
-       its own comment for the full rationale) — only the calc()'s 50vh
-       became 70vh here, matching this tier's own higher anchor/more
-       headroom. The clamp's min/max bounds (--toc-panel-height-min/-max)
-       are shared as-is, but its mid-point is a separate, higher 60vh
-       here (vs. 46vh on the wider tier) rather than reused verbatim: at
-       this tier's own real viewport heights (phones and small tablets,
-       roughly 650–950px) 60vh tracks the calc()'s existing ~70vh-minus-
-       overhead shape closely enough that the calc() side still does the
-       real, header-safety-critical work — a lower mid-point (e.g. the
-       wider tier's 46vh) would make the clamp itself the binding,
-       smaller value at these ordinary heights, quietly shrinking a
-       panel size real phones already relied on. The shared
-       --toc-panel-height-max ceiling only matters here for a viewport
-       taller than any real phone/tablet (an ultra-tall narrow window),
-       same modest-cap intent as the wider tier. */
-    .toc-panel {
-        bottom: calc(30vh - (var(--touch-target-minimum) / 2));
-        max-height: min(
-            clamp(var(--toc-panel-height-min), 60vh, var(--toc-panel-height-max)),
-            calc(70vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2))
-        );
-    }
-}
+/* Mobile <=767px "Open Item" (per spec) — investigated, no override
+   needed here: this tier used to retune bottom/max-height to track
+   .action-rail-group's own mobile-only top: 70% (vs. 50% wider), since
+   the panel's position and cap were both derived from the trigger back
+   then. Now that top/height above anchor to the header/tab-bar instead,
+   that dependency is gone — and the header/tab-bar height they anchor to
+   is the same 64px at this tier as every other (confirmed via direct
+   read: `.tab-bar` — the fixed top bar mobile shows in `header`'s place
+   — is height: 64px, identical to `header` itself at wider tiers). One
+   unconditional rule now correctly covers all three breakpoints; no
+   @media (max-width: 767px) block for .toc-panel is left to write. */
 
 /* display: flex (was block text) lays the new content.svg icon beside
    the text — script.js builds this class for the panel's own label. */

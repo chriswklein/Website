@@ -1628,15 +1628,38 @@ that disables the transition, add `--visible`, force a reflow, remove
 `visibility: hidden`-elements-silently-refuse-`.focus()` problem that
 would otherwise reintroduce a keyboard-accessibility regression.
 
-**Panel positioning:** `position: fixed`, anchored bottom-right to the
-trigger's own resting position — `right: max(--space-6, (100vw - --max-content)/4)`
-(same formula the Desktop Filter Panel uses), `width: var(--toc-rail-width)`
+**Panel positioning (revised 2026-09-19 — decoupled from the trigger):**
+`position: fixed`, `right: max(--space-6, (100vw - --max-content)/4)`
+(same formula the Desktop Filter Panel uses, and the trigger's own
+`.action-rail-group` — coincidentally shared, not derived from it),
+`top: var(--toc-panel-top-offset)` (`:root`; `calc(64px + --space-6)` —
+`64px` is this site's header/tab-bar height, confirmed via direct read of
+both `header` — sticky, tablet/desktop — and `.tab-bar` — fixed, mobile
+— before changing anything: both render at exactly 64px at their own
+visible breakpoints, so one constant covers every tier), `width: var(--toc-rail-width)`
 (`240px`), `max-width: calc(100vw - --space-8 * 2)`. Applies at every
-breakpoint, unconditionally. `bottom` is tiered: `calc(50vh - --touch-target-minimum/2)`
-by default, narrowing to `calc(30vh - --touch-target-minimum/2)` at a
-separate, narrower `max-width: 767px` tier nested inside it — this inner
-bottom-anchor tiering is unaffected by the outer rail's removal (2026-09-18);
-it's still keyed to 767px, confirmed by direct read rather than assumed.
+breakpoint, unconditionally — no per-tier override.
+
+Previously `bottom`-anchored to the trigger's own resting position
+(mirroring `.action-rail-group`'s `top: 50%`/`70%`), which meant the
+panel's growable space topped out around 45–48% of viewport height no
+matter what percentage its `max-height` used — there was never more room
+than the gap between the header and wherever the trigger sat. `top` now
+anchors a fixed length below the header instead, entirely independent of
+the trigger's own position, freeing height to reach the real 75–80%
+target below. `transform-origin` flipped from `bottom right` to
+`top right` to match (the panel now opens by easing down into place from
+a fixed point below the header, not up from the trigger's own corner).
+
+**Mobile `<=767px` tier — investigated, no override needed:** the old
+`bottom`-anchored design needed a separate `max-width: 767px` override to
+retune its cap for `.action-rail-group`'s own mobile-only `top: 70%`
+(vs. `50%` wider). That dependency is gone now that position anchors to
+the header/tab-bar instead of the trigger, and the header/tab-bar height
+those anchor to is identical (`64px`) at every tier — confirmed via
+direct read, not assumed. One unconditional rule now correctly covers
+mobile, tablet, and desktop; no `.toc-panel`-specific media query
+remains.
 
 **Height-cap, scroll, overflow:** `.toc-panel` (the outer `<nav>`) is
 itself the scroll container — there's no separate inner scrolling list;
@@ -1645,7 +1668,34 @@ own. `overflow-y: auto` plus a restyled scrollbar: `::-webkit-scrollbar*`
 selectors (Chrome/Edge/Safari) and its own `scrollbar-width: thin` /
 `scrollbar-color` declaration (Firefox).
 
-**`max-height` clamp (revised 2026-09-19):** `max-height: min(clamp(--toc-panel-height-min, Nvh, --toc-panel-height-max), <header-safety calc()>)` at both tiers — `N` is `46vh` at the wider (≥768px width) tier, `60vh` at the ≤767px tier. The `<header-safety calc()>` is the same formula this shipped with (`calc(50vh - 64px - --space-6 + --touch-target-minimum/2)` wide tier, `70vh` in place of `50vh` at ≤767px; `64px` reserves the fixed header/tab-bar height so the panel can never draw over it) — investigated fresh before changing anything and confirmed this was already `vh`-relative, not a fixed px value, despite how an earlier prompt framed the problem. `--toc-panel-height-min`/`-max` (`:root`, `320px`/`768px`) are derived from `--space-32` (`calc(--space-32 * 2.5)` / `calc(--space-32 * 6)`, Rule 3a) rather than arbitrary numbers. `min()` — not `clamp()` alone — combines the two: at ordinary desktop/tablet/phone heights the header-safety `calc()` is almost always the smaller, still-binding value (unchanged behavior, confirmed via direct measurement: 384px at 1600×900, 484px at 834×1100, ~506px at 390×844 — all identical to what the pre-2026-09-19 formula alone produced), so `clamp()`'s own bounds mostly document intent rather than actively resizing anything day to day. Only past a large/4K-class viewport height does the `calc()` side's unbounded `vh` growth exceed `--toc-panel-height-max`, and `min()` picks the smaller, capped clamp value instead (confirmed 768px, not the `calc()` side's ~1014px, at 3840×2160) — modest per spec ("without trying to fill most of the available vertical space"), while still meaningfully taller than the panel's ordinary-desktop size, per the spec's own complaint that the old unbounded-but-untested large-display behavior read as disproportionate. `clamp()` alone (without the `min()` safety wrap) was rejected: its own floor would force the panel taller than the `calc()`'s real safe headroom on a short or resized window, overlapping the header — confirmed by direct arithmetic, not assumed.
+**`max-height` clamp (revised 2026-09-19, twice — see both entries in
+REFERENCE.md §14):** `max-height: min(clamp(--toc-panel-height-min, 78vh, --toc-panel-height-max), calc(100vh - --toc-panel-top-offset - --space-6))`.
+Briefly shipped as `height` (not `max-height`) the same day, on the
+reasoning that the spec's real ~75–80% target called for a presence size
+rather than a shrink-to-content ceiling — but a real `height` forces
+every panel to that size regardless of content, so a short heading list
+rendered visible empty space below its last row. Reverted to `max-height`
+same day, same value otherwise unchanged: a short list now shrink-wraps
+its own content (confirmed via `thoughts/physical-and-digital-media.html`,
+5 headings — no trailing gap), while a long list still caps at ~78vh
+with internal scroll (confirmed via `work/star-engine.html`, ~20
+headings — unchanged from the decoupled-position verification).
+`--toc-panel-height-min`/`-max`
+(`:root`, `320px`/`1024px`) are derived from `--space-32` (`calc(--space-32 * 2.5)`
+/ `calc(--space-32 * 8)`, Rule 3a). With `top` now a fixed length rather
+than a `vh` fraction, `calc(100vh - --toc-panel-top-offset - --space-6)`
+alone is sufficient to guarantee no header overlap or viewport overflow
+at any height — simpler than the old trigger-relative formula, which had
+to reason about `vh` fractions on both the anchor and the cap. `min()`
+combines it with the clamp: the `78vh` mid-point is what actually governs
+height at every ordinary viewport (confirmed via direct Playwright
+measurement — all landed at exactly 78.0%: 2560×1300, a realistic
+logical-CSS stand-in for a 4K panel at 150% OS scaling per the spec, not
+a monitor's raw physical resolution; 1920×1000; 834×1100; 390×844), while
+the `calc()` safety ceiling only binds on an unusually short window
+(confirmed at 1920×500) or the clamp's own `--toc-panel-height-max`
+ceiling binds on an unusually narrow-and-tall one (confirmed at
+390×3000) — both correctly handled without overlap.
 
 **Scrim:** `.toc-panel-scrim` is a real click-catching element
 (`pointer-events: auto` only while `--open`), not a document-click
