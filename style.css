@@ -1924,7 +1924,17 @@ footer p {
     pointer-events: auto;
 }
 
+/* --image-viewer-controls-z: the controls' layer inside this dialog's own
+   stacking context, above the enlarged image. The image always carries an
+   inline transform (zoom/pan, script.js), so it paints in the positioned
+   layer in DOM order — and Close comes before it in the DOM, so at any
+   zoom where the scaled image reaches Close's corner the image painted
+   over it and took its hover/click. Raising the controls fixes that
+   without touching DOM order, which is also the Tab order. Same
+   local-custom-property convention as .card's --card-block-link-z. */
 .image-viewer {
+    --image-viewer-controls-z: 1;
+
     position: fixed;
     inset: 0;
     z-index: 270;
@@ -1980,6 +1990,7 @@ footer p {
     position: absolute;
     top: var(--space-4);
     right: var(--space-4);
+    z-index: var(--image-viewer-controls-z);
 }
 
 /* Prev/Next — same .btn.action-rail-clear chrome as Close, vertically
@@ -1991,6 +2002,7 @@ footer p {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    z-index: var(--image-viewer-controls-z);
 }
 
 .image-viewer-nav--prev {
@@ -2011,6 +2023,7 @@ footer p {
     transform: translateX(-50%);
     display: flex;
     gap: var(--space-3);
+    z-index: var(--image-viewer-controls-z);
 }
 
 /* Video embed — aspect-ratio governs display size; the iframe's own
