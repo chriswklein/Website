@@ -2268,8 +2268,27 @@ footer p {
     background-color: var(--color-text-secondary);
 }
 
-.toc-rail-item--sub {
-    padding-left: var(--space-4);
+/* H3 rows only — lays the leading sub-section icon (TOC_SUB_ICON_HTML,
+   script.js) beside the row text; H2 rows and the Back to Top button keep
+   .toc-rail-link's plain display: block untouched. .toc-rail-item--sub
+   carries no rule of its own any more — it used to indent the li by
+   --space-4, removed 2026-09-20 now that the icon alone conveys nesting,
+   so H3 rows share H2 rows' exact left and right edges — and stays only
+   as the hook this selector (and script.js) key off. Gap and icon size
+   reuse --space-2 / --icon-size-md, same values .toc-panel-label already
+   uses for its own leading icon (Rule 3a). No colour here on purpose: the
+   icon's fill is currentColor, so it follows the row's own
+   default/hover/active text colour automatically. */
+.toc-rail-item--sub .toc-rail-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.toc-sub-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
 }
 
 /* Inactive state reuses .action-rail-trigger/.filter-drawer-page-btn's

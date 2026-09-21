@@ -1584,7 +1584,9 @@ positioned wrapper), `.action-rail-trigger` (trigger button, `id="toc-trigger"`)
 `.action-rail-badge` (position count), `.toc-panel` (panel `<nav>`,
 `id="toc-panel"`), `.toc-panel-label`, `.toc-panel-list`, `.toc-panel-scrim`,
 `.toc-rail-link` (row — shared with the Back to Top row), `.toc-rail-item--sub`
-(H3 indent), `.toc-rail-link--active` (current heading) — the `.toc-rail-*`
+(H3 marker — no rule of its own, only the hook the H3 icon layout keys off),
+`.toc-rail-link--active` (current heading), `.toc-sub-icon`
+(H3-only leading icon) — the `.toc-rail-*`
 naming on these three predates the rail's removal and is kept as-is
 (Rule 3a: the classes themselves were never rail-specific markup, just a
 shared naming prefix), not renamed as part of this change.
@@ -1592,7 +1594,49 @@ shared naming prefix), not renamed as part of this change.
 **Anatomy:** `.toc-panel-list` contains one Back to Top row first
 (`buildBackToTopRow()` — see below), then one `<li><a class="toc-rail-link">`
 per heading in document order (H3s additionally get `.toc-rail-item--sub`
-for indent).
+as a marker, and their link a leading `.toc-sub-icon` — see below).
+
+**H3 sub-section icon (added 2026-09-20):** every H3 row's `<a>` gets
+`assets/icons/floating-button/sub-section.svg` inlined (not `<img src>`)
+as its first child, built by `buildTocLinks()` from the `TOC_SUB_ICON_HTML`
+constant (script.js) — an elbow-connector glyph reading as "child of the
+row above." Path data is the source file's single flattened path, byte for
+byte (`M5 13H22V15H3V2H5V13Z`, one subpath, no strokes/masks — confirmed
+unioned/flattened before inlining, per the 8/21 contact-icons lesson);
+only `fill="white"` became `fill="currentColor"` and the fixed
+`width`/`height` moved to CSS. The source's `<g opacity="0.9">` wrapper is
+kept, same as the other inlined icons (`content.svg` on the trigger and
+panel label). Decorative: `aria-hidden="true"`, so a row's accessible name
+is still just its heading text. H2 rows and the Back to Top button get no
+icon and keep `display: block`; H3 links become `display: flex` with
+`gap: var(--space-2)` and a `--icon-size-md` (16px) icon (same two values
+`.toc-panel-label` uses for its own leading icon, Rule 3a) via
+`.toc-rail-item--sub .toc-rail-link`. No colour rule anywhere: the icon
+follows the row's own text colour through `currentColor` in every state —
+confirmed by direct measurement, icon fill equal to link text colour in
+default (`rgb(245,245,245)`), hover (`rgb(0,186,165)`) and active
+(`rgb(0,229,203)`). The active row's faux-bold `text-shadow` only affects
+glyphs, so the icon takes the active colour but not the extra weight.
+**No left indent (revised 2026-09-20):** `li.toc-rail-item--sub` used to
+carry `padding-left: var(--space-4)` (16px) to nest H3 rows under their H2.
+Removed once the icon shipped — the icon alone now conveys nesting, so H2,
+H3 and Back to Top rows all share identical left *and* right edges
+(confirmed by direct measurement: every row at the same left and right
+x-coordinate and the same width at both 1920×1000 and 390×844; H3 `li`
+padding now `0px`). Right edges were already identical before this (the
+link is `width: 100%` of its `li`), so the "H3 rows narrower than H2 rows"
+premise the icon work was scoped from never matched the shipped CSS.
+`.toc-rail-item--sub` keeps existing as a rule-less marker class only
+(script.js still sets it, and the H3 icon selector keys off it). One
+consequence carried over from the icon: it plus its gap take 24px of an H3
+row's text width in the fixed 240px panel, so longer H3 titles wrap
+earlier — on `work/star-engine.html`, "Decentralized Settings" wrapped to
+two lines (62px vs 40px, at both widths) even with the 16px indent given
+back, since the indent returned less width (16px) than the icon and gap
+took (24px). That heading was renamed "Tangled" on 2026-09-20 and no
+longer wraps (all 18 rows on that page are single-line), so no live row
+currently demonstrates the effect — it will recur for any future H3 title
+longer than roughly the width that heading had.
 
 **Scrollspy:** `updateActiveState()` tracks scroll position directly
 against each heading's own computed `scroll-margin-top` (not

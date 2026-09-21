@@ -250,8 +250,20 @@ function getTocHeadings() {
     return headings;
 }
 
+// sub-section.svg (assets/icons/floating-button/) inlined rather than
+// <img src> so fill: currentColor can follow the row's own text colour in
+// every state (default/hover/active) with no separate colour rule. Path
+// data is the source file's single flattened path, byte-for-byte; only
+// fill="white" became currentColor and the fixed width/height moved to
+// .toc-sub-icon (style.css). Decorative — the row's own text is its name.
+const TOC_SUB_ICON_HTML =
+    '<svg class="toc-sub-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
+    '<g opacity="0.9">' +
+    '<path d="M5 13H22V15H3V2H5V13Z" fill="currentColor"/>' +
+    '</g></svg>';
+
 // Builds one <li><a class="toc-rail-link"> per heading into `container`,
-// H3s getting the --sub indent modifier.
+// H3s getting the --sub modifier and a leading sub-section icon.
 function buildTocLinks(headings, container) {
     return headings.map(heading => {
         const item = document.createElement('li');
@@ -261,6 +273,7 @@ function buildTocLinks(headings, container) {
         link.className = 'toc-rail-link';
         link.href = `#${heading.id}`;
         link.textContent = heading.textContent;
+        if (heading.tagName === 'H3') link.insertAdjacentHTML('afterbegin', TOC_SUB_ICON_HTML);
 
         item.appendChild(link);
         container.appendChild(item);
