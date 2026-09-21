@@ -1,6 +1,6 @@
 # Design System — Component Specifications
-**Version:** 2.0.0
-**Last Updated:** 2026-08-25
+**Version:** 2.1.0
+**Last Updated:** 2026-09-21
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -73,6 +73,7 @@ Buttons are the primary interactive call-to-action element. They communicate the
 |---|---|---|
 | Primary | `.btn` | Default — main CTA, filled background |
 | Ghost | `.btn--ghost` | Secondary — outline only, no fill |
+| Danger hover | `.btn--danger-hover` | Modifier added to `.btn` on controls that clear or remove something (the Archive's three Clear controls — see `## 2c`). Hover (hover-capable devices only, `@media (hover: hover)`) and `:active` set the background to `--color-danger`; never while `disabled`. Border and text keep the shared `.btn` hover tokens (~6.3:1 on the red). Not for dismiss/confirm controls — see md/DESIGN-SYSTEM.md §1.7b |
 | Icon + Label | `.btn--icon` | Button with an icon left of label — not currently built in style.css; no icon library is in use site-wide (see md/REFERENCE.md §5) |
 
 ### Component Tokens
@@ -336,7 +337,7 @@ Dim duplicate state (desktop `#archive-secondary-chips` only, when this tag is a
 
 ## 2c. Filter Drawer
 
-**CSS Classes:** `.filter-drawer`, `.filter-drawer-body`, `.filter-drawer-scroll`, `.filter-drawer-trigger`, `.action-rail-group`, `.action-rail-trigger`, `.archive-scrim`, `.archive-inline-filters`, `.archive-active-chips`, `.tag-chip-more`, `.tag-chip--collapsed`, `.body-scroll-locked`, `.archive-sort-count-row`, `.chip-count`
+**CSS Classes:** `.filter-drawer`, `.filter-drawer-body`, `.filter-drawer-scroll`, `.filter-drawer-trigger`, `.action-rail-group`, `.action-rail-trigger`, `.action-rail-clear`, `.btn--danger-hover`, `.archive-scrim`, `.archive-inline-filters`, `.archive-active-chips`, `.tag-chip-more`, `.tag-chip--collapsed`, `.body-scroll-locked`, `.archive-sort-count-row`, `.chip-count`
 **JS Functions:** `initFilterDrawer()`, `initArchive()`, `trapFocus()` in `script.js`
 
 ### Design Intent
@@ -350,7 +351,7 @@ Two distinct filter access modes exist, governed by a single IntersectionObserve
 
 **All breakpoints — between header and results:** A `.archive-sort-count-row` shows the sort toggle (left) and entry count (right), positioned between the archive header and the results grid. This row is visible at all breakpoints.
 
-The drawer is a unified bottom-sheet with four stacked rows: Clear/Search/Close controls, primary type chips (with the disclosure toggle), an active-tags row, and the secondary tag list. Only the secondary tag list scrolls — everything above it (controls, primary chips, active-tags row) is pinned in place via a dedicated `.filter-drawer-scroll` wrapper (`flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable`) around `#filter-drawer-chips` alone, inside `.filter-drawer-body` (which no longer scrolls itself). `scrollbar-gutter: stable` reserves space for the scrollbar whether or not it's currently needed, so expanding the secondary list to a scrollable length never shifts the drawer's width. Closing happens via the drawer's own trigger (labelled "Close" when open), the scrim, or Escape — all three restore the background scroll position saved on open (see Background Scroll Lock, below).
+The drawer is a unified bottom-sheet with four stacked rows: Clear/Search/Done controls, primary type chips (with the disclosure toggle), an active-tags row, and the secondary tag list. Only the secondary tag list scrolls — everything above it (controls, primary chips, active-tags row) is pinned in place via a dedicated `.filter-drawer-scroll` wrapper (`flex: 1; min-height: 0; overflow-y: auto; scrollbar-gutter: stable`) around `#filter-drawer-chips` alone, inside `.filter-drawer-body` (which no longer scrolls itself). `scrollbar-gutter: stable` reserves space for the scrollbar whether or not it's currently needed, so expanding the secondary list to a scrollable length never shifts the drawer's width. Closing happens via the drawer's own trigger (labelled "Done" when open — changes apply live as tags are selected, so "Close" wrongly implied they were discarded), the scrim, or Escape — all three restore the background scroll position saved on open (see Background Scroll Lock, below).
 
 **Active-tags row (both contexts):** an always-visible row — `#archive-active-chips` on desktop, `#filter-drawer-active-chips` in the drawer — shows every currently-active secondary tag with its own × remove control, populated by the shared `updateActiveChipsRow()` function (writes to both containers on every `render()` pass, regardless of which is currently visible on screen). Its purpose is to guarantee an active tag stays reachable even if its duplicate in the full secondary list is currently collapsed by "Show More"/"Show Less" or scrolled elsewhere. The duplicate entry for that same tag inside the full secondary list renders Dim, not Active, via `applyChipState()`'s `isDuplicateOfActiveRow` logic (see `## 2b. Tag-Chip`) — this applies identically on desktop (`#archive-secondary-chips`) and in the drawer (`#filter-drawer-chips`).
 
@@ -408,7 +409,7 @@ The drawer is a unified bottom-sheet with four stacked rows: Clear/Search/Close 
             aria-controls="filter-drawer"
             aria-haspopup="dialog"
             aria-expanded="false"
-            aria-label="Open filters">
+            aria-label="Open Filters">
         <span class="trigger-label">Filters</span>
         <span class="action-rail-badge" aria-hidden="true" hidden>0</span>
     </button>
@@ -423,7 +424,7 @@ The drawer is a unified bottom-sheet with four stacked rows: Clear/Search/Close 
      hidden inert>
     <div class="filter-drawer-body">
 
-        <!-- Row 1: Clear (left) · Search (fills width) · Filters/Close trigger (right).
+        <!-- Row 1: Clear (left) · Search (fills width) · Filters/Done trigger (right).
              Pinned — outside the scrollable region below. -->
         <div class="filter-drawer-controls">
             <button class="archive-clear-btn btn btn--ghost" type="button" disabled>Clear</button>
@@ -469,11 +470,25 @@ The drawer is a unified bottom-sheet with four stacked rows: Clear/Search/Close 
 ```
 
 **Notes:**
-- The `.trigger-label` span isolates the dynamic text ("Filters" ↔ "Close") from the badge span so JS can update the label without disturbing other content.
+- The `.trigger-label` span isolates the dynamic text ("Filters" ↔ "Done") from the badge span so JS can update the label without disturbing other content.
 - `.archive-sticky-header` receives `.is-condensed` from the IntersectionObserver callback. CSS uses `:not(.is-condensed)` to show inline chips and hide the Filters trigger on desktop.
 - **All three** trigger buttons — the header's inline `.filter-drawer-trigger`, the floating `.action-rail-trigger`, and the drawer's own internal `.filter-drawer-trigger` (Row 1 above) — carry an `.action-rail-badge` span. All three are updated from the same `filterCount` in the same `render()` pass (a single unscoped `document.querySelectorAll('.action-rail-badge')`), keeping all three in sync at all times — this previously missed the drawer's own internal trigger, which had no badge markup at all until it was added to match the other two.
 - Chip-count badges (`.chip-count`) on each chip show how many entries match that filter given the current query and other active filters, updating on every render.
 - `#filter-drawer-active-chips` reuses the exact `.archive-active-chips` class desktop uses — same `display: none` default / `.is-active { display: flex }` toggle, no separate styling needed.
+
+### Clear Controls
+
+Three controls clear every active filter, all wired to the same `doReset()`:
+
+| Control | Classes | Visible | Accessible name |
+|---|---|---|---|
+| Floating Clear X | `.archive-clear-btn.btn.btn--danger-hover.action-rail-clear` | × (`.tag-chip-x`, `aria-hidden`) | "Clear all filters" (`aria-label`) |
+| Drawer Clear (Row 1) | `.archive-clear-btn.btn.btn--danger-hover` | "Clear" | "Clear all filters" (`aria-label`; begins with the visible word) |
+| Empty-state "Clear Filters!" | `.archive-clear-btn.btn.btn--danger-hover.archive-empty-clear-btn` | "Clear Filters!" | "Clear Filters!" (its visible text already says what it does) |
+
+- **Floating Clear X:** first child of `.action-rail-group`, rendered only while a filter is active (`hidden` toggled by `render()`), and hidden with the rest of the group while the drawer is open. 44×44 (`--touch-target-minimum`), so it renders as a circle at `--border-radius-full` with `box-shadow: var(--elevation-md)` — the same radius and shadow as the Filters pill beside it, set by `.action-rail-group .action-rail-clear`. The image dialog's Close, zoom and Prev/Next buttons also use `.action-rail-clear`, and keep their flat radius and no shadow because that rule is scoped to the rail group.
+- **Red hover/press:** `.btn--danger-hover` (see `## 1. Button`) turns the background `--color-danger` on hover (hover-capable devices only) and on `:active`, never while `disabled`. Only the three controls above carry it; the drawer's Done, the image dialog's controls, the Filters pill and tag chips stay neutral on hover. `:focus-visible` keeps the standard white 2px ring — focus alone never turns a Clear red.
+- **After a Clear:** the drawer Clear (which becomes disabled) sends focus to Done; the floating Clear and the empty-state button (which disappear) send it to the floating Filters trigger. One announcement follows: "Filters cleared. Showing N entries." (see Accessibility, below).
 
 ### Background Scroll Lock
 
@@ -481,7 +496,7 @@ While the drawer is open, `<body>` is locked using the `position: fixed` body-lo
 
 - **On open** (`lockBodyScroll()` in `initFilterDrawer()`): saves `window.scrollY`, sets `document.body.style.top = -{savedScrollY}px` inline, and adds `.body-scroll-locked` (`position: fixed; left: 0; right: 0;` — defined in style.css, `top` is the one value that must be set inline since it's dynamic per open).
 - **On close** (`unlockBodyScroll()`, called at the top of `closeDrawer()`): removes `.body-scroll-locked`, clears the inline `top`, and calls `window.scrollTo(0, savedScrollY)` to restore the exact pre-open position.
-- All three close paths (drawer's own Close trigger, scrim click, Escape) call the same `closeDrawer()`, so all three restore scroll identically — there is only one close code path, not three separate ones to keep in sync.
+- All three close paths (drawer's own Done trigger, scrim click, Escape) call the same `closeDrawer()`, so all three restore scroll identically — there is only one close code path, not three separate ones to keep in sync.
 - `inert` (already applied to background content) has no effect on document-level scroll — it's a hit-testing/focus concept, not a scroll concept — so this lock is a separate, necessary mechanism, not redundant with `inert`.
 
 ### Archive Item Markup
@@ -500,10 +515,10 @@ Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable
 
 | Trigger | Result |
 |---|---|
-| Click "Filters" (header/rail/drawer-internal trigger, closed) | Drawer slides up; scrim fades in; trigger label becomes "Close"; background scroll locked (position saved); focus moves to first focusable element in drawer; all page content outside drawer becomes `inert` |
-| Click "Close" (any trigger, open) | Drawer slides down; scrim fades out; background scroll unlocked and restored to the saved position; `inert` removed from page content; focus returns to the trigger that opened the drawer |
-| Click scrim | Same as clicking "Close" |
-| Escape key | Drawer closes; same cleanup as "Close" |
+| Click "Filters" (header/rail/drawer-internal trigger, closed) | Drawer slides up; scrim fades in; trigger label becomes "Done"; background scroll locked (position saved); focus moves to first focusable element in drawer; all page content outside drawer becomes `inert` |
+| Click "Done" (any trigger, open) | Drawer slides down; scrim fades out; background scroll unlocked and restored to the saved position; `inert` removed from page content; focus returns to the trigger that opened the drawer |
+| Click scrim | Same as clicking "Done" |
+| Escape key | Drawer closes; same cleanup as "Done" |
 | Tab / Shift+Tab with drawer open | Focus stays within drawer — browser enforces this via `inert` on all outside elements; `trapFocus()` provides belt-and-suspenders wrapping |
 | Touch-drag or wheel over the scrim while open | No effect — background scroll is locked, not just visually blocked |
 | Scroll within the secondary tag list | Only `.filter-drawer-scroll` (`#filter-drawer-chips`'s wrapper) moves; controls row, primary chips, and active-tags row stay pinned on screen |
@@ -520,7 +535,7 @@ Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable
 ### Accessibility
 
 - All trigger buttons: `aria-expanded` updated by JS; `aria-controls="filter-drawer"`; `aria-haspopup="dialog"`
-- `.action-rail-trigger`: `aria-label` updated dynamically ("Open filters" / "Close filters")
+- `.action-rail-trigger`: `aria-label` updated dynamically ("Open Filters" / "Done filtering") and extended with the active-filter count — see the accessible-name bullets below
 - `.tag-chip-more`: `aria-expanded` reflects `secondaryExpanded`, updated on every render regardless of the button's own DOM position relative to the list it controls
 - Clear button: `disabled` attribute toggled by JS — screen readers announce "dimmed" state; removed from tab order when disabled
 - Scrim: `aria-hidden="true"` — decorative; close affordance is the trigger button and Escape key
@@ -529,6 +544,11 @@ Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable
 - Return focus: whichever trigger opened the drawer receives focus on close; `inert` removed before focus return
 - Chip count badges: `.chip-count` spans are `aria-hidden="true"` — counts are supplementary; button labels carry the semantic meaning
 - Keyboard: Escape closes from any position inside drawer
+- Trigger names: the floating trigger and the drawer's own trigger both get an `aria-label` built in one place, `updateTriggerLabels()`: the visible label plus the active-filter count from `getActiveFilterSummary()`. Floating trigger: "Open Filters" closed, "Done filtering" open. Drawer's own trigger: "Filters" / "Done". With N ≥ 1 active filters ", N active filters" is appended (", 1 active filter" for one; nothing at 0). Names start with the visible word (WCAG 2.5.3). The visible badge stays `aria-hidden="true"`, so the count is never read twice.
+- Trigger descriptions: each trigger has its own `.sr-only` sibling `span#filter-trigger-description-{n}`, referenced by `aria-describedby`, reading "Selected: {names}" — the first three active filters in on-screen order (type chip first, then tags in the order selected), then " and N more". The attribute is removed entirely at 0 filters. The elements are siblings of each trigger, not children, so they stay out of the trigger's own name.
+- Filter announcer: `#filter-announcer` (`.sr-only`, `role="status"`, `aria-live="polite"`, `aria-atomic="true"`) is a direct child of `<body>`, outside `<main>`, the drawer and the rail, so it is never inert or hidden in either drawer state. `announceFilterChange()` sets it once per user action: "{Name} selected. Showing N entries.", "{Name} removed. Showing N entries.", or "Filters cleared. Showing N entries." ("1 entry" when one). It clears first and sets after 100ms so an identical repeat is still announced, and it is never called on page load, on `?type=`/`?tag=` arrival, or on open/close. `#archive-count` is no longer a live region (it sits in the inert `<main>` while the drawer is open, and the announcer carries the same count from the same `filtered.length`).
+- Focus containment: `trapFocus()` wraps at the first/last *rendered* control (hidden pagination and collapsed chips are skipped), and the skip link is in the drawer's inert set — Tab and Shift+Tab never leave the open drawer.
+- Focus retention (never `<body>`): selecting a type chip keeps focus on it; selecting a tag moves focus to that tag's chip in the selected-tags row; removing a tag with its × moves focus to its chip in the tag grid if visible, else the neighbouring selected chip (next, then previous), else Done; Clear controls as described under Clear Controls. Nothing moves focus on page load or arrival with pre-applied filters.
 
 ### Archive Item Markup
 
@@ -546,10 +566,10 @@ Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable
 
 | Trigger | Result |
 |---|---|
-| Click "Filters" (header/rail trigger, closed) | Drawer slides up; scrim fades in; trigger label becomes "Close"; focus moves to first focusable element in drawer; all page content outside drawer becomes `inert` |
-| Click "Close" (any trigger, open) | Drawer slides down; scrim fades out; `inert` removed from page content; focus returns to the trigger that opened the drawer |
-| Click scrim | Same as clicking "Close" |
-| Escape key | Drawer closes; same cleanup as "Close" |
+| Click "Filters" (header/rail trigger, closed) | Drawer slides up; scrim fades in; trigger label becomes "Done"; focus moves to first focusable element in drawer; all page content outside drawer becomes `inert` |
+| Click "Done" (any trigger, open) | Drawer slides down; scrim fades out; `inert` removed from page content; focus returns to the trigger that opened the drawer |
+| Click scrim | Same as clicking "Done" |
+| Escape key | Drawer closes; same cleanup as "Done" |
 | Tab / Shift+Tab with drawer open | Focus stays within drawer — browser enforces this via `inert` on all outside elements; `trapFocus()` provides belt-and-suspenders wrapping |
 | Click inline chip (desktop, uncondensed) | Toggles filter; state syncs across inline chips and drawer chips |
 | Click chip in drawer | Toggles filter; state syncs across drawer chips and inline chips |
@@ -563,7 +583,7 @@ Filterable items need `data-tags` (comma-separated slugs) and a `data-searchable
 ### Accessibility
 
 - All trigger buttons: `aria-expanded` updated by JS; `aria-controls="filter-drawer"`; `aria-haspopup="dialog"`
-- `.action-rail-trigger`: `aria-label` updated dynamically ("Open filters" / "Close filters")
+- `.action-rail-trigger`: `aria-label` updated dynamically ("Open Filters" / "Done filtering") and extended with the active-filter count — see the accessible-name bullets below
 - Clear button: `disabled` attribute toggled by JS — screen readers announce "dimmed" state; removed from tab order when disabled
 - Scrim: `aria-hidden="true"` — decorative; close affordance is the trigger button and Escape key
 - Drawer: `role="dialog"` + `aria-modal="true"` + `aria-label="Search and filter"`
@@ -1444,8 +1464,29 @@ existing caption class rather than a second caption style.
 of the inner `img` so a captioned figure doesn't double up spacing.
 Uncaptioned images are a bare `<img>` with no wrapper. All images require
 alt text (`alt=""` only for decorative images) and `loading="lazy"`, matching
-the convention already used on About's profile photo. No click/expand
-behaviour — that's a separate, not-yet-scoped lightbox feature.
+the convention already used on About's profile photo. Every in-body image
+is also a click-to-zoom trigger — see below and `### Image Viewer
+(Click-to-Zoom)`.
+
+**Click-to-zoom trigger (as of 2026-09-21):** at page load `initImageViewer()`
+wraps each `.standard-page-content img` in a real
+`<button type="button" class="image-zoom-trigger">` (entry HTML is unchanged;
+the trigger is added by JS, so every current and future body image gets it).
+Its accessible name is "View larger image: {alt}" (an `.sr-only` prefix plus
+the image's own alt), one Tab stop per image. **Hover:** a 2px
+`--color-accent-primary-text` outline (`outline-offset: calc(-1 *
+var(--border-width-thin))`) drawn over the trigger's reserved 1px transparent
+border, so nothing shifts; it applies on `:hover:not(:focus-visible)`, so a
+keyboard-focused trigger keeps the sitewide focus ring and its
+`--color-accent-primary` border. **Expand icon:** a decorative
+`.image-zoom-trigger-icon` (`aria-hidden`, `pointer-events: none` — the whole
+thumbnail stays the single click target) in the image's top-right corner,
+inset `--space-2`: a `--space-8` plate (`--color-background-surface` fill, 1px
+`--color-border-strong`, `--border-radius-sm`) holding a `--space-5` inline SVG
+of `assets/icons/arrows/expand.svg` in `currentColor`. Visibility: hidden at
+rest; shown on `:hover` and on `:focus-visible`; always shown under
+`@media (hover: none)`, since touch has no hover. The fade uses
+`--duration-fast` / `--ease-out`, covered by the sitewide reduced-motion rule.
 
 **In-body tables (2026-08-18):** `.standard-page-content table` caps at the
 same 65ch reading column as everything else in body content (a per-instance
@@ -1457,6 +1498,21 @@ element) instead of trying to reflow columns on narrow viewports. `th` reuses
 value, not by selector reference. `td` matches body paragraph text. Row separators use
 the sitewide thin-border convention, with the last row's border removed the
 same way `.about-history-item:last-child` drops its own.
+
+### Image Viewer (Click-to-Zoom)
+
+**CSS Classes:** `.image-viewer`, `.image-viewer-scrim`, `.image-viewer-image`, `.image-viewer-close`, `.image-viewer-nav`, `.image-viewer-zoom-controls`, `.image-zoom-trigger`, `.image-zoom-trigger-icon`
+**JS Function:** `initImageViewer()` in `script.js` (depends on `trapFocus()`); a no-op on any page without `.standard-page-content` images.
+
+A modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label` = the current image's alt text) showing one enlarged image, opened from the click-to-zoom trigger above. It is built once per page and shared by every image on it, using the same accessible-modal mechanics as the Filter Drawer and ToC panel (inert background, `trapFocus()`, body scroll lock) rather than a new technique.
+
+- **Anatomy:** `.image-viewer-scrim` (`z-index` 269, `--color-background-base`, 0.85 opacity when open) and `.image-viewer` (`z-index` 270) containing Close (×, top-right), the enlarged image, zoom − / + (bottom centre) and Previous / Next (left / right edge; only created when the page has 2+ images, and they wrap around). All controls are `.btn.action-rail-clear` buttons with neutral hover.
+- **Zoom and pan:** 1× (fit) to 4× in 0.5 steps, applied as `translate() scale()` on the image; pan is clamped so the visible edge never crosses the fit-to-view frame. Zoom out is disabled at 1×, zoom in at 4×, and Previous / Next are disabled while zoomed (arrows pan instead).
+- **Input:** Esc closes. `+`/`=` and `-`/`_` zoom. Arrow keys pan by 40px when zoomed, and navigate (Left/Right) at 1×. The scroll wheel over the image zooms; dragging the image pans when zoomed; two-finger pinch zooms at any level. Pressing a control never starts a pan (drag is bound to the image only).
+- **High-res tier:** the dialog loads `{name}-full.webp`, derived from the thumbnail's `src` by `deriveFullSrc()` (always `.webp`); `scripts/build-images.js` generates it at `HIGH_RES_SCALE` (2×) the 800px thumbnail width. If the `-full` file is missing, `onerror` falls back once to the thumbnail, so an image not yet processed still opens.
+- **Layering:** every control has `z-index: var(--image-viewer-controls-z)` (a local custom property, `1`, on `.image-viewer` — the same convention as `--card-block-link-z`), so it renders above the enlarged image at every zoom and pan state. Without it the transformed image painted over Close from about 1.5× zoom. DOM order (which is also Tab order) is unchanged.
+- **Focus and screen readers:** opening focuses Close; Esc or Close returns focus to the exact trigger for the image on screen (it follows Previous / Next); Tab and Shift+Tab stay inside the dialog. A `.sr-only` polite region announces "Image N of M: {alt}" as the image changes. The background is `inert` and body scroll is locked while open.
+- **Known gap:** the scrim has a click-to-close handler, but `.image-viewer` covers it, so clicking the empty area of the dialog does not close it today (Esc and Close do).
 
 ### Template Consolidation — Flagged Follow-Up
 
@@ -2009,6 +2065,7 @@ Quick reference mapping every component token to its semantic source.
 | `--card-image-column-width` | — (global `:root` token, see md/DESIGN-SYSTEM.md §4.5) | `42%` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
+| `--image-viewer-controls-z` | — (local to `.image-viewer`) | `1` |
 | `--tag-border` | `--color-accent-primary` | `#00BAA5` |
 | `--tag-border-hover` | `--color-accent-primary-text` | `#00E5CB` |
 | `--tag-text` | `--color-accent-primary` | `#00BAA5` |

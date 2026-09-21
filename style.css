@@ -3249,13 +3249,13 @@ footer p {
     outline-offset: 3px;
 }
 
-/* Filter drawer — Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right).
-   Grid, not flex — Clear (44px icon square) and the Close trigger (wider,
+/* Filter drawer — Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Done trigger (right).
+   Grid, not flex — Clear (44px icon square) and the Done trigger (wider,
    padded text + badge) are different widths, so flex: 1 on the label alone
    only fills the leftover space between two unequal flanks; it doesn't
    centre the label relative to the row itself. The standard fix: two equal
    1fr side columns (their content — Clear left-aligned via justify-self:
-   start, Close right-aligned via justify-self: end — never has to match
+   start, Done right-aligned via justify-self: end — never has to match
    width) force the auto-sized centre column to sit at the row's true
    midpoint, regardless of how unequal the two flanking buttons are. */
 .filter-drawer-controls {

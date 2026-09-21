@@ -1,6 +1,6 @@
 # Design System — Atomic Foundation
-**Version:** 1.0.0
-**Last Updated:** 2026-08-25
+**Version:** 1.1.0
+**Last Updated:** 2026-09-21
 **Status:** Active — source of truth for all design and build decisions
 
 ---
@@ -97,6 +97,16 @@ Pink is the secondary accent. Used for secondary tags and blockquote borders.
 | `--color-accent-quote` | `pink-dark` `#A9407C` | ~4.6:1 ✅ | Secondary tag fill, blockquote left border |
 | `--color-accent-quote-text` | `pink-light` `#FF60BB` | — | Pink text on dark surfaces |
 
+### 1.7b Semantic Tokens — Danger
+
+**Red means "this removes something."** It appears only on the Clear controls (`.btn--danger-hover`: the Filter Drawer's Clear, the floating Clear ×, and the empty-state "Clear Filters!") as a hover / `:active` background fill. Dismiss and confirm controls — the drawer's Done, the image dialog's Close, zoom and Prev/Next — stay neutral on hover. Red is never used for text, borders, or general emphasis.
+
+| CSS Variable | Value | Contrast | Usage |
+|---|---|---|---|
+| `--color-danger` | `#B41321` | ~6.3:1 with `--color-text-primary` ✅ AA | Hover and `:active` background of clear-all controls only |
+
+Defined once in `:root` next to the other semantic colours, with no primitive of its own. It is deliberately absent from the `[data-theme]` override blocks (it does not change with the accent theme) and has no `-text` variant, since no red text is used anywhere. Only the fill changes: the control keeps its neutral `--color-interactive-hover` border and `--color-interactive-default` text on hover, and the ~6.3:1 figure is that light text on the red fill. Against the page background red is only ~2.8:1, which is why it is a fill behind light text and never a text or border colour. Hover applies on hover-capable devices only and never while the control is `disabled` — see §9.5.
+
 ### 1.8 Semantic Tokens — Components
 
 | CSS Variable | References | Usage |
@@ -130,6 +140,7 @@ All text pairings verified against WCAG AA (4.5:1 minimum for normal text, 3:1 f
 | `--color-accent-primary-text` on `--color-background-subtle` | `#E5A000` on `#2A2A2A` | ~6.4:1 | ✅ AA |
 | `--color-accent-primary-text` on `--color-background-surface` | `#E5A000` on `#1A1A1A` | ~7.8:1 | ✅ AAA |
 | `--color-interactive-focus` on `--color-background-base` | `#FFFFFF` on `#111111` | ~19:1 | ✅ AAA |
+| `--color-text-primary` on `--color-danger` | `#F5F5F5` on `#B41321` | ~6.3:1 | ✅ AA |
 
 **Known automated-tooling gap (confirmed 2026-09-15):** the table above was hand-verified against solid colour pairings and remains accurate, but an automated axe-core sweep (4.10.2, `wcag2a`/`wcag2aa`/`wcag21aa`) cannot independently confirm most of it in practice. Because §1.11's dot-texture background is a CSS `radial-gradient` and the containers between `body` and most page text (`main`, `.page-grid`, `.standard-page`, `.home-hero`, etc.) are themselves background-transparent, axe cannot resolve an exact background colour for any text sitting in that chain and marks the check `incomplete` rather than pass or fail — roughly 314 elements sitewide, effectively all body copy on the four Standard Page entries. This is not evidence of a contrast problem: a manual worst-case calculation confirms it directly. §1.11's pattern is `radial-gradient(circle, rgba(255,255,255,0.05) 1.5px, transparent 1.5px)` on a 24px grid — a 5%-opacity white dot covering ~1.2% of the background area. Blending 5% white into `#111111` gives a worst-case pixel of `#1D1D1D` (reachable only if a glyph lands exactly on a dot's center). Using the WCAG relative-luminance formula: `--color-text-primary` (#F5F5F5) on plain `#111111` is ≈17.3:1; on the worst-case dot pixel `#1D1D1D` it's still ≈15.5:1 — both far above the 4.5:1 AA floor (and above 7:1 AAA). **This confirms the "kept low-opacity so it never interferes with text contrast" design intent (md/REFERENCE.md §12) mathematically, not just by eye.** Treat this as a standing tooling blind spot: a future axe run showing 0 violations does not mean contrast was fully checked — re-run this manual calculation (or resolve it structurally, e.g. a non-gradient dot technique) before trusting a clean automated result as complete coverage. A separate, smaller `incomplete` cause exists on Home/Archive card text (18 elements) — axe's occlusion detection tripping on the `.card-block-link`/`.card-cta` layered-link technique (COMPONENTS.md §3), not this gradient — already covered by this table's text-primary-on-`--color-background-surface` figure (~12:1) and independently safe.
 
@@ -146,7 +157,7 @@ One background theme (dark — fixed) with two accent colour variants selectable
 
 The theme toggle button (`initThemeToggle()` in `script.js`) is dormant — the function remains in the codebase but its call is commented out pending a permanent home in the planned Vertical Action Rail. No toggle button is rendered on any page.
 
-All other tokens — backgrounds, greyscale, pink accent, borders — are unaffected by the theme system. Only `--color-accent-primary` and `--color-accent-primary-text` vary between themes.
+All other tokens — backgrounds, greyscale, pink accent, danger red, borders — are unaffected by the theme system. Only `--color-accent-primary` and `--color-accent-primary-text` vary between themes.
 
 Teal contrast ratios verified: `#00BAA5` on `#111111` ≈ 7.7:1 ✅ AA · `#00E5CB` on `#111111` ≈ 11.8:1 ✅ AAA.
 Gold contrast ratios verified: `#BA8200` on `#111111` ≈ 5.2:1 ✅ AA · `#E5A000` on `#111111` ≈ 8.9:1 ✅ AAA.
@@ -477,7 +488,7 @@ Used sparingly on dark backgrounds. Shadows are diffuse and dark.
 | CSS Variable | Value | Usage |
 |---|---|---|
 | `--elevation-sm` | `0 1px 3px rgba(0,0,0,0.4)` | Subtle lift — tags, badges |
-| `--elevation-md` | `0 4px 12px rgba(0,0,0,0.5)` | Cards, dropdowns, tooltips |
+| `--elevation-md` | `0 4px 12px rgba(0,0,0,0.5)` | Cards, dropdowns, tooltips, the floating rail controls (Filters pill and Clear ×) |
 | `--elevation-lg` | `0 8px 24px rgba(0,0,0,0.6)` | Modals, overlays |
 | `--elevation-xl` | `0 16px 48px rgba(0,0,0,0.7)` | Floating elements |
 
@@ -607,6 +618,14 @@ Visually hidden until keyboard focus. First child of `<body>` on every page.
     top: 0;
 }
 ```
+
+### 9.5 Hover Patterns
+
+**Zero-shift hover border.** When a hover adds or thickens a border, draw it as an `outline` with a negative `outline-offset` over a border already reserved at rest — never by widening `border-width`, which would move the box and everything around it. The in-body image trigger (`.image-zoom-trigger`) reserves a 1px transparent border and, on hover, adds `outline: var(--border-width-medium) solid var(--color-accent-primary-text)` with `outline-offset: calc(-1 * var(--border-width-thin))`: a 2px band that starts at the reserved border's inner edge and grows outward. Scope it `:hover:not(:focus-visible)` so a keyboard-focused element keeps the sitewide focus ring (§9.1) instead of a competing hover outline.
+
+**Hover-revealed decoration needs a touch fallback.** Anything shown only on hover — the expand icon plate on inline images, `.image-zoom-trigger-icon` — must also show on `:focus-visible`, and must be always visible under `@media (hover: none)`. Touch devices have no hover, so decoration hidden until hover would never appear there. Fade it with `--duration-*` / `--ease-*` tokens; the sitewide reduced-motion rule (§8.3) covers the fade.
+
+**Hover fills stay out of touch.** Hover fills go inside `@media (hover: hover)` so a tap never leaves a stuck hover state (`.btn:hover` and `.btn--danger-hover:hover` both follow this); press feedback on `:active` stays outside the query so touch still gets it. A disabled control gets neither (`:not(:disabled)` on the danger rules).
 
 ---
 

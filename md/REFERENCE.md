@@ -1,6 +1,6 @@
 # Personal Website — Project Reference Document
-**Version:** 1.3.0
-**Last Updated:** 2026-08-25
+**Version:** 1.4.0
+**Last Updated:** 2026-09-21
 **Status:** In Progress — Home page ready to build
 
 ---
@@ -149,7 +149,7 @@ Nav and footer inject automatically via `script.js`.
 
 ### Colour System
 
-**Palette:** Greyscale dark theme with two accent colours for tags, dividers, links, and interactive highlights.
+**Palette:** A greyscale dark base with a teal accent (live default; gold is a dormant `[data-theme="gold"]` override), a pink quote accent, and one danger red (`--color-danger`) used only as the hover/press fill on Clear controls.
 
 #### Primitive Scale
 | Token | Value |
@@ -191,6 +191,7 @@ Teal is the live default primary accent (confirmed against style.css's real `:ro
 | `--color-interactive-default` | #F5F5F5 | ~15:1 ✅ |
 | `--color-interactive-hover` | #CCCCCC | — |
 | `--color-interactive-focus` | #FFFFFF | ~19:1 ✅ |
+| `--color-danger` | #B41321 | ~6.3:1 ✅ with `--color-text-primary` — a fill behind light text, never a text colour (see md/DESIGN-SYSTEM.md §1.7b) |
 | `--color-link` | var(--color-accent-primary-text) | Hyperlink default |
 | `--color-link-hover` | var(--color-accent-primary) | Hyperlink hover |
 | `--color-divider-accent` | var(--color-accent-primary) | hr and section dividers |
