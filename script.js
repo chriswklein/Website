@@ -743,7 +743,13 @@ function trapFocus(element) {
     function handler(event) {
         if (event.key !== 'Tab') return;
 
-        const focusable = [...element.querySelectorAll(FOCUSABLE)];
+        // Rendered controls only — a display: none control (a collapsed tag
+        // chip, the hidden pagination nav) can never be the element focus is
+        // actually on, so counting it as "last" meant Tab from the real last
+        // control never matched it and walked straight out of the trap.
+        const focusable = [...element.querySelectorAll(FOCUSABLE)].filter(el =>
+            el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden'
+        );
         if (!focusable.length) return;
 
         const first = focusable[0];
@@ -768,7 +774,7 @@ function trapFocus(element) {
 
 // Filter drawer — all triggers via [aria-controls="filter-drawer"].
 // Works for .action-rail-trigger (the floating trigger, always visible, all
-// breakpoints) and the drawer's own internal .filter-drawer-trigger (Close).
+// breakpoints) and the drawer's own internal .filter-drawer-trigger (Done).
 // Depends on: trapFocus()
 function initFilterDrawer() {
     const drawer = document.getElementById('filter-drawer');
@@ -793,28 +799,16 @@ function initFilterDrawer() {
     // sibling in its own container — the floating trigger's inside
     // .action-rail-group, the drawer's own inside .filter-drawer-controls —
     // so an inert ancestor elsewhere can't take it away, and it stays out of
-    // the trigger's own name (a child of the button would be read as part of
-    // it for the drawer trigger, whose name comes from its content). The
-    // drawer's own trigger also has no aria-label, so its count phrase is a
-    // visually-hidden span after its label rather than a new aria-label; the
-    // floating trigger's count goes in the aria-label updateTriggerLabels()
-    // already swaps. The visible badge stays aria-hidden, so the count is
-    // never read twice.
-    const triggerA11y = new Map();
+    // the trigger's own name. Both triggers' names carry the count phrase in
+    // an aria-label built in one place, updateTriggerLabels(); the visible
+    // badge stays aria-hidden, so the count is never read twice.
+    const triggerDescriptions = new Map();
     allTriggers.forEach((t, i) => {
         const desc = document.createElement('span');
         desc.className = 'sr-only';
         desc.id = `filter-trigger-description-${i + 1}`;
         t.after(desc);
-
-        let countEl = null;
-        const labelSpan = t.querySelector('.trigger-label');
-        if (labelSpan && !t.classList.contains('action-rail-trigger')) {
-            countEl = document.createElement('span');
-            countEl.className = 'sr-only';
-            labelSpan.after(countEl);
-        }
-        triggerA11y.set(t, { desc, countEl });
+        triggerDescriptions.set(t, desc);
     });
 
     // Locks background scroll while the drawer is open — inert blocks click/
@@ -847,6 +841,7 @@ function initFilterDrawer() {
     // Elements to inert while the drawer is open — prevents focus leaking to duplicate controls
     function getInertTargets() {
         return [
+            document.querySelector('.skip-link'),
             document.getElementById('archive-sticky-header'),
             document.querySelector('.action-rail-group'),
             document.getElementById('theme-toggle'),
@@ -863,16 +858,20 @@ function initFilterDrawer() {
         allTriggers.forEach(t => {
             const labelSpan = t.querySelector('.trigger-label');
             if (labelSpan) labelSpan.textContent = isOpen ? 'Done' : 'Filters';
-            if (t.classList.contains('action-rail-trigger')) {
-                // Matches the visible .trigger-label text's exact case ("Filters") —
-                // WCAG 2.5.3 (Label in Name) requires the visible text to appear
-                // verbatim in the accessible name; the prior lowercase "filters"
-                // failed axe/Lighthouse's label-content-name-mismatch check.
-                t.setAttribute('aria-label', (isOpen ? 'Done filtering' : 'Open Filters') + activeSummary.namePhrase);
-            }
 
-            const { desc, countEl } = triggerA11y.get(t);
-            if (countEl) countEl.textContent = activeSummary.namePhrase;
+            // Same aria-label mechanism for both triggers. Matches the visible
+            // .trigger-label text's exact case — WCAG 2.5.3 (Label in Name)
+            // requires the visible text to appear verbatim in the accessible
+            // name (the prior lowercase "filters" failed axe/Lighthouse's
+            // label-content-name-mismatch check). The floating trigger's own
+            // label is mobile-hidden and reads "Open Filters"/"Done
+            // filtering"; the drawer's own trigger is just its visible label.
+            const baseName = t.classList.contains('action-rail-trigger')
+                ? (isOpen ? 'Done filtering' : 'Open Filters')
+                : (labelSpan ? labelSpan.textContent : '');
+            if (baseName) t.setAttribute('aria-label', baseName + activeSummary.namePhrase);
+
+            const desc = triggerDescriptions.get(t);
             desc.textContent = activeSummary.description;
             if (activeSummary.description) t.setAttribute('aria-describedby', desc.id);
             else t.removeAttribute('aria-describedby');
@@ -1053,6 +1052,7 @@ function initArchive(filterDrawer) {
 
     // State
     let allEntries         = [];
+    let resultCount        = 0; // entries matching the current filters — the number #archive-count shows, and announceFilterChange() speaks
     let activeType         = null;
     const activeSecondary  = new Set();
     let currentSort        = 'latest';
@@ -1156,12 +1156,15 @@ function initArchive(filterDrawer) {
             countSpan.setAttribute('aria-hidden', 'true');
             btn.appendChild(countSpan);
             btn.addEventListener('click', () => {
-                if (activeSecondary.has(slug)) {
+                const wasActive = activeSecondary.has(slug);
+                if (wasActive) {
                     activeSecondary.delete(slug);
                 } else {
                     activeSecondary.add(slug);
                 }
                 render();
+                announceFilterChange(wasActive ? 'removed' : 'selected', label);
+                if (!wasActive) focusSelectedTag(slug);
             });
             drawerChipsEl.appendChild(btn);
         });
@@ -1375,7 +1378,7 @@ function initArchive(filterDrawer) {
     //
     // Single shared pool now (#filter-drawer-chips, paginated 6 per page) at
     // every breakpoint.
-    function focusDeactivatedSecondaryTag(slug) {
+    function focusDeactivatedSecondaryTag(slug, rowIndex) {
         const poolEl = drawerChipsEl;
         if (!poolEl) return;
 
@@ -1415,9 +1418,12 @@ function initArchive(filterDrawer) {
             // Other tags are still active — the pool/pagination stays
             // hidden (.filter-drawer--tags-active), so the active-chips row
             // itself (always visible whenever any tag is active) is the
-            // reachable, contextually relevant fallback.
-            const firstActive = drawerActiveChipsEl ? drawerActiveChipsEl.querySelector('.tag-chip') : null;
-            if (firstActive) { firstActive.focus(); return; }
+            // reachable, contextually relevant fallback: the chip that took
+            // the removed one's place (the row is rebuilt in Set order, so
+            // that's the same index), else the one before it.
+            const rowChips = drawerActiveChipsEl ? drawerActiveChipsEl.children : [];
+            const neighbour = rowChips[rowIndex] || rowChips[rowIndex - 1];
+            if (neighbour) { neighbour.focus(); return; }
         } else {
             // This was the last active tag and the pool is visible again
             // (.filter-drawer--tags-active just came off) — first visible
@@ -1433,7 +1439,35 @@ function initArchive(filterDrawer) {
         // is a silent no-op, confirmed, not assumed.
         if (pageNavEl && !pageNavEl.hidden && pagePrevBtn) {
             pagePrevBtn.focus();
+            return;
         }
+
+        // Nothing else to land on — the drawer's Done trigger is always
+        // present, visible and enabled, so focus is never left on <body>.
+        const doneBtn = document.querySelector('.filter-drawer-controls .filter-drawer-trigger');
+        if (doneBtn) doneBtn.focus();
+    }
+
+    // Selecting a secondary tag hides the grid chip that was just pressed
+    // (.filter-drawer--tags-active), which would drop focus to <body> — move
+    // it to that same tag's chip in the selected-tags row instead. Found by
+    // the tag's slug (its position in activeSecondary, which the row is
+    // rebuilt from), not a DOM reference, since render() rebuilds the row.
+    function focusSelectedTag(slug) {
+        const idx = [...activeSecondary].indexOf(slug);
+        const chip = drawerActiveChipsEl ? drawerActiveChipsEl.children[idx] : null;
+        if (chip) chip.focus();
+    }
+
+    // After a Clear control resets everything, the pressed control is
+    // either disabled (the drawer's own Clear) or gone (the floating Clear,
+    // the empty-state button) — land on a control that is still there: Done
+    // for the drawer's own, the floating Filters trigger for the rest.
+    function focusAfterClear(clearBtn) {
+        const target = clearBtn.closest('#filter-drawer')
+            ? document.querySelector('.filter-drawer-controls .filter-drawer-trigger')
+            : document.querySelector('.action-rail-trigger');
+        if (target) target.focus({ preventScroll: true });
     }
 
     // Update active secondary chips row (shown above secondary list)
@@ -1457,9 +1491,11 @@ function initArchive(filterDrawer) {
             btn.textContent = label;
             btn.appendChild(x);
             btn.addEventListener('click', () => {
+                const rowIndex = [...activeSecondary].indexOf(slug);
                 activeSecondary.delete(slug);
                 render();
-                focusDeactivatedSecondaryTag(slug);
+                announceFilterChange('removed', label);
+                focusDeactivatedSecondaryTag(slug, rowIndex);
             });
             container.appendChild(btn);
         });
@@ -1559,6 +1595,27 @@ function initArchive(filterDrawer) {
         };
     }
 
+    // The one spoken update for a user-initiated filter change: "{Name}
+    // selected." / "{Name} removed." / "Filters cleared.", then "Showing N
+    // entries." from resultCount — the same filtered.length render() writes
+    // into #archive-count, so the two can't disagree. Called from the
+    // user-action handlers after render(), never from render() itself, so
+    // page load, ?type=/?tag= arrival and Esc/Done/open/close stay silent.
+    // #filter-announcer lives outside <main> and the drawer (see
+    // archive.html), so it is exposed whether the drawer is open or closed.
+    // Cleared first and set after a short delay so an identical repeat
+    // message is still announced as a change.
+    const announcerEl = document.getElementById('filter-announcer');
+    let announceTimer = null;
+    function announceFilterChange(action, name) {
+        if (!announcerEl) return;
+        const lead = action === 'cleared' ? 'Filters cleared' : `${name} ${action}`;
+        const message = `${lead}. Showing ${resultCount} ${resultCount === 1 ? 'entry' : 'entries'}.`;
+        clearTimeout(announceTimer);
+        announcerEl.textContent = '';
+        announceTimer = setTimeout(() => { announcerEl.textContent = message; }, 100);
+    }
+
     // Main render — updates all UI from current state
     function render() {
         const filtered = getFiltered();
@@ -1574,6 +1631,7 @@ function initArchive(filterDrawer) {
         // full unfiltered entry list (covers the 0-active-filters case, and
         // correctly falls back to the real number if search text narrows
         // results even with 0 chip filters active).
+        resultCount = filtered.length;
         if (countEl) {
             const displayCount = filtered.length === allEntries.length ? 'All' : filtered.length;
             const entriesWord  = filtered.length === 1 ? 'Entry' : 'Entries';
@@ -1759,7 +1817,7 @@ function initArchive(filterDrawer) {
         btn.type = 'button';
         btn.className = 'archive-clear-btn btn btn--danger-hover archive-empty-clear-btn';
         btn.textContent = 'Clear Filters!';
-        btn.addEventListener('click', doReset);
+        btn.addEventListener('click', () => { doReset(); announceFilterChange('cleared'); focusAfterClear(btn); });
         content.appendChild(btn);
 
         wrap.appendChild(content);
@@ -1772,11 +1830,13 @@ function initArchive(filterDrawer) {
         btn.addEventListener('click', () => {
             const type = btn.dataset.filterType;
             activeType = activeType === type ? null : type;
+            const typeLabel = btn.dataset.label;
             const url = new URL(window.location.href);
             if (activeType) url.searchParams.set('type', activeType);
             else            url.searchParams.delete('type');
             window.history.replaceState({}, '', url.toString());
             render();
+            announceFilterChange(activeType ? 'selected' : 'removed', typeLabel);
         });
     });
 
@@ -1846,11 +1906,11 @@ function initArchive(filterDrawer) {
 
     // Wire clear buttons (header, drawer, and floating external instance)
     document.querySelectorAll('.archive-clear-btn').forEach(btn => {
-        // Same fix as the drawer's Close/Filters trigger (see
+        // Same fix as the drawer's Done/Filters trigger (see
         // initFilterDrawer) — prevents mousedown from shifting focus/layout
         // before the click lands.
         btn.addEventListener('mousedown', (e) => e.preventDefault());
-        btn.addEventListener('click', doReset);
+        btn.addEventListener('click', () => { doReset(); announceFilterChange('cleared'); focusAfterClear(btn); });
     });
 
     // The floating action rail is visible by default at every breakpoint
