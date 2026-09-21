@@ -1244,10 +1244,10 @@ function initArchive(filterDrawer) {
         const url        = entry.url || '#';
         const date       = formatDate(entry.date);
         const ctaText    = entry.type === 'work' ? 'View' : 'Read';
-        // blockLinkLabel override: manifest escape hatch for the rare title
-        // where "{ctaText} {title}" reads redundant (e.g. "Read Read Me" for
-        // the "Read Me" entry) — general convention unchanged for every
-        // entry that doesn't set this field.
+        // blockLinkLabel override: optional manifest escape hatch for the
+        // rare title where "{ctaText} {title}" reads redundant or awkward
+        // (e.g. a title that itself starts with "Read" or "View") — general
+        // convention unchanged for every entry that doesn't set this field.
         const blockLinkLabel = entry.blockLinkLabel
             ? escapeHTML(entry.blockLinkLabel)
             : `${ctaText} ${escapeHTML(entry.title)}`;

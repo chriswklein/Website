@@ -1481,8 +1481,8 @@ hardcoded logic — so consolidating later stays a mechanical merge.
 
 **Migration status (confirmed complete 2026-08-23):** all five live entries
 (`work/star-engine.html`, `work/this-website.html`,
-`thoughts/read-me.html` (renamed 2026-09-08, formerly
-`thoughts/code-and-conduct.html`, formerly `thoughts/thrilling-beginnings.html`),
+`thoughts/welcome.html` (renamed 2026-09-20, formerly `thoughts/read-me.html`,
+before that `thoughts/code-and-conduct.html`, before that `thoughts/thrilling-beginnings.html`),
 `thoughts/physical-and-digital-media.html`,
 `thoughts/industrializing-the-industry.html`) plus both templates use this
 design. The previous `.standard-page-meta` / `.standard-page-nav` structure
