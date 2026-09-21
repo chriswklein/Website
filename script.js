@@ -779,6 +779,43 @@ function initFilterDrawer() {
     let removeTrapFocus = null;
     let openerBtn = null;
     let savedScrollY = 0;
+    let drawerIsOpen = false;
+
+    // Active-filter summary pushed in by initArchive()'s render() via
+    // setActiveSummary() below (one function there builds both strings, next
+    // to the badge update, so the badge, the announced count and the tag
+    // names can't disagree): namePhrase is appended to each trigger's
+    // accessible name (", 2 active filters", or '' at 0), description is
+    // the "Selected: …" text behind aria-describedby (or '' at 0).
+    let activeSummary = { namePhrase: '', description: '' };
+
+    // Each trigger gets its own visually-hidden description element as a
+    // sibling in its own container — the floating trigger's inside
+    // .action-rail-group, the drawer's own inside .filter-drawer-controls —
+    // so an inert ancestor elsewhere can't take it away, and it stays out of
+    // the trigger's own name (a child of the button would be read as part of
+    // it for the drawer trigger, whose name comes from its content). The
+    // drawer's own trigger also has no aria-label, so its count phrase is a
+    // visually-hidden span after its label rather than a new aria-label; the
+    // floating trigger's count goes in the aria-label updateTriggerLabels()
+    // already swaps. The visible badge stays aria-hidden, so the count is
+    // never read twice.
+    const triggerA11y = new Map();
+    allTriggers.forEach((t, i) => {
+        const desc = document.createElement('span');
+        desc.className = 'sr-only';
+        desc.id = `filter-trigger-description-${i + 1}`;
+        t.after(desc);
+
+        let countEl = null;
+        const labelSpan = t.querySelector('.trigger-label');
+        if (labelSpan && !t.classList.contains('action-rail-trigger')) {
+            countEl = document.createElement('span');
+            countEl.className = 'sr-only';
+            labelSpan.after(countEl);
+        }
+        triggerA11y.set(t, { desc, countEl });
+    });
 
     // Locks background scroll while the drawer is open — inert blocks click/
     // focus/AT interaction on background content, but has no effect on
@@ -822,17 +859,31 @@ function initFilterDrawer() {
     }
 
     function updateTriggerLabels(isOpen) {
+        drawerIsOpen = isOpen;
         allTriggers.forEach(t => {
             const labelSpan = t.querySelector('.trigger-label');
-            if (labelSpan) labelSpan.textContent = isOpen ? 'Close' : 'Filters';
+            if (labelSpan) labelSpan.textContent = isOpen ? 'Done' : 'Filters';
             if (t.classList.contains('action-rail-trigger')) {
                 // Matches the visible .trigger-label text's exact case ("Filters") —
                 // WCAG 2.5.3 (Label in Name) requires the visible text to appear
                 // verbatim in the accessible name; the prior lowercase "filters"
                 // failed axe/Lighthouse's label-content-name-mismatch check.
-                t.setAttribute('aria-label', isOpen ? 'Close Filters' : 'Open Filters');
+                t.setAttribute('aria-label', (isOpen ? 'Done filtering' : 'Open Filters') + activeSummary.namePhrase);
             }
+
+            const { desc, countEl } = triggerA11y.get(t);
+            if (countEl) countEl.textContent = activeSummary.namePhrase;
+            desc.textContent = activeSummary.description;
+            if (activeSummary.description) t.setAttribute('aria-describedby', desc.id);
+            else t.removeAttribute('aria-describedby');
         });
+    }
+
+    // Re-applies the trigger names/descriptions for whichever open/closed
+    // state the drawer is currently in — called on every render().
+    function setActiveSummary(summary) {
+        activeSummary = summary;
+        updateTriggerLabels(drawerIsOpen);
     }
 
     function openDrawer(opener) {
@@ -951,7 +1002,7 @@ function initFilterDrawer() {
         scrim.addEventListener('click', closeDrawer);
     }
 
-    return { openDrawer, closeDrawer };
+    return { openDrawer, closeDrawer, setActiveSummary };
 }
 
 // Archive page — fetch manifest, build chips, filter, sort, paginate, sync URL
@@ -1479,6 +1530,35 @@ function initArchive(filterDrawer) {
         else           btn.removeAttribute('aria-label');
     }
 
+    // Count + announced text for the trigger badges, built once per render().
+    // Names are in on-screen order — the primary type chip (top group) first,
+    // then the secondary tags in the order #filter-drawer-active-chips lists
+    // them (same Set, same dataset.label source updateActiveChipsRow() uses)
+    // — with no "primary"/"secondary" wording, since the UI has no such
+    // group labels. At most three names, then "and N more".
+    function getActiveFilterSummary() {
+        const names = [];
+        if (activeType) {
+            const typeBtn = [...primaryChips].find(btn => btn.dataset.filterType === activeType);
+            names.push(typeBtn ? typeBtn.dataset.label : activeType);
+        }
+        activeSecondary.forEach(slug => {
+            const sourceBtn = document.querySelector(`[data-filter-tag="${slug}"]`);
+            names.push(sourceBtn ? sourceBtn.dataset.label : slug);
+        });
+
+        const count = names.length;
+        if (count === 0) return { count, namePhrase: '', description: '' };
+
+        const shown = names.slice(0, 3).join(', ');
+        const extra = count - 3;
+        return {
+            count,
+            namePhrase: `, ${count} active ${count === 1 ? 'filter' : 'filters'}`,
+            description: `Selected: ${shown}${extra > 0 ? ` and ${extra} more` : ''}`
+        };
+    }
+
     // Main render — updates all UI from current state
     function render() {
         const filtered = getFiltered();
@@ -1515,12 +1595,17 @@ function initArchive(filterDrawer) {
             btn.textContent = currentSort === 'latest' ? 'Latest ↑' : 'Earliest ↓';
         });
 
-        // Update all trigger badges (header trigger + floating rail trigger) from shared state
-        const filterCount = (activeType ? 1 : 0) + activeSecondary.size;
+        // Update all trigger badges (header trigger + floating rail trigger) from shared state.
+        // The visible badge, the count in each trigger's accessible name and
+        // the "Selected: …" description all come from this one summary, so
+        // they can't disagree.
+        const activeSummary = getActiveFilterSummary();
+        const filterCount = activeSummary.count;
         document.querySelectorAll('.action-rail-badge').forEach(badgeEl => {
             badgeEl.textContent = filterCount;
             badgeEl.hidden = filterCount === 0;
         });
+        if (filterDrawer) filterDrawer.setActiveSummary(activeSummary);
 
         // Enable Clear buttons when either search text or a filter is active —
         // disabled only when both are empty. Previously checked filterCount
@@ -1672,7 +1757,7 @@ function initArchive(filterDrawer) {
 
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'archive-clear-btn btn archive-empty-clear-btn';
+        btn.className = 'archive-clear-btn btn btn--danger-hover archive-empty-clear-btn';
         btn.textContent = 'Clear Filters!';
         btn.addEventListener('click', doReset);
         content.appendChild(btn);

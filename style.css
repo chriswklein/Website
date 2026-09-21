@@ -54,6 +54,12 @@
     --color-accent-quote: #A9407C;
     --color-accent-quote-text: #FF60BB;
 
+    /* ---- Colour: Semantic — Danger ---- */
+    /* Destructive / removes-something hover fill; light text on it is 6.3:1.
+       Not themed (absent from the [data-theme] blocks) and has no -text
+       variant — no red text is used anywhere. */
+    --color-danger: #B41321;
+
     /* ---- Colour: Semantic — Components ---- */
     --color-link: var(--color-accent-primary-text);
     --color-link-hover: var(--color-accent-primary);
@@ -746,6 +752,26 @@ pre code {
         --btn-border-hover: var(--color-accent-primary-text);
         --btn-text-hover:   var(--color-accent-primary-text);
     }
+}
+
+/* Red = "this removes something." Applied to the controls that clear
+   filters (Filter Drawer Clear, floating Clear "x", empty-state "Clear
+   Filters!") and nothing else. Only the fill changes: the shared
+   .btn:hover already supplies the border/text tokens that keep 6.3:1
+   against --color-danger, and .btn's own background-color transition
+   covers the fade. Hover sits in @media (hover: hover) so a tap never
+   leaves a stuck red state; :active sits outside it for press feedback on
+   touch. :not(:disabled) keeps a disabled Clear neutral. Three-part
+   selectors (0,3,0) outrank .btn:hover/.btn:active (0,2,0) without
+   !important. */
+@media (hover: hover) {
+    .btn--danger-hover:hover:not(:disabled) {
+        background-color: var(--color-danger);
+    }
+}
+
+.btn--danger-hover:active:not(:disabled) {
+    background-color: var(--color-danger);
 }
 
 /* Share button — auto-width, not full-width like .btn default */
@@ -3595,11 +3621,13 @@ footer p {
     font-size: var(--font-size-md);
 }
 
-/* Floating external Clear only — round like the Filters pill beside it
-   (same token). Scoped to .action-rail-group because the image viewer's
-   Close/zoom/Prev/Next reuse .action-rail-clear and keep their own radius. */
+/* Floating external Clear only — round and shadowed like the Filters pill
+   beside it (same tokens as .action-rail-trigger). Scoped to
+   .action-rail-group because the image viewer's Close/zoom/Prev/Next reuse
+   .action-rail-clear and keep their own flat radius/no shadow. */
 .action-rail-group .action-rail-clear {
     border-radius: var(--border-radius-full);
+    box-shadow: var(--elevation-md);
 }
 
 /* No disabled rule of its own — .btn:disabled above already gives the
