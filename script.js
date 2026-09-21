@@ -2277,6 +2277,21 @@ function initImageViewer() {
     enlargedImg.addEventListener('pointerup', releasePointer);
     enlargedImg.addEventListener('pointercancel', releasePointer);
 
+    // expand.svg (assets/icons/arrows/) inlined rather than <img src> so
+    // fill: currentColor can follow the plate's own text colour, same
+    // technique as TOC_SUB_ICON_HTML above. Path data is the source file's
+    // two paths and <g opacity>, byte-for-byte; only fill="white" became
+    // currentColor and the fixed width/height moved to CSS
+    // (.image-zoom-trigger-icon svg). Decorative only — the trigger's own
+    // "View larger image" label is its name, and pointer-events: none in CSS
+    // keeps the whole thumbnail the single click target.
+    const EXPAND_ICON_HTML =
+        '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">' +
+        '<g opacity="0.9">' +
+        '<path d="M13.2929 9.29289C12.9024 9.68342 12.9024 10.3166 13.2929 10.7071C13.6834 11.0976 14.3166 11.0976 14.7071 10.7071L14 10L13.2929 9.29289ZM22 3C22 2.44771 21.5523 2 21 2L12 2C11.4477 2 11 2.44772 11 3C11 3.55228 11.4477 4 12 4L20 4L20 12C20 12.5523 20.4477 13 21 13C21.5523 13 22 12.5523 22 12L22 3ZM14 10L14.7071 10.7071L21.7071 3.70711L21 3L20.2929 2.29289L13.2929 9.29289L14 10Z" fill="currentColor"/>' +
+        '<path d="M10.7071 14.7071C11.0976 14.3166 11.0976 13.6834 10.7071 13.2929C10.3166 12.9024 9.68342 12.9024 9.29289 13.2929L10 14L10.7071 14.7071ZM2 21C2 21.5523 2.44771 22 3 22L12 22C12.5523 22 13 21.5523 13 21C13 20.4477 12.5523 20 12 20L4 20L4 12C4 11.4477 3.55228 11 3 11C2.44772 11 2 11.4477 2 12L2 21ZM10 14L9.29289 13.2929L2.29289 20.2929L3 21L3.70711 21.7071L10.7071 14.7071L10 14Z" fill="currentColor"/>' +
+        '</g></svg>';
+
     images.forEach(img => {
         const trigger = document.createElement('button');
         trigger.type = 'button';
@@ -2289,8 +2304,13 @@ function initImageViewer() {
         label.className = 'sr-only';
         label.textContent = 'View larger image: ';
 
+        const icon = document.createElement('span');
+        icon.className = 'image-zoom-trigger-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerHTML = EXPAND_ICON_HTML;
+
         img.parentNode.insertBefore(trigger, img);
-        trigger.append(label, img);
+        trigger.append(label, img, icon);
 
         trigger.addEventListener('mousedown', (e) => e.preventDefault());
         trigger.addEventListener('click', () => openViewer(img));
