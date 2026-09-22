@@ -286,7 +286,7 @@ First child of `<body>` on every page. Links to `<main id="main-content">`.
 | `aria-live="polite"` | Dynamic content (search results, toast notifications) | Implement with search and share button |
 | `role="tooltip"` | Tooltip elements | ✅ Confirmed for this build |
 | `aria-describedby` | Links trigger element to tooltip | ✅ Confirmed for this build |
-| Focus trapping | Overlays and modals | Deferred — implement with search overlay |
+| Focus trapping | Overlays and modals | ✅ Implemented — `trapFocus()` in the Filter Drawer, the ToC panel and the image viewer dialog |
 
 ### Link and Button Label Standards
 Short visible labels with `.sr-only` hidden context for screen readers.
@@ -345,8 +345,8 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Archive (archive.html)
 **Purpose:** Unified index of every Work and Thoughts entry — replaces the earlier separate `work.html` / `thoughts.html` page concept entirely.
-**Status:** Built — client-side fetch of `data/archive-entries.json`, with search, sort, and the Filter Drawer (type + tag filtering, unified across all three breakpoints). Full behaviour spec: md/COMPONENTS.md "## 2c. Filter Drawer".
-**Layout:** Sticky/condensing header with inline filter chips on desktop (floating rail trigger once scrolled), bottom-sheet/anchored-panel Filter Drawer on tablet/mobile and on desktop once condensed. Results grid below, single column of cards.
+**Status:** Built — client-side fetch of `data/archive-entries.json`, with sort and the Filter Drawer (type + tag filtering, one drawer at every breakpoint). Full behaviour spec: md/COMPONENTS.md "## 2c. Filter Drawer". Search-matching logic exists in `script.js` (`currentQuery`) but is currently dormant — no search UI is wired to it, pending a future redesign.
+**Layout:** A floating "Filters" pill (`.action-rail-group`), visible at every scroll position and breakpoint, is the sole entry point to the Filter Drawer — a bottom sheet below 1024px, an anchored panel from 1024px up. An entry-count-and-sort row sits between the header and the results grid. Results grid below, single column of cards.
 **Entry points:** `?type=work`, `?type=thoughts`, `?tag={slug}` query params pre-filter on load — used by nav links, tag links, and Home's "View more work" / "Read more thoughts" links.
 
 ### Standard Page Template (Work entries, Thoughts entries)
@@ -563,11 +563,13 @@ Accessibility is a stated project pillar (see Core Principles, §1), not a post-
 - Focus trap inside the open Filter Drawer (`trapFocus()`)
 - Background content excluded from Tab order via `inert` while the drawer is open, and the drawer's own content excluded via `inert` while closed — both directions handled, not just one
 - Escape closes the drawer, with focus returned to whichever trigger opened it
+- Image viewer (click-to-zoom on Standard Page images, `initImageViewer()`): an accessible modal on the same mechanics as the drawer — `role="dialog"`, `aria-modal="true"`, named from the image's own alt text, background `inert`, `trapFocus()`, Escape closes, focus lands on Close on open and returns to the image's trigger on close. Each image's trigger is a real button (`View larger image: {alt}`). Zoom works without a pointer (+/− buttons, `+`/`−` keys); arrow keys pan when zoomed (drag alternative), and Previous/Next (2+ images only) are disabled while zoomed because the same arrows then pan
 - The invisible full-card click overlay (`.card-block-link`) is `aria-hidden="true"` and `tabindex="-1"` on every card (`index.html`, `buildCard()` in `script.js`, `design-system.html`'s previews) as of 2026-09-02 — mouse convenience never creates a redundant or confusing tab stop. The real, visible, keyboard-focusable link on each card is now `.link-cta` (md/COMPONENTS.md §17), which sits above the block-link (`z-index: 2` vs `1`) and carries a full descriptive `aria-label`. Confirmed via a real accessibility-tree snapshot and Tab-key walkthrough, not just markup review — Tab moves directly from content before the card to `.link-cta`, and the block-link never receives focus.
 
 **Screen Reader & Semantic**
 - Real NVDA testing conducted during development — not automated-only
 - Meaningful `aria-label`s on state-changing controls (filter chips, Clear, Share, Back to Top, drawer triggers)
+- Filter announcer: `#filter-announcer` (`role="status"`, `aria-live="polite"`, `aria-atomic="true"`, `.sr-only`) is the one live region for Archive filter and sort changes — "{Name} selected/removed. Showing N entries.", "Filters cleared. Showing N entries.", and "Sorted by Latest/Earliest first." for the sort toggle. It is a direct child of `<body>`, outside `<main>`, the drawer and the rail group, so it is never `inert` in either drawer state, and it speaks only on a user action — never on page load, on `?type=`/`?tag=` arrival, or on drawer open/close. `#archive-count` is deliberately not a live region, so a change is spoken once. Spec: md/COMPONENTS.md "## 2c. Filter Drawer"
 - `aria-expanded` / `aria-pressed` reflect live state, updated on every relevant interaction
 - Heading and excerpt exposure verified against a real accessibility-tree snapshot, not assumed from markup alone
 - Line-clamped card excerpts retain their full text in the DOM — the visual clamp never removes content from screen readers

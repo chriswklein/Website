@@ -3505,7 +3505,7 @@ footer p {
    No scrim/backdrop change needed — .archive-scrim already renders at
    opacity: 0 unconditionally (invisible click-outside hit-area only, see
    above), so "no dimmed scrim" already holds true at every breakpoint.
-   Dismiss (Close button, click-outside via the scrim, Escape) and the
+   Dismiss (Done button, click-outside via the scrim, Escape) and the
    floating trigger's own hide-while-open behaviour are both already
    breakpoint-agnostic in script.js's openDrawer()/closeDrawer() — nothing
    to change there either. */

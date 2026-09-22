@@ -1056,6 +1056,15 @@ function initArchive(filterDrawer) {
     let activeType         = null;
     const activeSecondary  = new Set();
     let currentSort        = 'latest';
+    // SEARCH FILTERING (dormant — no search UI exists to set this)
+    // currentQuery and everything below that reads it (getFiltered(),
+    // getChipCountForType(), getChipCountForTag()) are fully implemented
+    // but unreachable: archive.html has no search input, no URL param
+    // feeds it, and doReset() only ever resets it back to '' — so it
+    // never holds anything but the empty string today. Kept
+    // intentionally, not removed: Chris wants to rebuild Archive search
+    // but hasn't decided its structure yet, and this matching logic is
+    // ready to be wired to whatever that input turns out to be.
     let currentQuery       = '';
     let secondaryPage      = 0; // Filter Drawer paginated secondary tags, 0-indexed
     // The grid page the user was on right before any secondary tag went
@@ -1134,7 +1143,7 @@ function initArchive(filterDrawer) {
     }
 
     // Build secondary tag chips into the Filter Drawer — the one shared
-    // pool of secondary tags at every breakpoint now, paginated 6 per page
+    // pool of secondary tags at every breakpoint now, paginated 12 per page
     // (see the pagination block in render() and the Previous/Next/dots
     // wiring below).
     function buildSecondaryChips(entries) {
@@ -1376,7 +1385,7 @@ function initArchive(filterDrawer) {
     // happens to be first in DOM order on whatever page is showing —
     // exactly the "different, unrelated tag" symptom reported.
     //
-    // Single shared pool now (#filter-drawer-chips, paginated 6 per page) at
+    // Single shared pool now (#filter-drawer-chips, paginated 12 per page) at
     // every breakpoint.
     function focusDeactivatedSecondaryTag(slug, rowIndex) {
         const poolEl = drawerChipsEl;
@@ -1604,16 +1613,32 @@ function initArchive(filterDrawer) {
     // #filter-announcer lives outside <main> and the drawer (see
     // archive.html), so it is exposed whether the drawer is open or closed.
     // Cleared first and set after a short delay so an identical repeat
-    // message is still announced as a change.
+    // message is still announced as a change. announce() is the only code
+    // that writes to the region; announceFilterChange() and
+    // announceSortChange() just build their message and hand it over.
     const announcerEl = document.getElementById('filter-announcer');
     let announceTimer = null;
-    function announceFilterChange(action, name) {
+    function announce(message) {
         if (!announcerEl) return;
-        const lead = action === 'cleared' ? 'Filters cleared' : `${name} ${action}`;
-        const message = `${lead}. Showing ${resultCount} ${resultCount === 1 ? 'entry' : 'entries'}.`;
         clearTimeout(announceTimer);
         announcerEl.textContent = '';
         announceTimer = setTimeout(() => { announcerEl.textContent = message; }, 100);
+    }
+
+    // sortWasReset: only ever passed true by a Clear control (see doReset()
+    // below) — true information only, so a Clear that found sort already
+    // at Latest says nothing about sort at all.
+    function announceFilterChange(action, name, sortWasReset = false) {
+        const lead = action === 'cleared'
+            ? (sortWasReset ? 'Filters cleared, sort reset to Latest' : 'Filters cleared')
+            : `${name} ${action}`;
+        announce(`${lead}. Showing ${resultCount} ${resultCount === 1 ? 'entry' : 'entries'}.`);
+    }
+
+    // Sort toggle — order only; the entry count never changes, so no count
+    // in the message. Same wording as the toggle's own visible label.
+    function announceSortChange() {
+        announce(`Sorted by ${currentSort === 'latest' ? 'Latest' : 'Earliest'} first.`);
     }
 
     // Main render — updates all UI from current state
@@ -1703,7 +1728,7 @@ function initArchive(filterDrawer) {
         // (drawer open).
         updateDrawerSecondaryMetrics();
 
-        // Filter Drawer secondary tags — paginated 6 per page (already
+        // Filter Drawer secondary tags — paginated 12 per page (already
         // alphabetically sorted; zero-count tags already excluded above) —
         // same drawer, same pagination, at every breakpoint now.
         if (drawerChipsEl) {
@@ -1817,7 +1842,7 @@ function initArchive(filterDrawer) {
         btn.type = 'button';
         btn.className = 'archive-clear-btn btn btn--danger-hover archive-empty-clear-btn';
         btn.textContent = 'Clear Filters!';
-        btn.addEventListener('click', () => { doReset(); announceFilterChange('cleared'); focusAfterClear(btn); });
+        btn.addEventListener('click', () => { const sortWasReset = doReset(); announceFilterChange('cleared', null, sortWasReset); focusAfterClear(btn); });
         content.appendChild(btn);
 
         wrap.appendChild(content);
@@ -1845,6 +1870,7 @@ function initArchive(filterDrawer) {
         btn.addEventListener('click', () => {
             currentSort = currentSort === 'latest' ? 'earliest' : 'latest';
             render();
+            announceSortChange();
         });
     });
 
@@ -1887,7 +1913,12 @@ function initArchive(filterDrawer) {
         }).observe(filterDrawerEl, { attributes: true, attributeFilter: ['hidden'] });
     }
 
+    // Returns whether this reset actually changed the sort — captured
+    // before currentSort is overwritten below, since announceFilterChange()
+    // (called after doReset() by every caller) needs to know the prior
+    // value, not the post-reset 'latest' it's about to become.
     function doReset() {
+        const sortWasReset = currentSort !== 'latest';
         activeType = null;
         activeSecondary.clear();
         currentQuery = '';
@@ -1902,6 +1933,7 @@ function initArchive(filterDrawer) {
         url.searchParams.delete('type');
         window.history.replaceState({}, '', url.toString());
         render();
+        return sortWasReset;
     }
 
     // Wire clear buttons (header, drawer, and floating external instance)
@@ -1910,7 +1942,7 @@ function initArchive(filterDrawer) {
         // initFilterDrawer) — prevents mousedown from shifting focus/layout
         // before the click lands.
         btn.addEventListener('mousedown', (e) => e.preventDefault());
-        btn.addEventListener('click', () => { doReset(); announceFilterChange('cleared'); focusAfterClear(btn); });
+        btn.addEventListener('click', () => { const sortWasReset = doReset(); announceFilterChange('cleared', null, sortWasReset); focusAfterClear(btn); });
     });
 
     // The floating action rail is visible by default at every breakpoint
