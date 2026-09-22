@@ -36,7 +36,7 @@
          and hides along with the rest of the group whenever the drawer is open. -->
     <div class="action-rail-group action-rail-group--visible" id="action-rail-group">
 
-        <button class="archive-clear-btn btn action-rail-clear" type="button" hidden aria-label="Clear filters">
+        <button class="archive-clear-btn btn btn--danger-hover action-rail-clear" type="button" hidden aria-label="Clear all filters">
             <span class="tag-chip-x" aria-hidden="true">×</span>
         </button>
 
@@ -66,9 +66,9 @@
          hidden inert>
         <div class="filter-drawer-body">
 
-            <!-- Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right) -->
+            <!-- Row 1: Clear (left) · "Filter" label (true centre) · Filters/Done trigger (right) -->
             <div class="filter-drawer-controls">
-                <button class="archive-clear-btn btn" type="button" disabled>Clear</button>
+                <button class="archive-clear-btn btn btn--danger-hover" type="button" disabled aria-label="Clear all filters">Clear</button>
                 <p class="filter-drawer-label">
                     <svg class="filter-drawer-label-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
                         <g opacity="0.9">
@@ -133,7 +133,7 @@
 
             <!-- Entry count (left) and sort toggle (right) — between header and results grid -->
             <div class="archive-sort-count-row">
-                <p class="archive-count" id="archive-count" aria-live="polite">Loading…</p>
+                <p class="archive-count" id="archive-count">Loading…</p>
                 <button class="archive-sort-toggle" type="button">Latest ↑</button>
             </div>
 
@@ -151,6 +151,14 @@
     </main>
 
     <div role="status" aria-live="polite" class="toast">URL copied to clipboard!</div>
+
+    <!-- Filter-change announcer — the one live region for user-initiated filter
+         changes (select / remove / clear), spoken from script.js's
+         announceFilterChange(). A direct child of body, outside <main>, the
+         drawer and the action rail, so it is never inert or hidden in either
+         drawer state; #archive-count (inside the inert <main> while the drawer
+         is open) is no longer a live region, so a change is spoken once. -->
+    <div class="sr-only" id="filter-announcer" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <nav class="tab-bar" aria-label="Mobile navigation">
         <a href="/index.html" class="tab-bar-item">

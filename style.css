@@ -1,6 +1,11 @@
 /* ================================
    BASE RESET
 ================================ */
+/* Removes every browser's own default spacing/box-model quirks so every
+   margin/padding/width on this site comes from a token below, never a
+   browser default nobody chose. box-sizing: border-box means a padded
+   element's declared width includes its padding/border instead of
+   growing past it — the sizing model every rule in this file assumes. */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
@@ -10,6 +15,13 @@
 /* ================================
    ROOT TOKENS
 ================================ */
+/* Every colour, size, spacing, and timing value the site uses is defined
+   once here as a CSS custom property ("token") and referenced by name
+   everywhere else — never hardcoded again below. This is what makes
+   DESIGN-SYSTEM.md's token tables and the live site the same source of
+   truth: change a value here and it updates everywhere that token is
+   used, all at once. See md/DESIGN-SYSTEM.md for what each token means
+   and when to use it. */
 :root {
     /* ---- Colour: Background ---- */
     --color-background-base: #111111;
@@ -41,6 +53,12 @@
     /* ---- Colour: Accent — Pink ---- */
     --color-accent-quote: #A9407C;
     --color-accent-quote-text: #FF60BB;
+
+    /* ---- Colour: Semantic — Danger ---- */
+    /* Destructive / removes-something hover fill; light text on it is 6.3:1.
+       Not themed (absent from the [data-theme] blocks) and has no -text
+       variant — no red text is used anywhere. */
+    --color-danger: #B41321;
 
     /* ---- Colour: Semantic — Components ---- */
     --color-link: var(--color-accent-primary-text);
@@ -118,6 +136,39 @@
     --max-content: 1200px;
     --card-image-column-width: 42%;
     --toc-rail-width: 240px;
+    /* ToC panel positioning (2026-09-19, revised): the panel used to be
+       anchored to the floating trigger's own fixed position (bottom-right
+       corner pinned to wherever .action-rail-group's top: 50%/70% put it),
+       which put a hard ceiling around 45–48% of viewport height on its
+       max-height regardless of how generous a vh percentage was used —
+       there was simply no more room than that between the header and the
+       trigger. Decoupled here: the panel now anchors directly below the
+       header/tab-bar instead, independent of the trigger entirely, so its
+       target height can reach the real 75–80% of viewport height the
+       current spec calls for. --toc-panel-top-offset reuses the same
+       64px literal every other fixed-chrome-height formula in this file
+       already treats as this site's header/tab-bar height (confirmed via
+       direct read of both `header` — sticky, tablet/desktop — and
+       `.tab-bar` — fixed, mobile — before changing anything: both render
+       at exactly 64px at the breakpoints where each is the visible one,
+       so one constant covers every tier, no per-breakpoint override
+       needed) plus --space-6 breathing room. This offset is a fixed
+       length, not a vh fraction, so top placement alone already
+       guarantees the panel can never overlap the header at any viewport
+       height — no trigger-relative arithmetic left to get that wrong.
+       --toc-panel-height-min/-max bound the target-height clamp (see
+       .toc-panel's own height comment) — derived from the largest
+       spacing token (--space-32, 128px) rather than arbitrary numbers
+       (Rule 3a): min = 2.5x (320px), a floor for short/resized windows;
+       max = 8x (1024px), generous enough that the clamp's own ~78vh
+       mid-point — not this ceiling — is what actually governs height at
+       every real viewport tested (2560×1300, 1920×1000, 834×1100,
+       390×844: all land at exactly 78% of their own height), while still
+       bounding growth on a hypothetically much taller window rather than
+       scaling unbounded. */
+    --toc-panel-top-offset: calc(64px + var(--space-6));
+    --toc-panel-height-min: calc(var(--space-32) * 2.5);
+    --toc-panel-height-max: calc(var(--space-32) * 8);
 
     /* ---- Border Radius ---- */
     --border-radius-none: 0px;
@@ -164,6 +215,11 @@
 /* ================================
    TEAL THEME OVERRIDE
 ================================ */
+/* Teal is the site's live default accent (already set above in :root),
+   so this override exists only so an explicit data-theme="teal"
+   attribute (set by the toggle logic in script.js, currently dormant —
+   see THEME TOGGLE RAIL below) resolves to the same values as no
+   attribute at all. Harmless duplication, not dead code. */
 [data-theme="teal"] {
     --color-accent-primary: #00BAA5;
     --color-accent-primary-text: #00E5CB;
@@ -171,6 +227,12 @@
 
 /* ================================
    GOLD THEME OVERRIDE (dormant — toggle UI disabled pending Action Rail)
+   A second accent-colour option, built and contrast-verified but not
+   currently reachable by any visible UI — the toggle button that would
+   set data-theme="gold" is disabled pending a permanent home in the
+   planned Vertical Action Rail (see THEME TOGGLE RAIL below). If a
+   visitor had switched to gold before it was disabled, this rule is why
+   their saved preference still renders correctly.
 ================================ */
 [data-theme="gold"] {
     --color-accent-primary: #BA8200;
@@ -184,6 +246,17 @@ html {
     scroll-behavior: smooth;
 }
 
+/* The radial-gradient here is the sitewide dot-texture background — a
+   decorative, very low-opacity (5%) pattern, not a solid colour, sitting
+   behind every page. It's deliberately faint so it never meaningfully
+   changes the contrast of text placed over it (see md/REFERENCE.md §12
+   Visual & Contrast and md/DESIGN-SYSTEM.md §1.9/§1.11) — but because
+   it's a gradient rather than a flat colour, automated contrast-checking
+   tools (axe-core) can't always compute an exact ratio for text sitting
+   directly on body's background and mark it "needs manual review"
+   instead of pass/fail. That's a known tooling limitation, not a sign
+   of a real contrast problem — see md/DESIGN-SYSTEM.md §1.9 for the
+   manual math confirming this. */
 body {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
@@ -217,6 +290,13 @@ footer {
 /* ================================
    FOCUS STYLES (Accessibility)
 ================================ */
+/* The one focus-ring style every interactive element on the site uses,
+   so keyboard users always get the same clearly visible outline no
+   matter what they've tabbed to. :focus-visible (not :focus) means this
+   only shows for keyboard/assistive-tech focus, not for a mouse click —
+   so clicking a button doesn't draw a ring a mouse user didn't ask for,
+   while Tabbing to it still does. The 3px offset keeps the ring from
+   touching the element's own border/background at small sizes. */
 :focus-visible {
     outline: var(--border-width-medium) solid var(--color-interactive-focus);
     outline-offset: 3px;
@@ -225,6 +305,13 @@ footer {
 /* ================================
    ACCESSIBILITY UTILITIES
 ================================ */
+/* .sr-only: hides content visually while keeping it readable by screen
+   readers — used for context a sighted user doesn't need but a screen
+   reader user does (e.g. "in the Work section" appended to a "View
+   more" link). Every property here matters: display:none or
+   visibility:hidden would hide it from screen readers too, so this
+   instead shrinks the element to 1px and clips it, which screen readers
+   still announce. */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -237,6 +324,12 @@ footer {
     border: 0;
 }
 
+/* .skip-link: the "Skip to main content" link every page starts with.
+   Invisible until a keyboard user Tabs to it (top: -100% moves it off-
+   screen; :focus below brings it back), so sighted mouse users never see
+   it, but anyone navigating by keyboard can jump straight past the nav
+   to the page's real content instead of tabbing through every nav link
+   first. */
 .skip-link {
     position: absolute;
     top: -100%;
@@ -256,6 +349,11 @@ footer {
 /* ================================
    TYPOGRAPHY
 ================================ */
+/* Heading sizes step down from h1 (largest) to h4 in a fixed type scale
+   (see md/DESIGN-SYSTEM.md §2.2) — never skip a level in the HTML (e.g.
+   h1 straight to h3) even if a smaller size is wanted somewhere; that's
+   a real accessibility requirement (screen reader users navigate by
+   heading level), not just a visual choice. */
 h1, h2, h3, h4 {
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
@@ -280,6 +378,10 @@ ul, ol {
 /* ================================
    LINKS
 ================================ */
+/* Sitewide default for every plain-text link not covered by a more
+   specific component below (.tag, .link-inline, .link-cta, etc.) —
+   underlined at rest, not just on hover, so a link is identifiable
+   without relying on colour alone (WCAG 1.4.1). */
 a {
     color: var(--color-link);
     text-decoration: underline;
@@ -293,6 +395,13 @@ a:hover {
 /* ================================
    DIVIDER (HR)
 ================================ */
+/* Two different section-divider styles exist on purpose: a plain <hr>
+   (this rule) for a simple horizontal rule, and .divider--dots (below)
+   — a row of three small dots — used specifically between body sections
+   on Standard Page entries and Home. Pick whichever the surrounding
+   page already uses; they're not interchangeable variants of the same
+   component, just two separate ones that happen to serve the same
+   layout purpose. */
 hr {
     border: none;
     border-top: var(--border-width-thin) solid var(--color-divider-accent);
@@ -333,6 +442,10 @@ hr {
 /* ================================
    BLOCKQUOTE
 ================================ */
+/* Pull-quote style — left border stripe, tinted background, italic
+   body text — used for testimonials (Home's "Nice Words") and quoted
+   material inside entry body content. See COMPONENTS.md "Blockquote"
+   for the full spec. */
 blockquote {
     border-left: var(--border-width-thick) solid var(--color-quote-border);
     background-color: var(--color-background-surface);
@@ -351,6 +464,10 @@ blockquote cite {
 /* ================================
    CODE / PRE
 ================================ */
+/* Styling shared by inline `code` spans and multi-line `pre` code
+   blocks in entry body content — left border colour and background
+   distinguish code from prose at a glance. See .code-wrap below for why
+   long code lines get their own horizontal-scroll wrapper. */
 code,
 pre {
     background-color: var(--color-code-bg);
@@ -404,6 +521,12 @@ pre code {
 /* ================================
    TAGS
 ================================ */
+/* A Tag is always a real link (never plain text) to a filtered Archive
+   view — clicking "User Experience" navigates to
+   /archive.html?tag=user-experience. Used on cards and entry pages to
+   label what an entry is about. Not the same component as Tag-Chip
+   below, which looks similar but toggles a filter in place rather than
+   navigating anywhere — see COMPONENTS.md §2 vs §2b for the distinction. */
 .tag {
     display: inline-flex;
     align-items: center;
@@ -439,6 +562,13 @@ pre code {
 /* ================================
    TAG-CHIP
 ================================ */
+/* Tag-Chip looks like Tag above but behaves differently: it's a button,
+   not a link, and clicking it toggles a filter on the Archive page in
+   place (no navigation, no page reload) rather than jumping to a
+   filtered view. Used only inside the Archive's filter controls
+   (inline chips row and the Filter Drawer). The --active/--dim modifier
+   classes below reflect whether this specific filter is currently on,
+   off, or available-but-shadowed by another active filter. */
 .tag-chip {
     display: inline-flex;
     align-items: center;
@@ -522,6 +652,10 @@ pre code {
 /* ================================
    BUTTON
 ================================ */
+/* Base button style — filled background, used for primary actions
+   (Share, View Resume). .btn--ghost below is the outline-only variant
+   for secondary actions; .btn--cta and .share-btn further down are
+   small visual variants of the same base, not separate components. */
 .btn {
     --btn-bg:             var(--color-background-subtle);
     --btn-bg-hover:       var(--color-border-strong);
@@ -620,6 +754,26 @@ pre code {
     }
 }
 
+/* Red = "this removes something." Applied to the controls that clear
+   filters (Filter Drawer Clear, floating Clear "x", empty-state "Clear
+   Filters!") and nothing else. Only the fill changes: the shared
+   .btn:hover already supplies the border/text tokens that keep 6.3:1
+   against --color-danger, and .btn's own background-color transition
+   covers the fade. Hover sits in @media (hover: hover) so a tap never
+   leaves a stuck red state; :active sits outside it for press feedback on
+   touch. :not(:disabled) keeps a disabled Clear neutral. Three-part
+   selectors (0,3,0) outrank .btn:hover/.btn:active (0,2,0) without
+   !important. */
+@media (hover: hover) {
+    .btn--danger-hover:hover:not(:disabled) {
+        background-color: var(--color-danger);
+    }
+}
+
+.btn--danger-hover:active:not(:disabled) {
+    background-color: var(--color-danger);
+}
+
 /* Share button — auto-width, not full-width like .btn default */
 .share-btn {
     width: auto;
@@ -629,6 +783,11 @@ pre code {
 /* ================================
    TOOLTIP
 ================================ */
+/* Small hover/focus popup for supplementary context that's never
+   required to understand the page (if it were required, it'd be visible
+   text instead). Desktop only — the @media (hover: none) rule below
+   turns it off entirely on touch devices, since there's no reliable
+   "hover" gesture on a touchscreen for it to attach to. */
 .tooltip-wrapper {
     position: relative;
     display: inline-block;
@@ -667,6 +826,10 @@ pre code {
 /* ================================
    TOAST
 ================================ */
+/* Small temporary confirmation message (currently used for "URL copied
+   to clipboard!" after the Share button). Positioned fixed at the
+   bottom of the viewport, faded in/out — script.js shows it by toggling
+   .toast--visible and hides it again automatically after 2 seconds. */
 .toast {
     position: fixed;
     bottom: var(--space-8);
@@ -698,6 +861,9 @@ pre code {
 /* ================================
    BREADCRUMB
 ================================ */
+/* The "Work › Entry Title" trail at the top of every Work/Thoughts
+   entry page, showing where the current page sits in the site
+   structure and offering a link back up one level. */
 .breadcrumb {
     margin-bottom: var(--space-6);
 }
@@ -738,6 +904,13 @@ pre code {
 
 /* ================================
    CARD
+   The clickable preview tile used for both Work and Thought entries on
+   Home and the Archive — image (Work only) + title + tags + date +
+   excerpt + a "View"/"Read" link. The whole card is clickable via
+   .card-block-link below (an invisible full-card overlay for mouse
+   users); .link-cta further down is the one real, visible,
+   keyboard-focusable link inside it. See COMPONENTS.md §3 for the full
+   anatomy and why the card is split into these two separate links.
 ================================ */
 .card {
     --card-bg:              var(--color-background-surface);
@@ -1028,6 +1201,11 @@ pre code {
 /* ================================
    PAGE GRID
 ================================ */
+/* The single-column layout wrapper for Home's page sections (Featured
+   Work, Thoughts, Nice Words, Contact) — centres content, caps it at
+   --max-content width, and adds consistent vertical gaps between
+   sections. .card-row/.card-row--two below control how many columns
+   of cards appear within one of those sections. */
 .page-grid {
     width: 100%;
     max-width: var(--max-content);
@@ -1083,6 +1261,11 @@ pre code {
     margin-top: var(--space-4);
 }
 
+/* HOME HERO
+   The full-width introduction block at the top of the Home page — page
+   title (H1), one-line role summary, and a scroll-down chevron. No
+   photo (removed 2026-09-10, see .home-hero-icons[hidden] below) — just
+   text, centred. */
 /* ================================
    HOME HERO
    Desktop/tablet: natural height, --space-24 vertical padding (one
@@ -1216,6 +1399,9 @@ pre code {
 /* ================================
    CONTACT BUTTONS (Home)
 ================================ */
+/* The row of "About / Email / LinkedIn" icon buttons under the "Want to
+   work together?" heading, reused identically at the bottom of every
+   page (Home, About, and every entry's footer). */
 .contact-buttons {
     display: flex;
     flex-wrap: wrap;
@@ -1285,6 +1471,10 @@ pre code {
 /* ================================
    BACK TO TOP
 ================================ */
+/* Floating-style button that appears after the user scrolls 400px down
+   any page (see initBackToTop() in script.js) and smooth-scrolls back
+   to the top when clicked. Starts invisible (opacity/visibility: 0) —
+   .back-to-top--visible is what script.js toggles on scroll. */
 .back-to-top {
     display: inline-flex;
     align-items: center;
@@ -1325,6 +1515,12 @@ pre code {
 /* ================================
    MOBILE TAB BAR
 ================================ */
+/* Replaces the desktop header nav entirely on mobile (<768px) — a
+   fixed row of Home/Archive/About links pinned to the top of the
+   screen instead of a hamburger menu, so primary navigation is always
+   one tap away without an extra open/close step. Hidden outright on
+   tablet/desktop; see NAVIGATION below for the header shown there
+   instead. */
 .tab-bar {
     display: none;
 }
@@ -1352,6 +1548,11 @@ pre code {
 
 /* ================================
    NAVIGATION
+   The sticky top header shown on tablet and desktop (replaced by the
+   Mobile Tab Bar above on phones) — site name/logo plus Home/Archive/
+   About links. Injected into the page from nav.html by script.js's
+   loadComponent(), not written directly into each page's HTML, so
+   there's one nav to update instead of one per page.
 ================================ */
 /* Fixes position: sticky silently failing on <header> below — confirmed via
    testing, not assumed. #nav-placeholder is a plain block div injected by
@@ -1505,6 +1706,11 @@ header {
 /* ================================
    FOOTER
 ================================ */
+/* The "© Christopher Klein" credit line shown at the bottom of every
+   page on tablet/desktop, hidden on mobile (see MOBILE section) since
+   the Tab Bar already occupies that screen real estate. Injected from
+   footer.html by script.js the same way nav.html is — see NAVIGATION
+   above. */
 footer {
     border-top: var(--border-width-thin) solid var(--color-border-default);
     padding: var(--space-8) 0;
@@ -1519,6 +1725,11 @@ footer p {
 
 /* ================================
    STANDARD PAGE
+   The shared template every Work and Thoughts entry uses: breadcrumb,
+   banner image, title, tag/detail row, then free-form body content,
+   then a footer with Share/More-entries actions and the site's contact
+   section. One template, reused for every entry rather than one-off
+   markup per page — see COMPONENTS.md §14 for the full anatomy.
 ================================ */
 .standard-page {
     width: 100%;
@@ -1586,6 +1797,7 @@ footer p {
    move that margin onto the figure instead) so wrapping in a button
    doesn't change the visible gap between images. */
 .image-zoom-trigger {
+    position: relative;
     display: block;
     width: 100%;
     padding: 0;
@@ -1601,15 +1813,23 @@ footer p {
     transition: border-color var(--duration-fast) var(--ease-out);
 }
 
-/* Same dark teal token already used for this exact kind of hover/focus
-   border elsewhere (code blocks' --color-code-border, tooltips'
-   --color-tooltip-border, .tag/.tag-chip hover) — not a new colour
-   relationship. Both selectors together (not hover alone, as .tag does
-   it) per spec: keyboard users get the same visible affordance mouse
-   users get, not just the generic focus outline. */
-.image-zoom-trigger:hover,
+/* Keyboard focus — dark teal border alongside the sitewide :focus-visible
+   ring, unchanged. Kept separate from hover below: the two no longer share
+   a rule or a look. */
 .image-zoom-trigger:focus-visible {
     border-color: var(--color-accent-primary);
+}
+
+/* Hover — 2px teal border matching .card:hover's --color-accent-primary-text.
+   An outline, not a wider border: the transparent 1px border above already
+   reserves the box, and the outline's negative offset (one border-width)
+   starts at that border's inner edge and grows outward, so the box — and
+   everything around it — never moves. :not(:focus-visible) leaves the
+   sitewide focus ring in charge when the trigger is both hovered and
+   keyboard-focused. */
+.image-zoom-trigger:hover:not(:focus-visible) {
+    outline: var(--border-width-medium) solid var(--color-accent-primary-text);
+    outline-offset: calc(-1 * var(--border-width-thin));
 }
 
 .image-zoom-trigger img {
@@ -1620,6 +1840,49 @@ footer p {
 @media (hover: hover) {
     .image-zoom-trigger:hover img {
         opacity: 0.9;
+    }
+}
+
+/* Decorative expand icon on a solid plate, top-right of the thumbnail
+   (injected by initImageViewer(), script.js). Not a hit target — the whole
+   thumbnail is the one click target, so pointer-events: none and the
+   44px minimum doesn't apply. Solid surface + strong border so it holds
+   contrast over any screenshot. Icon is 24-viewBox artwork inset 2 units
+   from each edge, so --space-5 (20px) in a --space-8 (32px) plate leaves
+   an even margin without needing a different size. */
+.image-zoom-trigger-icon {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--space-8);
+    height: var(--space-8);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text-primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.image-zoom-trigger-icon svg {
+    width: var(--space-5);
+    height: var(--space-5);
+}
+
+.image-zoom-trigger:hover .image-zoom-trigger-icon,
+.image-zoom-trigger:focus-visible .image-zoom-trigger-icon {
+    opacity: 1;
+}
+
+/* No hover on touch — show it always rather than hide the only cue that
+   the image is tappable. */
+@media (hover: none) {
+    .image-zoom-trigger-icon {
+        opacity: 1;
     }
 }
 
@@ -1661,7 +1924,17 @@ footer p {
     pointer-events: auto;
 }
 
+/* --image-viewer-controls-z: the controls' layer inside this dialog's own
+   stacking context, above the enlarged image. The image always carries an
+   inline transform (zoom/pan, script.js), so it paints in the positioned
+   layer in DOM order — and Close comes before it in the DOM, so at any
+   zoom where the scaled image reaches Close's corner the image painted
+   over it and took its hover/click. Raising the controls fixes that
+   without touching DOM order, which is also the Tab order. Same
+   local-custom-property convention as .card's --card-block-link-z. */
 .image-viewer {
+    --image-viewer-controls-z: 1;
+
     position: fixed;
     inset: 0;
     z-index: 270;
@@ -1717,6 +1990,7 @@ footer p {
     position: absolute;
     top: var(--space-4);
     right: var(--space-4);
+    z-index: var(--image-viewer-controls-z);
 }
 
 /* Prev/Next — same .btn.action-rail-clear chrome as Close, vertically
@@ -1728,6 +2002,7 @@ footer p {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
+    z-index: var(--image-viewer-controls-z);
 }
 
 .image-viewer-nav--prev {
@@ -1748,6 +2023,7 @@ footer p {
     transform: translateX(-50%);
     display: flex;
     gap: var(--space-3);
+    z-index: var(--image-viewer-controls-z);
 }
 
 /* Video embed — aspect-ratio governs display size; the iframe's own
@@ -2054,179 +2330,61 @@ footer p {
 }
 
 /* ================================
-   STANDARD PAGE — TABLE OF CONTENTS RAIL
-   Desktop-only (min-width: 1440px — deliberately narrower than this
-   site's usual 1024px desktop floor: Chris decided iPad, any orientation
-   or model including the 1366px-wide 12.9" Pro, should never get the
-   rail's permanently-docked treatment at all — he's explicitly fine with
-   the panel's overlap-on-open there instead, since it gives back more
-   usable space than a width-constrained sidebar could at these sizes.
-   1440px puts every real iPad width (1024–1366px) on the panel side of
-   the line), always visible, no trigger/collapse —
-   built entirely by initTocRail() (script.js) on any page with
-   .standard-page-content; no hand-authored markup lives in any entry's
-   HTML. Tablet/mobile render nothing (separate trigger + panel pattern,
-   not built here).
+   STANDARD PAGE — TABLE OF CONTENTS SCROLLBAR
+   .toc-panel's own restyled scrollbar (Chrome/Edge/Safari) — left at
+   browser default it renders as a stark, full-size light grey bar with
+   arrow buttons, badly out of place against this dark two-tone palette.
+   Thumb reuses --color-border-strong (this component's own border
+   colour, and the sitewide "emphasized border" token per
+   DESIGN-SYSTEM.md §1.4); track reuses --color-background-subtle (the
+   sitewide "recessed surface" token, §1.2) — no new colour values.
+   Firefox's scrollbar-width/scrollbar-color equivalent lives on
+   .toc-panel itself, below (no ::-webkit- equivalent exists for it).
 ================================ */
-/* top: --toc-rail-top is set by initTocRail() (script.js) to .breadcrumb's
-   real top edge, flush — no gap — so the rail lines up with the
-   breadcrumb row instead of sitting lower next to body copy (previously
-   anchored to .standard-page-banner's bottom edge + a --space-8 gap; see
-   script.js's updateRailTop() for the full history). Fallback (pre-JS, or
-   an entry with no breadcrumb) is --space-16 + --space-8 — the sticky
-   nav's own height plus main's own padding-top, which is exactly what
-   places the breadcrumb's real top edge pre-JS, confirmed by direct
-   measurement — so this value needed no change alongside the anchor
-   swap. */
-.toc-rail {
-    display: none;
-    position: fixed;
-    top: var(--toc-rail-top, calc(var(--space-16) + var(--space-8)));
-    z-index: 10;
-}
-
-@media (min-width: 1440px) {
-    /* --toc-rail-left: set by initTocRail() (script.js) to the real
-       rendered right edge of .standard-page-content (the 65ch text
-       column) + a gap (--space-16, widened from --space-6 per Chris's
-       decision to move the rail noticeably further right, closer to the
-       viewport edge — see updateRailLeft()'s own comment in script.js),
-       the same "measure the real DOM, don't derive it" approach
-       --toc-rail-top already uses for the vertical axis (see
-       updateRailTop() and its comment there). The var()'s own fallback
-       (50% of the viewport, this is position: fixed, + 32.5ch — half the
-       column's own 65ch width — + the same --space-16 gap, kept in sync
-       with the live JS value above so the rail doesn't visibly jump
-       further right once JS takes over) is pure CSS for the pre-JS
-       case only; it depends on 'ch' resolving against the *currently
-       active* font, which made it fragile as the live formula — Noto
-       Sans loads async (display: swap; see the <link> in each entry's
-       <head>) so the page briefly renders in a fallback font with
-       different glyph metrics, and this custom property didn't reliably
-       reflow once the swap completed (confirmed real-iPad landscape
-       testing showed the rail collapsed to a near-unusable width; re-
-       deriving the same math against Chromium's own metrics at matching
-       viewports never produced a collapse there, and a follow-up session
-       found the width could still change again specifically on the
-       user's first scroll — see updateRailLeft()'s own comment in
-       script.js for the current best explanation, since this MCP
-       environment has no WebKit engine to confirm directly against.
-       Measuring the column's actual box sidesteps the 'ch'/font-timing
-       dependency entirely: correct regardless of which font is active
-       when it runs). width still falls back via min() to whatever room
-       is actually left before the viewport's right edge — at 1440px
-       (this breakpoint's own new floor, moved up from 1024px so no real
-       iPad width ever gets the rail — see this section's top comment)
-       the full --toc-rail-width already fits with room to spare
-       (confirmed by direct measurement: 240px, unclamped, at 1440px and
-       every wider width tested), so this min() no longer binds at any
-       width the rail actually renders at today — kept as a safety net
-       against a narrower future floor or a wider --toc-rail-width, not
-       because it's load-bearing right now. */
-    .toc-rail {
-        display: flex;
-        flex-direction: column;
-        left: var(--toc-rail-left, calc(50% + 32.5ch + var(--space-16)));
-        width: min(var(--toc-rail-width), calc(100vw - var(--toc-rail-left, calc(50% + 32.5ch + var(--space-16))) - var(--space-6)));
-        /* max-height/chrome moved here from .toc-rail-list below, now that
-           the list has a label sibling above it inside this same card —
-           mirrors .toc-panel's own architecture (outer element carries
-           the card chrome + height cap, inner list is layout-only) so the
-           label reads as part of one unified card instead of a floating
-           line above a separately-bordered box. Formula itself is
-           unchanged from the one .toc-rail-list used to carry: self-
-           adjusts to whatever room exists between --toc-rail-top and a
-           bottom-of-viewport margin. This already recomputes correctly
-           against the breadcrumb-anchored --toc-rail-top (moved up from
-           the old banner-anchored one, see updateRailTop() in script.js)
-           with no formula change needed — it reads the same live custom
-           property either way, so a smaller top offset automatically
-           yields a taller max-height, confirmed by direct measurement
-           rather than assumed. */
-        max-height: calc(100vh - var(--toc-rail-top, calc(var(--space-16) + var(--space-8))) - var(--space-16));
-        padding: var(--space-3);
-        background-color: var(--color-background-surface);
-        border: var(--border-width-thin) solid var(--color-border-strong);
-        border-radius: var(--border-radius-md);
-        box-shadow: var(--elevation-md);
-    }
-}
-
-/* flex: 1 1 auto + min-height: 0 lets this shrink below its own content
-   size inside .toc-rail's flex column so max-height (above, on the
-   parent now) actually constrains it instead of the list pushing the
-   card taller than its cap — standard flex-scroll-child pattern.
-   Overflow scrolls internally with the next item deliberately clipped
-   mid-row (no fade/gradient — would read as a rendering glitch on this
-   two-tone palette) so it reads as "there's more, scroll".
-   scrollbar-width/scrollbar-color (Firefox) and the ::-webkit-scrollbar*
-   rules below (Chrome/Edge/Safari) restyle the internal scrollbar this
-   overflow produces — left at browser default it renders as a stark,
-   full-size light grey bar with arrow buttons, badly out of place against
-   this dark two-tone palette. Thumb reuses --color-border-strong (this
-   component's own border colour, and the sitewide "emphasized border"
-   token per DESIGN-SYSTEM.md §1.4); track reuses --color-background-subtle
-   (the sitewide "recessed surface" token, §1.2) — no new colour values. */
-/* padding (was 0): every row is width: 100% of this list, so with zero
-   padding each row's own box sits flush against this list's edges — the
-   list itself (not .toc-rail, its padded parent) is what actually scrolls
-   and clips (overflow-y: auto, below), so a row's default outward
-   :focus-visible ring (+5px: outline + offset) had nowhere to render and
-   got clipped. This isn't only the first/last row: any row can land
-   flush against this box's top or bottom edge once the list is scrolled,
-   and (confirmed by direct measurement) every row shares the same
-   left/right edges regardless of scroll position — so padding on all
-   four sides, not just top/bottom, is what actually keeps the ring fully
-   visible on every row at every scroll position. Kept as the sitewide
-   outward ring per Chris's decision — no inward-offset exceptions — so
-   the clearance has to live here instead. This does shrink the list's
-   own usable scroll height slightly inside .toc-rail's unchanged
-   max-height cap; see the Floating ToC spec revision notes for the
-   measured effect on the longest live entry's clipped-next-item
-   affordance. */
-.toc-rail-list {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-    gap: var(--space-2);
-    margin: 0;
-    padding: var(--space-2);
-    list-style: none;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
-}
-
-.toc-rail-list::-webkit-scrollbar,
 .toc-panel::-webkit-scrollbar {
     width: 8px;
 }
 
-.toc-rail-list::-webkit-scrollbar-track,
 .toc-panel::-webkit-scrollbar-track {
     background-color: var(--color-background-subtle);
     border-radius: var(--border-radius-full);
 }
 
-.toc-rail-list::-webkit-scrollbar-thumb,
 .toc-panel::-webkit-scrollbar-thumb {
     background-color: var(--color-border-strong);
     border-radius: var(--border-radius-full);
 }
 
-.toc-rail-list::-webkit-scrollbar-thumb:hover,
 .toc-panel::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-text-secondary);
 }
 
-.toc-rail-item--sub {
-    padding-left: var(--space-4);
+/* H3 rows only — lays the leading sub-section icon (TOC_SUB_ICON_HTML,
+   script.js) beside the row text; H2 rows and the Back to Top button keep
+   .toc-rail-link's plain display: block untouched. .toc-rail-item--sub
+   carries no rule of its own any more — it used to indent the li by
+   --space-4, removed 2026-09-20 now that the icon alone conveys nesting,
+   so H3 rows share H2 rows' exact left and right edges — and stays only
+   as the hook this selector (and script.js) key off. Gap and icon size
+   reuse --space-2 / --icon-size-md, same values .toc-panel-label already
+   uses for its own leading icon (Rule 3a). No colour here on purpose: the
+   icon's fill is currentColor, so it follows the row's own
+   default/hover/active text colour automatically. */
+.toc-rail-item--sub .toc-rail-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.toc-sub-icon {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+    flex-shrink: 0;
 }
 
 /* Inactive state reuses .action-rail-trigger/.filter-drawer-page-btn's
    shared traits (font-size-sm, border-strong, subtle background) rather
-   than inventing a parallel style — elevation lives on .toc-rail-list
+   than inventing a parallel style — elevation lives on .toc-panel
    above (the panel as a whole), not per-item, since neither reference
    button is a list row. font-family/cursor: this class now also renders
    as a <button> (the "Back to Top" row — buildBackToTopRow(), script.js
@@ -2278,123 +2436,128 @@ footer p {
 }
 
 /* ================================
-   STANDARD PAGE — TABLE OF CONTENTS TRIGGER + PANEL (<1440px)
-   Covers every real iPad width in both orientations (1024–1366px) as
-   well as phone/tablet — deliberate, per Chris's decision that iPad
-   should never get the permanently-docked rail (see the rail's own
-   section comment above for the full reasoning).
+   STANDARD PAGE — TABLE OF CONTENTS TRIGGER + PANEL (all breakpoints)
+   Unified onto this one trigger + anchored panel pattern at every width,
+   including desktop — the earlier always-visible desktop rail (>=1440px)
+   was removed (see md/REFERENCE.md §14 changelog, 2026-09-18) after it
+   was found to have no reserved gutter in the content column, so it
+   overlapped the entry's own <h1>/body copy at desktop widths. This
+   pattern already covered every real iPad width in both orientations
+   (1024–1366px) plus phone/tablet; it now covers desktop too, unchanged.
    Trigger reuses .action-rail-group/.action-rail-trigger/
    .action-rail-badge verbatim (Rule 3a) — same classes Archive's Filter
    trigger uses, safe to share since the two never appear on the same
-   page. .toc-trigger-group only adds the display override below, which
-   inverts .toc-rail's own breakpoint (rail: block at >=1440px, hidden
-   below; trigger/panel: the reverse) so the two surfaces never coexist.
-   Heading-list items inside the panel reuse .toc-rail-link/
-   .toc-rail-item--sub/.toc-rail-link--active verbatim too — same
-   font-size-sm treatment as the desktop rail (confirmed via direct grep,
-   not assumed), same active/inactive states, no parallel styling.
+   page. .toc-trigger-group carries no display override of its own —
+   .action-rail-group's own base display: flex (below) already applies
+   unconditionally; real show/hide is opacity/visibility-driven via
+   .action-rail-group--visible (scroll-threshold), same as every other
+   breakpoint already used.
 ================================ */
-.action-rail-group.toc-trigger-group {
-    display: none;
-}
-
 .toc-panel {
     display: none;
 }
 
-@media (max-width: 1439px) {
-    .action-rail-group.toc-trigger-group {
-        display: flex;
-    }
-
-    /* :not([hidden]) rather than toggling display in script.js — this way
-       the >=1440px rule above still wins on its own regardless of the
-       hidden attribute's state, so the panel can never render at desktop
-       widths even if JS state were ever wrong. */
-    .toc-panel:not([hidden]) {
-        display: block;
-    }
-
-    /* Anchor: bottom-right corner pinned to the trigger's own resting
-       position, same technique the Desktop Filter Panel already uses for
-       .filter-drawer (see DESKTOP (min-width: 1024px) — Filter Drawer
-       becomes an anchored panel, below) — right formula reused verbatim;
-       bottom derived the same way (trigger's vertical centre, offset by
-       half its own height) but recomputed for *this* trigger's real
-       centre at this breakpoint: .action-rail-group sits at top: 50% here
-       (no override until the 767px tier below), so bottom mirrors the
-       Filter Panel's own 50vh math exactly. Width reuses --toc-rail-width
-       (the desktop rail's own width token) rather than a new value;
-       max-width clamps it against a narrow phone viewport the same way
-       the Filter Panel's own max-width does. */
-    .toc-panel {
-        position: fixed;
-        z-index: 250;
-        right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
-        bottom: calc(50vh - (var(--touch-target-minimum) / 2));
-        width: var(--toc-rail-width);
-        max-width: calc(100vw - (var(--space-8) * 2));
-        /* max-height: NOT the Filter Panel's calc(100vh - (--space-8 * 2))
-           formula this shipped with (copied verbatim per Rule 3a) — that
-           value is only safe at the Filter Panel's own >=1024px breakpoint,
-           where the viewport is tall enough that content never actually
-           reaches the cap. This panel's anchor (bottom, above) sits at
-           50vh minus half the trigger's own height, so what's actually
-           free to grow into is just the gap between that bottom edge and
-           the fixed header's bottom (64px — same literal
-           .archive-sort-count-row already anchors to elsewhere), not the
-           full viewport. Left uncapped at the real anchor, the panel
-           overflowed off the top of the screen on shorter real-device
-           viewports (Safari's toolbar chrome shrinks the visible viewport
-           below the 100vh this was measured against) or, on taller ones,
-           grew tall enough to draw over the header instead of stopping
-           short of it — both confirmed via direct measurement at reduced
-           viewport heights, not assumed. --space-6 reuses the same
-           breathing-room token this panel's own `right` offset already
-           uses. */
-        max-height: calc(50vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2));
-        overflow-y: auto;
-        margin: 0;
-        padding: var(--space-3);
-        background-color: var(--color-background-surface);
-        border: var(--border-width-thin) solid var(--color-border-strong);
-        border-radius: var(--border-radius-md);
-        transform: translateY(var(--space-2)) scale(0.98);
-        transform-origin: bottom right;
-        opacity: 0;
-        transition: transform var(--duration-base) var(--ease-out),
-                    opacity var(--duration-base) var(--ease-out);
-        scrollbar-width: thin;
-        scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
-    }
-
-    .toc-panel--open {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-        box-shadow: var(--elevation-xl);
-    }
+/* :not([hidden]) rather than toggling display in script.js — display
+   stays driven by the hidden attribute's own state regardless of any
+   future breakpoint-scoped override, so the panel can never render
+   without JS explicitly clearing `hidden` first. */
+.toc-panel:not([hidden]) {
+    display: block;
 }
 
-@media (max-width: 767px) {
-    /* .action-rail-group moves to top: 70% at this tier (see MOBILE
-       section, below) — bottom mirrors that same centre (100vh - 70vh =
-       30vh from the bottom) rather than the 50vh math above, so the panel
-       stays anchored to the trigger's real position instead of drifting
-       from it once the trigger itself moves. max-height mirrors the same
-       shift (70vh of headroom above the anchor instead of 50vh, same
-       header/space-6 reservation as the tier above — see that comment) so
-       the cap keeps tracking the anchor's real position at this tier too,
-       not the wider tier's now-stale one. */
-    .toc-panel {
-        bottom: calc(30vh - (var(--touch-target-minimum) / 2));
-        max-height: calc(70vh - 64px - var(--space-6) + (var(--touch-target-minimum) / 2));
-    }
+/* Anchor (revised 2026-09-19): position is now independent of the
+   trigger entirely — previously the bottom-right corner was pinned to
+   the trigger's own resting position (same technique the Desktop Filter
+   Panel still uses for .filter-drawer, see DESKTOP (min-width: 1024px)
+   — Filter Drawer becomes an anchored panel, below), which meant this
+   panel's max-height could never exceed roughly the gap between the
+   header and wherever .action-rail-group's top: 50%/70% happened to put
+   the trigger — a hard ceiling around 45–48% of viewport height no vh
+   percentage could get past. `top` now anchors a fixed offset
+   (--toc-panel-top-offset, :root) below the header/tab-bar instead, so
+   height is free to reach the real 75–80% target below regardless of
+   where the trigger sits. `right` is unchanged — it was never trigger-
+   derived to begin with, just the same formula the trigger's own
+   .action-rail-group happens to share (Rule 3a), coincidence not
+   coupling, so no reason to touch it. Width still reuses --toc-rail-width
+   (this component's own width token) rather than a new value; max-width
+   clamps it against a narrow phone viewport the same way the Filter
+   Panel's own max-width does. */
+.toc-panel {
+    position: fixed;
+    z-index: 250;
+    right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
+    top: var(--toc-panel-top-offset);
+    width: var(--toc-rail-width);
+    max-width: calc(100vw - (var(--space-8) * 2));
+    /* max-height (2026-09-19 follow-up — was briefly `height` earlier
+       today): a real `height` forced every panel to ~78vh regardless of
+       content, so a page with a short heading list rendered visible
+       empty space below its last row — not the intended "visible
+       presence that scales with viewport height," just a gap. `max-height`
+       keeps the exact same clamp/ceiling value and every property this
+       replaced (still governs at ~78vh on every ordinary viewport —
+       confirmed via direct measurement at all four verification sizes:
+       2560×1300, 1920×1000, 834×1100, 390×844), but now only acts as a
+       ceiling: a short list shrink-wraps to its own content, a long list
+       (confirmed via star-engine.html, ~20 headings) still caps at ~78vh
+       with internal scroll, unchanged from today's verified behavior.
+       min()'d against calc(100vh - top-offset - space-6) as a safety
+       ceiling: with `top` now a fixed length rather than a vh fraction,
+       this calc() alone is sufficient to guarantee no overlap with the
+       header/tab-bar and no overflow off the bottom of the viewport at
+       any height — simpler and more robust than the old trigger-relative
+       formula it replaces, which had to reason about vh fractions on
+       both the anchor and the cap. This calc() only binds on an
+       unusually short window (confirmed: at 1920×500 it narrowly wins
+       over the clamp, 388px vs 390px) or an unusually narrow-and-tall
+       one (confirmed: at 390×3000 the clamp's own --toc-panel-height-max
+       ceiling of 1024px binds well before this calc()'s ~2888px would)
+       — both correctly handled without overlapping anything. */
+    max-height: min(
+        clamp(var(--toc-panel-height-min), 78vh, var(--toc-panel-height-max)),
+        calc(100vh - var(--toc-panel-top-offset) - var(--space-6))
+    );
+    overflow-y: auto;
+    margin: 0;
+    padding: var(--space-3);
+    background-color: var(--color-background-surface);
+    border: var(--border-width-thin) solid var(--color-border-strong);
+    border-radius: var(--border-radius-md);
+    /* translateY/transform-origin flipped to top (was bottom right) to
+       match the new top-anchored position — the panel now grows downward
+       from a fixed point below the header, so it enters by easing down
+       into place from slightly above, not up from below as it did when
+       anchored to the trigger's own bottom-right corner. */
+    transform: translateY(calc(-1 * var(--space-2))) scale(0.98);
+    transform-origin: top right;
+    opacity: 0;
+    transition: transform var(--duration-base) var(--ease-out),
+                opacity var(--duration-base) var(--ease-out);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
 }
+
+.toc-panel--open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    box-shadow: var(--elevation-xl);
+}
+
+/* Mobile <=767px "Open Item" (per spec) — investigated, no override
+   needed here: this tier used to retune bottom/max-height to track
+   .action-rail-group's own mobile-only top: 70% (vs. 50% wider), since
+   the panel's position and cap were both derived from the trigger back
+   then. Now that top/height above anchor to the header/tab-bar instead,
+   that dependency is gone — and the header/tab-bar height they anchor to
+   is the same 64px at this tier as every other (confirmed via direct
+   read: `.tab-bar` — the fixed top bar mobile shows in `header`'s place
+   — is height: 64px, identical to `header` itself at wider tiers). One
+   unconditional rule now correctly covers all three breakpoints; no
+   @media (max-width: 767px) block for .toc-panel is left to write. */
 
 /* display: flex (was block text) lays the new content.svg icon beside
-   the text — shared by both instances of this class (the always-visible
-   desktop rail's own label and the <1440px panel's, script.js), same as
-   the class itself is already shared between them (Rule 3a). */
+   the text — script.js builds this class for the panel's own label. */
 .toc-panel-label {
     display: flex;
     align-items: center;
@@ -2412,9 +2575,9 @@ footer p {
     flex-shrink: 0;
 }
 
-/* Layout only — no background/border/shadow here, unlike .toc-rail-list:
-   .toc-panel (above) already carries that chrome at the container level,
-   so putting it on the list too would double it up. */
+/* Layout only — no background/border/shadow here: .toc-panel (above)
+   already carries that chrome at the container level, so putting it on
+   the list too would double it up. */
 .toc-panel-list {
     display: flex;
     flex-direction: column;
@@ -2435,33 +2598,29 @@ footer p {
    Drawer's; pointer-events: auto on --open is what actually catches and
    stops a background click from also reaching whatever is underneath.
    z-index 249 — one below .toc-panel's own 250, same relative offset as
-   .archive-scrim (249) sits below .filter-drawer (250). display: none
-   unconditionally above 1439px is a hard gate independent of JS state,
-   matching .toc-panel's own belt-and-suspenders pattern. */
+   .archive-scrim (249) sits below .filter-drawer (250). */
 .toc-panel-scrim {
-    display: none;
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 249;
+    background-color: var(--color-background-base);
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out);
+    pointer-events: none;
 }
 
-@media (max-width: 1439px) {
-    .toc-panel-scrim {
-        display: block;
-        position: fixed;
-        inset: 0;
-        z-index: 249;
-        background-color: var(--color-background-base);
-        opacity: 0;
-        transition: opacity var(--duration-base) var(--ease-out);
-        pointer-events: none;
-    }
-
-    .toc-panel-scrim--open {
-        pointer-events: auto;
-    }
+.toc-panel-scrim--open {
+    pointer-events: auto;
 }
 
 /* ================================
    ABOUT PAGE
 ================================ */
+/* Styles specific to about.html only — portrait figure, employment
+   history list, skills tags. Shares its outer page structure
+   (.standard-page) with entry pages above, but everything in this
+   section is About-only content, not reused elsewhere. */
 .about-hero {
     text-align: center;
     padding: var(--space-12) 0 var(--space-8);
@@ -2785,6 +2944,10 @@ footer p {
 /* ================================
    ARCHIVE HEADER
 ================================ */
+/* The controls row at the top of the Archive page — currently just the
+   Filter Drawer's trigger button; search/sort live further down in
+   ARCHIVE PAGE below. See FILTER DRAWER immediately below for the full
+   filter panel these buttons open. */
 .archive-header {
     margin-bottom: var(--space-8);
 }
@@ -3086,13 +3249,13 @@ footer p {
     outline-offset: 3px;
 }
 
-/* Filter drawer — Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Close trigger (right).
-   Grid, not flex — Clear (44px icon square) and the Close trigger (wider,
+/* Filter drawer — Row 1: Clear (left) · "Filter by Tag" label (true centre) · Filters/Done trigger (right).
+   Grid, not flex — Clear (44px icon square) and the Done trigger (wider,
    padded text + badge) are different widths, so flex: 1 on the label alone
    only fills the leftover space between two unequal flanks; it doesn't
    centre the label relative to the row itself. The standard fix: two equal
    1fr side columns (their content — Clear left-aligned via justify-self:
-   start, Close right-aligned via justify-self: end — never has to match
+   start, Done right-aligned via justify-self: end — never has to match
    width) force the auto-sized centre column to sit at the row's true
    midpoint, regardless of how unequal the two flanking buttons are. */
 .filter-drawer-controls {
@@ -3342,7 +3505,7 @@ footer p {
    No scrim/backdrop change needed — .archive-scrim already renders at
    opacity: 0 unconditionally (invisible click-outside hit-area only, see
    above), so "no dimmed scrim" already holds true at every breakpoint.
-   Dismiss (Close button, click-outside via the scrim, Escape) and the
+   Dismiss (Done button, click-outside via the scrim, Escape) and the
    floating trigger's own hide-while-open behaviour are both already
    breakpoint-agnostic in script.js's openDrawer()/closeDrawer() — nothing
    to change there either. */
@@ -3375,6 +3538,10 @@ footer p {
 
 /* ================================
    ARCHIVE PAGE
+   Layout rules specific to archive.html: the collapsed/empty sticky
+   header (filtering now happens via the floating action rail, not an
+   inline header), the visually-hidden page title, and the entry-count/
+   sort row above the results grid.
 ================================ */
 /* No background/border at any breakpoint — blends into the page background,
    no divider anywhere. The floating action rail is the one persistent
@@ -3465,6 +3632,15 @@ footer p {
 
 .action-rail-clear .tag-chip-x {
     font-size: var(--font-size-md);
+}
+
+/* Floating external Clear only — round and shadowed like the Filters pill
+   beside it (same tokens as .action-rail-trigger). Scoped to
+   .action-rail-group because the image viewer's Close/zoom/Prev/Next reuse
+   .action-rail-clear and keep their own flat radius/no shadow. */
+.action-rail-group .action-rail-clear {
+    border-radius: var(--border-radius-full);
+    box-shadow: var(--elevation-md);
 }
 
 /* No disabled rule of its own — .btn:disabled above already gives the
@@ -3621,6 +3797,15 @@ footer p {
 
 /* ================================
    REDUCED MOTION
+   Sitewide commitment: if the visitor's OS is set to reduce motion,
+   every CSS transition and animation on the site collapses to
+   effectively instant (0.01ms — not 0, since some browsers ignore a
+   literal 0 duration) and smooth-scrolling turns off. This is what
+   REFERENCE.md §12 (Motion) and the 2026-09 accessibility audit verify
+   — confirmed working, not just declared, by checking computed styles
+   with and without this preference emulated. Covers CSS-driven motion
+   only; JS-driven motion (autoplaying video) has its own separate check
+   — see autoplayUnlessReducedMotion() in script.js.
 ================================ */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {

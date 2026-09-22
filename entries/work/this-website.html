@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="With Claude and Claude Code, Christopher Klein built this site to leave Squarespace, learn web development and AI workflows, and implement accessibility.">
     <script>/* flash-prevention: reads saved theme before CSS loads to prevent a visible colour flicker */(function(){var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}());</script>
-    <title>This Website — Work — Christopher Klein</title>
+    <title>Building an Accessible Website with AI — Work — Christopher Klein</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
                         <span aria-hidden="true" class="breadcrumb-separator">›</span>
                     </li>
                     <li class="breadcrumb-item">
-                        <span aria-current="page">This Website</span>
+                        <span aria-current="page">Building an Accessible Website with AI</span>
                     </li>
                 </ol>
             </nav>
@@ -39,7 +39,7 @@
             <p class="standard-page-caption">Scalable, Accessible, Performant: ingredients for this website</p>
 
             <!-- Title -->
-            <h1 class="standard-page-title">This Website</h1>
+            <h1 class="standard-page-title">Building an Accessible Website with AI</h1>
 
             <!-- Tags -->
             <div class="standard-page-details-tags">
@@ -68,28 +68,30 @@
             <div class="standard-page-content">
                 
                 <h2 id="overview">Overview</h2>
-                <p>For the past 3 months, I sought to eliminate my dependency on Squarespace as a platform for my portfolio, as I've utilized the service on and off for many years but it was never what I truly wanted.</p>
-                
-                
-                <p>Problem #1: Squarespace is an expensive recurring charge and specific features are gated behind a more expensive tier.</p>
+                <p>For the past 3 months, I've worked to leave Squarespace behind. I'd used it on and off for years, but it was limiting in what I wanted. I had tried wordpress too but that also seemed rather limiting and costly given any specific features I wanted were behind pricier plans.</p>
 
-                <p>Problem #2: I don't know much about web development.</p>
+                <p>With the abundence of new websites being created using AI, I decided it was my turn to make my own site.</p>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
 
-                <h2 id="solution">Solution</h2>
-                <p>Solution #1: Replace my Squarespace subscription with an Anthropic subscription</p>
+                <h2 id="the-plan">The Plan</h2>
+                
+                <ul>
+                    <li>Replace my Squarespace subscription with an Anthropic subscription.</li>
+                    <li>Have fun learning how to create a website.</li>
+                    <li>Learn how to use web test tools.</li>
+                    <li>Learn how to implement accessibility.</li>
 
-                <p>Solution #2: Have fun in the process, and learn through fun.</p>
+                </ul>
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 
-                <h2 id="foundations">.LANG-ing the Foundations</h2>
-                <p>Not being a web-head by trade, I knew I was going to get myself caught in the sticky webbing of setup. I spent time inquiring about scalability, performance, and accessibility principles with Claude in order to establish specification documents and the technical stack we would use.</p>
+                <h2 id="foundations">Foundations</h2>
+                <p>I'm not a web developer by trade, so I knew setup would be complicated. I spent time pinning down scalability, accessibility, and performance principles with Claude in order to establish specification documents and the technical stack we would use.</p>
          
                
                 <h3 id="core-principles">Core Principles</h3>
@@ -155,13 +157,13 @@
 
                 <h3 id="markdown">Markdown Files</h3>
                 
-                <p>In earlier LLM experiments, I ran into slight hallucinations and/or the models would infer and do their own thing without guidance. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
+                <p>In earlier AI experiments, the models sometimes made things up or went off on their own without clear direction. Since then, I've read enough cautionary tales and workflow improvement articles from developers that informed how I would go forward with this project.</p>
                 
                 <p>I moved the discussion out of a singular chat and established a project. Within the project, I could ensure it contained context and documentation between chats. We created the Markdown (MD) files which would provide the support pillars.</p> 
                 
-                <p>The MDs would grow over the months, adding methods to avoid the aforementioned issues, build development and process guardrails, contain best practices to avoid wasting tokens on specific tasks I could easily check myself, archive changes over time, and note design intent.</p>
+                <p>Over time, the docs grew to: avoid repeat mistakes, set process guardrails, save effort on tasks I could check myself, track changes, and record design decisions.</p>
 
-                <p>Architecture and planning happened in Claude while implementation and Git operations were handled in Claude Code running in Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
+                <p>I planned the architecture in Claude, then built it and ran Git in Claude Code inside Visual Studio. The docs were utilized and referenced via prompts and were the only thing that had to survive the handoff between the two.</p>
 
                 <ul>
                     <li>REFERENCE.md for project decisions and session handoffs</li>
@@ -186,7 +188,7 @@
 
                 <p>I decided on Color, Spacing, Motion, picked a typeface (Noto Sans) for wider localization capabilities, had a decent set of Components made in Figma and a Standard Page template all working somewhat effectively in Desktop, Tablet, and Mobile breakpoints.</p>
              
-                <p>However, when you are developing a site that reflects your principles - you get nitpicky, and you start to repeat “Not good enough” to yourself. And often push back on your own simplicity guardrails in favor of implementing something complex or even removing a feature after testing.</p>
+                <p>When you're building a site that reflects your own principles, you get nitpicky. You start telling yourself, "this element is not good enough". This lead to me pushing back on my own rules for keeping things simple.</p>
 
                 <p>As a result of just having the basics - the site has taken longer than I wanted. I would see and reproduce a bug, and those bugs might have user experience issues that needed new solutions designed and tested. It also went through multiple partner reviews with my wife, who had some solid constructive criticism.</p>
 
@@ -228,7 +230,7 @@
                 <p>After being proud of my implementation, I had set off biking to the store to pick up groceries. I was almost at the store when a gust of wind hit me in the face and provided me with the realization that I had forgotten to account for Virtual Keyboards.</p>
 
 
-                <p>As I picked out a good cabbage in the vegetable aisle, its sprinkler spritzed my face with cold water, and barely managed to wash away the embarrassment I felt for forgetting something I see every single day.</p> 
+                <p>As I picked out a cabbage, the produce sprinkler hit me with cold water. It almost washed away the embarrassment of forgetting something I see every day</p> 
                 
                 <!-- image -->
                 <img src="/assets/images/entries/work/this-website/atla-cabbages.png" alt="The infamous Cabbage vendor from Avatar: The Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
@@ -311,8 +313,6 @@
                     <li>No audio or video content currently exists on the site, but when I add, this will get addressed.</li>
                 </ul>
 
-                <p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
-
 
                 <h2 id="performance">Performance</h2>
                 <p>Performance was crucial for me. I've seen many websites over the years be so flashy it hurts and I just click out of it instantly. Between ads and images - I wanted my site to be as fast as I could make it.</p>
@@ -329,7 +329,8 @@
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="the-future">The Future</h2>
-                <p>Next up for me is to take a web break to work on new projects. Stay tuned y’all!</p>
+                
+                <p>As time goes on, I will continue to maintain, verify, and introduce further accessibility options to the site. If you are reading this and observe an issue or lack of accessibility - please contact me using the information below.</p>
 
             </div>
 
