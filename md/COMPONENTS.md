@@ -1329,31 +1329,27 @@ Same at all breakpoints.
 **Used for:** Individual Work entries and Thoughts entries (blog posts, project writeups)
 
 ### Design Intent
-The standard page template provides a consistent reading experience for all long-form content. It is single column, centred, and optimised for sustained reading. Redesigned 2026-08-17: the header separated authorship from structured metadata (a left-aligned Project Details / Details card), the banner image became contained rather than full-bleed on mobile, and the footer was rebuilt around Share, a tag-driven "More Work" / "More Thoughts" link, and a reused contact section — replacing the old non-functional Previous / Next navigation entirely. Revised again 2026-08-19 against a visual review: the author row was removed outright, the Details card's tag pills and row text were brought back down to the site's existing shared scales (they'd drifted to Figma-derived sizes larger than the rest of the site), the footer's two action buttons were fixed to render at matching size, and the banner's max-width was capped to the same 65ch the text column beneath it already uses (it had been stretching to the full 1200px page ceiling instead).
+The standard page template provides a consistent reading experience for all long-form content. It is a single 65ch reading column (`.standard-page--reading`, added 2026-09-25) with a solid panel behind it, left-aligned at the top, optimised for sustained reading. Redesigned 2026-08-17: the header separated authorship from structured metadata (a left-aligned Project Details / Details card), the banner image became contained rather than full-bleed on mobile, and the footer was rebuilt around Share, a tag-driven "More Work" / "More Thoughts" link, and a reused contact section — replacing the old non-functional Previous / Next navigation entirely. Revised again 2026-08-19 against a visual review: the author row was removed outright, the Details card's tag pills and row text were brought back down to the site's existing shared scales, the footer's two action buttons were fixed to render at matching size, and the tags row was moved out of the Details card into its own standalone row above it. **Banner removed sitewide 2026-09-25**, alongside the reading-column/panel change: Work and Thoughts entries now share one identical layout with no banner/no-banner distinction; title and tags row changed from centre to left aligned to match; an optional lead image (`img.standard-page-lead`) sits between the title and the tags row instead — a bare `<img>` with alt text only, no figure/figcaption, and deliberately not part of the click-to-zoom image viewer (see Image Viewer notes below).
 
 ### Anatomy
 
 ```
 [ nav.breadcrumb — Primary Tag › Page Title, 2 segments ]
-[ .standard-page-banner — 3:1 ratio (3:2 mobile), full-width (`width: 100%`, no max-width — confirmed 2026-08-25; the 8/19 revision's intent to cap it to the 65ch text column was reverted later the same day and never carried into this doc until now), contained within .standard-page's own padding at every breakpoint ]
-[ p.standard-page-caption ]
-[ h1.standard-page-title — centre aligned ]
-[ .standard-page-details — card ]
+[ h1.standard-page-title — left aligned (changed 2026-09-25 — was centre when a banner sat above it) ]
+[ img.standard-page-lead — optional lead image, bare <img>, no figure/figcaption, alt text only (added 2026-09-25 as the first item in body content, replacing the removed banner; relocated the same day to sit here, between title and tags, once the layout settled). Never loading="lazy" — it's the first image on the page. Not part of the click-to-zoom image viewer — initImageViewer() only ever targets .standard-page-content img, and this element sits outside that container by design. ]
+[ .standard-page-details-tags — a.tag row, standalone, left aligned (changed 2026-09-25 — was centre) ]
+[ .standard-page-details — card, centred, unchanged ]
   [ .standard-page-details-row — Employer / Role / Timeline / Tools (Work) or Published / Updated (Thoughts) ]
     [ span.standard-page-details-label ]
     [ span.standard-page-details-value ]
-  [ .standard-page-details-row.standard-page-details-row--tags ]
-    [ span.standard-page-details-label — "Tags" ]
-    [ .standard-page-details-tags > a.tag — same class/size as an Archive card tag, no modifier ]
-[ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-content ]
   [ h2 headings, h3 subheadings, p body text ]
   [ ul/ol lists, blockquote, code blocks as needed ]
-  [ figure > img + figcaption.standard-page-caption — captioned in-body image ]
-  [ img — bare, uncaptioned in-body image ]
+  [ figure > img + figcaption — captioned in-body image, loading="lazy" ]
+  [ img — bare, uncaptioned in-body image, loading="lazy" ]
   [ table — 65ch reading column, scrolls via overflow-x on narrow viewports ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
-[ .standard-page-footer ]
+[ .standard-page-footer — unchanged by the 2026-09-25 revision, still centred ]
   [ .standard-page-footer-actions ]
     [ button.share-btn.btn.btn--ghost ]
     [ a.btn.btn--ghost — "More Work" (Work) or "More Thoughts" (Thoughts), tag-driven per template ]
@@ -1362,25 +1358,40 @@ The standard page template provides a consistent reading experience for all long
 [ .back-to-top-row > button.back-to-top ]
 ```
 
+There is one `hr.standard-page-divider`, immediately before the footer — not one after the Details card as well; an earlier revision of this doc showed two and was never corrected until now.
+
 There is no author row (photo + name) — it was added in the 8/18 redesign
 and removed in the 8/19 revision as a deliberate simplification, not an
 oversight. Authorship for both entry types is Christopher Klein by default
 and isn't otherwise surfaced in this header.
 
-**In-body images (2026-08-18):** `.standard-page-content img` (full width,
-natural aspect ratio, `border-radius: var(--border-radius-md)`,
-`margin-bottom: var(--space-6)`) styles any image dropped into body content,
-separate from the banner (which is a CSS background-image, not an `<img>`).
-Images needing a credit/caption use `<figure><img><figcaption
-class="standard-page-caption"></figcaption></figure>` — reusing the banner's
-existing caption class rather than a second caption style.
-`.standard-page-content figure` carries the block's `margin-bottom` instead
-of the inner `img` so a captioned figure doesn't double up spacing.
-Uncaptioned images are a bare `<img>` with no wrapper. All images require
-alt text (`alt=""` only for decorative images) and `loading="lazy"`, matching
-the convention already used on About's profile photo. Every in-body image
-is also a click-to-zoom trigger — see below and `### Image Viewer
-(Click-to-Zoom)`.
+**In-body images (2026-08-18, banner/lead-image markup updated 2026-09-25):**
+`.standard-page-content img` (full width, natural aspect ratio,
+`border-radius: var(--border-radius-md)`, `margin-bottom: var(--space-6)`)
+styles any image dropped into body content. Images needing a credit/caption
+use `<figure><img><figcaption></figcaption></figure>` — `.standard-page-content
+figcaption` styles a bare `<figcaption>` directly (2026-09-25); no class is
+needed any more, replacing the old `.standard-page-caption` class the banner
+used to require. `.standard-page-content figure` carries the block's
+`margin-bottom` instead of the inner `img` so a captioned figure doesn't
+double up spacing. Uncaptioned images are a bare `<img>` with no wrapper.
+All images require alt text (`alt=""` only for decorative images) and
+`loading="lazy"`. Every in-body image is also a click-to-zoom trigger —
+see below and `### Image Viewer (Click-to-Zoom)`.
+
+**Lead image (`img.standard-page-lead`, added 2026-09-25):** lives outside
+`.standard-page-content` entirely — see Anatomy above — so none of the
+`.standard-page-content` rules in this section apply to it. Its own rule,
+`.standard-page-lead` (`display: block`, `width`/`max-width: 100%`, `height:
+auto`, the same `border-radius: var(--border-radius-md)` in-body images
+use), covers width/height/radius; spacing reuses `--space-6` on both sides
+to match the title-to-tags rhythm elsewhere in this header. Alt text only —
+no `<figure>`, no `<figcaption>`, and it is never `loading="lazy"` (it's the
+first image on the page, matching the convention already used on About's
+profile photo). It is **not** a click-to-zoom trigger: `initImageViewer()`
+selects `.standard-page-content img` specifically, and the lead image sits
+outside that container by design, so it's excluded from the viewer's image
+sequence entirely — Previous/Next on an in-body image never lands on it.
 
 **Click-to-zoom trigger (as of 2026-09-21):** at page load `initImageViewer()`
 wraps each `.standard-page-content img` in a real

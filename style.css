@@ -68,6 +68,11 @@
     --color-tooltip-border: var(--color-accent-primary);
     --color-tooltip-text: var(--color-text-primary);
 
+    /* ---- Colour: Background Pattern (theme-agnostic) ---- */
+    --pattern-dot-color: rgba(255, 255, 255, 0.05);
+    --pattern-dot-size: 1.5px;
+    --pattern-dot-spacing: var(--space-6);
+
     /* ---- Typography: Family ---- */
     --font-family-base: 'Noto Sans', 'Noto Sans JP', sans-serif;
 
@@ -219,6 +224,25 @@ html {
     scroll-behavior: smooth;
 }
 
+/* The radial-gradient here is the sitewide dot-texture background — a
+   decorative, very low-opacity (5%) pattern, not a solid colour, sitting
+   behind every page. Restored 2026-09-25 after the reading-column/panel
+   work: Work/Thoughts entries and About now render their text inside
+   .standard-page--reading, a solid --color-background-base panel with
+   no gradient, so that text is fully computable by automated
+   contrast-checking tools (axe-core) — the pattern never sits directly
+   behind it any more. Only text placed directly on this body pattern
+   with nothing else behind it — Home's hero (.home-hero-subtitle) and
+   the sitewide footer copyright line (footer.html's .container > p,
+   outside every panel on every page) are the two confirmed cases — may
+   still be marked "needs manual review" rather than pass/fail, for the
+   same reason the whole page used to be before the panel existed:
+   axe-core can't always compute an exact ratio for text sitting on a
+   gradient rather than a flat colour. That's a known tooling
+   limitation, not a sign of a real contrast problem — the pattern is
+   deliberately faint enough that it never meaningfully changes actual
+   contrast (see md/DESIGN-SYSTEM.md §1.9). Removed entirely under
+   prefers-contrast: more, below. */
 body {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
@@ -226,10 +250,26 @@ body {
     line-height: var(--line-height-loose);
     color: var(--color-text-primary);
     background-color: var(--color-background-base);
+    background-image: radial-gradient(circle, var(--pattern-dot-color) var(--pattern-dot-size), transparent var(--pattern-dot-size));
+    background-size: var(--pattern-dot-spacing) var(--pattern-dot-spacing);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+/* prefers-contrast: more — the dot pattern is deliberately very faint
+   (5% opacity) so it never meaningfully changes real contrast (see the
+   body comment above), but a user who has explicitly asked for more
+   contrast than their OS default shouldn't have to rely on that
+   judgment call. Dropping the background-image here still leaves
+   background-color: var(--color-background-base) in place, so nothing
+   else about the page changes — just a flat fill instead of the
+   texture. */
+@media (prefers-contrast: more) {
+    body {
+        background-image: none;
+    }
 }
 
 img {
@@ -1714,38 +1754,25 @@ footer p {
     padding: 0 var(--space-8);
 }
 
-/* Reverted 2026-08-19 (round 2): round 1 capped this at max-width: 65ch to
-   line up with the text column beneath it. Reverted per direct review —
-   the banner is meant to span .standard-page's full width (up to
-   --max-content, 1200px), wider than the 65ch text column, same as before
-   round 1. Text column components (.standard-page-content,
-   .standard-page-divider) keep their own 65ch cap unchanged — only this
-   banner reverts. */
-.standard-page-banner {
-    width: 100%;
-    aspect-ratio: 3 / 1;
-    background-color: var(--color-background-subtle);
-    background-size: cover;
-    background-position: center;
-    border-radius: var(--border-radius-md);
-    margin-bottom: var(--space-4);
-}
-
-/* Revised 2026-08-19 (round 2): the 8/18 build used font-size-md (18px,
-   the Figma "Body-18" spec) here, which read too large next to the site's
-   established caption scale. Now uses DESIGN-SYSTEM.md §2.7's documented
-   "caption" assembled style (font-size-sm + font-weight-medium +
-   line-height-loose + letter-spacing-wide) — the sanctioned style for
-   "Image captions, timestamps, metadata" — instead of a one-off value. */
-.standard-page-caption {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    text-align: center;
-    margin-bottom: var(--space-8);
-    line-height: var(--line-height-loose);
-    letter-spacing: var(--letter-spacing-wide);
-    max-width: none;
+/* Reading column + panel (2026-09-25) — Work/Thoughts entries and About
+   sit on a single 65ch (--measure-reading) column with a solid
+   --color-background-base panel, so the sitewide dot pattern (restored
+   below, BASE STYLES) reads as a texture around the column rather than
+   behind the text itself. max-width adds .standard-page's own current
+   side padding on both sides (2 * the padding value) on top of the
+   65ch measure, so the padding continues to sit inside the panel at
+   every breakpoint instead of the panel clipping to exactly 65ch and
+   losing its own gutter — the per-breakpoint overrides below use the
+   same padding value .standard-page itself uses at that breakpoint
+   (TABLET/MOBILE sections). Only top/bottom padding is added here;
+   left/right spacing still comes from .standard-page's own padding
+   above, applied to both classes on the same element. Not applied to
+   index.html or archive.html — those keep the pattern with no panel. */
+.standard-page--reading {
+    max-width: calc(var(--measure-reading) + (2 * var(--space-8)));
+    background-color: var(--color-background-base);
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
 }
 
 .standard-page-content img {
@@ -1763,6 +1790,20 @@ footer p {
 
 .standard-page-content figure img {
     margin-bottom: 0;
+}
+
+/* Reuses DESIGN-SYSTEM.md §2.7's "caption" assembled style — the same
+   style the old (now-removed) banner caption class used before banners
+   were removed sitewide (2026-09-25). Left-aligned (no text-align
+   override needed — block default) to match the reading column's
+   left-aligned content, not centred like the old banner caption was. */
+.standard-page-content figcaption {
+    margin-top: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-loose);
+    letter-spacing: var(--letter-spacing-wide);
 }
 
 /* Click-to-zoom trigger — wraps each .standard-page-content img (see
@@ -2040,26 +2081,45 @@ footer p {
     border-radius: var(--border-radius-md);
 }
 
+/* text-align: left + margin-top: var(--space-8) (2026-09-25, banner
+   removal) — banners are gone sitewide, so every entry now flows
+   breadcrumb -> title directly. --space-8 replaces the old
+   bannerless-only margin-top modifier (that modifier class is gone),
+   applied unconditionally now that every page is bannerless — the same
+   "distinct components" gap DESIGN-SYSTEM.md §3.1 already calls for
+   elsewhere (hr, dot dividers, .standard-page-details), so the title
+   still sits comfortably below .breadcrumb's own --space-6
+   margin-bottom rather than cramped directly against it. Left-aligned
+   to match the reading column's left-aligned tags/details below it,
+   replacing the old centred banner-era treatment. */
 .standard-page-title {
     font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-tight);
     color: var(--color-text-primary);
-    text-align: center;
+    text-align: left;
+    margin-top: var(--space-8);
     margin-bottom: var(--space-6);
 }
 
-/* Thought entries drop the banner+caption (2026-09-08) — without it,
-   .breadcrumb's own margin-bottom (--space-6) alone left the title in a
-   cramped jump straight off the breadcrumb row. Adds the same --space-8
-   this file already uses as its standard section-break gap (hr, dot
-   dividers, .standard-page-details) so a bannerless entry keeps
-   comparable breathing room above the title. Scoped to
-   .standard-page--no-banner so Work entries (still bannered) are
-   unaffected. */
-.standard-page--no-banner .standard-page-title {
-    margin-top: var(--space-8);
+/* Optional lead image (added 2026-09-25) — sits between the title and
+   the tags row, alt text only, no figure/figcaption (that pattern is
+   reserved for in-body images, .standard-page-content figure below) and
+   deliberately not part of the image viewer (initImageViewer() only
+   ever targets .standard-page-content img). border-radius matches
+   .standard-page-content img's own value, not a new one.
+   margin-bottom: var(--space-6) reuses the same gap .standard-page-title
+   above and .standard-page-details-tags below already use against each
+   other elsewhere on this page, so the image's rhythm doesn't stand
+   apart from the rest of the top section. */
+.standard-page-lead {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--space-6);
 }
 
 /* ================================
@@ -2134,9 +2194,10 @@ footer p {
 .standard-page-details-tags {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-start;
     gap: var(--space-2);
     max-width: var(--measure-reading);
-    margin: 0 auto var(--space-6);
+    margin: 0 0 var(--space-6);
 }
 
 /* ================================
@@ -3826,6 +3887,10 @@ footer p {
         padding: 0 var(--space-6);
     }
 
+    .standard-page--reading {
+        max-width: calc(var(--measure-reading) + (2 * var(--space-6)));
+    }
+
     .standard-page-title {
         font-size: var(--font-size-3xl);
     }
@@ -4028,12 +4093,8 @@ footer p {
         padding: 0 var(--space-4);
     }
 
-    /* Contained, not full-bleed — stays inside .standard-page's own
-       padding at every breakpoint like the rest of the page, matching the
-       site's existing fluid/responsive container convention rather than
-       the previous negative-margin viewport-edge treatment. */
-    .standard-page-banner {
-        aspect-ratio: 3 / 2;
+    .standard-page--reading {
+        max-width: calc(var(--measure-reading) + (2 * var(--space-4)));
     }
 
     .standard-page-title {

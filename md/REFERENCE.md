@@ -226,13 +226,13 @@ Reading column width: `65ch` (`--measure-reading`, added 2026-09-24) — caps bo
 
 ### Image Standards
 - **Format:** WebP primary, JPG fallback for photos, SVG for icons and illustrations
-- **Aspect ratios:** 16:9 (320×180px), 3:2 (320×213px), 1:1 (320×320px), 3:1 banner (1200×400px)
+- **Aspect ratios:** 16:9 (320×180px), 3:2 (320×213px), 1:1 (320×320px)
 - **Card thumbnails:** 16:9 ratio on Home page cards
-- **Article header banners:** 3:1 ratio on individual post pages
-- **Always use:** `loading="lazy"`, explicit `width` and `height`, `srcset` for responsive images
+- **Lead images (Work/Thoughts entries):** banners were removed sitewide 2026-09-25; entries now open with an optional lead image between the title and the tags row instead. Markup: a bare `<img class="standard-page-lead">` — no `<figure>`, no `<figcaption>`, alt text only (figures/figcaptions are for in-body images only, see md/COMPONENTS.md §14). Always a descriptive `alt`; always explicit `width`/`height`; **never** `loading="lazy"` — it's the first image on the page. Not part of the click-to-zoom image viewer (`initImageViewer()` only targets `.standard-page-content img`). Lead images go through the same WebP pipeline as every other entry image (`scripts/build-images.js`, below) and currently share one source file with that entry's Home/Archive card thumbnail (e.g. `this-website-inline.webp`, `StarEngine-Logo.webp`) rather than a separate crop per use.
+- **Always use:** `loading="lazy"` (except a lead image, above), explicit `width` and `height`, `srcset` for responsive images
 - **Alt text:** Descriptive on meaningful images, `alt=""` and `aria-hidden="true"` on decorative images
 - **Performance targets:** Hero under 200kb, card thumbnails under 100kb, no single image over 500kb
-- **Compression tool:** Squoosh (free, browser-based)
+- **Compression tool:** Squoosh (free, browser-based), or `scripts/build-images.js` (sharp-based batch pipeline — raw exports in `raw-exports/`, produces an 80%-quality thumbnail plus a `-full.webp` high-res variant per source file; see md/COMPONENTS.md §14's Image Viewer notes for how `-full` is consumed)
 - **CSS rule required on all images:**
 ```css
 img {
@@ -357,13 +357,19 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Standard Page Template (Work entries, Thoughts entries)
 **Purpose:** Individual work or blog post pages.
-**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/welcome.html` (renamed 2026-09-20, formerly `thoughts/read-me.html`, before that `thoughts/code-and-conduct.html`, before that `thoughts/thrilling-beginnings.html`), `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Floating Table of Contents added 2026-08-23, mobile/tablet trigger+panel variant completed 2026-08-25, unified onto a single trigger + anchored panel pattern at every breakpoint 2026-09-18 (the earlier always-visible Desktop rail at ≥1440px was removed — it had no reserved gutter in the content column and overlapped the entry's own `<h1>`/body copy at Desktop widths). Panel positioning decoupled from the trigger 2026-09-19 — it now anchors a fixed offset below the header/tab-bar and targets a real ~78% of viewport height via a `clamp()`, rather than a `bottom`-anchored formula whose growable space topped out around 45–48% of viewport height regardless of any percentage used. Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
-**Layout:** Single column, centred, max-width 65ch content.
+**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/welcome.html` (renamed 2026-09-20, formerly `thoughts/read-me.html`, before that `thoughts/code-and-conduct.html`, before that `thoughts/thrilling-beginnings.html`), `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Floating Table of Contents added 2026-08-23, mobile/tablet trigger+panel variant completed 2026-08-25, unified onto a single trigger + anchored panel pattern at every breakpoint 2026-09-18 (the earlier always-visible Desktop rail at ≥1440px was removed — it had no reserved gutter in the content column and overlapped the entry's own `<h1>`/body copy at Desktop widths). Panel positioning decoupled from the trigger 2026-09-19 — it now anchors a fixed offset below the header/tab-bar and targets a real ~78% of viewport height via a `clamp()`, rather than a `bottom`-anchored formula whose growable space topped out around 45–48% of viewport height regardless of any percentage used. Banner removed sitewide 2026-09-25 — Work and Thoughts entries now share one identical layout with no banner/no-banner distinction; an optional lead image is authored as the first inline figure in body content instead (see §5 Image Standards). Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
+**Layout:** Single 65ch reading column (`.standard-page--reading`, added 2026-09-25) with a solid `--color-background-base` panel behind it — see "Reading Column, Panel, and Background Pattern" below. Order: breadcrumb, title, optional lead image, tags, Details card, body content (the lead image moved here from inside body content the same day — see §5 Image Standards). Breadcrumb, title, and tags are left-aligned (changed from centred 2026-09-25); the footer (Share/More-entries actions plus contact section) is unchanged, still centred.
 **Creation process:** md/NEW-ENTRY-PROCESS.md.
+
+### Reading Column, Panel, and Background Pattern
+**Status:** Built 2026-09-25. Every page renders the sitewide dot-texture pattern (`--pattern-dot-*` tokens, `body`'s `background-image`) directly on `body`. Work/Thoughts entries and About additionally wrap their content in `.standard-page--reading`, a solid `--color-background-base` panel capped at 65ch (`--measure-reading`) plus that breakpoint's own side padding — so the pattern reads as a texture around the column, never behind the reading text itself. Home and Archive keep the bare pattern with no panel — unchanged. The pattern is removed entirely under `prefers-contrast: more` (`background-image: none`), leaving the flat `--color-background-base` fill.
+**Two accepted exceptions** still render text directly on the bare pattern, confirmed via axe-core: Home's hero subtitle (`.home-hero-subtitle`) and the sitewide footer copyright line (`footer.html`'s `.container > p`, outside every panel on every page). Both may be marked "needs manual review" (not a violation) by automated contrast tooling for the same reason the whole site used to be before the panel existed — the pattern is a gradient, not a flat colour, so axe-core can't always compute an exact ratio, even though the pattern is deliberately faint enough (5% opacity) to never meaningfully change real contrast.
+**Floating ToC interaction:** the Table of Contents (below) is an on-demand overlay at every breakpoint — closed by default, opened only by the user. While open it may visually cover part of the reading column/panel (confirmed at 1024–1280px on a real entry); this is intended/accepted, not a bug, since the ToC is dismissible and never blocks the page on load.
+**Tokens and CSS:** see md/DESIGN-SYSTEM.md §1 (colour pattern tokens) and §4.3 (`.standard-page--reading`).
 
 ### About (about.html)
 **Purpose:** Detailed personal bio. Handles contact and feedback link.
-**Status:** Built — hero, history/experience entries, recommendations, contact section.
+**Status:** Built — profile figure, About/Skills/Employment History/Resume sections, contact section. Exactly one `<h1>` ("About", added 2026-09-25 — the page previously had none). Uses `.standard-page--reading` (see above), same as Work/Thoughts entries.
 
 ---
 

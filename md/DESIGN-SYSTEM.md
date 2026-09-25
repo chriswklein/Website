@@ -152,13 +152,42 @@ All text pairings verified against WCAG AA (4.5:1 minimum for normal text, 3:1 f
 
 **Fixed 2026-09-24 — danger/Clear hover border.** `--color-interactive-hover` (the default `.btn:hover` border colour) became teal (`#00BAA5`) in the same-day token update, matching `--color-accent-primary` — which meant the three Clear controls (`.btn--danger-hover`: Filter Drawer Clear, floating Clear ×, empty-state "Clear Filters!") rendered a teal border on their red hover fill, contradicting §1.7b's "stays neutral on hover" framing. `.btn--danger-hover:hover:not(:disabled)` now also overrides `--btn-border-hover` to `--color-danger`, so the border matches the fill (no separate contrast ratio applies — it's the same colour against itself, effectively borderless in appearance). `:active` was already unaffected (`.btn:active` never touched `border-color`).
 
-**Automated-tooling note (updated 2026-09-24):** the background dot-pattern that previously caused axe-core to mark ~314 body-text elements sitewide as `incomplete` (rather than pass/fail) for the `color-contrast` rule was removed in the 2026-09-24 reading comfort token update (former §1.11, now removed) — `body` renders on a flat `--color-background-base` fill with no gradient, so that specific blind spot no longer applies. Re-running axe-core (4.10.2, `color-contrast` rule) against Home, Archive, the This Website entry, and About at mobile/tablet/desktop after the update found **0 violations** at every page/breakpoint combination. A much smaller, separately-caused `incomplete` result still appears on some Home/Archive card text — axe's occlusion detection tripping on the `.card-block-link`/`.card-cta` layered-link technique (COMPONENTS.md §3), unrelated to backgrounds — already covered by this table's text-primary-on-surface figure above and independently safe.
+**Automated-tooling note (updated 2026-09-25):** the background dot-pattern was removed sitewide in the 2026-09-24 reading comfort token update (former §1.11, removed that day) because it caused axe-core to mark ~314 body-text elements as `incomplete` for `color-contrast` — `body` rendered on a flat `--color-background-base` fill with no gradient for one day. It was **restored 2026-09-25** (§1.11 below) alongside the single-column reading panel: Work/Thoughts entries and About now render their text inside `.standard-page--reading`, a solid panel with no gradient, so the pattern never sits directly behind that text — the original blind spot doesn't reapply there. Re-running axe-core (4.10.2) against both Work entries, Home, and Archive after the 2026-09-25 change found **0 `color-contrast` violations** anywhere; two `incomplete` (needs-review) results remain, both confirmed real and both accepted exceptions: Home's `.home-hero-subtitle` and the sitewide footer copyright line (`footer.html`'s `.container > p`), each sitting directly on the bare pattern outside any panel. A separately-caused `incomplete` result also still appears on some Home/Archive card text — axe's occlusion detection tripping on the `.card-block-link`/`.card-cta` layered-link technique (COMPONENTS.md §3), unrelated to backgrounds — already covered by this table's text-primary-on-surface figure above and independently safe.
 
 ### 1.10 Theme System
 
 Effectively single-theme: teal is the only accent, defined directly in `:root`. The `[data-theme="teal"]` override block remains in place — its values match the `:root` default exactly, a harmless no-op, kept only so an explicit `data-theme="teal"` attribute (set by the dormant toggle logic below) resolves correctly if it's ever reactivated.
 
 The `[data-theme="gold"]` override block was removed from style.css in the 2026-09-24 reading comfort token update — gold is no longer preserved anywhere in the codebase, dormant or otherwise. Teal's contrast figures are documented once, in §1.9.
+
+### 1.11 Background Pattern
+
+A decorative, very low-opacity dot texture sits behind every page, applied directly to `body`. Removed 2026-09-24, restored 2026-09-25 once the reading panel (§4.3) existed to shield entry/About body text from it.
+
+| CSS Variable | Value | Usage |
+|---|---|---|
+| `--pattern-dot-color` | `rgba(255, 255, 255, 0.05)` | Dot fill — 5% white, deliberately faint |
+| `--pattern-dot-size` | `1.5px` | Dot radius |
+| `--pattern-dot-spacing` | `var(--space-6)` (24px) | Grid spacing between dots |
+
+```css
+body {
+    background-image: radial-gradient(circle, var(--pattern-dot-color) var(--pattern-dot-size), transparent var(--pattern-dot-size));
+    background-size: var(--pattern-dot-spacing) var(--pattern-dot-spacing);
+}
+```
+
+**Where it shows:** Home and Archive render it with no panel — the full page background. Work/Thoughts entries and About render it only *around* `.standard-page--reading`'s solid panel (§4.3); the panel itself has no gradient, so pattern and reading text never overlap on those pages. See §1.9's Automated-tooling note above for the two accepted exceptions where text still sits directly on the pattern (Home's hero subtitle, the sitewide footer line).
+
+**High contrast:** removed entirely under `prefers-contrast: more` —
+
+```css
+@media (prefers-contrast: more) {
+    body { background-image: none; }
+}
+```
+
+— leaving the flat `--color-background-base` fill. This is an accessibility accommodation, not a sign the pattern is unsafe at default contrast: it is deliberately faint enough (5% opacity) to never meaningfully change real contrast ratios; a user who has asked their OS for more contrast than default shouldn't have to rely on that judgment call, so it's dropped outright rather than left to a manual read.
 
 The theme toggle button (`initThemeToggle()` in `script.js`) is dormant — the function remains in the codebase but its call is commented out pending a permanent home in the planned Vertical Action Rail. No toggle button is rendered on any page.
 
@@ -248,6 +277,8 @@ These are the complete text styles as they appear on the page. Every text elemen
 | `caption` | `--font-size-sm` | `--font-weight-medium` | `--line-height-loose` | `--letter-spacing-wide` | Image captions, timestamps, metadata |
 | `label` | `--font-size-sm` | `--font-weight-medium` | `--line-height-normal` | `--letter-spacing-widest` | Buttons, tags, nav items, badges |
 | `nav-tab` | `--font-size-xs` | `--font-weight-medium` | `--line-height-normal` | `--letter-spacing-widest` | Mobile tab bar labels only |
+
+**`caption` in CSS (added 2026-09-25):** `.standard-page-content figcaption` — styles an **in-body** image's `<figcaption>` with this assembled style directly (left-aligned, small top margin). Replaces the old `.standard-page-caption` class, which only ever styled the banner caption and was removed with the banner sitewide; `figcaption` needs no class of its own now. Scoped to `.standard-page-content` specifically — the optional lead image (`img.standard-page-lead`, moved above the tags row the same day) is a bare `<img>` with alt text only, never a `<figure>`/`<figcaption>`, so this style never applies to it.
 
 ### 2.8 Typography Rules
 
@@ -392,16 +423,17 @@ Single column page-grid. Card rows control multi-column layout within sections:
 
 On tablet (≤1023px) and mobile: all card rows collapse to single column.
 
-**Standard Page — Single Column Centred**
+**Standard Page — Single Reading Column**
 
-Content centred using `.standard-page` (max-width 1200px, horizontal padding). Body text constrained to `--measure-reading` (65ch, added 2026-09-24 — previously a bare `65ch` literal repeated at every consumer). Used for Work entries and Thoughts entries.
+`.standard-page` itself still centres at up to 1200px (`--max-content`), but Work entries, Thoughts entries, and About (2026-09-25) additionally carry `.standard-page--reading`, which narrows the whole element to `--measure-reading` (65ch) plus that breakpoint's own side padding (`calc(var(--measure-reading) + (2 * padding))`, overridden per breakpoint alongside `.standard-page`'s own padding overrides) and gives it a solid `--color-background-base` panel background with `--space-8` top/bottom padding. Banners were removed the same day — Work and Thoughts entries now share one identical layout, with an optional lead image between the title and the tags row instead (moved out of body content 2026-09-25 — see md/REFERENCE.md §5 Image Standards). See "Background Pattern" (§1.11) for how this panel relates to the sitewide dot pattern.
 
 | Element | Width | Alignment |
 |---|---|---|
-| Banner image | Full content width | Left edge to right edge |
-| Title | Full content width | Centre aligned |
-| Metadata block | Auto | Centre aligned |
-| Section headings | Full content width | Left aligned |
+| Title | Full panel width | Left aligned (changed 2026-09-25 — was centre, when a banner sat above it) |
+| Lead image (`img.standard-page-lead`, optional) | `width: 100%`, `max-width: 100%` | Block, full column width — moved here from inside body content 2026-09-25; alt text only, no figure/figcaption, not in the image viewer |
+| Tags row | `max-width: var(--measure-reading)` | Left aligned (changed 2026-09-25 — was centre) |
+| Details card | `max-width: var(--measure-reading)`, centred | Centre aligned — unchanged |
+| Section headings | Full panel width | Left aligned |
 | Body text | `max-width: var(--measure-reading)` (65ch) | Left aligned |
 
 **Exception:** `design-system.html` uses `.standard-page-content` for its real body (needed so the Floating ToC's existing heading-scan can find its section headings) but deliberately cancels the reading-width cap via a companion `.ds-page-content` class, rendering full-width up to `.standard-page`'s 1200px ceiling instead — confirmed 2026-09-06, not a bug to correct back to 65ch. See design-system.html's own Section 26 for a side-by-side of both treatments.
