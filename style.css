@@ -24,27 +24,25 @@
    and when to use it. */
 :root {
     /* ---- Colour: Background ---- */
-    --color-background-base: #111111;
-    --color-background-surface: #1A1A1A;
-    --color-background-subtle: #2A2A2A;
+    --color-background-base: #1C1C1C;
+    --color-background-surface: #242424;
+    --color-background-subtle: #2F2F2F;
+    --color-background-hover: #3D3D3D;
 
     /* ---- Colour: Text ---- */
-    --color-text-primary: #F5F5F5;
-    --color-text-secondary: #AAAAAA;
-    --color-text-tertiary: #888888;
+    --color-text-primary: #E8E8E8;
+    --color-text-secondary: #AEAEAE;
     --color-text-disabled: #666666;
     --color-text-inverse: #111111;
 
     /* ---- Colour: Border ---- */
-    --color-border-default: #2A2A2A;
-    --color-border-strong: #666666;
+    --color-border-default: #3D3D3D;
+    --color-border-strong: #707070;
 
     /* ---- Colour: Interactive ---- */
-    --color-interactive-default: #F5F5F5;
-    --color-interactive-hover: #CCCCCC;
-    --color-interactive-active: #FFFFFF;
+    --color-interactive-default: #E8E8E8;
+    --color-interactive-hover: #00BAA5;
     --color-interactive-focus: #FFFFFF;
-    --color-interactive-disabled: #666666;
 
     /* ---- Colour: Accent — Teal (live default) ---- */
     --color-accent-primary: #00BAA5;
@@ -52,7 +50,6 @@
 
     /* ---- Colour: Accent — Pink ---- */
     --color-accent-quote: #A9407C;
-    --color-accent-quote-text: #FF60BB;
 
     /* ---- Colour: Semantic — Danger ---- */
     /* Destructive / removes-something hover fill; light text on it is 6.3:1.
@@ -71,18 +68,13 @@
     --color-tooltip-border: var(--color-accent-primary);
     --color-tooltip-text: var(--color-text-primary);
 
-    /* ---- Colour: Background Pattern (theme-agnostic) ---- */
-    --pattern-dot-color: rgba(255, 255, 255, 0.05);
-    --pattern-dot-size: 1.5px;
-    --pattern-dot-spacing: var(--space-6);
-
     /* ---- Typography: Family ---- */
-    --font-family-base: 'Noto Sans', sans-serif;
+    --font-family-base: 'Noto Sans', 'Noto Sans JP', sans-serif;
 
     /* ---- Typography: Size ---- */
     --font-size-xs: 0.75rem;
     --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
+    --font-size-base: 1.125rem;
     --font-size-md: 1.125rem;
     --font-size-lg: 1.25rem;
     --font-size-xl: 1.5rem;
@@ -92,9 +84,9 @@
     --font-size-5xl: 3.75rem;
 
     /* ---- Typography: Weight ---- */
-    --font-weight-regular: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
+    --font-weight-regular: 540;
+    --font-weight-medium: 600;
+    --font-weight-semibold: 650;
     --font-weight-bold: 700;
 
     /* ---- Typography: Line Height ---- */
@@ -102,19 +94,13 @@
     --line-height-snug: 1.3;
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.6;
-    --line-height-loose: 1.75;
+    --line-height-loose: 1.8;
 
     /* ---- Typography: Letter Spacing ---- */
     --letter-spacing-tight: -0.02em;
     --letter-spacing-normal: 0em;
     --letter-spacing-wide: 0.04em;
     --letter-spacing-widest: 0.08em;
-
-    /* ---- Typography: Paragraph Spacing ---- */
-    --paragraph-spacing-sm: 12px;
-    --paragraph-spacing-base: 16px;
-    --paragraph-spacing-md: 24px;
-    --paragraph-spacing-lg: 32px;
 
     /* ---- Spacing ---- */
     --space-0: 0px;
@@ -134,6 +120,7 @@
 
     /* ---- Layout ---- */
     --max-content: 1200px;
+    --measure-reading: 65ch;
     --card-image-column-width: 42%;
     --toc-rail-width: 240px;
     /* ToC panel positioning (2026-09-19, revised): the panel used to be
@@ -226,46 +213,19 @@
 }
 
 /* ================================
-   GOLD THEME OVERRIDE (dormant — toggle UI disabled pending Action Rail)
-   A second accent-colour option, built and contrast-verified but not
-   currently reachable by any visible UI — the toggle button that would
-   set data-theme="gold" is disabled pending a permanent home in the
-   planned Vertical Action Rail (see THEME TOGGLE RAIL below). If a
-   visitor had switched to gold before it was disabled, this rule is why
-   their saved preference still renders correctly.
-================================ */
-[data-theme="gold"] {
-    --color-accent-primary: #BA8200;
-    --color-accent-primary-text: #E5A000;
-}
-
-/* ================================
    BASE STYLES
 ================================ */
 html {
     scroll-behavior: smooth;
 }
 
-/* The radial-gradient here is the sitewide dot-texture background — a
-   decorative, very low-opacity (5%) pattern, not a solid colour, sitting
-   behind every page. It's deliberately faint so it never meaningfully
-   changes the contrast of text placed over it (see md/REFERENCE.md §12
-   Visual & Contrast and md/DESIGN-SYSTEM.md §1.9/§1.11) — but because
-   it's a gradient rather than a flat colour, automated contrast-checking
-   tools (axe-core) can't always compute an exact ratio for text sitting
-   directly on body's background and mark it "needs manual review"
-   instead of pass/fail. That's a known tooling limitation, not a sign
-   of a real contrast problem — see md/DESIGN-SYSTEM.md §1.9 for the
-   manual math confirming this. */
 body {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-regular);
-    line-height: var(--line-height-relaxed);
+    line-height: var(--line-height-loose);
     color: var(--color-text-primary);
     background-color: var(--color-background-base);
-    background-image: radial-gradient(circle, var(--pattern-dot-color) var(--pattern-dot-size), transparent var(--pattern-dot-size));
-    background-size: var(--pattern-dot-spacing) var(--pattern-dot-spacing);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     display: flex;
@@ -366,12 +326,12 @@ h3 { font-size: var(--font-size-xl);  line-height: var(--line-height-snug); font
 h4 { font-size: var(--font-size-lg);  line-height: var(--line-height-normal); font-weight: var(--font-weight-semibold); }
 
 p {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     color: var(--color-text-primary);
 }
 
 ul, ol {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     color: var(--color-text-primary);
 }
 
@@ -627,15 +587,15 @@ pre code {
 
 .tag-chip--dim {
     border: var(--border-width-thin) solid var(--color-border-strong);
-    background-color: var(--color-background-subtle);
-    color: var(--color-text-disabled);
+    background-color: transparent;
+    color: var(--color-text-secondary);
     font-weight: var(--font-weight-regular);
 }
 
 .tag-chip--dim:hover {
-    background-color: var(--color-background-subtle);
+    background-color: transparent;
     border-color: var(--color-border-strong);
-    color: var(--color-text-disabled);
+    color: var(--color-text-secondary);
     font-weight: var(--font-weight-regular);
 }
 
@@ -658,7 +618,7 @@ pre code {
    small visual variants of the same base, not separate components. */
 .btn {
     --btn-bg:             var(--color-background-subtle);
-    --btn-bg-hover:       var(--color-border-strong);
+    --btn-bg-hover:       var(--color-background-hover);
     --btn-bg-active:      var(--color-border-default);
     --btn-border:         var(--color-border-strong);
     --btn-border-hover:   var(--color-interactive-hover);
@@ -693,14 +653,20 @@ pre code {
    Touch devices have no way to "un-hover": a tap latches :hover on the
    tapped element and nothing ever fires to clear it (no mouse-leave event
    exists on touch). On a disabled button that stale :hover collides with
-   .btn:disabled's text color below — both resolve to the same #666666
-   (--color-border-strong / --color-text-disabled), rendering the label
-   invisible. Confirmed via real-device testing (iPhone SE2): Clear's label
-   vanished after a successful clear, reproducing exactly this collision.
-   pointer-events: none on :disabled already stops *future* hover
-   hit-testing, but can't retroactively clear a :hover a tap already
-   latched before the button became disabled — this media query removes
-   the possibility at the source instead, for every .btn sitewide. */
+   .btn:disabled's text color below — confirmed via real-device testing
+   (iPhone SE2, against the token values active at the time, when
+   --btn-bg-hover aliased --color-border-strong directly): Clear's label
+   vanished after a successful clear, a near-1:1 fill/text collision.
+   --btn-bg-hover now aliases the dedicated --color-background-hover token
+   (#3D3D3D, added 2026-09-24 specifically so a hover fill is never also a
+   border colour — see the Button section below) paired against
+   --btn-text-disabled (--color-text-disabled, #666666) it's ~1.9:1 — better,
+   but still not a pairing worth relying on, so the fix below stays in place
+   regardless of whatever the hover fill happens to be. pointer-events: none
+   on :disabled already stops
+   *future* hover hit-testing, but can't retroactively clear a :hover a tap
+   already latched before the button became disabled — this media query
+   removes the possibility at the source instead, for every .btn sitewide. */
 @media (hover: hover) {
     .btn:hover {
         background-color: var(--btn-bg-hover);
@@ -718,14 +684,19 @@ pre code {
     color: var(--btn-text-disabled);
     cursor: not-allowed;
     /* Disabled is non-interactive — it shouldn't show interactive hover
-       feedback at all, which is misleading on its own, but here it's also
-       a real contrast bug: confirmed via testing that :hover still matches
-       a disabled button, and --btn-bg-hover (--color-border-strong,
-       #666666) is the exact same value as --btn-text-disabled
+       feedback at all, which is misleading on its own, but it was also a
+       real contrast bug at the token values active when this was found:
+       confirmed via testing that :hover still matches a disabled button,
+       and the hover fill was then --color-border-strong directly — a
+       close, low-contrast grey against --btn-text-disabled
        (--color-text-disabled, #666666) — hovering a disabled button made
-       its text and background identical, 1:1 contrast, fully invisible.
-       pointer-events: none suppresses :hover matching entirely while
-       disabled, fixing both issues at once. */
+       its text nearly indistinguishable from its background. --btn-bg-hover
+       now aliases the dedicated --color-background-hover token (#3D3D3D,
+       2026-09-24) instead, pairing better with disabled text (~1.9:1) but
+       still not a pairing worth relying on — pointer-events: none
+       suppresses :hover matching entirely while disabled regardless,
+       fixing both issues at once independent of whatever the hover fill
+       is. */
     pointer-events: none;
 }
 
@@ -756,16 +727,21 @@ pre code {
 
 /* Red = "this removes something." Applied to the controls that clear
    filters (Filter Drawer Clear, floating Clear "x", empty-state "Clear
-   Filters!") and nothing else. Only the fill changes: the shared
-   .btn:hover already supplies the border/text tokens that keep 6.3:1
-   against --color-danger, and .btn's own background-color transition
-   covers the fade. Hover sits in @media (hover: hover) so a tap never
-   leaves a stuck red state; :active sits outside it for press feedback on
-   touch. :not(:disabled) keeps a disabled Clear neutral. Three-part
-   selectors (0,3,0) outrank .btn:hover/.btn:active (0,2,0) without
-   !important. */
+   Filters!") and nothing else. The fill changes directly; the border also
+   overrides --btn-border-hover to --color-danger (2026-09-24 fix) instead
+   of inheriting the shared .btn:hover's default, which resolves through
+   --color-interactive-hover — teal since the 2026-09-24 reading comfort
+   update — and previously rendered a teal border on this red fill,
+   contradicting "red means remove." .btn's own background-color/
+   border-color transitions cover the fade for both. Hover sits in
+   @media (hover: hover) so a tap never leaves a stuck red state; :active
+   sits outside it for press feedback on touch (border unaffected there —
+   .btn:active never touched border-color to begin with). :not(:disabled)
+   keeps a disabled Clear neutral. Three-part selectors (0,3,0) outrank
+   .btn:hover/.btn:active (0,2,0) without !important. */
 @media (hover: hover) {
     .btn--danger-hover:hover:not(:disabled) {
+        --btn-border-hover: var(--color-danger);
         background-color: var(--color-danger);
     }
 }
@@ -1142,7 +1118,7 @@ pre code {
    description text's secondary tier. */
 .card-date {
     font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
     line-height: var(--line-height-loose);
     max-width: none;
 }
@@ -1764,7 +1740,7 @@ footer p {
 .standard-page-caption {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
     text-align: center;
     margin-bottom: var(--space-8);
     line-height: var(--line-height-loose);
@@ -2101,7 +2077,7 @@ footer p {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin: 0 auto var(--space-8);
     padding: var(--space-2);
     background-color: var(--color-background-surface);
@@ -2159,7 +2135,7 @@ footer p {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin: 0 auto var(--space-6);
 }
 
@@ -2169,7 +2145,7 @@ footer p {
    contact section reused verbatim from about.html.
 ================================ */
 .standard-page-footer {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin: 0 auto;
 }
 
@@ -2195,7 +2171,7 @@ footer p {
 }
 
 .standard-page-divider {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin-left: auto;
     margin-right: auto;
     margin-top: var(--space-8);
@@ -2203,7 +2179,7 @@ footer p {
 }
 
 .standard-page-content {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin-left: auto;
     margin-right: auto;
     width: 100%;
@@ -2238,21 +2214,21 @@ footer p {
 
 .standard-page-content p {
     font-size: var(--font-size-base);
-    line-height: var(--line-height-relaxed);
+    line-height: var(--line-height-loose);
     color: var(--color-text-primary);
     margin-bottom: var(--space-6);
-    max-width: 65ch;
+    max-width: var(--measure-reading);
 }
 
 .standard-page-content ul,
 .standard-page-content ol {
     font-size: var(--font-size-base);
-    line-height: var(--line-height-relaxed);
+    line-height: var(--line-height-loose);
     color: var(--color-text-primary);
     list-style-position: outside;
     padding-left: var(--space-6);
     margin-bottom: var(--space-6);
-    max-width: 65ch;
+    max-width: var(--measure-reading);
 }
 
 .standard-page-content li {
@@ -2298,7 +2274,7 @@ footer p {
 
 .standard-page-content .table-wrap {
     width: 100%;
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin-bottom: var(--space-6);
 }
 
@@ -2624,7 +2600,7 @@ footer p {
 .about-hero {
     text-align: center;
     padding: var(--space-12) 0 var(--space-8);
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin: 0 auto;
 }
 
@@ -2638,7 +2614,7 @@ footer p {
 }
 
 .about-hero-subtitle {
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-lg);
     color: var(--color-text-secondary);
     line-height: var(--line-height-relaxed);
     max-width: none;
@@ -2666,7 +2642,7 @@ footer p {
 }
 
 .about-section {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
     margin: 0 auto var(--space-12);
 }
 
