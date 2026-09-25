@@ -1,6 +1,6 @@
 # Design System — Component Specifications
-**Version:** 2.1.0
-**Last Updated:** 2026-09-21
+**Version:** 2.2.1
+**Last Updated:** 2026-09-24
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -223,7 +223,7 @@ Single variant only — `.tag`. No `.tag--secondary`.
 **HTML Element:** `<button class="tag-chip" type="button" data-filter-tag="{slug}" aria-pressed="false">` (tag chips) or `data-filter-type="{work|thoughts}"` (type chips)
 
 ### Design Intent
-Tag-Chips are the interactive filter controls used inside the Filter Drawer (`## 2c. Filter Drawer`) — the only place they appear; there is no separate desktop chip row. Unlike Tag links (which navigate to a new page), Tag-Chips toggle filter state in place with no page reload. They follow a 4-state model: Default, Hover, Active (filter applied), and Dim (available while another filter is active).
+Tag-Chips are the interactive filter controls used inside the Filter Drawer (`## 2c. Filter Drawer`) — the only place they appear; there is no separate desktop chip row. Unlike Tag links (which navigate to a new page), Tag-Chips toggle filter state in place with no page reload. They follow a 4-state model: Default, Hover, Active (filter applied), and Dim — a lower-emphasis but fully clickable state, never a disabled one. See States below for exactly what triggers Dim and where it's currently reachable on screen.
 
 A selected tag renders twice, at every breakpoint: once in `#filter-drawer-active-chips` (the selected-tags row — the sole Active-styled instance, with its own × remove control) and once in its usual place in `#filter-drawer-chips` (the tag grid). That grid copy renders Dim, not Active — Active styling is reserved for the selected-tags-row instance only, so the same filter never appears "on" twice. The grid copy stays fully clickable (clicking it removes the filter, same as its selected-tags-row counterpart) — only the visual state differs; `aria-pressed` and `aria-label` reflect the real toggle state on both. One drawer, one grid, no per-breakpoint variant.
 
@@ -240,7 +240,7 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 |---|---|
 | (none) | Default — filter not applied |
 | `.tag-chip--active` | Filter is currently applied |
-| `.tag-chip--dim` | Available, but another filter is active |
+| `.tag-chip--dim` | Available and fully clickable, but another filter is active or this chip duplicates one already shown active elsewhere — never disabled |
 
 ### Component Tokens
 
@@ -261,10 +261,10 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 --chip-text-active:        var(--color-accent-primary-text);
 --chip-font-weight-active: var(--font-weight-bold);
 
-/* Dim */
+/* Dim — recoloured 2026-09-24 (reading comfort token update) */
 --chip-border-dim:         var(--border-width-thin) solid var(--color-border-strong);
---chip-bg-dim:             var(--color-background-subtle);
---chip-text-dim:           var(--color-text-disabled);
+--chip-bg-dim:             transparent;
+--chip-text-dim:           var(--color-text-secondary);
 ```
 
 ### Anatomy
@@ -286,7 +286,9 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 | Default | `transparent` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `regular` |
 | Hover | `--color-background-subtle` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `bold` |
 | Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `bold` |
-| Dim | `--color-background-subtle` | `thin` + `--color-border-strong` | `--color-text-disabled` | `regular` |
+| Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | `regular` |
+
+**What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`), or when a chip is a grid duplicate of a tag already shown Active in the selected-tags row (`isDuplicateOfActiveRow`). Both triggers apply to type chips (`.filter-drawer-primary-chips`) and tag chips (`#filter-drawer-chips`) alike — but only type-chip Dim is currently visible on screen: that row is never hidden, so selecting Work visibly dims Thoughts. Tag-chip Dim is computed and classed identically, but `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state, while correct, has no currently-reachable on-screen instance. The class and its styling are left in place, ready for a future layout that keeps the tag grid visible alongside active selections.
 
 ### Accessibility
 
@@ -297,6 +299,7 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 - Focus ring: `2px solid var(--color-interactive-focus)`, offset `3px`
 - Screen reader (default): "{Label}. Button."
 - Screen reader (active): "Remove {Label} filter. Button."
+- Dim is a purely visual de-emphasis cue — it never sets `aria-disabled` and adds no visually-hidden text. `aria-pressed`/`aria-label` always reflect the real underlying toggle state exactly as they would if the chip weren't dimmed (`true` / "Remove {Label} filter" for a duplicate-of-active Dim chip; `false` / no label for an available-but-shadowed one) — a screen reader user gets no distinct signal that a chip is specifically Dim, only whichever real pressed state it already had
 
 ### Responsive Behaviour
 
@@ -323,7 +326,7 @@ Active state (set by JS, not authored manually):
 </button>
 ```
 
-Dim duplicate state (`#filter-drawer-chips` grid copy, when this tag is active and already shown in `#filter-drawer-active-chips`):
+Dim duplicate state (`#filter-drawer-chips` grid copy, when this tag is active and already shown in `#filter-drawer-active-chips`) — shown for markup reference; per the reachability note above, `#filter-drawer-chips` itself is hidden whenever any tag is active, so this exact instance isn't currently visible on screen:
 ```html
 <button class="tag-chip tag-chip--dim" type="button" data-filter-tag="quality-assurance"
         aria-pressed="true" aria-label="Remove Quality Assurance filter">
@@ -1964,15 +1967,22 @@ Built and live on every card as of 2026-09-02: `index.html`'s Feature and Though
 
 Quick reference mapping every component token to its semantic source.
 
+Updated 2026-09-24 (reading comfort token update, Parts A–D) to current hex values.
+
 | Component Token | Semantic Token | Raw Value |
 |---|---|---|
-| `--btn-bg` | `--color-background-subtle` | `#2A2A2A` |
-| `--btn-border` | `--color-border-strong` | `#666666` |
-| `--btn-text` | `--color-text-primary` | `#F5F5F5` |
-| `--card-bg` | `--color-background-surface` | `#1A1A1A` |
-| `--card-border` | `--color-border-default` | `#2A2A2A` |
+| `--btn-bg` | `--color-background-subtle` | `#2F2F2F` |
+| `--btn-bg-hover` | `--color-background-hover` (added 2026-09-24 — previously aliased `--color-border-strong` directly, which failed AA text contrast on hover; see md/DESIGN-SYSTEM.md §1.9) | `#3D3D3D` |
+| `--btn-bg-active` | `--color-border-default` (a border token reused as a fill — audited 2026-09-24 and left as-is: `--color-text-primary` on it is ~8.9:1, already well above AA) | `#3D3D3D` |
+| `--btn-border` | `--color-border-strong` | `#707070` |
+| `--btn-border-hover` | `--color-interactive-hover` (teal as of 2026-09-24 — `.btn--danger-hover:hover` overrides this to `--color-danger` instead, so the Clear controls' hover border matches their red fill rather than rendering teal) | `#00BAA5` |
+| `--btn-text` | `--color-text-primary` | `#E8E8E8` |
+| `--btn-text-hover` | `--color-interactive-default` | `#E8E8E8` |
+| `--btn-text-disabled` | `--color-text-disabled` | `#666666` |
+| `--card-bg` | `--color-background-surface` | `#242424` |
+| `--card-border` | `--color-border-default` | `#3D3D3D` |
 | `--card-radius` | `--border-radius-md` | `8px` |
-| `--card-image-bg` | `--color-background-subtle` | `#2A2A2A` |
+| `--card-image-bg` | `--color-background-subtle` | `#2F2F2F` |
 | `--card-image-column-width` | — (global `:root` token, see md/DESIGN-SYSTEM.md §4.5) | `42%` |
 | `--card-block-link-z` | — | `1` |
 | `--card-cta-z` | — | `2` |
@@ -1982,19 +1992,21 @@ Quick reference mapping every component token to its semantic source.
 | `--tag-text` | `--color-accent-primary` | `#00BAA5` |
 | `--tag-text-hover` | `--color-accent-primary-text` | `#00E5CB` |
 | `--tag-bg` | `transparent` | `transparent` |
-| `--tag-bg-hover` | `--color-background-base` | `#111111` |
-| `--nav-bg` | `--color-background-base` | `#111111` |
-| `--nav-link-color` | `--color-text-secondary` | `#AAAAAA` |
-| `--nav-link-active` | `--color-text-primary` | `#F5F5F5` |
-| `--tab-bar-bg` | `--color-background-surface` | `#1A1A1A` |
-| `--tab-bar-item-color` | `--color-text-secondary` | `#AAAAAA` |
-| `--tab-bar-item-active` | `--color-interactive-default` | `#F5F5F5` |
-| `--tooltip-bg` | `--color-tooltip-bg` → `--color-background-surface` | `#1A1A1A` |
+| `--tag-bg-hover` | `--color-background-base` | `#1C1C1C` |
+| `--nav-bg` | `--color-background-base` | `#1C1C1C` |
+| `--nav-link-color` | `--color-text-secondary` | `#AEAEAE` |
+| `--nav-link-active` | `--color-text-primary` | `#E8E8E8` |
+| `--tab-bar-bg` | `--color-background-surface` | `#242424` |
+| `--tab-bar-item-color` | `--color-text-secondary` | `#AEAEAE` |
+| `--tab-bar-item-active` | `--color-interactive-default` | `#E8E8E8` |
+| `--tooltip-bg` | `--color-tooltip-bg` → `--color-background-surface` | `#242424` |
 | `--tooltip-border` | `--color-tooltip-border` → `--color-accent-primary` | `#00BAA5` |
 | `--toast-border` | `--color-accent-primary` | `#00BAA5` |
 | `--blockquote-border-color` | `--color-quote-border` → `--color-accent-quote` | `#A9407C` |
 | `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#00BAA5` |
 | `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
+
+`--tag-border`/`--tag-border-hover`/`--tag-bg-hover` are documented here (and in DESIGN-SYSTEM.md §1.8) as named component tokens, but neither actually exists as a CSS custom property in style.css — `.tag`/`.tag-chip` reference the semantic tokens directly. Pre-existing drift, not caused by this update and not resolved here (see the 2026-09-24 audit's Flags).
 
 ---
 
