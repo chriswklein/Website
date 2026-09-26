@@ -7,7 +7,7 @@
     <title>Design System Reference</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500..700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/fav/fav-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/fav/fav-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/fav/fav-180.png">
@@ -98,19 +98,6 @@
             max-width: none;
         }
 
-        /* Section 20's nested anatomy-diagram demo is the one place a
-           <p class="standard-page-caption"> ends up inside this page's
-           real .standard-page-content (production entries never nest one
-           the same way — their banner caption sits beside, not inside,
-           the content div). Without this, .standard-page-content p's
-           font-size/color would win over .standard-page-caption's own
-           smaller/tertiary styling on specificity alone. */
-        .ds-page-content .standard-page-caption {
-            max-width: none;
-            font-size: var(--font-size-sm);
-            color: var(--color-text-tertiary);
-        }
-
         /* ================================
            SECTION 1 — COLOUR SWATCHES
         ================================ */
@@ -151,6 +138,7 @@
         .s-bg-base    { background-color: var(--color-background-base);    border: var(--border-width-thin) solid var(--color-border-strong); }
         .s-bg-surface { background-color: var(--color-background-surface); border: var(--border-width-thin) solid var(--color-border-default); }
         .s-bg-subtle  { background-color: var(--color-background-subtle);  border: var(--border-width-thin) solid var(--color-border-default); }
+        .s-bg-hover   { background-color: var(--color-background-hover);   border: var(--border-width-thin) solid var(--color-border-default); }
 
         /* Text swatches — text written in that colour */
         .swatch-text-box {
@@ -166,7 +154,6 @@
 
         .s-text-primary   { color: var(--color-text-primary); }
         .s-text-secondary { color: var(--color-text-secondary); }
-        .s-text-tertiary  { color: var(--color-text-tertiary); }
         .s-text-disabled  { color: var(--color-text-disabled); }
         .s-text-inverse   { color: var(--color-text-inverse); background-color: var(--color-text-primary); }
 
@@ -177,20 +164,14 @@
         /* Interactive swatches */
         .s-int-default  { background-color: var(--color-interactive-default);  }
         .s-int-hover    { background-color: var(--color-interactive-hover);    }
-        .s-int-active   { background-color: var(--color-interactive-active);   }
         .s-int-focus    { background-color: var(--color-interactive-focus);    }
-        .s-int-disabled { background-color: var(--color-interactive-disabled); }
 
-        /* Accent swatches — teal is the live default (data-theme unset or
-           "teal"); gold is a dormant, fully-defined but currently
-           unreachable [data-theme="gold"] override, per DESIGN-SYSTEM.md
-           §1.8 and style.css's :root/[data-theme] blocks. */
+        /* Accent swatches — teal is the site's only accent theme; the
+           dormant [data-theme="gold"] override was removed from style.css
+           in the 2026-09-24 reading comfort token update. */
         .s-acc-teal      { background-color: #00BAA5; }
         .s-acc-teal-text { background-color: #00E5CB; }
-        .s-acc-gold      { background-color: #BA8200; }
-        .s-acc-gold-text { background-color: #E5A000; }
         .s-acc-pink      { background-color: var(--color-accent-quote); }
-        .s-acc-pink-text { background-color: var(--color-accent-quote-text); }
 
         /* Semantic component tokens that alias the accent tokens above —
            real custom properties defined in style.css :root (not the same
@@ -243,7 +224,7 @@
         .ts-h3         { font-size: var(--font-size-xl);  font-weight: var(--font-weight-semibold);  line-height: var(--line-height-snug);    letter-spacing: var(--letter-spacing-normal);  }
         .ts-h4         { font-size: var(--font-size-lg);  font-weight: var(--font-weight-semibold);  line-height: var(--line-height-normal);  letter-spacing: var(--letter-spacing-normal);  }
         .ts-body-large { font-size: var(--font-size-md);  font-weight: var(--font-weight-regular);   line-height: var(--line-height-relaxed); letter-spacing: var(--letter-spacing-normal);  }
-        .ts-body       { font-size: var(--font-size-base); font-weight: var(--font-weight-regular);  line-height: var(--line-height-relaxed); letter-spacing: var(--letter-spacing-normal);  }
+        .ts-body       { font-size: var(--font-size-base); font-weight: var(--font-weight-regular);  line-height: var(--line-height-loose);   letter-spacing: var(--letter-spacing-normal);  }
         .ts-caption    { font-size: var(--font-size-sm);  font-weight: var(--font-weight-medium);    line-height: var(--line-height-loose);   letter-spacing: var(--letter-spacing-wide);    }
         .ts-label      { font-size: var(--font-size-sm);  font-weight: var(--font-weight-medium);    line-height: var(--line-height-normal);  letter-spacing: var(--letter-spacing-widest);  }
         .ts-nav-tab    { font-size: var(--font-size-xs);  font-weight: var(--font-weight-medium);    line-height: var(--line-height-normal);  letter-spacing: var(--letter-spacing-widest);  }
@@ -587,16 +568,6 @@
             padding: 0;
         }
 
-        .ds-anatomy-banner-fill {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            color: var(--color-text-disabled);
-            font-size: var(--font-size-sm);
-        }
-
         @media (prefers-reduced-motion: reduce) {
             .motion-box {
                 transition: none !important;
@@ -610,16 +581,6 @@
 
     <main id="main-content">
         <div class="container">
-
-            <!-- Banner Image — temporary placeholder, reused from the
-                 Building an Accessible Website with AI entry (no dedicated design-system banner asset
-                 exists yet). Real .standard-page-banner/.standard-page-caption
-                 classes, same as every Work/Thoughts entry — this page has
-                 no <img>, so the required placeholder string lives in the
-                 caption (the pattern's only real accessible-text carrier;
-                 the banner div itself is aria-hidden, same as production). -->
-            <div class="standard-page-banner" role="img" aria-hidden="true" style="background-image: url('/assets/images/entries/work/this-website/this-website-banner.png');"></div>
-            <p class="standard-page-caption">[PLACEHOLDER — banner image reused from Building an Accessible Website with AI entry, needs real description]</p>
 
             <h1>Design System Reference</h1>
             <p class="preview-subtitle">Every atom and component currently live in style.css, rendered with real classes and (where practical) real markup — not restated values. Dev/design reference only: not linked from nav, footer, or any live page. Renamed and rebuilt from the earlier preview.html on 2026-08-18; card-variants-preview.html (a since-resolved card-layout comparison scratch file) was removed the same session — its "final candidate" layout is what Section 14 and the live .card--feature CSS both already show. Last rebuilt 2026-08-18.</p>
@@ -663,17 +624,22 @@
                         <div class="swatch">
                             <div class="swatch-box s-bg-base"></div>
                             <p class="swatch-name">--color-background-base</p>
-                            <p class="swatch-hex">#111111</p>
+                            <p class="swatch-hex">#1C1C1C</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-bg-surface"></div>
                             <p class="swatch-name">--color-background-surface</p>
-                            <p class="swatch-hex">#1A1A1A</p>
+                            <p class="swatch-hex">#242424</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-bg-subtle"></div>
                             <p class="swatch-name">--color-background-subtle</p>
-                            <p class="swatch-hex">#2A2A2A</p>
+                            <p class="swatch-hex">#2F2F2F</p>
+                        </div>
+                        <div class="swatch">
+                            <div class="swatch-box s-bg-hover"></div>
+                            <p class="swatch-name">--color-background-hover</p>
+                            <p class="swatch-hex">#3D3D3D · added 2026-09-24</p>
                         </div>
                     </div>
                 </div>
@@ -684,17 +650,12 @@
                         <div class="swatch">
                             <div class="swatch-text-box s-text-primary">--color-text-primary</div>
                             <p class="swatch-name">--color-text-primary</p>
-                            <p class="swatch-hex">#F5F5F5</p>
+                            <p class="swatch-hex">#E8E8E8</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-text-box s-text-secondary">--color-text-secondary</div>
                             <p class="swatch-name">--color-text-secondary</p>
-                            <p class="swatch-hex">#AAAAAA</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-text-box s-text-tertiary">--color-text-tertiary</div>
-                            <p class="swatch-name">--color-text-tertiary</p>
-                            <p class="swatch-hex">#888888</p>
+                            <p class="swatch-hex">#AEAEAE</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-text-box s-text-disabled">--color-text-disabled</div>
@@ -715,12 +676,12 @@
                         <div class="swatch">
                             <div class="swatch-box s-border-default"></div>
                             <p class="swatch-name">--color-border-default</p>
-                            <p class="swatch-hex">#2A2A2A</p>
+                            <p class="swatch-hex">#3D3D3D</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-border-strong"></div>
                             <p class="swatch-name">--color-border-strong</p>
-                            <p class="swatch-hex">#666666</p>
+                            <p class="swatch-hex">#707070</p>
                         </div>
                     </div>
                 </div>
@@ -731,27 +692,17 @@
                         <div class="swatch">
                             <div class="swatch-box s-int-default"></div>
                             <p class="swatch-name">--color-interactive-default</p>
-                            <p class="swatch-hex">#F5F5F5</p>
+                            <p class="swatch-hex">#E8E8E8</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-int-hover"></div>
                             <p class="swatch-name">--color-interactive-hover</p>
-                            <p class="swatch-hex">#CCCCCC</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-box s-int-active"></div>
-                            <p class="swatch-name">--color-interactive-active</p>
-                            <p class="swatch-hex">#FFFFFF</p>
+                            <p class="swatch-hex">#00BAA5</p>
                         </div>
                         <div class="swatch">
                             <div class="swatch-box s-int-focus"></div>
                             <p class="swatch-name">--color-interactive-focus</p>
                             <p class="swatch-hex">#FFFFFF</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-box s-int-disabled"></div>
-                            <p class="swatch-name">--color-interactive-disabled</p>
-                            <p class="swatch-hex">#666666</p>
                         </div>
                     </div>
                 </div>
@@ -774,35 +725,13 @@
                 </div>
 
                 <div class="preview-subsection">
-                    <h3>Accent — Gold (dormant)</h3>
-                    <p class="preview-section-desc">A fully-defined <code>[data-theme="gold"]</code> override block exists in style.css but no UI currently sets that attribute — preserved for a future theme toggle, not reachable on the live site today.</p>
-                    <div class="swatch-grid">
-                        <div class="swatch">
-                            <div class="swatch-box s-acc-gold"></div>
-                            <p class="swatch-name">--color-accent-primary (gold theme)</p>
-                            <p class="swatch-hex">#BA8200</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-box s-acc-gold-text"></div>
-                            <p class="swatch-name">--color-accent-primary-text (gold theme)</p>
-                            <p class="swatch-hex">#E5A000</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="preview-subsection">
                     <h3>Accent — Pink</h3>
-                    <p class="preview-section-desc">Theme-independent — unaffected by the teal/gold toggle.</p>
+                    <p class="preview-section-desc">Theme-independent — unaffected by the accent theme.</p>
                     <div class="swatch-grid">
                         <div class="swatch">
                             <div class="swatch-box s-acc-pink"></div>
                             <p class="swatch-name">--color-accent-quote</p>
                             <p class="swatch-hex">#A9407C</p>
-                        </div>
-                        <div class="swatch">
-                            <div class="swatch-box s-acc-pink-text"></div>
-                            <p class="swatch-name">--color-accent-quote-text</p>
-                            <p class="swatch-hex">#FF60BB</p>
                         </div>
                     </div>
                 </div>
@@ -914,7 +843,7 @@
                     <div class="type-row">
                         <div>
                             <p class="type-meta-name">body</p>
-                            <p class="type-meta-detail">base · regular · relaxed · 0em</p>
+                            <p class="type-meta-detail">base · regular · loose · 0em</p>
                         </div>
                         <p class="type-sample ts-body">The quick brown fox jumps over the lazy dog</p>
                     </div>
@@ -1101,20 +1030,16 @@
             ================================ -->
             <section class="preview-section" aria-labelledby="s10-heading">
                 <h2 id="s10-heading">Section 10 — In-body Images (Standard Page body content)</h2>
-                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content img</code> — full width, natural aspect ratio, <code>border-radius: var(--border-radius-md)</code>, nothing else: no background, border, padding, or shadow — not a card. Captioned images use <code>&lt;figure&gt;</code> + <code>&lt;figcaption class="standard-page-caption"&gt;</code> — the same caption class the page banner already uses, not a second caption style. Uncaptioned images are a bare <code>&lt;img&gt;</code>. Both require alt text and <code>loading="lazy"</code>. No lightbox/click-expand — that's a separate, not-yet-scoped feature. Shown unframed below (no demo box) — a real entry page has no wrapper around this either.</p>
+                <p class="preview-section-desc">Added 2026-08-18. <code>.standard-page-content img</code> — full width, natural aspect ratio, <code>border-radius: var(--border-radius-md)</code>, nothing else: no background, border, padding, or shadow — not a card. Captioned images use <code>&lt;figure&gt;</code> + a bare <code>&lt;figcaption&gt;</code> — styled directly by <code>.standard-page-content figcaption</code> (2026-09-25), left-aligned, no class needed. Uncaptioned images are a bare <code>&lt;img&gt;</code>. Both require alt text and <code>loading="lazy"</code>. No lightbox/click-expand — that's handled separately by the click-to-zoom image viewer (<code>initImageViewer()</code>).</p>
 
                 <div class="standard-page-content">
                     <figure>
-                        <img src="/assets/images/examples/banner-wide-1200x400.png" width="1200" height="400" alt="A person sits silhouetted on a rooftop ledge at sunset, a pair of crutches propped beside them, overlooking a palm-lined city skyline." loading="lazy">
-                        <figcaption class="standard-page-caption">Banner image — 3:1, 1200&times;400</figcaption>
-                    </figure>
-                    <figure>
                         <img src="/assets/images/examples/inline-wide-800x450.png" width="800" height="450" alt="A person sits silhouetted on a rooftop ledge at sunset, a pair of crutches propped beside them, overlooking a palm-lined city skyline." loading="lazy">
-                        <figcaption class="standard-page-caption">Inline content image — 16:9, 800&times;450</figcaption>
+                        <figcaption>Inline content image — 16:9, 800&times;450</figcaption>
                     </figure>
                     <figure>
                         <img src="/assets/images/examples/inline-tall-600x750.png" width="600" height="750" alt="A person sits silhouetted on a rooftop ledge at sunset, a pair of crutches propped beside them, overlooking a palm-lined city skyline, cropped to a taller portrait frame." loading="lazy">
-                        <figcaption class="standard-page-caption">Inline content image, portrait — 4:5, 600&times;750</figcaption>
+                        <figcaption>Inline content image, portrait — 4:5, 600&times;750</figcaption>
                     </figure>
                 </div>
             </section>
@@ -1151,7 +1076,7 @@
                                     <tr>
                                         <td>--border-radius-md</td>
                                         <td>8px</td>
-                                        <td>Banner, images, cards</td>
+                                        <td>Images, cards</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1343,7 +1268,7 @@ function setActiveNavLink() {
             ================================ -->
             <section class="preview-section" aria-labelledby="s20-heading">
                 <h2 id="s20-heading">Section 20 — Standard Page Anatomy</h2>
-                <p class="preview-section-desc">The full Work/Thoughts entry template, assembled from real classes in the order they appear on a live entry (e.g. work/star-engine.html): breadcrumb → banner → caption → title → tags row → Details card → body content → divider → footer actions → back-to-top. There is no author row (photo + name) — removed in the 2026-08-19 revision as a deliberate simplification. The footer's "Want to work together?" contact section is reused verbatim from about.html and isn't duplicated here.</p>
+                <p class="preview-section-desc">The full Work/Thoughts entry template, assembled from real classes in the order they appear on a live entry (e.g. work/star-engine.html): breadcrumb → title → optional lead image → tags row → Details card → body content → divider → footer actions → back-to-top. Banners were removed sitewide 2026-09-25 — entries now open straight from the breadcrumb into the title. The lead image moved above the tags row 2026-09-25 (was briefly the first element in body content) — it's a bare <code>img.standard-page-lead</code>, alt text only, no figure/figcaption, and deliberately excluded from the image viewer (<code>initImageViewer()</code> only targets <code>.standard-page-content img</code>). There is no author row (photo + name) — removed in the 2026-08-19 revision as a deliberate simplification. The footer's "Want to work together?" contact section is reused verbatim from about.html and isn't duplicated here.</p>
 
                 <div class="ds-anatomy-frame">
                     <div class="standard-page">
@@ -1359,12 +1284,9 @@ function setActiveNavLink() {
                             </ol>
                         </nav>
 
-                        <div class="standard-page-banner" role="img" aria-hidden="true">
-                            <span class="ds-anatomy-banner-fill">Banner (CSS background-image, 3:1)</span>
-                        </div>
-                        <p class="standard-page-caption">Example banner caption, reusing .standard-page-caption.</p>
-
                         <h1 class="standard-page-title">Entry Title</h1>
+
+                        <img class="standard-page-lead" src="/assets/images/examples/inline-wide-800x450.png" alt="Example lead image alt text" width="800" height="450">
 
                         <div class="standard-page-details-tags">
                             <a href="#" class="tag">User Experience</a>
@@ -1521,7 +1443,7 @@ function setActiveNavLink() {
                     </div>
                 </div>
 
-                <p class="preview-label">Reading — 65ch cap (every Work/Thoughts entry)</p>
+                <p class="preview-label">Reading — <code>var(--measure-reading)</code> cap, 65ch (every Work/Thoughts entry)</p>
                 <div class="standard-page-content">
                     <p>Line length is the first thing a reading system gets right or wrong. Sixty-five characters is the width most typography guidance converges on for sustained body copy — narrow enough that the eye finds the start of the next line without losing its place, wide enough that a paragraph doesn't collapse into a ladder of short, choppy lines. This page is the one deliberate exception to that rule: a design-system reference is scanned and compared across columns and swatches, not read start to finish like a Work entry, so its real body content stays at the full 1200px content width instead.</p>
                 </div>

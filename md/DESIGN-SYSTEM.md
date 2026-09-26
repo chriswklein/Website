@@ -1,6 +1,6 @@
 # Design System — Atomic Foundation
-**Version:** 1.1.0
-**Last Updated:** 2026-09-21
+**Version:** 1.2.1
+**Last Updated:** 2026-09-24
 **Status:** Active — source of truth for all design and build decisions
 
 ---
@@ -37,8 +37,6 @@ Raw colour values. Never apply these directly to elements. Always reference via 
 | `grey-800` | `#1A1A1A` | Near black |
 | `grey-900` | `#111111` | Almost black |
 | `grey-1000` | `#000000` | Pure black |
-| `gold-dark` | `#BA8200` | Dark gold |
-| `gold-light` | `#E5A000` | Light gold |
 | `pink-dark` | `#A9407C` | Deep pink/magenta |
 | `pink-light` | `#FF60BB` | Light pink |
 | `teal-dark` | `#00BAA5` | Dark teal |
@@ -48,54 +46,59 @@ Raw colour values. Never apply these directly to elements. Always reference via 
 
 | CSS Variable | References | Usage |
 |---|---|---|
-| `--color-background-base` | `grey-900` `#111111` | Main page background — applied to `body` |
-| `--color-background-surface` | `grey-800` `#1A1A1A` | Cards, panels, sidebars, elevated surfaces |
-| `--color-background-subtle` | `grey-700` `#2A2A2A` | Hover states, image placeholders, code blocks |
+| `--color-background-base` | `#1C1C1C` (no primitive — introduced 2026-09-24) | Main page background — applied to `body` |
+| `--color-background-surface` | `#242424` (no primitive — introduced 2026-09-24) | Cards, panels, sidebars, elevated surfaces |
+| `--color-background-subtle` | `#2F2F2F` (no primitive — introduced 2026-09-24) | Hover states, image placeholders, code blocks |
+| `--color-background-hover` | `#3D3D3D` (no primitive — introduced 2026-09-24; same hex as `--color-border-default` today, a deliberately separate token so the two can change independently) | Default `.btn` hover fill (`--btn-bg-hover`) — added specifically so a hover fill is never also a border colour (see §1.9) |
 
 ### 1.3 Semantic Tokens — Text
 
-| CSS Variable | References | Contrast vs Base | Usage |
-|---|---|---|---|
-| `--color-text-primary` | `grey-50` `#F5F5F5` | ~15:1 ✅ | All body text, headings, primary UI labels |
-| `--color-text-secondary` | `grey-300` `#AAAAAA` | ~7.5:1 ✅ | Captions, metadata, timestamps, helper text |
-| `--color-text-tertiary` | `grey-400` `#888888` | ~4.6:1 ✅ | Placeholder text — large sizes only |
-| `--color-text-disabled` | `grey-500` `#666666` | Not required | Disabled state text |
-| `--color-text-inverse` | `grey-900` `#111111` | — | Text placed on light surfaces |
+Two text levels for real content — see the two-tier principle below the table.
+
+| CSS Variable | References | Contrast on Base | Contrast on Surface | Usage |
+|---|---|---|---|---|
+| `--color-text-primary` | `grey-100` `#E8E8E8` | ~13.9:1 ✅ AAA | ~12.7:1 ✅ AAA | All body text, headings, primary UI labels |
+| `--color-text-secondary` | `#AEAEAE` (no primitive — introduced 2026-09-24) | ~7.7:1 ✅ AAA | ~7.0:1 ✅ AAA | Captions, metadata, timestamps, helper text |
+| `--color-text-disabled` | `grey-500` `#666666` | Not required | Not required | Disabled state text |
+| `--color-text-inverse` | `grey-900` `#111111` | — | — | Text placed on light or accent-fill surfaces (e.g. `.action-rail-badge` on teal — see §1.9) |
+
+**Two-tier text principle:** only two grey levels are used for real content — primary for the content itself, secondary for supporting info — both held at 7:1 or better against every background they actually sit on. Hierarchy comes from size, weight, and spacing, never a third, fainter grey step. `--color-text-disabled` is a separate non-content UI state (disabled controls), not a third text tier — `--color-text-tertiary` was removed in the 2026-09-24 update after confirming its only two real consumers (`.card-date`, `.standard-page-caption`) had simply been recoloured to secondary.
 
 ### 1.4 Semantic Tokens — Border
 
 | CSS Variable | References | Usage |
 |---|---|---|
-| `--color-border-default` | `grey-700` `#2A2A2A` | Subtle card and panel borders, dividers |
-| `--color-border-strong` | `grey-500` `#666666` | Input outlines, emphasized borders |
+| `--color-border-default` | `#3D3D3D` (no primitive — introduced 2026-09-24) | Subtle card and panel borders, dividers |
+| `--color-border-strong` | `#707070` (no primitive — introduced 2026-09-24) | Input outlines, emphasized borders |
 
 ### 1.5 Semantic Tokens — Interactive
 
 | CSS Variable | References | Usage |
 |---|---|---|
-| `--color-interactive-default` | `grey-50` `#F5F5F5` | Default interactive element colour |
-| `--color-interactive-hover` | `grey-200` `#CCCCCC` | Hover state |
-| `--color-interactive-active` | `grey-0` `#FFFFFF` | Active/pressed state |
-| `--color-interactive-focus` | `grey-0` `#FFFFFF` | Focus ring colour — ~19:1 contrast ✅ |
-| `--color-interactive-disabled` | `grey-500` `#666666` | Disabled interactive elements |
+| `--color-interactive-default` | `grey-100` `#E8E8E8` | Default interactive element colour |
+| `--color-interactive-hover` | `teal-dark` `#00BAA5` | Hover state — a border colour only (e.g. `.btn:hover`'s border, via `--btn-border-hover`); not applied as a text fill and not used for any hover background — see `--color-background-hover` for that. As of 2026-09-24 this is the same hex as `--color-accent-primary` |
+| `--color-interactive-focus` | `grey-0` `#FFFFFF` | Focus ring colour — ~17.0:1 on base / ~15.5:1 on surface ✅ |
+
+`--color-interactive-active` and `--color-interactive-disabled` were removed in the 2026-09-24 update — confirmed zero real CSS consumers (each was documented but never actually applied by any rule).
 
 ### 1.6 Semantic Tokens — Accent (Primary)
 
-Teal is the live default primary accent — used for dividers, primary tags, links, code borders, and tooltip borders. `--color-accent-primary` / `--color-accent-primary-text` resolve to the teal values below by default; gold is a dormant `[data-theme="gold"]` override, not a co-equal option — see §1.10 Theme System for the full theme mechanism.
+Teal is the site's only accent — used for dividers, primary tags, links, code borders, and tooltip borders. The dormant `[data-theme="gold"]` override was removed from style.css in the 2026-09-24 reading comfort token update; `[data-theme="teal"]` remains as a harmless no-op that matches the `:root` default — see §1.10.
 
-| CSS Variable | References (live default) | Contrast vs Base | Usage |
-|---|---|---|---|
-| `--color-accent-primary` | `teal-dark` `#00BAA5` | ~7.7:1 ✅ | Primary tag fill, hr dividers, code block border |
-| `--color-accent-primary-text` | `teal-light` `#00E5CB` | ~11.8:1 ✅ | Hyperlinks, tooltip text accents, text on dark |
+| CSS Variable | References | Contrast on Base | Contrast on Surface | Usage |
+|---|---|---|---|---|
+| `--color-accent-primary` | `teal-dark` `#00BAA5` | ~7.0:1 ✅ AA | ~6.3:1 ✅ AA | Primary tag fill, hr dividers, code block border |
+| `--color-accent-primary-text` | `teal-light` `#00E5CB` | ~10.6:1 ✅ AAA | ~9.7:1 ✅ AAA | Hyperlinks, tooltip text accents, text on dark |
 
 ### 1.7 Semantic Tokens — Accent (Pink)
 
 Pink is the secondary accent. Used for secondary tags and blockquote borders.
 
-| CSS Variable | References | Contrast vs Base | Usage |
-|---|---|---|---|
-| `--color-accent-quote` | `pink-dark` `#A9407C` | ~4.6:1 ✅ | Secondary tag fill, blockquote left border |
-| `--color-accent-quote-text` | `pink-light` `#FF60BB` | — | Pink text on dark surfaces |
+| CSS Variable | References | Contrast on Base | Contrast on Surface | Usage |
+|---|---|---|---|---|
+| `--color-accent-quote` | `pink-dark` `#A9407C` | ~3.0:1 | ~2.7:1 | Secondary tag fill, blockquote left border |
+
+`--color-accent-quote-text` was removed in the 2026-09-24 update — confirmed zero real CSS consumers.
 
 ### 1.7b Semantic Tokens — Danger
 
@@ -103,9 +106,9 @@ Pink is the secondary accent. Used for secondary tags and blockquote borders.
 
 | CSS Variable | Value | Contrast | Usage |
 |---|---|---|---|
-| `--color-danger` | `#B41321` | ~6.3:1 with `--color-text-primary` ✅ AA | Hover and `:active` background of clear-all controls only |
+| `--color-danger` | `#B41321` | ~5.6:1 with `--color-text-primary` / `--color-interactive-default` ✅ AA | Hover and `:active` background of clear-all controls only |
 
-Defined once in `:root` next to the other semantic colours, with no primitive of its own. It is deliberately absent from the `[data-theme]` override blocks (it does not change with the accent theme) and has no `-text` variant, since no red text is used anywhere. Only the fill changes: the control keeps its neutral `--color-interactive-hover` border and `--color-interactive-default` text on hover, and the ~6.3:1 figure is that light text on the red fill. Against the page background red is only ~2.8:1, which is why it is a fill behind light text and never a text or border colour. Hover applies on hover-capable devices only and never while the control is `disabled` — see §9.5.
+Defined once in `:root` next to the other semantic colours, with no primitive of its own. It is deliberately absent from the `[data-theme]` override blocks (it does not change with the accent theme) and has no `-text` variant, since no red text is used anywhere. The fill and, as of 2026-09-24, the hover border both change: the control's text stays `--color-interactive-default`, and the ~5.6:1 figure is that light text on the red fill. Against the page background red is only ~2.5:1, which is why it is a fill behind light text and never a general text colour. **Fixed 2026-09-24:** `--color-interactive-hover` (the default `.btn:hover` border colour) became teal (`#00BAA5`, the same hex as `--color-accent-primary` — see §1.5) in the same-day token update, which meant this control briefly rendered a teal border on its red hover fill, contradicting "red means remove" and the "stay neutral" framing above. `.btn--danger-hover:hover:not(:disabled)` now overrides `--btn-border-hover` to `--color-danger` directly, so the border matches the fill instead of inheriting the shared default — see §1.9 for the change note. Hover applies on hover-capable devices only and never while the control is `disabled` — see §9.5.
 
 ### 1.8 Semantic Tokens — Components
 
@@ -126,83 +129,99 @@ Defined once in `:root` next to the other semantic colours, with no primitive of
 
 ### 1.9 Contrast Verification
 
-All text pairings verified against WCAG AA (4.5:1 minimum for normal text, 3:1 for large text and UI components).
+All text pairings verified against WCAG AA (4.5:1 minimum for normal text, 3:1 for large text and UI components). Rebuilt 2026-09-24 from the real rendered pairings — the background each token's real consumer actually sits on, not just base — per the 2026-09-24 token audit's Step 3 pairing trace.
 
 | Foreground | Background | Ratio | Status |
 |---|---|---|---|
-| `--color-text-primary` on `--color-background-base` | `#F5F5F5` on `#111111` | ~15:1 | ✅ AAA |
-| `--color-text-secondary` on `--color-background-base` | `#AAAAAA` on `#111111` | ~7.5:1 | ✅ AA |
-| `--color-text-primary` on `--color-background-surface` | `#F5F5F5` on `#1A1A1A` | ~12:1 | ✅ AAA |
-| `--color-text-secondary` on `--color-background-surface` | `#AAAAAA` on `#1A1A1A` | ~6:1 | ✅ AA |
-| `--color-accent-primary` on `--color-background-base` | `#BA8200` on `#111111` | ~5.2:1 | ✅ AA |
-| `--color-accent-primary-text` on `--color-background-base` | `#E5A000` on `#111111` | ~8.9:1 | ✅ AAA |
-| `--color-accent-quote` on `--color-background-base` | `#A9407C` on `#111111` | ~4.6:1 | ✅ AA |
-| `--color-accent-primary-text` on `--color-background-subtle` | `#E5A000` on `#2A2A2A` | ~6.4:1 | ✅ AA |
-| `--color-accent-primary-text` on `--color-background-surface` | `#E5A000` on `#1A1A1A` | ~7.8:1 | ✅ AAA |
-| `--color-interactive-focus` on `--color-background-base` | `#FFFFFF` on `#111111` | ~19:1 | ✅ AAA |
-| `--color-text-primary` on `--color-danger` | `#F5F5F5` on `#B41321` | ~6.3:1 | ✅ AA |
+| `--color-text-primary` on `--color-background-base` | `#E8E8E8` on `#1C1C1C` | ~13.9:1 | ✅ AAA |
+| `--color-text-primary` on `--color-background-surface` | `#E8E8E8` on `#242424` | ~12.7:1 | ✅ AAA |
+| `--color-text-secondary` on `--color-background-base` | `#AEAEAE` on `#1C1C1C` | ~7.7:1 | ✅ AAA |
+| `--color-text-secondary` on `--color-background-surface` | `#AEAEAE` on `#242424` | ~7.0:1 | ✅ AAA |
+| `--color-interactive-default` on `--color-background-base` | `#E8E8E8` on `#1C1C1C` | ~13.9:1 | ✅ AAA |
+| `--color-accent-primary` on `--color-background-base` | `#00BAA5` on `#1C1C1C` | ~7.0:1 | ✅ AA |
+| `--color-accent-primary-text` on `--color-background-base` | `#00E5CB` on `#1C1C1C` | ~10.6:1 | ✅ AAA |
+| `--color-accent-primary-text` on `--color-background-surface` | `#00E5CB` on `#242424` | ~9.7:1 | ✅ AAA |
+| `--color-interactive-focus` on `--color-background-base` | `#FFFFFF` on `#1C1C1C` | ~17.0:1 | ✅ AAA |
+| `--color-text-primary` / `--color-interactive-default` on `--color-danger` | `#E8E8E8` on `#B41321` | ~5.6:1 | ✅ AA |
+| `--color-text-inverse` on `--color-accent-primary` (`.action-rail-badge`) | `#111111` on `#00BAA5` | ~7.7:1 | ✅ AAA |
+| `--color-text-secondary` on `--color-background-surface` (dimmed tag chip, `.tag-chip--dim`) | `#AEAEAE` on `#242424` | ~7.0:1 | ✅ AAA — same pairing as the base text-secondary row above; listed separately since it's a named component state (see COMPONENTS.md §2b) |
+| `--color-interactive-default` on `--color-background-hover` (`.btn:hover` fill) | `#E8E8E8` on `#3D3D3D` | ~8.9:1 | ✅ AAA |
+| `--color-danger` hover border vs. fill (`.btn--danger-hover:hover`) | `#B41321` border on `#B41321` fill | n/a | Border overridden to `--color-danger` itself (2026-09-24 fix) — see note below |
 
-**Known automated-tooling gap (confirmed 2026-09-15):** the table above was hand-verified against solid colour pairings and remains accurate, but an automated axe-core sweep (4.10.2, `wcag2a`/`wcag2aa`/`wcag21aa`) cannot independently confirm most of it in practice. Because §1.11's dot-texture background is a CSS `radial-gradient` and the containers between `body` and most page text (`main`, `.page-grid`, `.standard-page`, `.home-hero`, etc.) are themselves background-transparent, axe cannot resolve an exact background colour for any text sitting in that chain and marks the check `incomplete` rather than pass or fail — roughly 314 elements sitewide, effectively all body copy on the four Standard Page entries. This is not evidence of a contrast problem: a manual worst-case calculation confirms it directly. §1.11's pattern is `radial-gradient(circle, rgba(255,255,255,0.05) 1.5px, transparent 1.5px)` on a 24px grid — a 5%-opacity white dot covering ~1.2% of the background area. Blending 5% white into `#111111` gives a worst-case pixel of `#1D1D1D` (reachable only if a glyph lands exactly on a dot's center). Using the WCAG relative-luminance formula: `--color-text-primary` (#F5F5F5) on plain `#111111` is ≈17.3:1; on the worst-case dot pixel `#1D1D1D` it's still ≈15.5:1 — both far above the 4.5:1 AA floor (and above 7:1 AAA). **This confirms the "kept low-opacity so it never interferes with text contrast" design intent (md/REFERENCE.md §12) mathematically, not just by eye.** Treat this as a standing tooling blind spot: a future axe run showing 0 violations does not mean contrast was fully checked — re-run this manual calculation (or resolve it structurally, e.g. a non-gradient dot technique) before trusting a clean automated result as complete coverage. A separate, smaller `incomplete` cause exists on Home/Archive card text (18 elements) — axe's occlusion detection tripping on the `.card-block-link`/`.card-cta` layered-link technique (COMPONENTS.md §3), not this gradient — already covered by this table's text-primary-on-`--color-background-surface` figure (~12:1) and independently safe.
+**Fixed 2026-09-24 — `.btn:hover` contrast regression resolved.** The prior rebuild of this table (same day, earlier pass) surfaced `--color-interactive-default` on `--color-border-strong` (`.btn:hover`'s fill at the time) at ~4.0:1, failing the 4.5:1 AA floor — caused by `.btn:hover` reusing a *border* token as its hover *fill*. Fixed by giving hover its own token: `--color-background-hover` (`#3D3D3D`, §1.2) — coincidentally the same hex `--color-border-default` already used, but now a separate variable so the two can move independently. `--btn-bg-hover` now aliases `--color-background-hover` instead of `--color-border-strong`; the resulting ~8.9:1 is the row above. `--btn-bg-active` (`.btn:active`'s fill) still aliases `--color-border-default` directly and was deliberately left unchanged, per the same audit: `--color-text-primary` on it is ~8.9:1, already well above AA, so there was nothing to fix there.
+
+**Fixed 2026-09-24 — danger/Clear hover border.** `--color-interactive-hover` (the default `.btn:hover` border colour) became teal (`#00BAA5`) in the same-day token update, matching `--color-accent-primary` — which meant the three Clear controls (`.btn--danger-hover`: Filter Drawer Clear, floating Clear ×, empty-state "Clear Filters!") rendered a teal border on their red hover fill, contradicting §1.7b's "stays neutral on hover" framing. `.btn--danger-hover:hover:not(:disabled)` now also overrides `--btn-border-hover` to `--color-danger`, so the border matches the fill (no separate contrast ratio applies — it's the same colour against itself, effectively borderless in appearance). `:active` was already unaffected (`.btn:active` never touched `border-color`).
+
+**Automated-tooling note (updated 2026-09-25):** the background dot-pattern was removed sitewide in the 2026-09-24 reading comfort token update (former §1.11, removed that day) because it caused axe-core to mark ~314 body-text elements as `incomplete` for `color-contrast` — `body` rendered on a flat `--color-background-base` fill with no gradient for one day. It was **restored 2026-09-25** (§1.11 below) alongside the single-column reading panel: Work/Thoughts entries and About now render their text inside `.standard-page--reading`, a solid panel with no gradient, so the pattern never sits directly behind that text — the original blind spot doesn't reapply there. Re-running axe-core (4.10.2) against both Work entries, Home, and Archive after the 2026-09-25 change found **0 `color-contrast` violations** anywhere; two `incomplete` (needs-review) results remain, both confirmed real and both accepted exceptions: Home's `.home-hero-subtitle` and the sitewide footer copyright line (`footer.html`'s `.container > p`), each sitting directly on the bare pattern outside any panel. A separately-caused `incomplete` result also still appears on some Home/Archive card text — axe's occlusion detection tripping on the `.card-block-link`/`.card-cta` layered-link technique (COMPONENTS.md §3), unrelated to backgrounds — already covered by this table's text-primary-on-surface figure above and independently safe.
 
 ### 1.10 Theme System
 
-One background theme (dark — fixed) with two accent colour variants selectable via `data-theme` on `<html>`:
+Effectively single-theme: teal is the only accent, defined directly in `:root`. The `[data-theme="teal"]` override block remains in place — its values match the `:root` default exactly, a harmless no-op, kept only so an explicit `data-theme="teal"` attribute (set by the dormant toggle logic below) resolves correctly if it's ever reactivated.
 
-| Theme | `data-theme` value | `--color-accent-primary` | `--color-accent-primary-text` | Status |
-|---|---|---|---|---|
-| Teal | *(no attribute)* or `"teal"` | `teal-dark` `#00BAA5` | `teal-light` `#00E5CB` | **Live default** |
-| Gold | `"gold"` | `gold-dark` `#BA8200` | `gold-light` `#E5A000` | Dormant — preserved for future use |
-
-**Current state:** Teal is the site-wide default. The `:root` block defines `--color-accent-primary: #00BAA5` and `--color-accent-primary-text: #00E5CB`. The `[data-theme="teal"]` override block remains in place (its values match the default — harmless). A `[data-theme="gold"]` override block is defined but no UI currently activates it.
-
-The theme toggle button (`initThemeToggle()` in `script.js`) is dormant — the function remains in the codebase but its call is commented out pending a permanent home in the planned Vertical Action Rail. No toggle button is rendered on any page.
-
-All other tokens — backgrounds, greyscale, pink accent, danger red, borders — are unaffected by the theme system. Only `--color-accent-primary` and `--color-accent-primary-text` vary between themes.
-
-Teal contrast ratios verified: `#00BAA5` on `#111111` ≈ 7.7:1 ✅ AA · `#00E5CB` on `#111111` ≈ 11.8:1 ✅ AAA.
-Gold contrast ratios verified: `#BA8200` on `#111111` ≈ 5.2:1 ✅ AA · `#E5A000` on `#111111` ≈ 8.9:1 ✅ AAA.
-
-The flash-prevention `<script>` at the top of every page `<head>` still runs on every load. With no preference stored in `localStorage` (the toggle is disabled so nothing writes to it), it finds nothing and exits silently — the page renders with the teal `:root` default with no flash and no console error. If a user had previously toggled to gold and has `"theme": "gold"` in `localStorage`, the script would apply `data-theme="gold"` and gold would render correctly — the dormant infrastructure remains functional.
+The `[data-theme="gold"]` override block was removed from style.css in the 2026-09-24 reading comfort token update — gold is no longer preserved anywhere in the codebase, dormant or otherwise. Teal's contrast figures are documented once, in §1.9.
 
 ### 1.11 Background Pattern
 
-A subtle dot texture layered beneath `--color-background-base` on `body`, site-wide. Theme-agnostic — does not reference `--color-accent-primary` or any other theme-swappable token, so it renders identically regardless of which theme (teal or dormant gold) is active.
+A decorative, very low-opacity dot texture sits behind every page, applied directly to `body`. Removed 2026-09-24, restored 2026-09-25 once the reading panel (§4.3) existed to shield entry/About body text from it.
 
 | CSS Variable | Value | Usage |
 |---|---|---|
-| `--pattern-dot-color` | `rgba(255, 255, 255, 0.05)` | Dot colour — fixed, not theme-dependent |
-| `--pattern-dot-size` | `1.5px` | Radius of each dot |
-| `--pattern-dot-spacing` | `var(--space-6)` | Grid spacing between dots (24px) |
+| `--pattern-dot-color` | `rgba(255, 255, 255, 0.05)` | Dot fill — 5% white, deliberately faint |
+| `--pattern-dot-size` | `1.5px` | Dot radius |
+| `--pattern-dot-spacing` | `var(--space-6)` (24px) | Grid spacing between dots |
 
-Applied via `background-image` (radial-gradient dots) layered on top of `background-color` on `body` — the existing base colour is preserved underneath. Since it sits behind opaque card, header, and drawer surfaces, the pattern is only visible in empty page margins and gaps.
+```css
+body {
+    background-image: radial-gradient(circle, var(--pattern-dot-color) var(--pattern-dot-size), transparent var(--pattern-dot-size));
+    background-size: var(--pattern-dot-spacing) var(--pattern-dot-spacing);
+}
+```
+
+**Where it shows:** Home and Archive render it with no panel — the full page background. Work/Thoughts entries and About render it only *around* `.standard-page--reading`'s solid panel (§4.3); the panel itself has no gradient, so pattern and reading text never overlap on those pages. See §1.9's Automated-tooling note above for the two accepted exceptions where text still sits directly on the pattern (Home's hero subtitle, the sitewide footer line).
+
+**High contrast:** removed entirely under `prefers-contrast: more` —
+
+```css
+@media (prefers-contrast: more) {
+    body { background-image: none; }
+}
+```
+
+— leaving the flat `--color-background-base` fill. This is an accessibility accommodation, not a sign the pattern is unsafe at default contrast: it is deliberately faint enough (5% opacity) to never meaningfully change real contrast ratios; a user who has asked their OS for more contrast than default shouldn't have to rely on that judgment call, so it's dropped outright rather than left to a manual read.
+
+The theme toggle button (`initThemeToggle()` in `script.js`) is dormant — the function remains in the codebase but its call is commented out pending a permanent home in the planned Vertical Action Rail. No toggle button is rendered on any page.
+
+All other tokens — backgrounds, greyscale, pink accent, danger red, borders — are unaffected by the theme system. Only `--color-accent-primary` and `--color-accent-primary-text` could vary between themes, and only teal exists now.
+
+The flash-prevention `<script>` at the top of every page `<head>` still runs on every load. With no preference stored in `localStorage` (the toggle is disabled so nothing writes to it), it finds nothing and exits silently — the page renders with the teal `:root` default with no flash and no console error. If a visitor has a stale `"theme": "gold"` value in `localStorage` from before the gold override was removed, the flash-prevention script still sets `data-theme="gold"` on `<html>`, but since no matching CSS rule exists any more, it has no effect — the page silently renders the `:root` teal default instead, harmlessly.
 
 ---
 
 ## 2. Typography
 
-**Typeface:** Noto Sans — chosen for universal script coverage and localization support. Loaded via Google Fonts at weights 400, 500, 600, 700.
+**Typeface:** Noto Sans (variable) — chosen for universal script coverage and localization support. Loaded via Google Fonts as a variable font, weight range 500–700.
 
 Google Fonts link required in every page `<head>`:
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500..700&display=swap" rel="stylesheet">
 ```
 
 ### 2.1 Font Family
 
 | CSS Variable | Value | Usage |
 |---|---|---|
-| `--font-family-base` | `'Noto Sans', sans-serif` | All text on the site |
+| `--font-family-base` | `'Noto Sans', 'Noto Sans JP', sans-serif` | All text on the site — Noto Sans JP is a stack fallback only, not yet loaded via the `<link>` above; added when Japanese content ships |
 
 ### 2.2 Font Size Scale
 
-Built on a 1.25 Major Third modular ratio from a 16px base. Converted from `px` to `rem` 2026-08-10 (commit c2ea59f) so type respects the user's browser/OS font-size preference — values below are rem, `px` equivalents shown for reference against the 16px base only.
+Built on a 1.25 Major Third modular ratio from an original 16px base. Converted from `px` to `rem` 2026-08-10 (commit c2ea59f) so type respects the user's browser/OS font-size preference — values below are rem, `px` equivalents shown for reference against the 16px base only. `--font-size-base` was raised to `1.125rem` (18px) in the 2026-09-24 reading comfort update — a deliberate exception to the ratio, not a re-based scale; every other step (`xs` through `5xl`) still derives from the original 16px root, only `base` itself moved.
 
 | CSS Variable | Value | px equivalent | Usage |
 |---|---|---|---|
 | `--font-size-xs` | `0.75rem` | `12px` | Tab bar labels, legal fine print only |
 | `--font-size-sm` | `0.875rem` | `14px` | Captions, tags, metadata, timestamps, nav labels |
-| `--font-size-base` | `1rem` | `16px` | Body text — browser default, WCAG recommended minimum |
-| `--font-size-md` | `1.125rem` | `18px` | Large body, intro paragraphs |
+| `--font-size-base` | `1.125rem` | `18px` | Body text |
+| `--font-size-md` | `1.125rem` | `18px` | Large body, intro paragraphs — numerically identical to `--font-size-base` since 2026-09-24, flagged as a follow-up naming/consolidation question, not resolved here |
 | `--font-size-lg` | `1.25rem` | `20px` | H4 |
 | `--font-size-xl` | `1.5rem` | `24px` | H3 |
 | `--font-size-2xl` | `1.875rem` | `30px` | H2 |
@@ -214,9 +233,9 @@ Built on a 1.25 Major Third modular ratio from a 16px base. Converted from `px` 
 
 | CSS Variable | Value | Usage |
 |---|---|---|
-| `--font-weight-regular` | `400` | Body text, captions |
-| `--font-weight-medium` | `500` | Labels, tags, nav items, metadata |
-| `--font-weight-semibold` | `600` | H3, H4, subheadings |
+| `--font-weight-regular` | `540` | Body text, captions |
+| `--font-weight-medium` | `600` | Labels, tags, nav items, metadata |
+| `--font-weight-semibold` | `650` | H3, H4, subheadings |
 | `--font-weight-bold` | `700` | H1, H2, display text |
 
 ### 2.4 Line Height
@@ -226,8 +245,8 @@ Built on a 1.25 Major Third modular ratio from a 16px base. Converted from `px` 
 | `--line-height-tight` | `1.2` | Display and H1 — large type needs less leading |
 | `--line-height-snug` | `1.3` | H2, H3 |
 | `--line-height-normal` | `1.5` | H4, UI labels, large body |
-| `--line-height-relaxed` | `1.6` | Body text — optimal for sustained reading |
-| `--line-height-loose` | `1.75` | Small text, captions — compensates for reduced size |
+| `--line-height-relaxed` | `1.6` | Table cells, home hero subtitle, large-body specimen — no longer sustained body copy (moved to `loose` below, 2026-09-24) |
+| `--line-height-loose` | `1.8` | Body text, entry paragraphs and lists, captions and small text — the site's sustained-reading line height since 2026-09-24 |
 
 ### 2.5 Letter Spacing
 
@@ -240,14 +259,7 @@ Built on a 1.25 Major Third modular ratio from a 16px base. Converted from `px` 
 
 ### 2.6 Paragraph Spacing
 
-Space between consecutive paragraphs within a text block.
-
-| CSS Variable | Value | Usage |
-|---|---|---|
-| `--paragraph-spacing-sm` | `12px` | Between caption-level text blocks |
-| `--paragraph-spacing-base` | `16px` | Standard paragraph spacing |
-| `--paragraph-spacing-md` | `24px` | Between body paragraphs in long-form reading |
-| `--paragraph-spacing-lg` | `32px` | Between major content blocks |
+`--paragraph-spacing-sm/-base/-md/-lg` were removed from `:root` in the 2026-09-24 reading comfort token update — confirmed zero real CSS consumers before removal (they were documented here as governing paragraph spacing, but no rule anywhere actually applied them). Real paragraph spacing is set directly with the spacing scale instead: `.standard-page-content p` uses `margin-bottom: var(--space-6)` (24px) between consecutive paragraphs.
 
 ### 2.7 Assembled Type Styles
 
@@ -260,11 +272,13 @@ These are the complete text styles as they appear on the page. Every text elemen
 | `h2` | `--font-size-2xl` | `--font-weight-bold` | `--line-height-snug` | `--letter-spacing-normal` | Section headings — centre aligned |
 | `h3` | `--font-size-xl` | `--font-weight-semibold` | `--line-height-snug` | `--letter-spacing-normal` | Card titles, subsection headings |
 | `h4` | `--font-size-lg` | `--font-weight-semibold` | `--line-height-normal` | `--letter-spacing-normal` | Grouped content labels |
-| `body-large` | `--font-size-md` | `--font-weight-regular` | `--line-height-relaxed` | `--letter-spacing-normal` | Intro paragraphs, lead text |
-| `body` | `--font-size-base` | `--font-weight-regular` | `--line-height-relaxed` | `--letter-spacing-normal` | Default body text |
+| `body-large` | `--font-size-md` | `--font-weight-regular` | `--line-height-relaxed` | `--letter-spacing-normal` | Intro paragraphs, lead text — no live consumer as of 2026-09-24 (`.about-hero-subtitle` moved to `--font-size-lg`, see §2.2) |
+| `body` | `--font-size-base` | `--font-weight-regular` | `--line-height-loose` | `--letter-spacing-normal` | Default body text |
 | `caption` | `--font-size-sm` | `--font-weight-medium` | `--line-height-loose` | `--letter-spacing-wide` | Image captions, timestamps, metadata |
 | `label` | `--font-size-sm` | `--font-weight-medium` | `--line-height-normal` | `--letter-spacing-widest` | Buttons, tags, nav items, badges |
 | `nav-tab` | `--font-size-xs` | `--font-weight-medium` | `--line-height-normal` | `--letter-spacing-widest` | Mobile tab bar labels only |
+
+**`caption` in CSS (added 2026-09-25):** `.standard-page-content figcaption` — styles an **in-body** image's `<figcaption>` with this assembled style directly (left-aligned, small top margin). Replaces the old `.standard-page-caption` class, which only ever styled the banner caption and was removed with the banner sitewide; `figcaption` needs no class of its own now. Scoped to `.standard-page-content` specifically — the optional lead image (`img.standard-page-lead`, moved above the tags row the same day) is a bare `<img>` with alt text only, never a `<figure>`/`<figcaption>`, so this style never applies to it.
 
 ### 2.8 Typography Rules
 
@@ -278,7 +292,7 @@ These rules are mandatory. They define how type styles relate to each other on t
 
 **Body text rules:**
 - Body text is always left aligned — never centred
-- Maximum line length: `65ch` optimal, `80ch` maximum — enforced with `max-width` on `p` elements
+- Maximum line length: `65ch` optimal (`--measure-reading`), `80ch` maximum — enforced with `max-width` on `p` elements and `.standard-page-content` body copy
 - Minimum line length: `45ch` — never constrain text narrower than this
 
 **Spacing between type elements:**
@@ -286,7 +300,7 @@ These rules are mandatory. They define how type styles relate to each other on t
 - H2 → following paragraph: `--space-4` (16px) gap
 - H3 → following paragraph: `--space-3` (12px) gap
 - H4 → following paragraph: `--space-2` (8px) gap
-- Paragraph → following paragraph: `--paragraph-spacing-md` (24px)
+- Paragraph → following paragraph: `--space-6` (24px) — see §2.6
 - Paragraph → following heading: `--space-10` (40px)
 
 **Localization rules:**
@@ -409,19 +423,20 @@ Single column page-grid. Card rows control multi-column layout within sections:
 
 On tablet (≤1023px) and mobile: all card rows collapse to single column.
 
-**Standard Page — Single Column Centred**
+**Standard Page — Single Reading Column**
 
-Content centred using `.standard-page` (max-width 1200px, horizontal padding). Body text constrained to 65ch. Used for Work entries and Thoughts entries.
+`.standard-page` itself still centres at up to 1200px (`--max-content`), but Work entries, Thoughts entries, and About (2026-09-25) additionally carry `.standard-page--reading`, which narrows the whole element to `--measure-reading` (65ch) plus that breakpoint's own side padding (`calc(var(--measure-reading) + (2 * padding))`, overridden per breakpoint alongside `.standard-page`'s own padding overrides) and gives it a solid `--color-background-base` panel background with `--space-8` top/bottom padding. Banners were removed the same day — Work and Thoughts entries now share one identical layout, with an optional lead image between the title and the tags row instead (moved out of body content 2026-09-25 — see md/REFERENCE.md §5 Image Standards). See "Background Pattern" (§1.11) for how this panel relates to the sitewide dot pattern.
 
 | Element | Width | Alignment |
 |---|---|---|
-| Banner image | Full content width | Left edge to right edge |
-| Title | Full content width | Centre aligned |
-| Metadata block | Auto | Centre aligned |
-| Section headings | Full content width | Left aligned |
-| Body text | `max-width: 65ch` | Left aligned |
+| Title | Full panel width | Left aligned (changed 2026-09-25 — was centre, when a banner sat above it) |
+| Lead image (`img.standard-page-lead`, optional) | `width: 100%`, `max-width: 100%` | Block, full column width — moved here from inside body content 2026-09-25; alt text only, no figure/figcaption, not in the image viewer |
+| Tags row | `max-width: var(--measure-reading)` | Left aligned (changed 2026-09-25 — was centre) |
+| Details card | `max-width: var(--measure-reading)`, centred | Centre aligned — unchanged |
+| Section headings | Full panel width | Left aligned |
+| Body text | `max-width: var(--measure-reading)` (65ch) | Left aligned |
 
-**Exception:** `design-system.html` uses `.standard-page-content` for its real body (needed so the Floating ToC's existing heading-scan can find its section headings) but deliberately cancels the 65ch cap via a companion `.ds-page-content` class, rendering full-width up to `.standard-page`'s 1200px ceiling instead — confirmed 2026-09-06, not a bug to correct back to 65ch. See design-system.html's own Section 26 for a side-by-side of both treatments.
+**Exception:** `design-system.html` uses `.standard-page-content` for its real body (needed so the Floating ToC's existing heading-scan can find its section headings) but deliberately cancels the reading-width cap via a companion `.ds-page-content` class, rendering full-width up to `.standard-page`'s 1200px ceiling instead — confirmed 2026-09-06, not a bug to correct back to 65ch. See design-system.html's own Section 26 for a side-by-side of both treatments.
 
 ### 4.4 Navigation Layout
 
@@ -451,11 +466,12 @@ Content centred using `.standard-page` (max-width 1200px, horizontal padding). B
 
 ### 4.5 Component-Specific Layout Tokens
 
-Most component tokens (`--btn-*`, `--tag-*`, `--card-*`, etc.) are scoped locally inside their own component selector in `style.css` — see the Component Token Reference table in `md/COMPONENTS.md`. The token below is the exception: it's defined in the global `:root` block because it governs a layout ratio referenced across breakpoints, the same way `--max-content` is.
+Most component tokens (`--btn-*`, `--tag-*`, `--card-*`, etc.) are scoped locally inside their own component selector in `style.css` — see the Component Token Reference table in `md/COMPONENTS.md`. The tokens below are exceptions: they're defined in the global `:root` block because they govern layout ratios/measures referenced across breakpoints, the same way `--max-content` is.
 
 | CSS Variable | Value | Usage |
 |---|---|---|
 | `--card-image-column-width` | `42%` | Width of the image column in a horizontal (image-left) card layout, as a percentage of total card width |
+| `--measure-reading` | `65ch` | Added 2026-09-24. Reading-column max-width — body copy, entry paragraphs/lists, the Details card, and table wrappers (see §9.3) |
 
 ---
 
@@ -566,17 +582,17 @@ All interactive elements on mobile must meet minimum touch target size.
 
 ### 9.3 Line Length
 
-Applied to all `p` elements and long-form text containers.
+Applied to all `p` elements and long-form text containers, via `--measure-reading` (added 2026-09-24; previously a bare `65ch` literal repeated at every consumer).
 
 | Constraint | Value | Standard |
 |---|---|---|
 | Minimum | `45ch` | Below this reading feels choppy |
-| Optimal | `65ch` | WCAG 1.4.8 recommended |
+| Optimal | `65ch` (`--measure-reading`) | WCAG 1.4.8 recommended |
 | Maximum | `80ch` | Beyond this eye tracking suffers |
 
 ```css
 p {
-    max-width: 65ch;
+    max-width: var(--measure-reading);
 }
 ```
 

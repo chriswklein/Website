@@ -1,6 +1,6 @@
 # Personal Website — Project Reference Document
-**Version:** 1.4.0
-**Last Updated:** 2026-09-21
+**Version:** 1.5.1
+**Last Updated:** 2026-09-24
 **Status:** In Progress — Home page ready to build
 
 ---
@@ -104,8 +104,9 @@ Nav and footer inject automatically via `script.js`.
 ## 5. Design System
 
 ### Typeface
-**Noto Sans** — chosen for universal script coverage and localization support.
-- Loaded via Google Fonts at weights: 400, 500, 600, 700
+**Noto Sans** (variable) — chosen for universal script coverage and localization support.
+- Loaded via Google Fonts as a variable font, weight range 500–700 (`wght@500..700`)
+- `--font-family-base` also lists **Noto Sans JP** in the stack for future Japanese content, but it is not loaded via the Google Fonts `<link>` yet — added only when Japanese content ships
 - "No tofu" — renders all scripts without missing character boxes
 
 ### Icons
@@ -113,14 +114,16 @@ Nav and footer inject automatically via `script.js`.
 - No icon library is loaded on any page
 - Icon-only interactive elements must still have `aria-label` if icons are reintroduced
 
-### Type Scale (Major Third — 1.25 ratio from 16px base)
+### Type Scale (Major Third — 1.25 ratio from an original 16px base)
+
+`--font-size-base` was raised to 18px in the 2026-09-24 reading comfort update — a deliberate exception to the ratio (every other step still derives from the original 16px root). It is now numerically identical to `--font-size-md` (both 18px) — flagged as a follow-up naming/consolidation question, not resolved here.
 
 | Token | Size | Usage |
 |---|---|---|
 | `--font-size-xs` | 0.75rem | Legal/fine print, tab bar labels |
 | `--font-size-sm` | 0.875rem | Captions, labels, metadata, tags |
-| `--font-size-base` | 1rem | Body text (browser default) |
-| `--font-size-md` | 1.125rem | Large body, intro paragraphs |
+| `--font-size-base` | 1.125rem (18px) | Body text |
+| `--font-size-md` | 1.125rem | Large body, intro paragraphs — numerically identical to `--font-size-base` since 2026-09-24 |
 | `--font-size-lg` | 1.25rem | H4 |
 | `--font-size-xl` | 1.5rem | H3 |
 | `--font-size-2xl` | 1.875rem | H2 |
@@ -132,9 +135,9 @@ Nav and footer inject automatically via `script.js`.
 
 | Token | Value | Usage |
 |---|---|---|
-| `--font-weight-regular` | 400 | Body text |
-| `--font-weight-medium` | 500 | Labels, captions, tags |
-| `--font-weight-semibold` | 600 | H3, H4 |
+| `--font-weight-regular` | 540 | Body text |
+| `--font-weight-medium` | 600 | Labels, captions, tags |
+| `--font-weight-semibold` | 650 | H3, H4 |
 | `--font-weight-bold` | 700 | H1, H2 |
 
 ### Line Heights
@@ -144,12 +147,14 @@ Nav and footer inject automatically via `script.js`.
 | `--line-height-tight` | 1.2 | Display, H1 |
 | `--line-height-snug` | 1.3 | H2, H3 |
 | `--line-height-normal` | 1.5 | H4, UI labels |
-| `--line-height-relaxed` | 1.6 | Body text |
-| `--line-height-loose` | 1.75 | Captions, small text |
+| `--line-height-relaxed` | 1.6 | Table cells, home hero subtitle |
+| `--line-height-loose` | 1.8 | Body text, entry paragraphs/lists, captions/small text |
 
 ### Colour System
 
-**Palette:** A greyscale dark base with a teal accent (live default; gold is a dormant `[data-theme="gold"]` override), a pink quote accent, and one danger red (`--color-danger`) used only as the hover/press fill on Clear controls.
+**Palette:** A greyscale dark base with a teal accent, a pink quote accent, and one danger red (`--color-danger`) used only as the hover/press fill on Clear controls.
+
+**Two-tier text principle:** real content uses only two grey text levels — `--color-text-primary` for primary content and `--color-text-secondary` for supporting info (dates, captions, labels) — both verified at 7:1 or better against every background they're actually used on. Hierarchy comes from size, weight, and spacing, never a third, fainter grey step. (`--color-text-disabled` is a separate, non-content UI state — disabled controls — not a third text tier.)
 
 #### Primitive Scale
 | Token | Value |
@@ -168,30 +173,30 @@ Nav and footer inject automatically via `script.js`.
 | `grey-1000` | #000000 |
 
 #### Accent Primitives
-Teal is the live default primary accent (confirmed against style.css's real `:root` block) — gold is a dormant `[data-theme="gold"]` override, not a co-equal option. See md/DESIGN-SYSTEM.md §1.6 for the full theme mechanism.
+Teal is the site's only accent — the dormant `[data-theme="gold"]` override was removed from style.css in the 2026-09-24 reading comfort token update. See md/DESIGN-SYSTEM.md §1.6 for the full mechanism.
 
 | Token | Value | Notes |
 |---|---|---|
-| `--color-accent-primary` | #00BAA5 | Primary tag fill, dividers, code border. Live default — teal. Contrast on base: ~7.7:1 ✅ |
-| `--color-accent-primary-text` | #00E5CB | Teal text on dark, hyperlinks, tooltip border. Live default. Contrast on base: ~11.8:1 ✅ |
-| `--color-accent-quote` | #A9407C | Secondary tag fill, quote block border. Contrast on base: ~4.6:1 ✅ |
-| `--color-accent-quote-text` | #FF60BB | Pink text on dark, alt text contexts |
+| `--color-accent-primary` | #00BAA5 | Primary tag fill, dividers, code border. Contrast on base: ~7.0:1 ✅ · on surface: ~6.3:1 ✅ |
+| `--color-accent-primary-text` | #00E5CB | Teal text on dark, hyperlinks, tooltip border. Contrast on base: ~10.6:1 ✅ · on surface: ~9.7:1 ✅ |
+| `--color-accent-quote` | #A9407C | Secondary tag fill, quote block border. Contrast on base: ~3.0:1 · on surface: ~2.7:1 — below AA text minimums, but never rendered as text in current CSS (its one real consumer, `--color-quote-border`, is a border colour) |
 
 #### Semantic Tokens (as CSS variables in style.css)
-| Token | Value | Contrast vs Base |
+| Token | Value | Contrast on Base · on Surface |
 |---|---|---|
-| `--color-background-base` | #111111 | — |
-| `--color-background-surface` | #1A1A1A | — |
-| `--color-background-subtle` | #2A2A2A | — |
-| `--color-text-primary` | #F5F5F5 | ~15:1 ✅ |
-| `--color-text-secondary` | #AAAAAA | ~7.5:1 ✅ |
+| `--color-background-base` | #1C1C1C | — |
+| `--color-background-surface` | #242424 | — |
+| `--color-background-subtle` | #2F2F2F | — |
+| `--color-background-hover` | #3D3D3D | Default `.btn` hover fill only (added 2026-09-24, fixing an AA failure — the fill previously reused `--color-border-strong` directly). `--color-text-primary` on it: ~8.9:1 ✅ |
+| `--color-text-primary` | #E8E8E8 | ~13.9:1 ✅ · ~12.7:1 ✅ |
+| `--color-text-secondary` | #AEAEAE | ~7.7:1 ✅ · ~7.0:1 ✅ |
 | `--color-text-disabled` | #666666 | Not required |
-| `--color-border-default` | #2A2A2A | — |
-| `--color-border-strong` | #666666 | — |
-| `--color-interactive-default` | #F5F5F5 | ~15:1 ✅ |
-| `--color-interactive-hover` | #CCCCCC | — |
-| `--color-interactive-focus` | #FFFFFF | ~19:1 ✅ |
-| `--color-danger` | #B41321 | ~6.3:1 ✅ with `--color-text-primary` — a fill behind light text, never a text colour (see md/DESIGN-SYSTEM.md §1.7b) |
+| `--color-border-default` | #3D3D3D | — |
+| `--color-border-strong` | #707070 | — |
+| `--color-interactive-default` | #E8E8E8 | ~13.9:1 ✅ · ~12.7:1 ✅ |
+| `--color-interactive-hover` | #00BAA5 | — (border colour only — e.g. `.btn:hover` border — never a text fill; now the same hex as `--color-accent-primary`) |
+| `--color-interactive-focus` | #FFFFFF | ~17.0:1 ✅ · ~15.5:1 ✅ |
+| `--color-danger` | #B41321 | ~5.6:1 ✅ with `--color-text-primary` / `--color-interactive-default` — a fill behind light text, never a text colour (see md/DESIGN-SYSTEM.md §1.7b) |
 | `--color-link` | var(--color-accent-primary-text) | Hyperlink default |
 | `--color-link-hover` | var(--color-accent-primary) | Hyperlink hover |
 | `--color-divider-accent` | var(--color-accent-primary) | hr and section dividers |
@@ -217,16 +222,17 @@ CSS variables: `--space-1` through `--space-32`
 | Mobile | 390px | 4 | 16px | 16px |
 
 Max content width: `1200px` (`--max-content`)
+Reading column width: `65ch` (`--measure-reading`, added 2026-09-24) — caps body copy, entry paragraphs/lists, the Details card, and table wrappers at a comfortable line length, independent of the wider `--max-content` layout column
 
 ### Image Standards
 - **Format:** WebP primary, JPG fallback for photos, SVG for icons and illustrations
-- **Aspect ratios:** 16:9 (320×180px), 3:2 (320×213px), 1:1 (320×320px), 3:1 banner (1200×400px)
+- **Aspect ratios:** 16:9 (320×180px), 3:2 (320×213px), 1:1 (320×320px)
 - **Card thumbnails:** 16:9 ratio on Home page cards
-- **Article header banners:** 3:1 ratio on individual post pages
-- **Always use:** `loading="lazy"`, explicit `width` and `height`, `srcset` for responsive images
+- **Lead images (Work/Thoughts entries):** banners were removed sitewide 2026-09-25; entries now open with an optional lead image between the title and the tags row instead. Markup: a bare `<img class="standard-page-lead">` — no `<figure>`, no `<figcaption>`, alt text only (figures/figcaptions are for in-body images only, see md/COMPONENTS.md §14). Always a descriptive `alt`; always explicit `width`/`height`; **never** `loading="lazy"` — it's the first image on the page. Not part of the click-to-zoom image viewer (`initImageViewer()` only targets `.standard-page-content img`). Lead images go through the same WebP pipeline as every other entry image (`scripts/build-images.js`, below) and currently share one source file with that entry's Home/Archive card thumbnail (e.g. `this-website-inline.webp`, `StarEngine-Logo.webp`) rather than a separate crop per use.
+- **Always use:** `loading="lazy"` (except a lead image, above), explicit `width` and `height`, `srcset` for responsive images
 - **Alt text:** Descriptive on meaningful images, `alt=""` and `aria-hidden="true"` on decorative images
 - **Performance targets:** Hero under 200kb, card thumbnails under 100kb, no single image over 500kb
-- **Compression tool:** Squoosh (free, browser-based)
+- **Compression tool:** Squoosh (free, browser-based), or `scripts/build-images.js` (sharp-based batch pipeline — raw exports in `raw-exports/`, produces an 80%-quality thumbnail plus a `-full.webp` high-res variant per source file; see md/COMPONENTS.md §14's Image Viewer notes for how `-full` is consumed)
 - **CSS rule required on all images:**
 ```css
 img {
@@ -351,13 +357,19 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Standard Page Template (Work entries, Thoughts entries)
 **Purpose:** Individual work or blog post pages.
-**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/welcome.html` (renamed 2026-09-20, formerly `thoughts/read-me.html`, before that `thoughts/code-and-conduct.html`, before that `thoughts/thrilling-beginnings.html`), `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Floating Table of Contents added 2026-08-23, mobile/tablet trigger+panel variant completed 2026-08-25, unified onto a single trigger + anchored panel pattern at every breakpoint 2026-09-18 (the earlier always-visible Desktop rail at ≥1440px was removed — it had no reserved gutter in the content column and overlapped the entry's own `<h1>`/body copy at Desktop widths). Panel positioning decoupled from the trigger 2026-09-19 — it now anchors a fixed offset below the header/tab-bar and targets a real ~78% of viewport height via a `clamp()`, rather than a `bottom`-anchored formula whose growable space topped out around 45–48% of viewport height regardless of any percentage used. Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
-**Layout:** Single column, centred, max-width 65ch content.
+**Status:** Built and shipped on all 5 live entries (`work/star-engine.html`, `work/this-website.html`, `thoughts/welcome.html` (renamed 2026-09-20, formerly `thoughts/read-me.html`, before that `thoughts/code-and-conduct.html`, before that `thoughts/thrilling-beginnings.html`), `thoughts/physical-and-digital-media.html`, `thoughts/industrializing-the-industry.html`) plus both source templates in `templates/`. Redesigned 2026-08-17, revised 2026-08-19. Floating Table of Contents added 2026-08-23, mobile/tablet trigger+panel variant completed 2026-08-25, unified onto a single trigger + anchored panel pattern at every breakpoint 2026-09-18 (the earlier always-visible Desktop rail at ≥1440px was removed — it had no reserved gutter in the content column and overlapped the entry's own `<h1>`/body copy at Desktop widths). Panel positioning decoupled from the trigger 2026-09-19 — it now anchors a fixed offset below the header/tab-bar and targets a real ~78% of viewport height via a `clamp()`, rather than a `bottom`-anchored formula whose growable space topped out around 45–48% of viewport height regardless of any percentage used. Banner removed sitewide 2026-09-25 — Work and Thoughts entries now share one identical layout with no banner/no-banner distinction; an optional lead image is authored as the first inline figure in body content instead (see §5 Image Standards). Full anatomy, tokens, and states: md/COMPONENTS.md "## 14. Standard Page Template" — not duplicated here to avoid the two docs drifting out of sync again.
+**Layout:** Single 65ch reading column (`.standard-page--reading`, added 2026-09-25) with a solid `--color-background-base` panel behind it — see "Reading Column, Panel, and Background Pattern" below. Order: breadcrumb, title, optional lead image, tags, Details card, body content (the lead image moved here from inside body content the same day — see §5 Image Standards). Breadcrumb, title, and tags are left-aligned (changed from centred 2026-09-25); the footer (Share/More-entries actions plus contact section) is unchanged, still centred.
 **Creation process:** md/NEW-ENTRY-PROCESS.md.
+
+### Reading Column, Panel, and Background Pattern
+**Status:** Built 2026-09-25. Every page renders the sitewide dot-texture pattern (`--pattern-dot-*` tokens, `body`'s `background-image`) directly on `body`. Work/Thoughts entries and About additionally wrap their content in `.standard-page--reading`, a solid `--color-background-base` panel capped at 65ch (`--measure-reading`) plus that breakpoint's own side padding — so the pattern reads as a texture around the column, never behind the reading text itself. Home and Archive keep the bare pattern with no panel — unchanged. The pattern is removed entirely under `prefers-contrast: more` (`background-image: none`), leaving the flat `--color-background-base` fill.
+**Two accepted exceptions** still render text directly on the bare pattern, confirmed via axe-core: Home's hero subtitle (`.home-hero-subtitle`) and the sitewide footer copyright line (`footer.html`'s `.container > p`, outside every panel on every page). Both may be marked "needs manual review" (not a violation) by automated contrast tooling for the same reason the whole site used to be before the panel existed — the pattern is a gradient, not a flat colour, so axe-core can't always compute an exact ratio, even though the pattern is deliberately faint enough (5% opacity) to never meaningfully change real contrast.
+**Floating ToC interaction:** the Table of Contents (below) is an on-demand overlay at every breakpoint — closed by default, opened only by the user. While open it may visually cover part of the reading column/panel (confirmed at 1024–1280px on a real entry); this is intended/accepted, not a bug, since the ToC is dismissible and never blocks the page on load.
+**Tokens and CSS:** see md/DESIGN-SYSTEM.md §1 (colour pattern tokens) and §4.3 (`.standard-page--reading`).
 
 ### About (about.html)
 **Purpose:** Detailed personal bio. Handles contact and feedback link.
-**Status:** Built — hero, history/experience entries, recommendations, contact section.
+**Status:** Built — profile figure, About/Skills/Employment History/Resume sections, contact section. Exactly one `<h1>` ("About", added 2026-09-25 — the page previously had none). Uses `.standard-page--reading` (see above), same as Work/Thoughts entries.
 
 ---
 
@@ -438,11 +450,11 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 
 ### Code / Pre Blocks
 - Background: `--color-code-bg`
-- Left border: `--color-code-border` → `--color-accent-primary` (live default — teal `#00BAA5`; gold is a dormant `[data-theme="gold"]` override, see §5)
+- Left border: `--color-code-border` → `--color-accent-primary` (teal `#00BAA5`, see §5)
 - Monospace font
 
 ### Dividers (hr)
-- 1px solid `--color-divider-accent` → `--color-accent-primary` (live default — teal `#00BAA5`; gold is a dormant `[data-theme="gold"]` override, see §5)
+- 1px solid `--color-divider-accent` → `--color-accent-primary` (teal `#00BAA5`, see §5)
 - Used as section separators site-wide
 
 ### Profile Sidebar (Home page only)
@@ -508,7 +520,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 - No backend or server-side logic
 - No analytics (can be added post-launch)
 - No comments system on Thoughts/Blog
-- No dark/light mode toggle — dark backgrounds are fixed across all themes; a gold/teal accent colour toggle exists via `data-theme` attribute on `<html>` and does not affect backgrounds or greyscale tokens
+- No dark/light mode toggle — dark backgrounds are fixed; `[data-theme="teal"]` exists as a harmless no-op override (matches the `:root` default), but the dormant `[data-theme="gold"]` override it was originally paired with was removed 2026-09-24 — there is no second accent theme to toggle to. The theme-toggle rail (`.theme-toggle-rail`, `initThemeToggle()`) remains built but dormant regardless — see §8
 - No staging branch (removed — not needed for solo project)
 
 ---
@@ -577,9 +589,8 @@ Accessibility is a stated project pillar (see Core Principles, §1), not a post-
 **Visual & Contrast**
 - Every colour pairing verified with real WCAG contrast math, not eyeballed (see md/DESIGN-SYSTEM.md §1.9)
 - Tag/Chip states are differentiated by stroke width and font weight, not colour alone, per WCAG 1.4.1 (Default: thin border/regular weight; Active: medium border/bold weight; Dim: thin border/regular weight + muted text)
-- The teal theme's contrast was verified before it went live as the default (not just the original gold theme)
-- The background dot texture is kept low-opacity specifically so it never interferes with text contrast
-- **axe-core tooling limitation, confirmed 2026-09-15:** an automated WCAG 2.1 AA sweep (axe-core 4.10.2, scoped explicitly to `wcag2a`/`wcag2aa`/`wcag21aa`) found 0 real violations across Home, Archive, About, and three entry pages — but axe places ~314 body-text elements sitewide into its `incomplete` bucket for the color-contrast rule (not "pass," not "fail") because the dot-pattern background (§1.11 below) is a CSS gradient sitting behind transparent containers (`main`, `.page-grid`, `.standard-page`, `.home-hero`, etc.), and axe cannot compute an exact contrast ratio against a gradient background — it declines to check rather than guess. This affects nearly all body copy on the four Standard Page entries specifically, not an edge case. A manual worst-case calculation (dead-center of a dot, the lightest possible background pixel — see md/DESIGN-SYSTEM.md §1.9) confirms real contrast stays at ~15.5:1, safely above the 4.5:1 AA floor, consistent with the low-opacity-by-design claim above. **A future clean axe run must not be read as full contrast coverage** without re-confirming this manual result or resolving the underlying gradient (e.g. switching the dot texture to a technique axe can parse). A second, smaller, and separately-caused `incomplete` case (18 card-content elements on Home/Archive) comes from axe's occlusion detection getting confused by the `.card-block-link`/`.card-cta` overlay technique (COMPONENTS.md §3) — unrelated to the gradient, and independently safe since those elements sit on the fully opaque `--color-background-surface` card background already verified at ~12:1 (§1.9).
+- The background dot texture was removed site-wide in the 2026-09-24 reading comfort token update — `body` now renders on a flat `--color-background-base` fill with no gradient
+- **axe-core, re-confirmed 2026-09-24 after the token update:** an automated `color-contrast` sweep (axe-core 4.10.2) across Home, Archive, the This Website entry, and About at mobile/tablet/desktop found **0 violations** at every page/breakpoint combination. The dot-pattern-caused `incomplete` blind spot this section previously documented (axe unable to resolve an exact background colour against the old CSS gradient) no longer applies now that the pattern is gone. A much smaller, separately-caused `incomplete` result still appears on a handful of Home/Archive card elements — axe's occlusion detection tripping on the `.card-block-link`/`.card-cta` layered-link technique (COMPONENTS.md §3), unrelated to backgrounds — already covered by the text-primary-on-surface figure in md/DESIGN-SYSTEM.md §1.9 and independently safe.
 
 **Motion**
 - `prefers-reduced-motion` is respected for the Filter Drawer's open/close animation and all other transitions site-wide
@@ -708,6 +719,11 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
 - **ToC panel: H3 rows get a leading sub-section icon (Step 1 of a larger ToC aesthetic pass — container/button chrome removal and a legibility scrim are explicitly separate, later prompts, and were not touched).** Step 0 findings (before changing anything): (1) the task's "H3 rows are narrower than H2 rows, make them full width" premise did not match the shipped code — H3 nesting is `li.toc-rail-item--sub { padding-left: var(--space-4) }` on the `<li>`, and the link inside is `width: 100%` of that li's remaining content box, so every row (H2 and H3) already shared the same right edge, confirmed by direct `getBoundingClientRect()` measurement on `work/star-engine.html` (all rows at x=1702 at 1920px, all at x=328 at 390px; H3 left edge exactly 16px inside H2's). No width change made, per "confirm exactly how it's implemented" rather than assuming; (2) `assets/icons/floating-button/sub-section.svg` (added in the 9/20 commit) is one `<path d="M5 13H22V15H3V2H5V13Z">` — a single closed subpath, an L-shaped elbow, no strokes/masks/overlapping pieces, inside a `<g opacity="0.9">` — i.e. already unioned/flattened, so no re-export needed and no stop-and-report; (3) row text colours: default `#F5F5F5` (`rgb(245,245,245)`), hover `#00BAA5` (`rgb(0,186,165)`), active `#00E5CB` (`rgb(0,229,203)`, plus a faux-bold `text-shadow`). The spec docs the prompt cites (`claude/2026-09-19-toc-panel-h3-width-icon-spec.md`, `claude/2026-08-21-contact-icons-spec.md`) do not exist in this repo — same pattern as the other missing spec docs flagged 2026-08-23/09-18/09-19. Change: script.js gains a module-level `TOC_SUB_ICON_HTML` constant (the SVG inlined with the source's exact path data; only `fill="white"` → `currentColor`, fixed width/height moved to CSS, `aria-hidden`/`focusable="false"` added) and `buildTocLinks()` prepends it to H3 links only; style.css gains `.toc-rail-item--sub .toc-rail-link` (`display: flex; align-items: center; gap: var(--space-2)`) and `.toc-sub-icon` (`--icon-size-md`, `flex-shrink: 0`) — both reuse the values `.toc-panel-label` already uses for its own leading icon (Rule 3a). H2 rows and the Back to Top button keep `display: block` and get no icon. No colour rule anywhere: `currentColor` inheritance does it. Verified via Playwright at 1920×1000 and 390×844 on `work/star-engine.html`: 10/10 H3 rows have an icon, 0 H2 rows do; icon 16×16, 8px from text, vertical-centre offset 0.5px from the text's; icon fill equals link text colour in default, hover and active states (the three values above); rendering the source file as `<img>` and the live inlined icon at 4× and diffing alpha pixel-by-pixel gave 960 ink pixels each, 0 differing, max alpha delta 0 (plus a side-by-side 12× visual comparison); clicking directly on an icon still navigates and closes the panel (the row click handler's `closest('.toc-rail-link')` resolves through the SVG); the accessibility tree still names each link by its heading text alone. One side effect flagged for Chris: the icon plus gap take 24px of an H3 row's text width in the fixed 240px panel, so longer H3 titles wrap earlier — on `star-engine.html`, "Decentralized Settings" went from one line (40px) to two (62px) at both widths tested; every other row was unchanged. A two-line row's icon centres vertically between the lines; first-line alignment is a one-line change if preferred. Confirmed no hardcoded hex values or inline styles in the added CSS/JS (Rule 6); `git diff` shows only script.js and style.css changed by this task. DESIGN-SYSTEM.md needed no change (it doesn't inventory these icons).
 - **ToC panel: redundant H3 left indent removed.** With the sub-section icon shipped (entry above), the `li.toc-rail-item--sub { padding-left: var(--space-4) }` indent was redundant — the icon alone now conveys nesting, so H2, H3 and Back to Top rows share identical left and right edges. Removed the rule; `.toc-rail-item--sub` remains as a rule-less marker class (script.js still sets it; the H3 icon selector `.toc-rail-item--sub .toc-rail-link` keys off it), so nothing else changed — the icon, its 16px size, its 8px gap and everything else from the icon work are untouched. Also corrected the two comments that described the indent (style.css above the H3 flex rule; script.js above `buildTocLinks()`, which said "indent modifier") — comment text only. Verified via Playwright on `work/star-engine.html`: at 1920×1000 every row (Back to Top, all H2, all H3) has left 1497.3 / right 1702 / width 204.7, and at 390×844 left 123.3 / right 328; H3 `li` padding now `0px`; icon geometry identical to before (16×16, 8px gap, 10/10 H3 rows, 0 H2 rows); H2 and Back to Top heights unchanged (40/42 and 36). "Decentralized Settings" still wraps to two lines (62px) — the 16px indent gave back less width than the icon plus gap took (24px) — every other row stays on one line. COMPONENTS.md's ToC section updated ("H3 indent" wording and the nesting paragraph). Confirmed no hardcoded hex values or inline styles in the added lines (Rule 6).
 - **Star Engine entry: two headings renamed (visible text only).** `work/star-engine.html` H2 "Editor Settings Refactor" → "Editor Settings" and its child H3 "Decentralized Settings" → "Tangled"; sibling H3s "Performance" and "Outcome", every other heading and all body copy untouched (two lines changed in the diff). Step 0: heading IDs are static, hand-authored attributes (`id="Editor-Settings"`, `id="decentralized-settings"`), not derived from the text — `getTocHeadings()` in script.js only generates an ID for a heading that has none and never overwrites an existing one — so the text change moves no anchor, and per scope both IDs were left as-is. Grepped the whole repo (HTML, JS, JSON, md) for the old anchors and old heading text: nothing links to `#Editor-Settings` or `#decentralized-settings` (no `star-engine.html#…` links anywhere; the ToC's own links are built at runtime from each heading's current ID), and the other hits were body prose or dated history, left alone. Note for later: the H3's ID (`decentralized-settings`) no longer matches its visible text; kept deliberately so any already-shared `#decentralized-settings` link keeps working (site live since 9/8) — rename it only alongside a redirect story if that ever matters. Verified via Playwright: the ToC panel shows "Editor Settings" with "Tangled", "Performance", "Outcome" beneath it in order (18 rows, no old text, zero broken ToC or in-page anchors, no duplicate IDs); clicking each renamed entry sets the right hash, lands the heading at the scroll margin (80px from top), closes the panel, and highlights exactly that row ("Editor Settings" 9/18, "Tangled" 10/18); a cold deep link to `#decentralized-settings` at 390×844 also lands and highlights correctly. Side effect (good): "Tangled" is short enough that the H3-icon wrap noted above no longer occurs on this page — all rows single-line; COMPONENTS.md's ToC note updated to match.
+
+**2026-09-24**
+- **Reading comfort token update (Parts A–C).** Full reasoning, contrast math, and decisions: `claude/2026-09-24-reading-comfort-token-update-spec.md`. An audit (Part A) preceded any change — every token's real usage, background pairing, and doc-vs-code drift traced first (see that spec for the full findings). Shipped changes (Parts B/B2, `style.css` + all 11 HTML pages + `design-system.html`): `--color-text-primary` `#F5F5F5`→`#E8E8E8`, `--color-text-secondary` `#AAAAAA`→`#AEAEAE`, `--color-background-base/-surface/-subtle` → `#1C1C1C`/`#242424`/`#2F2F2F`, `--color-border-default/-strong` → `#3D3D3D`/`#707070`, `--color-interactive-default` → `#E8E8E8`, `--color-interactive-hover` → `#00BAA5` (now the same hex as `--color-accent-primary`); `--color-text-tertiary`, `--color-interactive-active`, `--color-interactive-disabled`, `--color-accent-quote-text`, and all four `--paragraph-spacing-*` tokens removed (confirmed zero real consumers before removal); `--font-family-base` gained `'Noto Sans JP'` in the stack (not loaded yet); `--font-size-base` `1rem`→`1.125rem` (18px, now identical to `--font-size-md` — flagged, not resolved); `--font-weight-regular/-medium/-semibold` → `540`/`600`/`650` (`-bold` unchanged at `700`); `--line-height-loose` `1.75`→`1.8`, and `body`'s line-height moved from `--line-height-relaxed` to `--line-height-loose` (Part B), followed by `.standard-page-content p`/`ul`/`ol` doing the same (Part B2) — `--line-height-relaxed` (1.6, unchanged) now covers only table cells, the Home hero subtitle, and the (now-unused-live) large-body specimen; `--measure-reading: 65ch` added and every real `max-width: 65ch` declaration (12 sites) repointed to it; the sitewide dot-pattern background removed entirely (`--pattern-dot-*` tokens and `body`'s `background-image`/`background-size` deleted); the dormant `[data-theme="gold"]` override block removed outright (`[data-theme="teal"]`, `initThemeToggle()`, and the flash-prevention head script all left untouched); `.tag-chip--dim` recoloured (`background: transparent`, text → `--color-text-secondary`, border unchanged); `.about-hero-subtitle` moved from `--font-size-md` to `--font-size-lg` (dead CSS — no live element currently carries this class, confirmed via repo-wide grep, left for a later cleanup pass). Verified via axe-core (0 color-contrast violations across Home/Archive/About/This-Website at mobile/tablet/desktop, both before and after) and direct `getComputedStyle()` reads (`.standard-page-content p` computes to `18px`/`32.4px`, exactly 1.8×, at all three breakpoints).
+- **This documentation pass (Part C).** REFERENCE.md, DESIGN-SYSTEM.md, and COMPONENTS.md brought in line with the shipped CSS above — new token values, contrast figures recomputed against the real new backgrounds (base *and* surface, not just base), gold/tertiary/pattern references removed throughout, `--measure-reading` documented, and COMPONENTS.md's Tag-Chip section rewritten to describe the real current Dim state (transparent background, `--color-border-strong` outline, `--color-text-secondary` text, fully clickable — never disabled, and not exposed to assistive tech beyond the real `aria-pressed` value). One genuine regression surfaced while rebuilding DESIGN-SYSTEM.md §1.9's contrast table, not previously known: `.btn:hover`'s text (`--color-interactive-default`) on its own hover fill (`--color-border-strong`) measured **~4.0:1, below the 4.5:1 AA minimum**. Also surfaced: `--color-interactive-hover` is now the same teal used for `--color-accent-primary`, so the Clear/danger buttons' hover border (which reuses the shared `.btn:hover` border colour) rendered teal on a red fill, contradicting DESIGN-SYSTEM.md §1.7b's "stays neutral on hover" claim. Both were documentation-only findings at the time — fixed the same day, see below. Pre-existing drift noticed but explicitly out of scope and not touched: the `--tag-*` token contradiction between this document and COMPONENTS.md, the dead `.card--profile` block, and the Primitive Scale / Accent Primitives tables in both REFERENCE.md and DESIGN-SYSTEM.md no longer tracing cleanly to the new semantic hex values.
+- **`.btn:hover` contrast fix + danger/Clear hover border fix (Part D, same day).** Root cause of the ~4.0:1 failure: `--btn-bg-hover` aliased `--color-border-strong` directly — a border token doing double duty as a hover fill. Added `--color-background-hover: #3D3D3D` to `:root` (same hex as `--color-border-default` today, deliberately a separate token so the two can move independently) and repointed `--btn-bg-hover` at it; `--color-text-primary`/`--color-interactive-default` on the new fill is ~8.9:1. Audited every other background/fill referencing a border or text token first (Step 1 of the spec) — found one more, `--btn-bg-active` (`.btn:active`'s fill, aliasing `--color-border-default`): left unchanged, since `--color-text-primary` on it is already ~8.9:1, no bug there. Separately, `.btn--danger-hover:hover:not(:disabled)` now also overrides `--btn-border-hover` to `--color-danger`, so the three Clear controls (Filter Drawer Clear, floating Clear ×, empty-state "Clear Filters!" — all `.btn.btn--danger-hover`) show a red hover border matching their red fill instead of the shared default's teal. Verified via Playwright: hovered a default `.btn` and a danger `.btn--danger-hover` at desktop width, read `getComputedStyle()` on both (`--color-interactive-default` `#E8E8E8` on `--color-background-hover` `#3D3D3D` ≈ 8.9:1; danger fill and hover border both resolve to `--color-danger` `#B41321`), and forced `:focus-visible` on a default button to confirm the focus ring is still `--color-interactive-focus` (`#FFFFFF`) against the surrounding page background, unaffected by this change. DESIGN-SYSTEM.md, COMPONENTS.md, and REFERENCE.md updated to match; design-system.html gained a swatch for the new token.
 
 ---
 
