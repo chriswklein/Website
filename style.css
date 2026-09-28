@@ -28,6 +28,7 @@
     --color-background-surface: #242424;
     --color-background-subtle: #2F2F2F;
     --color-background-hover: #3D3D3D;
+    --color-background-active: #474747;
 
     /* ---- Colour: Text ---- */
     --color-text-primary: #E8E8E8;
@@ -177,6 +178,7 @@
     /* ---- Elevation ---- */
     --elevation-sm: 0 1px 3px rgba(0,0,0,0.4);
     --elevation-md: 0 4px 12px rgba(0,0,0,0.5);
+    --elevation-md-up: 0 -4px 12px rgba(0,0,0,0.5);
     --elevation-lg: 0 8px 24px rgba(0,0,0,0.6);
     --elevation-xl: 0 16px 48px rgba(0,0,0,0.7);
 
@@ -659,7 +661,7 @@ pre code {
 .btn {
     --btn-bg:             var(--color-background-subtle);
     --btn-bg-hover:       var(--color-background-hover);
-    --btn-bg-active:      var(--color-border-default);
+    --btn-bg-active:      var(--color-background-active);
     --btn-border:         var(--color-border-strong);
     --btn-border-hover:   var(--color-interactive-hover);
     --btn-border-focus:   var(--color-interactive-focus);
@@ -907,7 +909,7 @@ pre code {
 }
 
 .breadcrumb-item a:hover {
-    color: var(--color-text-primary);
+    color: var(--color-interactive-hover);
 }
 
 .breadcrumb-separator {
@@ -1519,8 +1521,11 @@ pre code {
     pointer-events: auto;
 }
 
+/* Matches .action-rail-trigger:hover exactly (Rule 3a) — border and
+   text to teal, no background change. */
 .back-to-top:hover {
-    background-color: var(--color-background-subtle);
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
 }
 
 .back-to-top-row {
@@ -1555,6 +1560,11 @@ pre code {
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-widest);
     transition: color var(--duration-fast) var(--ease-out);
+}
+
+.tab-bar-item:hover,
+.tab-bar-item:focus-visible {
+    color: var(--color-interactive-hover);
 }
 
 .tab-bar-item[aria-current="page"],
@@ -1634,6 +1644,10 @@ header {
     line-height: var(--line-height-normal);
 }
 
+.nav-logo:hover {
+    color: var(--color-interactive-hover);
+}
+
 .nav-links {
     display: flex;
     align-items: center;
@@ -1652,7 +1666,7 @@ header {
 
 .nav-links a:hover,
 .nav-links a:focus-visible {
-    color: var(--color-text-primary);
+    color: var(--color-interactive-hover);
 }
 
 .nav-links a[aria-current="page"] {
@@ -2371,10 +2385,15 @@ footer p {
    .toc-panel's own restyled scrollbar (Chrome/Edge/Safari) — left at
    browser default it renders as a stark, full-size light grey bar with
    arrow buttons, badly out of place against this dark two-tone palette.
-   Thumb reuses --color-border-strong (this component's own border
-   colour, and the sitewide "emphasized border" token per
-   DESIGN-SYSTEM.md §1.4); track reuses --color-background-subtle (the
-   sitewide "recessed surface" token, §1.2) — no new colour values.
+   Local custom properties (--toc-scrollbar-*, defined on .toc-panel
+   itself, same pattern as .btn/.card's own local tokens) rather than a
+   direct --color-border-strong reference: at rest, --color-border-strong
+   thumb on --color-background-subtle track measured ~2.7:1, below the
+   3:1 UI-component minimum — --toc-scrollbar-thumb now resolves to
+   --color-text-secondary instead (~6:1 on the same track), with
+   --toc-scrollbar-thumb-hover one step up at --color-text-primary.
+   --toc-scrollbar-track keeps the same --color-background-subtle value
+   as before, just named locally so all three read as one group.
    Firefox's scrollbar-width/scrollbar-color equivalent lives on
    .toc-panel itself, below (no ::-webkit- equivalent exists for it).
 ================================ */
@@ -2383,17 +2402,17 @@ footer p {
 }
 
 .toc-panel::-webkit-scrollbar-track {
-    background-color: var(--color-background-subtle);
+    background-color: var(--toc-scrollbar-track);
     border-radius: var(--border-radius-full);
 }
 
 .toc-panel::-webkit-scrollbar-thumb {
-    background-color: var(--color-border-strong);
+    background-color: var(--toc-scrollbar-thumb);
     border-radius: var(--border-radius-full);
 }
 
 .toc-panel::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-text-secondary);
+    background-color: var(--toc-scrollbar-thumb-hover);
 }
 
 /* H3 rows only — lays the leading sub-section icon (TOC_SUB_ICON_HTML,
@@ -2521,6 +2540,10 @@ footer p {
    clamps it against a narrow phone viewport the same way the Filter
    Panel's own max-width does. */
 .toc-panel {
+    --toc-scrollbar-thumb:       var(--color-text-secondary);
+    --toc-scrollbar-thumb-hover: var(--color-text-primary);
+    --toc-scrollbar-track:       var(--color-background-subtle);
+
     position: fixed;
     z-index: 250;
     right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
@@ -2572,7 +2595,7 @@ footer p {
     transition: transform var(--duration-base) var(--ease-out),
                 opacity var(--duration-base) var(--ease-out);
     scrollbar-width: thin;
-    scrollbar-color: var(--color-border-strong) var(--color-background-subtle);
+    scrollbar-color: var(--toc-scrollbar-thumb) var(--toc-scrollbar-track);
 }
 
 .toc-panel--open {
@@ -3050,27 +3073,18 @@ footer p {
 
 .filter-drawer--open {
     transform: translateY(0);
-    /* Not a plain var(--elevation-md) reference — that token is
-       "0 4px 12px rgba(0,0,0,0.5)", a downward offset meant for
-       elements sitting on the page (md/DESIGN-SYSTEM.md §7). This
-       element is position: fixed; bottom: 0 — a downward shadow would
-       cast off the bottom of the viewport and never render. Vertical
-       offset flipped to negative so the shadow lands where the ambiguity
-       actually is, at the top edge; blur/spread/colour kept identical to
-       --elevation-md so it stays inside the existing token family
-       rather than inventing a new rgba value. Scoped to --open specifically (moved off the unconditional base
-       .filter-drawer rule) — at rest, translateY(100%) moves a
-       bottom: 0 fixed box down by exactly its own height, which always
-       lands the box's top edge (and this shadow's blur, which extends
-       above that edge) right at the viewport's bottom boundary,
-       regardless of the drawer's actual height. That put a faint but
-       real shadow sliver at the screen's bottom edge at all times,
-       closed or not, since position: fixed means scrolling never moves
-       it out of the way. Confirmed via the transform's own geometry, not
-       assumed — border-top above is a hairline at the exact box edge
-       with no blur to bleed past it, so it doesn't have this problem and
-       stays on the unconditional rule. */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+    /* --elevation-md-up, not --elevation-md: this element is
+       position: fixed; bottom: 0, so a downward shadow (--elevation-md)
+       would cast off the bottom of the viewport and never render —
+       --elevation-md-up is the same blur/spread/colour with the
+       vertical offset flipped negative so the shadow lands at the top
+       edge instead, where the ambiguity actually is. Scoped to --open
+       specifically (not the unconditional base .filter-drawer rule) —
+       at rest, translateY(100%) always lands the box's top edge (and
+       this shadow's blur) right at the viewport's bottom boundary
+       regardless of drawer height, which would put a faint shadow
+       sliver at the screen's bottom edge at all times, closed or not. */
+    box-shadow: var(--elevation-md-up);
 }
 
 /* Desktop/tablet: capped to the same content width as the rest of the page

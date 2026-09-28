@@ -1,6 +1,6 @@
 # Design System — Atomic Foundation
-**Version:** 1.2.1
-**Last Updated:** 2026-09-24
+**Version:** 1.2.2
+**Last Updated:** 2026-09-27
 **Status:** Active — source of truth for all design and build decisions
 
 ---
@@ -50,6 +50,7 @@ Raw colour values. Never apply these directly to elements. Always reference via 
 | `--color-background-surface` | `#242424` (no primitive — introduced 2026-09-24) | Cards, panels, sidebars, elevated surfaces |
 | `--color-background-subtle` | `#2F2F2F` (no primitive — introduced 2026-09-24) | Hover states, image placeholders, code blocks |
 | `--color-background-hover` | `#3D3D3D` (no primitive — introduced 2026-09-24; same hex as `--color-border-default` today, a deliberately separate token so the two can change independently) | Default `.btn` hover fill (`--btn-bg-hover`) — added specifically so a hover fill is never also a border colour (see §1.9) |
+| `--color-background-active` | `#474747` (no primitive — introduced 2026-09-27, one step lighter than `--color-background-hover` on the same rest→hover→active progression) | Default `.btn` press fill (`--btn-bg-active`) — added because `--btn-bg-active` previously aliased `--color-border-default` directly, which is the same hex as the pre-2026-09-24 hover fill, so `:hover` and `:active` were visually identical on every `.btn` (see §1.9) |
 
 ### 1.3 Semantic Tokens — Text
 
@@ -505,6 +506,7 @@ Used sparingly on dark backgrounds. Shadows are diffuse and dark.
 |---|---|---|
 | `--elevation-sm` | `0 1px 3px rgba(0,0,0,0.4)` | Subtle lift — tags, badges |
 | `--elevation-md` | `0 4px 12px rgba(0,0,0,0.5)` | Cards, dropdowns, tooltips, the floating rail controls (Filters pill and Clear ×) |
+| `--elevation-md-up` | `0 -4px 12px rgba(0,0,0,0.5)` | Same weight as `--elevation-md` with the vertical offset flipped negative — for a `position: fixed; bottom: 0` element (the mobile Filter Drawer, `.filter-drawer--open`) where a downward shadow would cast off the bottom of the viewport. Introduced 2026-09-27, replacing a hardcoded `box-shadow` value on that rule |
 | `--elevation-lg` | `0 8px 24px rgba(0,0,0,0.6)` | Modals, overlays |
 | `--elevation-xl` | `0 16px 48px rgba(0,0,0,0.7)` | Floating elements |
 

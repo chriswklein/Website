@@ -1,6 +1,6 @@
 # Personal Website — Project Reference Document
-**Version:** 1.5.1
-**Last Updated:** 2026-09-24
+**Version:** 1.5.2
+**Last Updated:** 2026-09-27
 **Status:** In Progress — Home page ready to build
 
 ---
@@ -188,6 +188,7 @@ Teal is the site's only accent — the dormant `[data-theme="gold"]` override wa
 | `--color-background-surface` | #242424 | — |
 | `--color-background-subtle` | #2F2F2F | — |
 | `--color-background-hover` | #3D3D3D | Default `.btn` hover fill only (added 2026-09-24, fixing an AA failure — the fill previously reused `--color-border-strong` directly). `--color-text-primary` on it: ~8.9:1 ✅ |
+| `--color-background-active` | #474747 | Default `.btn` press fill only (added 2026-09-27, fixing a no-visible-change bug — the fill previously reused `--color-border-default` directly, the same hex as the pre-9/24 hover fill, so `:hover` and `:active` looked identical). `--color-text-primary` on it: ~7.6:1 ✅ |
 | `--color-text-primary` | #E8E8E8 | ~13.9:1 ✅ · ~12.7:1 ✅ |
 | `--color-text-secondary` | #AEAEAE | ~7.7:1 ✅ · ~7.0:1 ✅ |
 | `--color-text-disabled` | #666666 | Not required |
