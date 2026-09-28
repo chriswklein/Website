@@ -42,7 +42,7 @@
 
     /* ---- Colour: Interactive ---- */
     --color-interactive-default: #E8E8E8;
-    --color-interactive-hover: #00BAA5;
+    --color-interactive-hover: var(--color-accent-primary-text);
     --color-interactive-focus: #FFFFFF;
 
     /* ---- Colour: Accent — Teal (live default) ---- */
@@ -59,8 +59,8 @@
     --color-danger: #B41321;
 
     /* ---- Colour: Semantic — Components ---- */
-    --color-link: var(--color-accent-primary-text);
-    --color-link-hover: var(--color-accent-primary);
+    --color-link: var(--color-accent-primary);
+    --color-link-hover: var(--color-accent-primary-text);
     --color-divider-accent: var(--color-accent-primary);
     --color-quote-border: var(--color-accent-quote);
     --color-code-bg: var(--color-background-subtle);
@@ -762,8 +762,8 @@ pre code {
 @media (hover: hover) {
     .btn--cta:hover {
         --btn-bg-hover:     var(--color-background-surface);
-        --btn-border-hover: var(--color-accent-primary-text);
-        --btn-text-hover:   var(--color-accent-primary-text);
+        --btn-border-hover: var(--color-interactive-hover);
+        --btn-text-hover:   var(--color-interactive-hover);
     }
 }
 
@@ -965,9 +965,11 @@ pre code {
 
 /* Hover — teal border + solid non-blurred drop-shadow lift, whole card
    including the image column where present (image carries no separate
-   border of its own, so it inherits this same treatment automatically). */
+   border of its own, so it inherits this same treatment automatically).
+   Border follows the teal rule (bright on interaction, --color-interactive-hover);
+   the lift shadow is a fill, so it stays on the dark --color-accent-primary. */
 .card:hover {
-    border-color: var(--color-accent-primary-text);
+    border-color: var(--color-interactive-hover);
     box-shadow: 0 var(--space-1) 0 var(--color-accent-primary);
 }
 
@@ -1029,7 +1031,7 @@ pre code {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-regular);
     letter-spacing: var(--letter-spacing-wide);
-    color: var(--color-accent-primary-text);
+    color: var(--color-accent-primary);
 }
 
 /* Title row — type icon + title on the left, open-link icon on the
@@ -1065,7 +1067,7 @@ pre code {
 }
 
 .card:hover .card-link-icon {
-    color: var(--color-accent-primary-text);
+    color: var(--color-interactive-hover);
 }
 
 /* Sole card link — no separate View/Read button. Covers the full card,
@@ -1401,12 +1403,12 @@ pre code {
 
 @media (hover: hover) {
     .home-hero-scroll:hover {
-        color: var(--color-accent-primary-text);
+        color: var(--color-interactive-hover);
     }
 }
 
 .home-hero-scroll:focus-visible {
-    color: var(--color-accent-primary-text);
+    color: var(--color-interactive-hover);
 }
 
 .home-hero-scroll svg {
@@ -1456,8 +1458,8 @@ pre code {
 }
 
 .contact-icon-btn:hover {
-    border-color: var(--color-accent-primary-text);
-    color: var(--color-accent-primary-text);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .contact-icon-btn:focus-visible {
@@ -1524,8 +1526,8 @@ pre code {
 /* Matches .action-rail-trigger:hover exactly (Rule 3a) — border and
    text to teal, no background change. */
 .back-to-top:hover {
-    border-color: var(--color-accent-primary);
-    color: var(--color-accent-primary);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .back-to-top-row {
@@ -1724,8 +1726,8 @@ header {
 }
 
 .theme-toggle-rail:hover {
-    border-color: var(--color-accent-primary);
-    color: var(--color-accent-primary);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .theme-toggle-rail:focus-visible {
@@ -1851,7 +1853,7 @@ footer p {
     border-color: var(--color-accent-primary);
 }
 
-/* Hover — 2px teal border matching .card:hover's --color-accent-primary-text.
+/* Hover — 2px teal border matching .card:hover's --color-interactive-hover.
    An outline, not a wider border: the transparent 1px border above already
    reserves the box, and the outline's negative offset (one border-width)
    starts at that border's inner edge and grows outward, so the box — and
@@ -1859,7 +1861,7 @@ footer p {
    sitewide focus ring in charge when the trigger is both hovered and
    keyboard-focused. */
 .image-zoom-trigger:hover:not(:focus-visible) {
-    outline: var(--border-width-medium) solid var(--color-accent-primary-text);
+    outline: var(--border-width-medium) solid var(--color-interactive-hover);
     outline-offset: calc(-1 * var(--border-width-thin));
 }
 
@@ -2310,17 +2312,18 @@ footer p {
     margin-bottom: var(--space-2);
 }
 
-/* Unordered-list bullets only, matching the same teal token links/tags
-   already use — no existing ::marker rule anywhere else in the file to
-   conflict with (confirmed via grep). Scoped to ul specifically, not the
-   shared .standard-page-content ul, ol base rule above: ol currently has
-   no real consumer anywhere in entry content (confirmed via repo-wide
-   search), so leaving its numeral markers at the default text color is
-   flagged, not assumed correct — matching bullets to teal but leaving
-   numerals white would be a visible inconsistency the moment a real
-   ordered list is ever added. */
+/* Unordered-list bullets only — decorative, resting teal (--color-accent-primary,
+   not the bright interactive token: a marker is never hovered/focused on its
+   own). No existing ::marker rule anywhere else in the file to conflict with
+   (confirmed via grep). Scoped to ul specifically, not the shared
+   .standard-page-content ul, ol base rule above: ol currently has no real
+   consumer anywhere in entry content (confirmed via repo-wide search), so
+   leaving its numeral markers at the default text color is flagged, not
+   assumed correct — matching bullets to teal but leaving numerals white
+   would be a visible inconsistency the moment a real ordered list is ever
+   added. */
 .standard-page-content ul li::marker {
-    color: var(--color-accent-primary-text);
+    color: var(--color-accent-primary);
 }
 
 .standard-page-content li:last-child {
@@ -2470,8 +2473,8 @@ footer p {
 }
 
 .toc-rail-link:hover {
-    border-color: var(--color-accent-primary);
-    color: var(--color-accent-primary);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .toc-rail-link:focus-visible {
@@ -3253,8 +3256,8 @@ footer p {
 }
 
 .filter-drawer-page-btn:hover {
-    border-color: var(--color-accent-primary);
-    color: var(--color-accent-primary);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .filter-drawer-page-btn:focus-visible {
@@ -3430,8 +3433,8 @@ footer p {
 }
 
 .action-rail-trigger:hover {
-    border-color: var(--color-accent-primary);
-    color: var(--color-accent-primary);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .action-rail-trigger:focus-visible {
@@ -3656,7 +3659,7 @@ footer p {
 
 .archive-count-value {
     font-weight: var(--font-weight-bold);
-    color: var(--color-accent-primary-text);
+    color: var(--color-accent-primary);
 }
 
 .archive-clear-btn {
@@ -3733,8 +3736,8 @@ footer p {
 }
 
 .archive-sort-toggle:hover {
-    border-color: var(--color-accent-primary);
-    color: var(--color-accent-primary);
+    border-color: var(--color-interactive-hover);
+    color: var(--color-interactive-hover);
 }
 
 .archive-sort-toggle:focus-visible {
