@@ -1,5 +1,5 @@
 # Design System — Atomic Foundation
-**Version:** 1.2.2
+**Version:** 1.3.0
 **Last Updated:** 2026-09-27
 **Status:** Active — source of truth for all design and build decisions
 
@@ -77,7 +77,7 @@ Two text levels for real content — see the two-tier principle below the table.
 | CSS Variable | References | Usage |
 |---|---|---|
 | `--color-interactive-default` | `grey-100` `#E8E8E8` | Default interactive element colour |
-| `--color-interactive-hover` | `teal-dark` `#00BAA5` | Hover state — a border colour only (e.g. `.btn:hover`'s border, via `--btn-border-hover`); not applied as a text fill and not used for any hover background — see `--color-background-hover` for that. As of 2026-09-24 this is the same hex as `--color-accent-primary` |
+| `--color-interactive-hover` | `var(--color-accent-primary-text)` `#00E5CB` (2026-09-27 — was `#00BAA5`/`--color-accent-primary`; see §1.6b, the teal interaction rule) | The one shared "interactive hover/focus" colour — border and text on hover/focus-visible across every in-page interactive element (`.btn` via `--btn-border-hover`, `.nav-links a`, `.tab-bar-item`, `.breadcrumb-item a`, `.back-to-top`, `.action-rail-trigger`, `.archive-sort-toggle`, `.filter-drawer-page-btn`, `.toc-rail-link`, `.contact-icon-btn`, `.card`, `.image-zoom-trigger`, `.home-hero-scroll`, `.theme-toggle-rail`). Not used for any hover background — see `--color-background-hover` for that |
 | `--color-interactive-focus` | `grey-0` `#FFFFFF` | Focus ring colour — ~17.0:1 on base / ~15.5:1 on surface ✅ |
 
 `--color-interactive-active` and `--color-interactive-disabled` were removed in the 2026-09-24 update — confirmed zero real CSS consumers (each was documented but never actually applied by any rule).
@@ -90,6 +90,21 @@ Teal is the site's only accent — used for dividers, primary tags, links, code 
 |---|---|---|---|---|
 | `--color-accent-primary` | `teal-dark` `#00BAA5` | ~7.0:1 ✅ AA | ~6.3:1 ✅ AA | Primary tag fill, hr dividers, code block border |
 | `--color-accent-primary-text` | `teal-light` `#00E5CB` | ~10.6:1 ✅ AAA | ~9.7:1 ✅ AAA | Hyperlinks, tooltip text accents, text on dark |
+
+### 1.6b The Teal Interaction Rule (added 2026-09-27)
+
+**Dark at rest, bright on interaction.** Every element that uses teal now follows one rule instead of each picking a shade independently:
+
+| Element state | Token | Shade |
+|---|---|---|
+| Resting text/border (`.card-tag`, `.archive-count-value`, hyperlinks, list bullets) | `--color-accent-primary` (`#00BAA5`) | Dark |
+| Hover / `:focus-visible` text or border (buttons, nav, cards, tags, the ToC, breadcrumb, back-to-top) | `--color-interactive-hover` → `--color-accent-primary-text` (`#00E5CB`) | Bright |
+| Decorative fills (`.action-rail-badge`, divider dots, tooltip/code/divider borders — anything not an interaction state) | `--color-accent-primary` (`#00BAA5`) | Dark — unaffected by hover, stays dark always |
+| Active / selected states (`.tag-chip--active`, `.toc-rail-link--active`, the current Filter Drawer page dot) | `--color-accent-primary-text` (`#00E5CB`) | Bright — a selected state reads as "already interacted with," not resting |
+
+Two consequences of centralising this in `--color-interactive-hover`: (1) `--color-link`/`--color-link-hover` swapped roles the same day — link text is now `--color-accent-primary` at rest and `--color-accent-primary-text` on hover, matching the rule, where it previously started bright and dimmed on hover; (2) `.tag`/`.tag-chip` were **not** touched — they already hardcode `--color-accent-primary`/`--color-accent-primary-text` directly for the same dark-rest/bright-hover pattern, just without routing through the shared token, so they already followed the rule before it had a name.
+
+One deliberate exception: `.image-zoom-trigger:focus-visible`'s border stays hardcoded to `--color-accent-primary` (dark), not `--color-interactive-hover` — its own comment documents this as intentionally distinct from its `:hover` state (different token, "the two no longer share a rule or a look"), so it was left out of the 2026-09-27 sweep rather than folded in.
 
 ### 1.7 Semantic Tokens — Accent (Pink)
 
@@ -118,8 +133,8 @@ Defined once in `:root` next to the other semantic colours, with no primitive of
 | `--tag-border` | `--color-accent-primary` | Tag default border and text colour |
 | `--tag-border-hover` | `--color-accent-primary` | Tag hover border colour |
 | `--tag-bg-hover` | `--color-background-subtle` | Tag hover background |
-| `--color-link` | `--color-accent-primary-text` | Hyperlink default colour |
-| `--color-link-hover` | `--color-accent-primary` | Hyperlink hover colour |
+| `--color-link` | `--color-accent-primary` (2026-09-27 — swapped with `--color-link-hover`; see §1.6b) | Hyperlink default colour |
+| `--color-link-hover` | `--color-accent-primary-text` (2026-09-27 — swapped with `--color-link` above) | Hyperlink hover colour |
 | `--color-divider-accent` | `--color-accent-primary` | hr and section dividers site-wide |
 | `--color-quote-border` | `--color-accent-quote` | Blockquote left border |
 | `--color-code-bg` | `--color-background-subtle` | Code and pre block background |
@@ -507,6 +522,7 @@ Used sparingly on dark backgrounds. Shadows are diffuse and dark.
 | `--elevation-sm` | `0 1px 3px rgba(0,0,0,0.4)` | Subtle lift — tags, badges |
 | `--elevation-md` | `0 4px 12px rgba(0,0,0,0.5)` | Cards, dropdowns, tooltips, the floating rail controls (Filters pill and Clear ×) |
 | `--elevation-md-up` | `0 -4px 12px rgba(0,0,0,0.5)` | Same weight as `--elevation-md` with the vertical offset flipped negative — for a `position: fixed; bottom: 0` element (the mobile Filter Drawer, `.filter-drawer--open`) where a downward shadow would cast off the bottom of the viewport. Introduced 2026-09-27, replacing a hardcoded `box-shadow` value on that rule |
+| `--elevation-lift` | `0 var(--space-1) 0 var(--color-accent-primary)` | A solid, non-blurred "pressed" shadow (not a diffuse blur like the others above) — `.card:hover`/`:focus-within` and `.btn--cta:hover`/`:focus-visible`. Introduced 2026-09-27, replacing each rule's own identical literal `box-shadow` value |
 | `--elevation-lg` | `0 8px 24px rgba(0,0,0,0.6)` | Modals, overlays |
 | `--elevation-xl` | `0 16px 48px rgba(0,0,0,0.7)` | Floating elements |
 
@@ -581,6 +597,18 @@ All interactive elements on mobile must meet minimum touch target size.
 |---|---|---|
 | `--touch-target-minimum` | `44px` | WCAG 2.5.5 AA minimum |
 | `--touch-target-comfortable` | `48px` | Recommended comfortable target |
+
+#### One Button Size (added 2026-09-27)
+
+Every in-page button-like control shares three tokens instead of each defining its own height/padding/icon-size — `.btn` (every variant), `.back-to-top`, `.action-rail-trigger`, `.archive-sort-toggle`, `.filter-drawer-page-btn`, `.filter-drawer-trigger`, and `.contact-icon-btn`:
+
+| Token | Value | Usage |
+|---|---|---|
+| `--button-height` | `var(--touch-target-minimum)` (44px) | Set via `height`, not `min-height` — `padding-block: 0` and `line-height: var(--button-height)` centre the label without depending on flex alignment, so it applies equally to non-flex buttons (`.archive-sort-toggle`, `.filter-drawer-page-btn`) |
+| `--button-padding-inline` | `var(--space-5)` (20px) | Horizontal padding on every button in the list above |
+| `--button-icon-size` | `var(--icon-size-lg)` (1.25rem/20px) | `.action-rail-trigger-icon`, `.contact-icon-btn svg` — the first real consumer of `--icon-size-lg` (§ Icon Size scale, `md/COMPONENTS.md`'s token reference doesn't define an icon-size scale of its own; the four `--icon-size-*` tokens live only in `style.css` `:root`) |
+
+Touch-target-square controls (`.action-rail-clear`, the image viewer controls that reuse it, the mobile icon-only `.action-rail-trigger`) are unaffected — they were already 44px squares and aren't part of this list. `.contact-icon-btn`'s previous 80px desktop / 64px mobile split and 36px/28px icon sizes are gone — one size at every breakpoint now.
 
 ### 9.3 Line Length
 
