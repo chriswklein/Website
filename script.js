@@ -64,13 +64,31 @@ function initNav() {
     });
 }
 
+// Shared by setActiveNavLink() and setActiveTabBar() below, so the two
+// never drift out of sync on what "current page" means. Takes
+// window.location.pathname only — the query string is deliberately never
+// part of the comparison, so a filtered Archive URL (/archive.html?type=work)
+// still matches the plain /archive.html nav link. Every real nav/tab-bar
+// href on the site is already a canonical "/page.html" path (nav.html, the
+// per-page tab bar markup), so only the current page's own path needs
+// normalizing, not the links being compared against: "/" and "/index"
+// become "/index.html", a trailing slash is dropped, and a missing
+// extension gets ".html" appended — so /, /index, /archive, and /archive/
+// all resolve to the same form their real nav link's href already uses.
+function normalizeNavPath(pathname) {
+    if (pathname === '/' || pathname === '/index') return '/index.html';
+    let path = pathname;
+    if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+    if (!/\.[a-z0-9]+$/i.test(path)) path += '.html';
+    return path;
+}
+
 // Set aria-current="page" on the injected desktop nav link matching the current page
 function setActiveNavLink() {
-    const currentPath = window.location.pathname + window.location.search;
-    const normalizedPath = currentPath === '/' ? '/index.html' : currentPath;
+    const currentPath = normalizeNavPath(window.location.pathname);
 
     document.querySelectorAll('.nav-links a').forEach(link => {
-        if (link.getAttribute('href') === normalizedPath) {
+        if (link.getAttribute('href') === currentPath) {
             link.setAttribute('aria-current', 'page');
         } else {
             link.removeAttribute('aria-current');
@@ -80,11 +98,10 @@ function setActiveNavLink() {
 
 // Set aria-current="page" on the static tab bar item matching the current page
 function setActiveTabBar() {
-    const currentPath = window.location.pathname + window.location.search;
-    const normalizedPath = currentPath === '/' ? '/index.html' : currentPath;
+    const currentPath = normalizeNavPath(window.location.pathname);
 
     document.querySelectorAll('.tab-bar-item').forEach(item => {
-        if (item.getAttribute('href') === normalizedPath) {
+        if (item.getAttribute('href') === currentPath) {
             item.setAttribute('aria-current', 'page');
         } else {
             item.removeAttribute('aria-current');

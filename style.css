@@ -1631,9 +1631,17 @@ pre code {
     color: var(--color-interactive-hover);
 }
 
-.tab-bar-item[aria-current="page"],
-.tab-bar-item.is-active {
-    color: var(--color-interactive-default);
+/* Current page marked by more than colour alone (WCAG 1.4.1) — a
+   thicker, teal-coloured underline distinguishes it from the plain
+   text-decoration: none every other item has, not just a lighter grey.
+   .is-active removed 2026-09-27: nothing in script.js ever sets that
+   class, only aria-current="page" (setActiveTabBar()). */
+.tab-bar-item[aria-current="page"] {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-decoration-thickness: var(--border-width-medium);
+    text-underline-offset: var(--space-1);
+    text-decoration-color: var(--color-accent-primary-text);
 }
 
 /* ================================
@@ -1733,10 +1741,17 @@ header {
     color: var(--color-interactive-hover);
 }
 
+/* Current page marked by more than colour alone (WCAG 1.4.1) — a
+   thicker, teal-coloured underline, matching .tab-bar-item's own
+   current-page treatment (Rule 3a). Replaces the previous plain 2px-offset
+   underline, which used the same text colour for the line as the text
+   itself. */
 .nav-links a[aria-current="page"] {
     color: var(--color-text-primary);
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-decoration-thickness: var(--border-width-medium);
+    text-underline-offset: var(--space-1);
+    text-decoration-color: var(--color-accent-primary-text);
 }
 
 /* Desktop and landscape-tablet — logo shown, left of nav links (not
