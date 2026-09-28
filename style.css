@@ -1077,42 +1077,6 @@ pre code {
     color: var(--color-accent-primary);
 }
 
-/* Title row — type icon + title on the left, open-link icon on the
-   right. Shared by Work Entry and Thought Entry cards. Icons sized at
-   --space-10 (40px) per spec. */
-.card-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
-}
-
-.card-title-group {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-width: 0;
-}
-
-.card-type-icon {
-    width: var(--space-10);
-    height: var(--space-10);
-    color: var(--color-text-secondary);
-    flex-shrink: 0;
-}
-
-.card-link-icon {
-    width: var(--space-10);
-    height: var(--space-10);
-    color: var(--color-text-secondary);
-    flex-shrink: 0;
-    transition: color var(--duration-fast) var(--ease-out);
-}
-
-.card:hover .card-link-icon {
-    color: var(--color-interactive-hover);
-}
-
 /* Sole card link — no separate View/Read button. Covers the full card,
    carries the real accessible name, and is the card's only keyboard
    focus stop (see aria-label on the element itself, set per entry).
@@ -1227,54 +1191,9 @@ pre code {
 }
 
 /* Thought cards — no image, otherwise identical single-column content
-   flow to Feature (no separate icon column any more — the type icon now
-   lives in .card-title-row like Work Entry's). */
+   flow to Feature. */
 .card--thought .card-image {
     display: none;
-}
-
-/* Profile card */
-.card--profile {
-    --card-profile-name-size:       var(--font-size-2xl);
-    --card-profile-name-weight:     var(--font-weight-bold);
-    --card-profile-caption-size:    var(--font-size-xs);
-    --card-profile-caption-color:   var(--color-text-secondary);
-
-    overflow: visible;
-}
-
-.card--profile .card-image {
-    width: 100%;
-    max-width: 300px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-    border-radius: var(--border-radius-md);
-}
-
-.card--profile .card-image img {
-    width: 100%;
-    height: auto;
-}
-
-.card-image-caption {
-    font-size: var(--card-profile-caption-size, var(--font-size-xs));
-    color: var(--card-profile-caption-color, var(--color-text-secondary));
-    line-height: var(--line-height-loose);
-    padding: var(--space-2) var(--card-padding);
-    max-width: none;
-}
-
-.card-profile-name {
-    font-size: var(--card-profile-name-size);
-    font-weight: var(--card-profile-name-weight);
-    line-height: var(--line-height-snug);
-}
-
-.card-profile-actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
 }
 
 /* ================================
@@ -2762,29 +2681,6 @@ footer p {
    history list, skills tags. Shares its outer page structure
    (.standard-page) with entry pages above, but everything in this
    section is About-only content, not reused elsewhere. */
-.about-hero {
-    text-align: center;
-    padding: var(--space-12) 0 var(--space-8);
-    max-width: var(--measure-reading);
-    margin: 0 auto;
-}
-
-.about-hero-title {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-bold);
-    line-height: var(--line-height-tight);
-    letter-spacing: var(--letter-spacing-tight);
-    color: var(--color-text-primary);
-    margin-bottom: var(--space-4);
-}
-
-.about-hero-subtitle {
-    font-size: var(--font-size-lg);
-    color: var(--color-text-secondary);
-    line-height: var(--line-height-relaxed);
-    max-width: none;
-}
-
 /* Single pre-composited image (photo-real portrait + illustrated T-rex
    side by side) — capped near its own native width (702px) so it's never
    upscaled past source resolution; sitewide img{max-width:100%} handles
@@ -2916,140 +2812,10 @@ footer p {
 }
 
 /* About page responsive */
-@media (max-width: 1023px) {
-    .about-hero-title {
-        font-size: var(--font-size-3xl);
-    }
-}
-
 @media (max-width: 767px) {
-    .about-hero-title {
-        font-size: var(--font-size-2xl);
-    }
-
     .about-history-meta {
         flex-direction: column;
         gap: var(--space-1);
-    }
-}
-
-/* ================================
-   DESKTOP (min-width: 1024px) — Profile card wide layout
-================================ */
-@media (min-width: 1024px) {
-    .card--profile {
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        gap: 0;
-        padding: 0;
-    }
-
-    .card--profile .card-image {
-        width: auto;
-        min-width: unset;
-        max-width: unset;
-        flex-shrink: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: var(--space-6);
-        gap: var(--space-1);
-        margin: 0;
-        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
-        background-color: var(--color-background-surface);
-    }
-
-    .card--profile .card-image img {
-        width: 300px;
-        height: 300px;
-        flex-shrink: 0;
-        object-fit: cover;
-        border-radius: var(--border-radius-lg);
-        display: block;
-    }
-
-    .card--profile .card-image-caption {
-        width: 300px;
-        max-width: 300px;
-        font-size: var(--font-size-xs);
-        line-height: var(--line-height-loose);
-        font-style: italic;
-        font-weight: var(--font-weight-regular);
-        color: var(--color-text-secondary);
-        text-align: center;
-        padding: 0;
-        margin: 0;
-        align-self: stretch;
-    }
-
-    .card--profile .card-content {
-        flex: 1;
-        min-width: 0;
-        padding: var(--space-6);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: var(--space-4);
-    }
-}
-
-/* ================================
-   TABLET RANGE (768px–1023px) — Profile card wide layout (narrower image column)
-================================ */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .card--profile {
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        gap: 0;
-        padding: 0;
-    }
-
-    .card--profile .card-image {
-        width: 220px;
-        min-width: 220px;
-        max-width: 220px;
-        height: auto;
-        aspect-ratio: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: var(--space-4);
-        gap: var(--space-1);
-        margin: 0;
-        border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
-        background-color: var(--color-background-surface);
-    }
-
-    .card--profile .card-image img {
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-        border-radius: var(--border-radius-md);
-        display: block;
-    }
-
-    .card--profile .card-image-caption {
-        font-size: var(--font-size-xs);
-        font-style: italic;
-        color: var(--color-text-secondary);
-        text-align: center;
-        line-height: var(--line-height-loose);
-        padding: 0;
-        margin: 0;
-    }
-
-    .card--profile .card-content {
-        flex: 1;
-        min-width: 0;
-        padding: var(--space-5);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: var(--space-3);
     }
 }
 
@@ -4000,10 +3766,6 @@ footer p {
         font-size: var(--font-size-3xl);
     }
 
-    .card--profile {
-        position: static;
-    }
-
     /* position: fixed, not sticky — the row must be locked in place from
        the very first frame with no in-flow scroll-along period, which
        sticky can't do (it stays in normal flow and only locks once
@@ -4213,11 +3975,6 @@ footer p {
 
     .standard-page-footer-actions .btn {
         width: 100%;
-    }
-
-    .card--profile .card-image {
-        background-color: transparent;
-        padding-top: var(--space-4);
     }
 
     /* Top tab bar replaces desktop nav on mobile */

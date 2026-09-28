@@ -1,5 +1,5 @@
 # Design System — Component Specifications
-**Version:** 2.3.0
+**Version:** 2.3.1
 **Last Updated:** 2026-09-27
 **Status:** Active — source of truth for all component build decisions
 
@@ -290,7 +290,7 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 | Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `bold` |
 | Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | `regular` |
 
-**What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`), or when a chip is a grid duplicate of a tag already shown Active in the selected-tags row (`isDuplicateOfActiveRow`). Both triggers apply to type chips (`.filter-drawer-primary-chips`) and tag chips (`#filter-drawer-chips`) alike — but only type-chip Dim is currently visible on screen: that row is never hidden, so selecting Work visibly dims Thoughts. Tag-chip Dim is computed and classed identically, but `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state, while correct, has no currently-reachable on-screen instance. The class and its styling are left in place, ready for a future layout that keeps the tag grid visible alongside active selections.
+**What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`). This only actually happens for type chips (`.filter-drawer-primary-chips`) — that row is never hidden, so selecting Work visibly dims Thoughts. Tag chips (`#filter-drawer-chips`) always pass `anyActive: false` (2026-09-27, simplified from an earlier `isDuplicateOfActiveRow` special case that computed a real Dim state for them) — `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state could never have been seen regardless of how it was computed. `.tag-chip--dim` itself is left in place in `style.css`, ready for a future layout that keeps the tag grid visible alongside active selections.
 
 ### Accessibility
 
@@ -310,7 +310,7 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 
 ### JavaScript API
 
-Chips are built and wired by `initArchive()` in `script.js`. Tag chips carry `data-filter-tag="{slug}"`; type chips carry `data-filter-type="work"` or `data-filter-type="thoughts"`. On every `render()` pass, each chip's classes/`aria-pressed`/`aria-label`/× indicator are computed by the shared `applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow })` helper — the single source of truth for chip state, used for both the type-chip loop and the tag-chip loop (`isDuplicateOfActiveRow` is `true` for any chip inside `#filter-drawer-chips`, since every chip there is a grid copy of whatever the selected-tags row already shows for an active tag — see Design Intent above).
+Chips are built and wired by `initArchive()` in `script.js`. Tag chips carry `data-filter-tag="{slug}"`; type chips carry `data-filter-type="work"` or `data-filter-type="thoughts"`. On every `render()` pass, each chip's classes/`aria-pressed`/`aria-label`/× indicator are computed by the shared `applyChipState(btn, { isActive, anyActive })` helper — the single source of truth for chip state, used for both the type-chip loop and the tag-chip loop (the tag-chip loop always passes `anyActive: false` — see Design Intent above).
 
 Default chip:
 ```html
@@ -461,7 +461,7 @@ Three controls clear every active filter, all wired to the same `doReset()`:
 ### Type and Tag Chips
 
 - **Type chips** (`.filter-drawer-primary-chips`, `role="group"`, `aria-label="Filter by type"`): Work and Thoughts, exclusive — selecting one replaces the other, selecting the active one clears it. The Archive `<h1>` (visually hidden) updates to "Archive / Work" or "Archive / Thoughts".
-- **Tag chips** (`#filter-drawer-chips`): every unique tag from `data/archive-entries.json`, alphabetical, multi-select (an entry matches if it has any selected tag). Tags with no entries under the current type are removed from the grid. A selected tag appears in `#filter-drawer-active-chips` as an Active chip with a × and `aria-label="Remove {Label} filter"`; its copy in the grid renders Dim (`isDuplicateOfActiveRow`, see `## 2b. Tag-Chip`).
+- **Tag chips** (`#filter-drawer-chips`): every unique tag from `data/archive-entries.json`, alphabetical, multi-select (an entry matches if it has any selected tag). Tags with no entries under the current type are removed from the grid. A selected tag appears in `#filter-drawer-active-chips` as an Active chip with a × and `aria-label="Remove {Label} filter"`; the grid itself (including its copy of that tag) is hidden outright via `.filter-drawer--tags-active` whenever any secondary tag is active — see `## 2b. Tag-Chip`.
 
 ### Pagination
 
@@ -579,7 +579,7 @@ z-index stack (.card has position: relative):
 --card-border:          var(--color-border-default);
 --card-border-hover:    var(--color-border-strong);  /* defined but unused — .card:hover/:focus-within use --color-interactive-hover directly, see States below */
 --card-radius:          var(--border-radius-md);
---card-padding:         var(--space-6);              /* .card-image-caption (Profile variant) only — .card-content sets its own padding directly, below */
+--card-padding:         var(--space-6);              /* defined but unused — the Profile variant that consumed it (.card--profile, .card-image-caption) was removed 2026-09-27, fully dead sitewide; .card-content sets its own padding directly, below */
 --card-image-bg:        var(--color-background-subtle);
 --card-block-link-z:    1;
 ```

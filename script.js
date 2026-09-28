@@ -1,7 +1,6 @@
 // Inject shared components, then wire up behaviour that depends on them
 document.addEventListener('DOMContentLoaded', () => {
     loadComponent('nav-placeholder', '/nav.html', () => {
-        initNav();
         setActiveNavLink();
         // Deferred until nav.html is actually injected: the sticky header
         // it contains is what scroll-margin-top clears, and initTocRail()
@@ -40,28 +39,6 @@ function loadComponent(placeholderId, file, callback) {
             if (callback) callback();
         })
         .catch(error => console.error(`Error loading ${file}:`, error));
-}
-
-// Mobile nav toggle — guarded since hamburger is hidden on mobile (tab bar replaces it)
-function initNav() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const navMenu = document.querySelector('.nav-links');
-    if (!navToggle || !navMenu) return;
-
-    navToggle.addEventListener('click', () => {
-        const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
-        navToggle.setAttribute('aria-expanded', !isOpen);
-        navMenu.classList.toggle('is-open');
-        navToggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
-    });
-
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navToggle.setAttribute('aria-expanded', 'false');
-            navMenu.classList.remove('is-open');
-            navToggle.setAttribute('aria-label', 'Open navigation menu');
-        });
-    });
 }
 
 // Shared by setActiveNavLink() and setActiveTabBar() below, so the two
@@ -1557,20 +1534,16 @@ function initArchive(filterDrawer) {
     }
 
     // Shared class/aria/× state for a tag-chip button — single source of truth
-    // for the primary-chip and secondary-chip render loops below.
-    // isDuplicateOfActiveRow: true for chips living in the full secondary
-    // list (#filter-drawer-chips), where an active tag is already shown
-    // separately in the active-chips row (#filter-drawer-active-chips) —
-    // that duplicate must render Dim, not Active, so only the true
-    // active-chips-row instance ever shows the Active state for a given
-    // slug. aria-pressed/×/aria-label stay driven by the real isActive value
-    // regardless of this distinction, since the underlying toggle state
-    // (and its removability) is unchanged — only the visual Active/Dim
-    // classing differs for the duplicate.
-    function applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow = false }) {
-        const dimAsDuplicate = isDuplicateOfActiveRow && isActive;
-        const showAsActive = isActive && !dimAsDuplicate;
-        const showAsDim = dimAsDuplicate || (!isActive && anyActive);
+    // for the primary-chip and secondary-chip render loops below. Dim only
+    // ever actually renders on primary type chips (Work/Thoughts) — secondary
+    // chips pass anyActive: false (see the secondary render loop below),
+    // since .filter-drawer--tags-active hides their whole grid the moment
+    // any secondary tag is active, so a dim state on them could never be
+    // seen anyway (confirmed 2026-09-27, removing the isDuplicateOfActiveRow/
+    // dimAsDuplicate special case this used to need for that grid).
+    function applyChipState(btn, { isActive, anyActive }) {
+        const showAsActive = isActive;
+        const showAsDim = !isActive && anyActive;
 
         btn.classList.toggle('tag-chip--active', showAsActive);
         btn.classList.toggle('tag-chip--dim', showAsDim);
@@ -1722,13 +1695,15 @@ function initArchive(filterDrawer) {
         const railClearBtn = document.querySelector('.action-rail-clear');
         if (railClearBtn) railClearBtn.hidden = filterCount === 0;
 
-        // Secondary tag chips (drawer — the one shared pool at every breakpoint)
+        // Secondary tag chips (drawer — the one shared pool at every breakpoint).
+        // anyActive: false — this grid is always hidden outright the moment any
+        // secondary tag is active (.filter-drawer--tags-active in style.css), so
+        // a dim state on these chips could never actually be seen; see
+        // applyChipState()'s own comment above.
         document.querySelectorAll('[data-filter-tag]').forEach(btn => {
             const slug     = btn.dataset.filterTag;
             const isActive = activeSecondary.has(slug);
-            const anyActive = activeSecondary.size > 0;
-            const isDuplicateOfActiveRow = !!btn.closest('#filter-drawer-chips');
-            applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow });
+            applyChipState(btn, { isActive, anyActive: false });
             const count = getChipCountForTag(slug);
             const tagCountEl = btn.querySelector('.chip-count');
             if (tagCountEl) tagCountEl.textContent = ` ${count}`;

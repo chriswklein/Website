@@ -1,5 +1,5 @@
 # Design System — Atomic Foundation
-**Version:** 1.3.0
+**Version:** 1.3.1
 **Last Updated:** 2026-09-27
 **Status:** Active — source of truth for all design and build decisions
 
@@ -288,7 +288,7 @@ These are the complete text styles as they appear on the page. Every text elemen
 | `h2` | `--font-size-2xl` | `--font-weight-bold` | `--line-height-snug` | `--letter-spacing-normal` | Section headings — centre aligned |
 | `h3` | `--font-size-xl` | `--font-weight-semibold` | `--line-height-snug` | `--letter-spacing-normal` | Card titles, subsection headings |
 | `h4` | `--font-size-lg` | `--font-weight-semibold` | `--line-height-normal` | `--letter-spacing-normal` | Grouped content labels |
-| `body-large` | `--font-size-md` | `--font-weight-regular` | `--line-height-relaxed` | `--letter-spacing-normal` | Intro paragraphs, lead text — no live consumer as of 2026-09-24 (`.about-hero-subtitle` moved to `--font-size-lg`, see §2.2) |
+| `body-large` | `--font-size-md` | `--font-weight-regular` | `--line-height-relaxed` | `--letter-spacing-normal` | Intro paragraphs, lead text — no live consumer (`.about-hero-subtitle`, its last consumer, was removed sitewide 2026-09-27 — fully dead) |
 | `body` | `--font-size-base` | `--font-weight-regular` | `--line-height-loose` | `--letter-spacing-normal` | Default body text |
 | `caption` | `--font-size-sm` | `--font-weight-medium` | `--line-height-loose` | `--letter-spacing-wide` | Image captions, timestamps, metadata |
 | `label` | `--font-size-sm` | `--font-weight-medium` | `--line-height-normal` | `--letter-spacing-widest` | Buttons, tags, nav items, badges |
