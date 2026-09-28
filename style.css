@@ -939,6 +939,8 @@ pre code {
     --card-image-bg:        var(--color-background-subtle);
     --card-block-link-z:    1;
 
+    display: flex;
+    flex-direction: column;
     background-color: var(--card-bg);
     border: var(--border-width-thin) solid var(--card-border);
     border-radius: var(--card-radius);
@@ -967,8 +969,15 @@ pre code {
    including the image column where present (image carries no separate
    border of its own, so it inherits this same treatment automatically).
    Border follows the teal rule (bright on interaction, --color-interactive-hover);
-   the lift shadow is a fill, so it stays on the dark --color-accent-primary. */
-.card:hover {
+   the lift shadow is a fill, so it stays on the dark --color-accent-primary.
+   :focus-within gets the identical treatment — the only way to reach
+   .link-cta by keyboard is to focus it, and .link-cta itself sits above
+   .card-block-link with no border/background of its own (see .link-cta
+   below), so without this a keyboard user tabbing to the card's real link
+   would see no card-level highlight at all, only the sitewide focus ring
+   on the link text itself. */
+.card:hover,
+.card:focus-within {
     border-color: var(--color-interactive-hover);
     box-shadow: 0 var(--space-1) 0 var(--color-accent-primary);
 }
@@ -990,11 +999,18 @@ pre code {
     border-top-right-radius: var(--card-radius);
 }
 
+/* flex: 1 + column layout is what lets .card-content .link-cta (below)
+   pin itself to the card's bottom edge with margin-top: auto, regardless
+   of excerpt length — gap: 0 because every child now sets its own
+   margin-top instead (title has none; date/tags/excerpt/link-cta each
+   carry their own spacing), so two cards in the same row align their
+   links even when one excerpt runs longer than the other. */
 .card-content {
-    padding: var(--space-2);
+    padding: var(--space-4);
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    flex: 1;
+    gap: 0;
 }
 
 .card p {
@@ -1010,6 +1026,8 @@ pre code {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-3);
 }
 
 .card-tags {
@@ -1018,6 +1036,7 @@ pre code {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+    margin-top: var(--space-3);
 }
 
 /* Card-preview tags — plain, non-interactive teal text. Not the real
@@ -1151,10 +1170,25 @@ pre code {
 /* Sits above .card-block-link (z-index 1) so it stays the real,
    clickable/focusable link once the block-link is aria-hidden +
    tabindex=-1. Scoped to card usage only — .link-cta itself carries no
-   z-index so it can be reused outside a stacking-context card body. */
+   z-index so it can be reused outside a stacking-context card body.
+   margin-top: auto pins the link to .card-content's bottom edge (flex:1
+   column, above) regardless of excerpt length, so two cards in the same
+   row align their links even when one excerpt runs one line longer than
+   the other. Keeps .link-cta's own negative horizontal/bottom margins
+   (touch-target pattern, above) — only the top value changes from a
+   fixed negative offset to auto. */
 .card-content .link-cta {
     position: relative;
     z-index: 2;
+    margin: auto calc(var(--space-2) * -1) calc(var(--space-3) * -1);
+}
+
+/* Hover/keyboard-focus on the card highlights its own link text too —
+   .link-cta itself has no border/background, so without this a card-level
+   hover/focus-within (above) would leave the link looking unaffected. */
+.card:hover .card-content .link-cta,
+.card:focus-within .card-content .link-cta {
+    color: var(--color-link-hover);
 }
 
 /* Date row — Thought Entry cards only. Reuses the tag/meta text size
@@ -1165,6 +1199,7 @@ pre code {
     color: var(--color-text-secondary);
     line-height: var(--line-height-loose);
     max-width: none;
+    margin-top: var(--space-1);
 }
 
 /* Thought cards — no image, otherwise identical single-column content
@@ -3787,6 +3822,15 @@ footer p {
 .skeleton-line {
     height: var(--space-4);
     border-radius: var(--border-radius-sm);
+}
+
+/* .card-content dropped its own gap in favour of per-element margin-top
+   (2026-09-27 card spacing pass) — real content supplies that via
+   .card-date/.card-tags/.card-excerpt's own rules, but these placeholder
+   divs carry none of those classes, so without this they'd render as one
+   solid stacked block instead of four spaced lines. */
+.skeleton-line + .skeleton-line {
+    margin-top: var(--space-3);
 }
 
 .skeleton-line--title {
