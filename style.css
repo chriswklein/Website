@@ -3677,23 +3677,17 @@ footer p {
 
 /* ================================
    ARCHIVE PAGE
-   Layout rules specific to archive.html: the collapsed/empty sticky
-   header (filtering now happens via the floating action rail, not an
-   inline header), the visually-hidden page title, and the entry-count/
-   sort row above the results grid.
-================================ */
-/* No background/border at any breakpoint — blends into the page background,
-   no divider anywhere. The floating action rail is the one persistent
-   filter entry point now, so this header has no visible content left
-   beyond the sr-only title, and collapses to zero height rather than
-   showing empty padding-driven space. */
-.archive-sticky-header {
-    padding: 0;
-}
-
+   Layout rules specific to archive.html: main's own clearance override,
+   the visually-hidden page title, and the entry-count/sort row above the
+   results grid. The #archive-sticky-header/.archive-title-row wrapper
+   this section used to also cover was removed 2026-09-27 — the real h1
+   now lives as the first child of <main>'s own .container instead of a
+   separate landmark-less div, fixing an axe "region" finding (content
+   not contained by a landmark); filtering happens via the floating
+   action rail, not an inline header, so nothing else was lost. */
 /* All breakpoints — main's sitewide padding-top (breathing room below the
    nav) is redundant on this page everywhere, not just desktop. On desktop
-   the header's own padding/chips content owns that transition instead. On
+   the results grid's own top spacing owns that transition instead. On
    mobile/tablet, .archive-results' own padding-top (140px mobile, 76px
    tablet — see max-width: 1023px below) already fully accounts for
    whatever clearance isn't already free from document flow. Stacking
@@ -3701,13 +3695,11 @@ footer p {
    dead space above the first result card. Previously scoped to
    min-width: 1024px only, back when mobile/tablet still relied on main's
    padding-top for nav clearance; no longer true now that .archive-results
-   owns that clearance directly. */
-.archive-sticky-header ~ main {
+   owns that clearance directly. Previously an .archive-sticky-header ~ main
+   sibling-selector hook — replaced with a class directly on <main> once
+   that sibling element was removed. */
+.main--archive {
     padding-top: 0;
-}
-
-.archive-title-row {
-    margin-bottom: 0;
 }
 
 /* "Archive" h1 stays in the DOM (one h1 per page, real heading for screen
@@ -4181,11 +4173,6 @@ footer p {
     .archive-empty-message {
         font-size: var(--font-size-lg);
     }
-
-    /* .archive-sticky-header no longer needs its own margin-top for fixed-nav
-       clearance — it has no visible content on mobile now, so that job goes
-       back to main's own padding-top (restored to normal on mobile/tablet, see the
-       min-width: 1024px-scoped override above) — same as every other page. */
 
     .page-grid {
         padding: 0 var(--space-4);

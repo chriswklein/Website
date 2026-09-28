@@ -18,18 +18,6 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="nav-placeholder"></div>
 
-    <!-- Archive filter header — scrolls away with page -->
-    <div class="archive-sticky-header" id="archive-sticky-header">
-        <div class="container">
-
-            <!-- Title row -->
-            <div class="archive-title-row">
-                <h1 class="archive-title" id="archive-title">Archive</h1>
-            </div>
-
-        </div>
-    </div>
-
     <!-- Floating action rail group — fixed at the viewport edge; the one persistent
          filter entry point, visible at every scroll position, at all three breakpoints.
          External Clear only renders while a filter is active (see script.js render()),
@@ -101,7 +89,7 @@
                  +N-more collapse state of the full list below -->
             <div class="archive-active-chips" id="filter-drawer-active-chips"></div>
 
-            <!-- Row 3: Secondary tag chips, paginated 6 per page — same drawer,
+            <!-- Row 3: Secondary tag chips, paginated 12 per page — same drawer,
                  same pagination, at all three breakpoints now. Fixed min-height
                  on the page container keeps the drawer's size stable across
                  pages with different tag counts/label lengths, populated by
@@ -121,8 +109,10 @@
         </div>
     </div>
 
-    <main id="main-content">
+    <main id="main-content" class="main--archive">
         <div class="container">
+
+            <h1 class="archive-title" id="archive-title">Archive</h1>
 
             <!-- Visually-hidden heading closes the h1 -> h3 level-skip the results
                  grid's card titles would otherwise create (Home avoids this via its

@@ -859,7 +859,6 @@ function initFilterDrawer() {
     function getInertTargets() {
         return [
             document.querySelector('.skip-link'),
-            document.getElementById('archive-sticky-header'),
             document.querySelector('.action-rail-group'),
             document.getElementById('theme-toggle'),
             document.getElementById('main-content'),
