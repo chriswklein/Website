@@ -204,6 +204,20 @@
     --icon-size-sm: 0.875rem;
     --icon-size-md: 1rem;
     --icon-size-lg: 1.25rem;
+
+    /* ---- One Button Size (2026-09-27) ---- */
+    /* Every in-page button-like control (.btn, .back-to-top,
+       .action-rail-trigger, .archive-sort-toggle, .filter-drawer-page-btn,
+       .filter-drawer-trigger, .contact-icon-btn) shares this one height —
+       previously a mix of a hardcoded 44px, var(--touch-target-minimum)
+       as a min-height, and .contact-icon-btn's own unrelated 80px/64px.
+       Touch-target-square controls (.action-rail-clear, the image viewer
+       controls that reuse it, the mobile icon-only .action-rail-trigger)
+       are unaffected — they were already 44px squares. */
+    --button-height: var(--touch-target-minimum);
+    --button-padding-inline: var(--space-5);
+    --button-icon-size: var(--icon-size-lg);
+    --elevation-lift: 0 var(--space-1) 0 var(--color-accent-primary);
 }
 
 /* ================================
@@ -674,8 +688,10 @@ pre code {
     justify-content: center;
     gap: var(--space-2);
     width: 100%;
-    min-height: 44px;
-    padding: var(--space-3) var(--space-5);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     background-color: var(--btn-bg);
     border: var(--border-width-thin) solid var(--btn-border);
     border-radius: var(--border-radius-sm);
@@ -688,7 +704,8 @@ pre code {
     cursor: pointer;
     transition: background-color var(--duration-fast) var(--ease-out),
                 border-color var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
+                color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
 }
 
 /* hover: hover — scoped to genuine hover-capable pointers (mouse/trackpad).
@@ -764,7 +781,12 @@ pre code {
         --btn-bg-hover:     var(--color-background-surface);
         --btn-border-hover: var(--color-interactive-hover);
         --btn-text-hover:   var(--color-interactive-hover);
+        box-shadow: var(--elevation-lift);
     }
+}
+
+.btn--cta:focus-visible {
+    box-shadow: var(--elevation-lift);
 }
 
 /* Red = "this removes something." Applied to the controls that clear
@@ -969,7 +991,8 @@ pre code {
    including the image column where present (image carries no separate
    border of its own, so it inherits this same treatment automatically).
    Border follows the teal rule (bright on interaction, --color-interactive-hover);
-   the lift shadow is a fill, so it stays on the dark --color-accent-primary.
+   the lift shadow is a fill (--elevation-lift, :root), so it stays on the
+   dark --color-accent-primary — same token .btn--cta's own lift reuses.
    :focus-within gets the identical treatment — the only way to reach
    .link-cta by keyboard is to focus it, and .link-cta itself sits above
    .card-block-link with no border/background of its own (see .link-cta
@@ -979,7 +1002,7 @@ pre code {
 .card:hover,
 .card:focus-within {
     border-color: var(--color-interactive-hover);
-    box-shadow: 0 var(--space-1) 0 var(--color-accent-primary);
+    box-shadow: var(--elevation-lift);
 }
 
 .card-image {
@@ -1473,11 +1496,13 @@ pre code {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    height: 80px;
-    padding: 0 var(--space-5);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     background-color: var(--color-background-surface);
     border: var(--border-width-thin) solid var(--color-border-default);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--border-radius-sm);
     color: var(--color-text-primary);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
@@ -1488,8 +1513,8 @@ pre code {
 }
 
 .contact-icon-btn svg {
-    width: 36px;
-    height: 36px;
+    width: var(--button-icon-size);
+    height: var(--button-icon-size);
 }
 
 .contact-icon-btn:hover {
@@ -1534,8 +1559,10 @@ pre code {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 44px;
-    padding: var(--space-3) var(--space-5);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     background-color: var(--color-background-surface);
     border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--border-radius-sm);
@@ -3061,8 +3088,10 @@ footer p {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: var(--touch-target-minimum);
-    padding: var(--space-2) var(--space-4);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-wide);
@@ -3273,7 +3302,10 @@ footer p {
    two of them like the old two-button row did. */
 .filter-drawer-page-btn {
     flex-shrink: 0;
-    padding: var(--space-2) var(--space-4);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     font-family: inherit;
@@ -3283,7 +3315,6 @@ footer p {
     border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--border-radius-sm);
     cursor: pointer;
-    min-height: var(--touch-target-minimum);
     white-space: nowrap;
     text-align: center;
     transition: border-color var(--duration-fast) var(--ease-out),
@@ -3451,7 +3482,10 @@ footer p {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-3) var(--space-5);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-wide);
@@ -3461,7 +3495,6 @@ footer p {
     border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--border-radius-full);
     cursor: pointer;
-    min-height: var(--touch-target-minimum);
     box-shadow: var(--elevation-md);
     transition: border-color var(--duration-fast) var(--ease-out),
                 color var(--duration-fast) var(--ease-out);
@@ -3479,12 +3512,13 @@ footer p {
 
 /* Archive's Filter trigger (filter.svg) and the Entry-page Contents/ToC
    trigger (content.svg, script.js) both reuse .action-rail-trigger
-   verbatim (Rule 3a) — same shared icon class, same --icon-size-md token
-   Section 24/25's .link-inline-icon/.link-cta-icon already established
-   for "small icon beside text," not a new size. */
+   verbatim (Rule 3a) — same shared icon class. Sized to --button-icon-size
+   (2026-09-27 one-button-size pass) — previously --icon-size-md, matching
+   the smaller "icon beside text" size .link-inline-icon/.link-cta-icon
+   use; every in-page button's icon is now one size instead. */
 .action-rail-trigger-icon {
-    width: var(--icon-size-md);
-    height: var(--icon-size-md);
+    width: var(--button-icon-size);
+    height: var(--button-icon-size);
     flex-shrink: 0;
 }
 
@@ -3494,9 +3528,9 @@ footer p {
    JS, since .sr-only itself has no breakpoint variant and this only ever
    applies below 768px — the same real mobile tier .action-rail-group's
    own top: 70% override already uses (MOBILE section, below). Padding
-   drops from the pill shape's asymmetric var(--space-3) var(--space-5)
-   to equal var(--space-3) on all sides, and min-width matches
-   min-height's existing --touch-target-minimum — both existed only to
+   drops from the pill shape's asymmetric padding-inline var(--button-padding-inline)
+   to equal var(--space-3) on all sides, and min-width matches the base
+   rule's own --button-height — both existed only to
    accommodate/center wide text content that's no longer visible; without
    them the button reads as a lopsided pill instead of a compact
    icon-button square. */
@@ -3753,7 +3787,10 @@ footer p {
 }
 
 .archive-sort-toggle {
-    padding: var(--space-2) var(--space-4);
+    height: var(--button-height);
+    padding-block: 0;
+    padding-inline: var(--button-padding-inline);
+    line-height: var(--button-height);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     letter-spacing: var(--letter-spacing-wide);
@@ -3762,7 +3799,6 @@ footer p {
     border: var(--border-width-thin) solid var(--color-border-strong);
     border-radius: var(--border-radius-sm);
     cursor: pointer;
-    min-height: var(--touch-target-minimum);
     font-family: inherit;
     white-space: nowrap;
     flex-shrink: 0;
@@ -4220,12 +4256,8 @@ footer p {
         top: calc(70% - var(--touch-target-minimum) - var(--space-8));
     }
 
-    .contact-icon-btn {
-        height: 64px;
-    }
-
-    .contact-icon-btn svg {
-        width: 28px;
-        height: 28px;
-    }
+    /* .contact-icon-btn's own 80px/64px desktop/mobile split removed
+       2026-09-27 — it now shares --button-height (44px) and
+       --button-icon-size unconditionally, same as every other in-page
+       button, with no mobile override needed. */
 }
