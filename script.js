@@ -42,19 +42,23 @@ function loadComponent(placeholderId, file, callback) {
 }
 
 // Shared by setActiveNavLink() and setActiveTabBar() below, so the two
-// never drift out of sync on what "current page" means. Takes
-// window.location.pathname only — the query string is deliberately never
-// part of the comparison, so a filtered Archive URL (/archive.html?type=work)
-// still matches the plain /archive.html nav link. Every real nav/tab-bar
-// href on the site is already a canonical "/page.html" path (nav.html, the
-// per-page tab bar markup), so only the current page's own path needs
-// normalizing, not the links being compared against: "/" and "/index"
-// become "/index.html", a trailing slash is dropped, and a missing
-// extension gets ".html" appended — so /, /index, /archive, and /archive/
-// all resolve to the same form their real nav link's href already uses.
-function normalizeNavPath(pathname) {
-    if (pathname === '/' || pathname === '/index') return '/index.html';
-    let path = pathname;
+// never drift out of sync on what "current page" means. Called on BOTH
+// sides of the comparison — window.location.pathname AND each link's own
+// getAttribute('href') — never just one (fixed 2026-09-28: the source repo's
+// nav.html/tab-bar markup does hardcode canonical "/page.html" hrefs, but
+// Netlify's Pretty URLs post-processing rewrites the deployed HTML (including
+// nav.html, fetched client-side by loadComponent()) to extension-stripped
+// hrefs like "/", "/archive", "/about" — so a build that only normalized
+// window.location.pathname worked locally, against the repo's own raw hrefs,
+// but never matched anything on the deployed site). The query string is
+// deliberately never part of the comparison, so a filtered Archive URL
+// (/archive.html?type=work) still matches the plain /archive.html nav link.
+// "/" and "/index" become "/index.html", a trailing slash is dropped, and a
+// missing extension gets ".html" appended — so every combination of
+// "/", "/index", "/archive", "/archive/" (pathname or href, local or
+// deployed) resolves to the same canonical form.
+function normalizeNavPath(path) {
+    if (path === '/' || path === '/index') return '/index.html';
     if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
     if (!/\.[a-z0-9]+$/i.test(path)) path += '.html';
     return path;
@@ -65,7 +69,7 @@ function setActiveNavLink() {
     const currentPath = normalizeNavPath(window.location.pathname);
 
     document.querySelectorAll('.nav-links a').forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
+        if (normalizeNavPath(link.getAttribute('href')) === currentPath) {
             link.setAttribute('aria-current', 'page');
         } else {
             link.removeAttribute('aria-current');
@@ -78,7 +82,7 @@ function setActiveTabBar() {
     const currentPath = normalizeNavPath(window.location.pathname);
 
     document.querySelectorAll('.tab-bar-item').forEach(item => {
-        if (item.getAttribute('href') === currentPath) {
+        if (normalizeNavPath(item.getAttribute('href')) === currentPath) {
             item.setAttribute('aria-current', 'page');
         } else {
             item.removeAttribute('aria-current');

@@ -1,6 +1,6 @@
 # Personal Website — Project Reference Document
-**Version:** 1.6.1
-**Last Updated:** 2026-09-27
+**Version:** 1.6.2
+**Last Updated:** 2026-09-28
 **Status:** In Progress — Home page ready to build
 
 ---
@@ -744,6 +744,9 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
   - **Tag-chip dim path** — confirmed `.filter-drawer--tags-active .filter-drawer-secondary-page { display: none; }` hides the entire secondary tag grid the moment any secondary tag is active, so the grid's own Dim state (via the old `isDuplicateOfActiveRow`/`dimAsDuplicate` branch in `applyChipState()`) could never actually be seen. Simplified `applyChipState()` to drop that branch; the secondary-chip render loop in `initArchive()` now passes `anyActive: false` instead of computing a real value. `.tag-chip--dim` kept in `style.css`; primary type-chip (Work/Thoughts) dimming unchanged and reconfirmed via Playwright (activating Work still visibly dims Thoughts). `aria-pressed`, the × glyph, and `aria-label` behaviour reconfirmed unchanged (still driven by the real `isActive` value) — activating a secondary tag still correctly shows it as the sole Active chip in `#filter-drawer-active-chips` with `aria-label="Remove {Label} filter"`.
   - **Audited, not touched** (per instruction): the tooltip component (`.tooltip-wrapper`, `.tooltip`, the Escape-keydown handler in `script.js`) has exactly one real consumer, a `design-system.html` demo — no live page uses it. `.about-contact-links` has zero consumers anywhere. Both flagged for Chris to decide, not removed.
   - Verified via Playwright at mobile/tablet/desktop on Home, Archive (drawer open, Work activated + Thoughts confirmed dimmed, a secondary tag activated + grid confirmed hidden + active chip confirmed correct), About, and one entry: zero console errors on every page/breakpoint combination.
+
+**2026-09-28**
+- **Current-page indicator fixed for the deployed site.** The 2026-09-27 `normalizeNavPath()` fix (Part D) only normalized `window.location.pathname`, never `link.getAttribute('href')` — harmless locally, where the repo's own `nav.html`/tab-bar markup already hardcodes canonical `/page.html` hrefs, but broken on the deployed dev site: confirmed via direct fetch that Netlify's Pretty URLs post-processing rewrites the deployed HTML — including `/nav.html`, fetched client-side by `loadComponent()` — to extension-stripped, single-quoted hrefs (`href='/'`, `href='/archive'`, `href='/about'`), which never matched the normalized pathname, so `aria-current` was never set anywhere on the live site. Fix: `normalizeNavPath()` now runs on both sides of every comparison in `setActiveNavLink()`/`setActiveTabBar()`. Verified locally (`127.0.0.1:5500`, both `/` and `/index.html`, `/archive.html?type=work`, desktop header and mobile tab bar) and against the full pathname × href matrix (`/`, `/index`, `/index.html`, `/archive`, `/archive/`, `/archive.html`, `/about`, `/about.html`, in every combination) resolving to one of three canonical forms regardless of side, plus a real entry-page pathname correctly matching none of them.
 
 ---
 
