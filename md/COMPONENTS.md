@@ -1,6 +1,6 @@
 # Design System — Component Specifications
-**Version:** 2.3.1
-**Last Updated:** 2026-09-27
+**Version:** 2.3.2
+**Last Updated:** 2026-09-29
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -1206,7 +1206,7 @@ Block — always wrapped in `.code-wrap` (added 2026-09-03, see below):
 
 **Every block `<pre><code>` must be wrapped in `<div class="code-wrap">`.** `.code-wrap { overflow-x: auto; margin: var(--space-6) 0; }` (`style.css`) — a plain scroll container, no visual styling of its own. `pre` itself also keeps its own `overflow-x: auto` as a defensive fallback, but `.code-wrap` is the reliable fix; do not rely on `pre`'s own overflow alone.
 
-**Why this exists:** a long, unbroken code line (`white-space: pre` — never wrapped; wrapping code text would break formatting/readability, the wrong tradeoff here) can render wider than its container. Without a dedicated scroll container, this silently expanded `window.innerWidth` on a narrow screen instead of producing a scrollbar — confirmed via testing 2026-09-03, the same root mechanism as `.table-wrap` (`## 3. Card`'s sibling table-overflow fix, same date). Never use `white-space: pre-wrap` or `word-break` to force-wrap code text to avoid this — horizontal scroll is the correct pattern for code, same as it is for wide tables.
+**Why this exists:** a long, unbroken code line (`white-space: pre` — never wrapped; wrapping code text would break formatting/readability, the wrong tradeoff here) can render wider than its container. Without a dedicated scroll container, this silently expanded `window.innerWidth` on a narrow screen instead of producing a scrollbar — confirmed via testing 2026-09-03, the same root mechanism as `.table-wrap` (`## 14. Standard Page Template`'s "In-body tables" note, same date). Never use `white-space: pre-wrap` or `word-break` to force-wrap code text to avoid this — horizontal scroll is the correct pattern for code, same as it is for wide tables.
 
 This is currently the only code block on the site (`design-system.html` Section 13) — no Work or Thoughts entry currently contains one — but any future code block, anywhere, must use this wrapper from the start rather than being discovered as a bug later.
 
@@ -1355,7 +1355,7 @@ The standard page template provides a consistent reading experience for all long
   [ ul/ol lists, blockquote, code blocks as needed ]
   [ figure > img + figcaption — captioned in-body image, loading="lazy" ]
   [ img — bare, uncaptioned in-body image, loading="lazy" ]
-  [ table — 65ch reading column, scrolls via overflow-x on narrow viewports ]
+  [ div.table-wrap[role="region"][tabindex="0"][aria-label] > table — 65ch reading column, scrolls horizontally on narrow viewports, keyboard-reachable ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-footer — unchanged by the 2026-09-25 revision, still centred ]
   [ .standard-page-footer-actions ]
@@ -1421,12 +1421,26 @@ rest; shown on `:hover` and on `:focus-visible`; always shown under
 `@media (hover: none)`, since touch has no hover. The fade uses
 `--duration-fast` / `--ease-out`, covered by the sitewide reduced-motion rule.
 
-**In-body tables (2026-08-18):** `.standard-page-content table` caps at the
-same 65ch reading column as everything else in body content (a per-instance
-call to override if a specific table genuinely needs more columns) and
-scrolls horizontally (`overflow-x: auto` directly on the table, the same
-approach `pre` already uses for wide content, rather than an extra wrapper
-element) instead of trying to reflow columns on narrow viewports. `th` reuses
+**In-body tables (2026-08-18, wrapper accessibility fixed 2026-09-29):** every
+table in body content is wrapped in `<div class="table-wrap" role="region"
+tabindex="0" aria-label="{descriptive label}, scrollable horizontally">` —
+this section previously (incorrectly) documented `overflow-x: auto` as living
+directly on the table with no wrapper; the real, live markup has always used
+`.table-wrap` as a separate scroll container (`style.css`: `.table-wrap {
+overflow-x: auto; }`, plus `.standard-page-content .table-wrap` for the 65ch
+cap — a per-instance `max-width` override if a specific table genuinely needs
+more columns). `role="region"` + `tabindex="0"` + `aria-label` together are
+required, not any one alone: a `tabindex="0"` div is what makes the scrollable
+region keyboard-reachable at all (WCAG 2.1.1 — otherwise a keyboard user has
+no way to trigger the horizontal scroll), but `aria-label` on a plain `<div>`
+with no ARIA role is not well-supported by assistive tech (confirmed via
+axe-core's `aria-prohibited-attr` check) — `role="region"` is what makes the
+label valid. The sitewide `:focus-visible` ring covers `.table-wrap`
+automatically (no ancestor `overflow: hidden` clips it) — confirmed via
+direct focus + screenshot, 2026-09-29. **Every future table must use this
+exact wrapper from the start** — same convention as `.code-wrap` above, and
+the same category of bug (a missing wrapper/attribute discovered as an axe
+finding rather than built in from day one). `th` reuses
 `.standard-page-details-label`'s exact label treatment (size/weight/color) by
 value, not by selector reference. `td` matches body paragraph text. Row separators use
 the sitewide thin-border convention, with the last row's border removed the
