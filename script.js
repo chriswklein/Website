@@ -320,23 +320,15 @@ function initTocRail() {
 
     const main = document.getElementById('main-content');
 
-    // A keyboard user tabbing from the top of the page otherwise has to
-    // pass through every heading link in the panel (inserted right before
-    // <main>, below) before ever reaching real page content.
-    // This link — reusing the sitewide .skip-link pattern verbatim
-    // (style.css, "ACCESSIBILITY UTILITIES"), not a new one — jumps past
-    // that list straight to headings[0]: the first heading the ToC itself
-    // links to, not the page's own h1 title, since bypassing "the ToC"
-    // means landing in the body content it indexes. tabindex="-1" makes
-    // that one heading a valid fragment-focus target without adding it
-    // to the normal Tab sequence — the ToC's real heading rows deliberately
-    // stay non-tab-stops, only their <a> rows are (see anatomy above);
-    // this doesn't change that.
-    headings[0].setAttribute('tabindex', '-1');
-    const tocSkipLink = document.createElement('a');
-    tocSkipLink.className = 'skip-link';
-    tocSkipLink.href = `#${headings[0].id}`;
-    tocSkipLink.textContent = 'Skip Table of Contents';
+    // No "Skip Table of Contents" link (removed 2026-09-29) — that skip link
+    // was built for the always-visible desktop rail removed 2026-09-18,
+    // when every heading link in the rail sat in the Tab sequence before
+    // real page content. The panel this section builds below is `hidden`
+    // until the trigger opens it, so its heading links were never real Tab
+    // stops to begin with — the only thing between here and <main> is the
+    // Contents trigger itself, a single stop with no list to skip past.
+    // Also removed the headings[0] tabindex="-1" that existed only as that
+    // link's fragment-focus target.
 
     // content.svg icon markup, shared by the trigger button below and the
     // panel's own label further down — decorative (the adjacent text
@@ -409,7 +401,6 @@ function initTocRail() {
     trigger.append(triggerLabel, badge);
     triggerGroup.appendChild(trigger);
     document.body.insertBefore(triggerGroup, main);
-    document.body.insertBefore(tocSkipLink, triggerGroup);
 
     // Same scroll-threshold value as .back-to-top's own (initBackToTop()
     // above) — not approximated.
