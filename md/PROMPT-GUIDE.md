@@ -1,6 +1,6 @@
 # Prompt Guide — Claude Code Session Rules
-**Version:** 1.2.0
-**Last Updated:** 2026-08-21
+**Version:** 1.3.0
+**Last Updated:** 2026-09-27
 **Purpose:** Defines which resources to load and which tools to use for each task type. Follow this document at the start of every session to avoid loading unnecessary context and consuming excess tokens.
  
 ---
@@ -100,6 +100,7 @@ After completing all tasks, run these checks before reporting completion:
 - Confirm any element resembling an existing site pattern (tags, buttons, card text, etc.) reuses that pattern's actual class/size rather than a new parallel value — see Rule 3a
 - Confirm the change was applied consistently across all breakpoints the decision covers per Rule 5a (all three by default, unless explicitly scoped narrower) — not just the breakpoint that happened to be top of mind
 - When a browser-automation tool (Playwright/Chrome) is available, use it to confirm the rendered result at mobile, tablet, and desktop widths — do not rely on static code/CSS review alone when a rendering check is possible. If no such tool is available in the session, say so explicitly in the completion report rather than reporting full verification.
+- If the change touches colour tokens, backgrounds, borders, or interactive-state selectors, complete Rule 6a's state-coverage and token-blast-radius checks and include the contrast table in the report — do not consider verification complete without it.
 
 **Report file changes concisely.**
 What changed: file(s) and the specific rule/element.
@@ -108,6 +109,20 @@ Why: root cause or reason, only if non-obvious.
 Learned: only if something generalizes beyond this task.
 Skip: reassurance language, restating the TLDR, narrating each verification step performed. State the result, not the process of getting there. If a judgment call was made, one line: what was decided and why — no framing paragraph.
  
+---
+
+## Rule 6a — Contrast Verification for Colour/Token/State Changes (added 9/27)
+
+Whenever a change touches colour tokens, backgrounds, borders, or interactive-state selectors, Rule 6's verification pass must also include:
+
+1. **State coverage** — verify contrast in every state the affected element actually has: resting, `:hover`, `:focus-visible`, `:active`, plus any component-specific states (selected, dimmed, pressed, etc.). Thresholds: 4.5:1 for normal text, 3:1 for large text, 3:1 for non-text UI and focus indicators against their adjacent colours. Compute the ratio from the actual token values in every state — axe-core only evaluates the resting state, so a clean axe run does not satisfy this check on its own. When a browser-automation tool (Playwright/Chrome) is available, also force each state and confirm the computed colours match; if no browser tool is available in the session, say so explicitly in the report rather than reporting full state coverage.
+
+2. **Token blast radius** — when any token's value changes, grep every `var(--token-name)` consumer in `style.css`, list each CSS property it feeds (`color`, `background`, `border`, `outline`, `fill`, etc.), and check each usage against the minimum contrast for *that property's actual role* — not the role implied by the token's name. A token named for one purpose (e.g. a border token) can be reused elsewhere as a background or text fill, and that usage carries its own contrast requirement regardless of what the name suggests.
+
+The completion report must include a contrast table with these columns: **element, state, foreground, background, ratio, required, pass/fail.**
+
+This rule exists because of a concrete case: a `.btn:hover` contrast regression passed axe-core cleanly, because axe only evaluates an element's resting state and never exercised the hover state where the failure actually lived. Separately, `--color-border-default` was found feeding a `background-color` in one of its consumers, not only borders as its name implied — the state-coverage gap and the name-vs-role gap were two independent ways a colour change had passed review looking clean.
+
 ---
  
 ## Rule 7 — Commit Messages

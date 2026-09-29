@@ -1,6 +1,6 @@
 # Design System — Component Specifications
-**Version:** 2.2.1
-**Last Updated:** 2026-09-24
+**Version:** 2.3.1
+**Last Updated:** 2026-09-27
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -80,8 +80,8 @@ Buttons are the primary interactive call-to-action element. They communicate the
 
 ```css
 --btn-bg:               var(--color-background-subtle);
---btn-bg-hover:         var(--color-border-strong);
---btn-bg-active:        var(--color-border-default);
+--btn-bg-hover:         var(--color-background-hover);
+--btn-bg-active:        var(--color-background-active);
 --btn-border:           var(--color-border-strong);
 --btn-border-hover:     var(--color-interactive-hover);
 --btn-border-focus:     var(--color-interactive-focus);
@@ -102,6 +102,8 @@ Buttons are the primary interactive call-to-action element. They communicate the
 --btn-ghost-border:     var(--color-border-strong);
 --btn-ghost-text:       var(--color-text-primary);
 ```
+
+**One button size (2026-09-27):** every in-page button-like control — not just `.btn` — now shares three global `:root` tokens instead of each defining its own height/padding/icon-size: `--button-height` (`var(--touch-target-minimum)`, 44px), `--button-padding-inline` (`var(--space-5)`), `--button-icon-size` (`var(--icon-size-lg)`, 20px — the first real consumer of `--icon-size-lg`). `.btn`, `.back-to-top`, `.action-rail-trigger`, `.archive-sort-toggle`, `.filter-drawer-page-btn`, `.filter-drawer-trigger`, and `.contact-icon-btn` all set `height: var(--button-height); padding-block: 0; padding-inline: var(--button-padding-inline); line-height: var(--button-height)` — replacing a mix of a hardcoded `44px`, `min-height: var(--touch-target-minimum)`, and `.contact-icon-btn`'s own unrelated 80px desktop / 64px mobile split (now one size at every breakpoint). Touch-target-square controls (`.action-rail-clear`, the image viewer controls that reuse it, the mobile icon-only `.action-rail-trigger`) are unaffected — they were already 44px squares and aren't in this list. `--elevation-lift` (`0 var(--space-1) 0 var(--color-accent-primary)`, md/DESIGN-SYSTEM.md §7) is the shared "pressed/lifted" shadow: `.card:hover`/`:focus-within` and `.btn--cta:hover`/`:focus-visible` both use it.
 
 ### Anatomy
 
@@ -138,7 +140,7 @@ Disabled: add `disabled` attribute on `<button>`. Add `aria-disabled="true"` and
 
 ### Responsive Behaviour
 
-- Min height `44px` at all breakpoints — touch target requirement
+- Fixed `height: var(--button-height)` (44px) at all breakpoints, not `min-height` — see "One button size" above
 - Full width on mobile when used as primary CTA in a card: add `.btn--full` modifier
 
 ---
@@ -288,7 +290,7 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 | Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `bold` |
 | Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | `regular` |
 
-**What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`), or when a chip is a grid duplicate of a tag already shown Active in the selected-tags row (`isDuplicateOfActiveRow`). Both triggers apply to type chips (`.filter-drawer-primary-chips`) and tag chips (`#filter-drawer-chips`) alike — but only type-chip Dim is currently visible on screen: that row is never hidden, so selecting Work visibly dims Thoughts. Tag-chip Dim is computed and classed identically, but `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state, while correct, has no currently-reachable on-screen instance. The class and its styling are left in place, ready for a future layout that keeps the tag grid visible alongside active selections.
+**What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`). This only actually happens for type chips (`.filter-drawer-primary-chips`) — that row is never hidden, so selecting Work visibly dims Thoughts. Tag chips (`#filter-drawer-chips`) always pass `anyActive: false` (2026-09-27, simplified from an earlier `isDuplicateOfActiveRow` special case that computed a real Dim state for them) — `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state could never have been seen regardless of how it was computed. `.tag-chip--dim` itself is left in place in `style.css`, ready for a future layout that keeps the tag grid visible alongside active selections.
 
 ### Accessibility
 
@@ -308,7 +310,7 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 
 ### JavaScript API
 
-Chips are built and wired by `initArchive()` in `script.js`. Tag chips carry `data-filter-tag="{slug}"`; type chips carry `data-filter-type="work"` or `data-filter-type="thoughts"`. On every `render()` pass, each chip's classes/`aria-pressed`/`aria-label`/× indicator are computed by the shared `applyChipState(btn, { isActive, anyActive, isDuplicateOfActiveRow })` helper — the single source of truth for chip state, used for both the type-chip loop and the tag-chip loop (`isDuplicateOfActiveRow` is `true` for any chip inside `#filter-drawer-chips`, since every chip there is a grid copy of whatever the selected-tags row already shows for an active tag — see Design Intent above).
+Chips are built and wired by `initArchive()` in `script.js`. Tag chips carry `data-filter-tag="{slug}"`; type chips carry `data-filter-type="work"` or `data-filter-type="thoughts"`. On every `render()` pass, each chip's classes/`aria-pressed`/`aria-label`/× indicator are computed by the shared `applyChipState(btn, { isActive, anyActive })` helper — the single source of truth for chip state, used for both the type-chip loop and the tag-chip loop (the tag-chip loop always passes `anyActive: false` — see Design Intent above).
 
 Default chip:
 ```html
@@ -459,7 +461,7 @@ Three controls clear every active filter, all wired to the same `doReset()`:
 ### Type and Tag Chips
 
 - **Type chips** (`.filter-drawer-primary-chips`, `role="group"`, `aria-label="Filter by type"`): Work and Thoughts, exclusive — selecting one replaces the other, selecting the active one clears it. The Archive `<h1>` (visually hidden) updates to "Archive / Work" or "Archive / Thoughts".
-- **Tag chips** (`#filter-drawer-chips`): every unique tag from `data/archive-entries.json`, alphabetical, multi-select (an entry matches if it has any selected tag). Tags with no entries under the current type are removed from the grid. A selected tag appears in `#filter-drawer-active-chips` as an Active chip with a × and `aria-label="Remove {Label} filter"`; its copy in the grid renders Dim (`isDuplicateOfActiveRow`, see `## 2b. Tag-Chip`).
+- **Tag chips** (`#filter-drawer-chips`): every unique tag from `data/archive-entries.json`, alphabetical, multi-select (an entry matches if it has any selected tag). Tags with no entries under the current type are removed from the grid. A selected tag appears in `#filter-drawer-active-chips` as an Active chip with a × and `aria-label="Remove {Label} filter"`; the grid itself (including its copy of that tag) is hidden outright via `.filter-drawer--tags-active` whenever any secondary tag is active — see `## 2b. Tag-Chip`.
 
 ### Pagination
 
@@ -545,24 +547,29 @@ The image viewer belongs to Standard Pages, not the Archive; it is listed becaus
 **HTML Element:** `<article class="card card--{variant}">`
 
 ### Design Intent
-Cards are the primary content presentation unit. The entire card is clickable via the IxDF block link pattern — an absolutely positioned anchor (`card-block-link`) covers the full card for mouse users, while the CTA anchor (`card-cta`) is the sole keyboard-focusable element with a full, descriptive `aria-label`. This gives mouse users click-anywhere convenience and keyboard users a clean, descriptive tab stop.
+Cards are the primary content presentation unit. The entire card is clickable via the IxDF block link pattern — an absolutely positioned anchor (`.card-block-link`) covers the full card for mouse users, while `.link-cta` (`## 17`) is the sole keyboard-focusable element with a full, descriptive `aria-label`. This gives mouse users click-anywhere convenience and keyboard users a clean, descriptive tab stop.
+
+**Rewritten 2026-09-27** (this section previously described an older Figma-era anatomy — `.card-cta`, `.card-meta`, real `.tag` links inside cards, and a 768px+ horizontal image-left layout — none of which match the live site; corrected below against the real `style.css`/`script.js`).
 
 ### Variants
 
-| Variant | Modifier | Figma Style | Usage |
-|---|---|---|---|
-| Feature | `.card--feature` | `Style=Feature` | Work / portfolio cards on Home and Work index |
-| Thought | `.card--thought` | `Style=Thought` | Blog / writing entries on Home and Thoughts index |
+| Variant | Modifier | Usage |
+|---|---|---|
+| Feature | `.card--feature` | Work / portfolio cards on Home and the Archive |
+| Thought | `.card--thought` | Blog / writing entries on Home and the Archive — identical anatomy, `.card-image` never renders (`buildCard()` in `script.js` only builds it when `entry.type === 'work'`) |
 
-### Block Link Pattern (Feature and Thought variants only)
+Both variants share one vertical-stack layout at every breakpoint — there is no horizontal/image-left variant at any width.
 
-The `.card-block-link` is an absolutely positioned empty anchor that covers the full card. It is `aria-hidden="true"` and `tabindex="-1"` — invisible to assistive technology and not keyboard focusable. Mouse users click anywhere on the card to navigate. The `.card-cta` anchor sits above the block link (`z-index: 2`) and is the only keyboard-accessible interactive element. It carries the full descriptive `aria-label`.
+### Block Link Pattern
+
+The `.card-block-link` is an absolutely positioned empty anchor that covers the full card. It is `aria-hidden="true"` and `tabindex="-1"` — invisible to assistive technology and not keyboard focusable. Mouse users click anywhere on the card to navigate. `.link-cta` (`## 17`) sits above the block link (`z-index: 2` vs `1`) and is the only keyboard-accessible interactive element on the card. It carries the full descriptive `aria-label`.
 
 ```
-z-index stack (card has position: relative):
-  .card-cta            z-index: var(--card-cta-z)       ← keyboard focus lands here
-  .card-block-link     z-index: var(--card-block-link-z) ← intercepts mouse clicks on card body
-  card content         z-index: auto                     ← visible but not pointer-interactive
+z-index stack (.card has position: relative):
+  .card-content .link-cta   z-index: 2   ← keyboard focus lands here
+  .card-block-link          z-index: var(--card-block-link-z) (1) ← intercepts mouse clicks on card body
+  card content               z-index: auto ← visible but not pointer-interactive (.card-tags is the
+                                              one exception, z-index: 3 — tag links stay independently clickable)
 ```
 
 ### Component Tokens
@@ -570,35 +577,36 @@ z-index stack (card has position: relative):
 ```css
 --card-bg:              var(--color-background-surface);
 --card-border:          var(--color-border-default);
+--card-border-hover:    var(--color-border-strong);  /* defined but unused — .card:hover/:focus-within use --color-interactive-hover directly, see States below */
 --card-radius:          var(--border-radius-md);
+--card-padding:         var(--space-6);              /* defined but unused — the Profile variant that consumed it (.card--profile, .card-image-caption) was removed 2026-09-27, fully dead sitewide; .card-content sets its own padding directly, below */
 --card-image-bg:        var(--color-background-subtle);
---card-image-ratio:     16 / 9;
---card-transition:      var(--duration-base) var(--ease-out);
 --card-block-link-z:    1;
---card-cta-z:           2;
-
-/* Card CTA button — inherits from Button component tokens */
---card-cta-bg:          var(--btn-bg);
---card-cta-border:      var(--btn-border);
---card-cta-text:        var(--btn-text);
---card-cta-radius:      var(--btn-radius);
---card-cta-padding-x:   var(--btn-padding-x);
---card-cta-padding-y:   var(--btn-padding-y);
 ```
 
-`.card-content` padding is `var(--space-3) var(--space-6)` (12px top/bottom, 24px left/right) — set directly on `.card-content`, not via the `--card-padding` custom property (which still exists for `.card-image-caption`'s use in the Profile variant, unaffected by this).
+`.card-content` — `padding: var(--space-4)` (16px all sides), `display: flex; flex-direction: column; flex: 1; gap: 0` (2026-09-27: was `padding: var(--space-2)`/`gap: var(--space-2)` — each child now carries its own `margin-top` instead, so `.card-content .link-cta` can pin itself to the bottom independent of excerpt length; see Spacing below). `.card` itself is `display: flex; flex-direction: column` (2026-09-27, added so `.card-content`'s `flex: 1` has a flex container to fill when a CSS-grid row — `.card-row--two` — stretches the card taller than its own natural content).
 
-Feature-variant desktop/tablet horizontal layout uses `--card-image-column-width` (`42%`) — see §4.5 of `md/DESIGN-SYSTEM.md`, since it's a global `:root` token rather than scoped to `.card`.
+### Spacing (2026-09-27)
+
+| Element | margin-top | margin-bottom | Note |
+|---|---|---|---|
+| `h3.card-title` | — (first child) | — | |
+| `p.card-date` | `--space-1` | — | |
+| `.card-tags` | `--space-3` | — | |
+| `p.card-excerpt` | `--space-3` | `--space-3` | |
+| `.card-content .link-cta` | `auto` | `calc(var(--space-3) * -1)` | pins to the bottom of `.card-content`'s flex column — two cards in the same grid row align their links even when one excerpt is shorter; horizontal margins stay the base `.link-cta` touch-target negative offset (`calc(var(--space-2) * -1)`), only the top value changes from a fixed negative offset to `auto` |
+
+The Archive loading skeleton (`buildSkeletonCard()`, `script.js`) renders bare `.skeleton-line` divs with none of the classes above, so it needs its own compensating rule: `.skeleton-line + .skeleton-line { margin-top: var(--space-3); }` (style.css), keeping the four placeholder bars visually spaced now that `.card-content` itself supplies no gap.
 
 ### States
 
-| State | Card Border | Card Background | Box Shadow | Transition |
-|---|---|---|---|---|
-| Default | `--card-border` | `--card-bg` | none | — |
-| Hover | `var(--color-accent-primary-text)` (teal) | `--card-bg` | `0 var(--space-1) 0 var(--color-accent-primary)` — solid, non-blurred | `--card-transition` |
-| Focus (keyboard) | Focus ring on `.card-cta` | `--card-bg` | none | Focus ring appears |
+| State | Card Border | Box Shadow | Link (`.card-content .link-cta`) Colour |
+|---|---|---|---|
+| Default | `--card-border` | none | `--color-link` |
+| Hover | `--color-interactive-hover` (teal) | `--elevation-lift` (`0 var(--space-1) 0 var(--color-accent-primary)`, `## 1`) — solid, non-blurred | `--color-link-hover` |
+| `:focus-within` (keyboard focus on `.link-cta`) | `--color-interactive-hover` — identical to hover | `--elevation-lift` — identical to hover | `--color-link-hover` |
 
-Hover applies to the whole card — including the image column on Feature cards at tablet/desktop width. The image has no border of its own; it's flush against the card's inner edge, so it's already visually wrapped by the same border with no separate rule needed.
+**Card/link hover coupling (2026-09-27):** `.card:hover` and `.card:focus-within` share one rule, and each also drives `.card-content .link-cta`'s own colour (`.card:hover .card-content .link-cta, .card:focus-within .card-content .link-cta { color: var(--color-link-hover); }`). `.link-cta` itself carries no border or background, so without `:focus-within` a keyboard user tabbing to the card's real link would see no card-level highlight at all — only the sitewide focus ring on the link text. Hover applies to the whole card, including the image column on Feature cards (the image carries no border of its own; it sits flush against the card's inner edge, already visually wrapped by the same border).
 
 ---
 
@@ -607,7 +615,7 @@ Hover applies to the whole card — including the image column on Feature cards 
 **CSS Class:** `.card.card--feature`
 **Usage:** Work / portfolio cards
 
-Content order (both Feature and Thought): **Title → Tags → Meta → Excerpt → CTA**. This was reordered from the earlier Title → Excerpt → Tags → Meta → CTA — validated in a card-layout comparison scratch file (`card-variants-preview.html`, since removed) before being promoted into this live component. See design-system.html Section 14 for the current live markup.
+Content order (both Feature and Thought): **Title → Date → Tags → Excerpt → Link**. Built by `buildCard()` in `script.js` for every Archive card; Home's two Featured Work cards are hand-written in `index.html` matching this markup exactly (Rule 3a).
 
 #### Anatomy
 
@@ -616,25 +624,28 @@ Content order (both Feature and Thought): **Title → Tags → Meta → Excerpt 
 [ .card-image — 16:9 decorative background, no fixed height ]
 [ .card-content ]
   [ h3.card-title ]
+  [ p.card-date ]
   [ .card-tags ]
-    [ .tag ]
-  [ p.card-meta — {date} · {author} ]
+    [ span.card-tag — plain, non-interactive, comma-separated ]
   [ p.card-excerpt — 2-line clamp, full text in DOM ]
-  [ a.card-cta ]
+  [ a.link-cta ]
 ```
 
 ```html
 <article class="card card--feature">
-    <a href="{url}" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
-    <div class="card-image" role="presentation"></div>
+    <a href="{url}" class="card-block-link" aria-label="View {Title}" aria-hidden="true" tabindex="-1"></a>
+    <div class="card-image" role="presentation" style="background-image: url('{image}');"></div>
     <div class="card-content">
         <h3 class="card-title">{Title}</h3>
+        <p class="card-date">{date}</p>
         <div class="card-tags">
-            <a href="/archive.html?tag={slug}" class="tag">{Tag}</a>
+            <span class="card-tag">{Tag}, {Tag}, {Tag}</span>
         </div>
-        <p class="card-meta">{date} · {author}</p>
-        <p class="card-excerpt">{Description}</p>
-        <a href="{url}" class="card-cta" aria-label="{Title} — view this project">View</a>
+        <p class="card-excerpt">{Excerpt}</p>
+        <a href="{url}" class="link-cta" aria-label="{Title} — View this work">
+            View this work
+            <svg class="link-cta-icon" aria-hidden="true" focusable="false">...</svg>
+        </a>
     </div>
 </article>
 ```
@@ -643,20 +654,15 @@ Content order (both Feature and Thought): **Title → Tags → Meta → Excerpt 
 
 - `<article>` announces as a landmark to screen readers
 - `.card-block-link` is `aria-hidden="true"` and `tabindex="-1"` — skipped entirely by keyboard and AT; it's a sibling of `.card-content`, never a wrapper around it
-- `.card-cta` is the sole focusable element (besides tags) — carries full `aria-label`
-- Tags are real `<a href="/archive.html?tag={slug}">` links — no `aria-hidden`, no `tabindex` override — independently focusable and clickable, verified via real Tab-key navigation and hit-testing
-- Screen reader output: "Article. {Title}, heading level 3. {Tag}, link. ... View, link." (CTA aria-label: "{Title} — view this project")
+- `.link-cta` is the sole focusable element — carries full `aria-label` (`## 17`)
+- `.card-tag` is a plain, non-interactive `<span>` — not a real `.tag` link (`## 2`); this is a separate class specifically so entry-page/Archive-filter tags (real links) keep their own styling and behaviour distinct from a card's decorative tag summary
+- Screen reader output: "Article. {Title}, heading level 3. {date}. {Tags}. {Excerpt}. {Title} — View this work, link."
 - Image: CSS background — no alt text needed
 - `.card-excerpt` visually clamps to 2 lines (`-webkit-line-clamp: 2`) but the full text remains in the DOM and is exposed in the accessibility tree — confirmed via a real accessibility-tree snapshot, not just source inspection
 
 #### Responsive Behaviour
 
-| Breakpoint | Layout | Image | Content |
-|---|---|---|---|
-| Below 768px | Stacked (default block flow — no extra CSS needed) | Full width, `aspect-ratio: 16/9` | Below image |
-| 768px and above (tablet + desktop) | `display: flex; flex-direction: row` | Left column, `width: var(--card-image-column-width)` (42%), `aspect-ratio: auto` | `flex: 1`, right of image |
-
-The image has no fixed height at either breakpoint. At 768px+, `align-items: stretch` on `.card--feature` makes the image match whatever height `.card-content` naturally reaches for its real text — verified against both a long-excerpt and a short-excerpt real entry, image height matched content height exactly (0px difference) in both cases. The card itself never exceeds the page's existing content-column width, since it fills its parent grid cell (`.card-row`, `.container`), which is already `max-width`-capped.
+One vertical-stack layout at every breakpoint — image full-width (`aspect-ratio: 16/9`) above `.card-content`, no horizontal/image-left variant at any width. `.card-row--two` (tablet/desktop, two cards per row) collapses to one column below 1024px.
 
 ---
 
@@ -665,7 +671,7 @@ The image has no fixed height at either breakpoint. At 768px+, `align-items: str
 **CSS Class:** `.card.card--thought`
 **Usage:** Blog / writing entries. No thumbnail image — content only, at every breakpoint.
 
-Same content order, padding, and hover treatment as Feature — see above. `.card--thought .card-image { display: none; }` remains as a safety net, but in practice no `.card-image` element is ever rendered for Thought entries (`buildCard()` only builds the image div when `entry.type === 'work'`), so the horizontal-layout media query (scoped to `.card--feature`) never applies here regardless of viewport width.
+Same content order, padding, and hover treatment as Feature — see above. `.card--thought .card-image { display: none; }` remains as a safety net, but in practice no `.card-image` element is ever rendered for Thought entries (`buildCard()` only builds the image div when `entry.type === 'work'`).
 
 #### Anatomy
 
@@ -673,32 +679,35 @@ Same content order, padding, and hover treatment as Feature — see above. `.car
 [ .card-block-link — empty, aria-hidden, tabindex=-1 ]
 [ .card-content ]
   [ h3.card-title ]
+  [ p.card-date ]
   [ .card-tags ]
-    [ .tag ]
-  [ p.card-meta — Published {date} · {author} ]
+    [ span.card-tag ]
   [ p.card-excerpt — 2-line clamp, full text in DOM ]
-  [ a.card-cta ]
+  [ a.link-cta ]
 ```
 
 ```html
 <article class="card card--thought">
-    <a href="{url}" class="card-block-link" aria-hidden="true" tabindex="-1"></a>
+    <a href="{url}" class="card-block-link" aria-label="Read {Title}" aria-hidden="true" tabindex="-1"></a>
     <div class="card-content">
         <h3 class="card-title">{Title}</h3>
+        <p class="card-date">{date}</p>
         <div class="card-tags">
-            <a href="/archive.html?tag={slug}" class="tag">{Tag}</a>
+            <span class="card-tag">{Tag}, {Tag}</span>
         </div>
-        <p class="card-meta">Published {date} · {author}</p>
-        <p class="card-excerpt">{Summary}</p>
-        <a href="{url}" class="card-cta" aria-label="{Title} — read this thought">Read</a>
+        <p class="card-excerpt">{Excerpt}</p>
+        <a href="{url}" class="link-cta" aria-label="{Title} — View this thought">
+            View this thought
+            <svg class="link-cta-icon" aria-hidden="true" focusable="false">...</svg>
+        </a>
     </div>
 </article>
 ```
 
 #### Accessibility
 
-- `.card-cta` `aria-label` action: "read this thought"
-- Screen reader output: "Article. {Title}, heading level 3. ... Read, link." (with aria-label: "{Title} — read this thought")
+- `.link-cta`'s visible label and `aria-label` action are both "View this thought" — the invisible `.card-block-link`'s own `aria-label` is the only place "Read {Title}" appears (matches REFERENCE.md's link-label standard: short visible label + full context in the accessible name)
+- Screen reader output: "Article. {Title}, heading level 3. ... {Title} — View this thought, link."
 - Same tag/excerpt accessibility notes as Feature, above
 
 ---
@@ -744,26 +753,28 @@ The desktop nav is the persistent wayfinding element. Logo/name is centred above
 - Each link: `<li><a href="{page}.html">{Label}</a></li>`
 - Active link: `aria-current="page"` set dynamically via `script.js` after nav injection
 
-### Active State
+### Active State (updated 2026-09-27)
 
-Active nav link:
-- Text colour: `--nav-link-active` (white)
-- Text decoration: underline, `2px` offset
-- Set via: `[aria-current="page"]` CSS selector
+Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thicker, teal underline, not just a lighter grey text colour:
+- Text colour: `--color-text-primary`
+- Text decoration: `underline`, `text-decoration-thickness: var(--border-width-medium)` (2px), `text-underline-offset: var(--space-1)` (4px), `text-decoration-color: var(--color-accent-primary-text)`
+- Set via: `[aria-current="page"]` CSS selector, matching `.tab-bar-item`'s own current-page treatment exactly (Rule 3a, `## 5` below)
+
+`setActiveNavLink()`/`setActiveTabBar()` (`script.js`) both call a shared `normalizeNavPath()` helper (fixed 2026-09-27) that compares `pathname` only (ignoring the query string) and normalises `/`/`/index` to `/index.html`, drops a trailing slash, and adds a missing `.html` extension — so a filtered Archive URL (`/archive.html?type=work`), an extensionless URL (`/archive`), and a trailing-slash URL (`/archive/`) all still correctly mark the Archive link current. Entry pages (`/entries/...`) never match any nav link, so nothing is marked current there.
 
 ### States
 
 | State | Colour | Decoration |
 |---|---|---|
 | Default | `--nav-link-color` | None |
-| Hover | `--nav-link-hover` | None |
-| Focus | `--nav-link-hover` | Focus ring |
-| Active (current page) | `--nav-link-active` | Underline |
+| Hover / Focus | `--color-interactive-hover` (2026-09-27 — was `--nav-link-hover`/`--color-text-primary`) | None |
+| Active (current page) | `--color-text-primary` | Underline — see Active State above |
 
 ### Accessibility
 
 - `aria-label="Main navigation"` on `<nav>`
-- `aria-current="page"` on the active link — set by `script.js`
+- `aria-current="page"` on the active link — set by `script.js`, fixed 2026-09-27 to match filtered/extensionless/trailing-slash URLs (see Active State above)
+- Current page is marked by colour **and** a distinct underline treatment, not colour alone (WCAG 1.4.1) — see Active State above
 - Skip link before nav: `<a href="#main-content" class="skip-link">Skip to main content</a>`
 
 ### Responsive Behaviour
@@ -831,20 +842,21 @@ Each item: `<a href="{page}.html" class="tab-bar-item">`
 Icon: `<i class="ti ti-{name}" aria-hidden="true"></i>`
 Label: `<span>{Label}</span>`
 
-Active item: `.tab-bar-item.is-active` or `[aria-current="page"]`
+Active item: `[aria-current="page"]` only — `.tab-bar-item.is-active` was removed 2026-09-27 (nothing in `script.js` ever set that class; `setActiveTabBar()` only ever sets `aria-current="page"`).
 
 ### States
 
-| State | Colour |
-|---|---|
-| Default | `--tab-bar-item-color` |
-| Active | `--tab-bar-item-active` |
-| Focus | Focus ring |
+| State | Colour | Decoration |
+|---|---|---|
+| Default | `--tab-bar-item-color` | None |
+| Hover / Focus | `--color-interactive-hover` (2026-09-27 — previously no explicit hover/focus rule existed at all) | None |
+| Active (current page) | `--color-text-primary` | Underline, `text-decoration-thickness: var(--border-width-medium)`, `text-underline-offset: var(--space-1)`, `text-decoration-color: var(--color-accent-primary-text)` — matches `.nav-links a[aria-current]`'s own treatment exactly (`## 4`, Rule 3a). Previously colour-only, an WCAG 1.4.1 gap fixed 2026-09-27 |
 
 ### Accessibility
 
 - `aria-label="Mobile navigation"` on `<nav>`
-- `aria-current="page"` on active item
+- `aria-current="page"` on active item — fixed 2026-09-27 to match filtered/extensionless/trailing-slash URLs too (see `## 4`'s Active State note — `setActiveNavLink()`/`setActiveTabBar()` share one `normalizeNavPath()` helper)
+- Current page marked by colour **and** underline, not colour alone (WCAG 1.4.1) — see States above
 - Icons: `aria-hidden="true"` — label provides the text
 - Min touch target: `44px` width and height per item
 
@@ -1004,7 +1016,7 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 --breadcrumb-font-size:         var(--font-size-sm);
 --breadcrumb-color:             var(--color-text-secondary);
 --breadcrumb-link-color:        var(--color-text-secondary);
---breadcrumb-link-hover:        var(--color-text-primary);
+--breadcrumb-link-hover:        var(--color-interactive-hover); /* 2026-09-27 — was --color-text-primary */
 --breadcrumb-current-color:     var(--color-text-primary);
 --breadcrumb-separator-color:   var(--color-text-secondary);
 --breadcrumb-gap:               var(--space-2);
@@ -1014,19 +1026,15 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 ### Anatomy
 
 ```
-[ Work ] [ › ] [ Page Title ]
+[ Archive ] [ › ] [ Work ] [ › ] [ Page Title ]
 ```
 
-Two segments only (Primary Tag, current page) — the Month/Year segment
-formerly between them was removed 2026-08-17 (duplicated the Primary Tag's
-own destination and caused the title/caption overlap fixed in the same
-pass). The Primary Tag link already covers "browse this section" via
-`/archive.html?type={work|thoughts}`; no separate Archive crumb is added.
+**Restructured 2026-09-27 to three segments** (Archive, Work/Thoughts, current page) — supersedes the 2026-08-17 two-segment version this section previously described. Archive links to `/archive.html`; Work/Thoughts links to `/archive.html?type={work|thoughts}` as before.
 
 - Wrapper: `<nav aria-label="Breadcrumb">`
 - List: `<ol class="breadcrumb-list">`
 - Each item: `<li class="breadcrumb-item">`
-- Links: `<a href="{url}">{Label}</a>`
+- Links: `<a href="{url}">{Label}</a>` — underlined at rest (`text-underline-offset: 2px`), not just on hover; rest colour unchanged, hover `var(--color-interactive-hover)` (2026-09-27 — was `--color-text-primary`)
 - Current page: `<span aria-current="page">{Title}</span>` — not a link
 - Separator: `<span aria-hidden="true" class="breadcrumb-separator">›</span>` — between items, hidden from screen readers
 
@@ -1035,7 +1043,7 @@ pass). The Primary Tag link already covers "browse this section" via
 - `aria-label="Breadcrumb"` on `<nav>` — distinguishes from main nav
 - `aria-current="page"` on the last item — current page is not a link
 - Separators: `aria-hidden="true"` — decorative only
-- Screen reader output: "Breadcrumb navigation. Work, link. Page Title, current page."
+- Screen reader output: "Breadcrumb navigation. Archive, link. Work, link. Page Title, current page."
 
 ### Responsive Behaviour
 
@@ -1948,7 +1956,9 @@ Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 - `font-style: normal` set explicitly, same reset rationale as `.link-inline`
 
 ### Touch-Target Padding
-`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. This is offset by an equal, negated `margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1)` so the added padding doesn't visually shift the link's position or widen the gap between it and the card excerpt above it — the padding grows the hit area only; the visible text stays exactly where it would sit with no padding at all.
+`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. This is offset by an equal, negated `margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1)` so the added padding doesn't visually shift the link's position — the padding grows the hit area only.
+
+**Card context override (2026-09-27):** `.card-content .link-cta` repoints the top value of that margin to `auto` — `margin: auto calc(var(--space-2) * -1) calc(var(--space-3) * -1)` — so the link pins itself to the bottom of `.card-content`'s flex column regardless of excerpt length (see `## 3` Card's Spacing section). Horizontal and bottom values are unchanged from the base rule above.
 
 ### States
 
@@ -1957,6 +1967,7 @@ Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 | Default | `--color-link` | underline |
 | Hover | `--color-link-hover` | underline |
 | Focus | `--color-link` | underline + sitewide `:focus-visible` ring (2px solid white, 3px offset) — `.link-cta` defines no focus override of its own |
+| Card hover / `:focus-within` (2026-09-27) | `--color-link-hover` | underline — driven by `.card:hover .card-content .link-cta`/`.card:focus-within .card-content .link-cta`, not `.link-cta:hover` alone, so focusing the link also highlights the whole card (`## 3`) |
 
 ### Accessibility
 
@@ -1965,6 +1976,7 @@ Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 - Icon: `aria-hidden="true" focusable="false"` — decorative
 - Focus ring: inherited from the sitewide `:focus-visible` rule — no component-level override
 - `.card-content .link-cta { position: relative; z-index: 2; }` keeps it above `.card-block-link` (`z-index: 1`) so it remains the real target for both mouse and keyboard, even though the block-link still visually covers the full card for mouse-anywhere convenience
+- Focusing `.link-cta` by keyboard also highlights the card itself (`:focus-within`, `## 3`) — without this, `.link-cta` has no border/background of its own, so a keyboard user would see only the sitewide focus ring with no card-level feedback
 
 ### Responsive Behaviour
 Same at all breakpoints — no responsive overrides defined.
@@ -1978,25 +1990,30 @@ Built and live on every card as of 2026-09-02: `index.html`'s Feature and Though
 
 Quick reference mapping every component token to its semantic source.
 
-Updated 2026-09-24 (reading comfort token update, Parts A–D) to current hex values.
+Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current-page indicator) — rows below marked 2026-09-27 changed value or were added this pass; everything else last updated 2026-09-24.
 
 | Component Token | Semantic Token | Raw Value |
 |---|---|---|
 | `--btn-bg` | `--color-background-subtle` | `#2F2F2F` |
-| `--btn-bg-hover` | `--color-background-hover` (added 2026-09-24 — previously aliased `--color-border-strong` directly, which failed AA text contrast on hover; see md/DESIGN-SYSTEM.md §1.9) | `#3D3D3D` |
-| `--btn-bg-active` | `--color-border-default` (a border token reused as a fill — audited 2026-09-24 and left as-is: `--color-text-primary` on it is ~8.9:1, already well above AA) | `#3D3D3D` |
+| `--btn-bg-hover` | `--color-background-hover` | `#3D3D3D` |
+| `--btn-bg-active` | `--color-background-active` (2026-09-27 — previously aliased `--color-border-default` directly, the same hex as the pre-9/24 hover fill, so `:hover` and `:active` were visually identical on every `.btn`) | `#474747` |
 | `--btn-border` | `--color-border-strong` | `#707070` |
-| `--btn-border-hover` | `--color-interactive-hover` (teal as of 2026-09-24 — `.btn--danger-hover:hover` overrides this to `--color-danger` instead, so the Clear controls' hover border matches their red fill rather than rendering teal) | `#00BAA5` |
+| `--btn-border-hover` | `--color-interactive-hover` (2026-09-27 — now aliases `--color-accent-primary-text`, not `--color-accent-primary`; see the teal interaction rule, md/DESIGN-SYSTEM.md §1.5. `.btn--danger-hover:hover` still overrides this to `--color-danger` instead, so the Clear controls' hover border matches their red fill) | `#00E5CB` |
 | `--btn-text` | `--color-text-primary` | `#E8E8E8` |
 | `--btn-text-hover` | `--color-interactive-default` | `#E8E8E8` |
 | `--btn-text-disabled` | `--color-text-disabled` | `#666666` |
+| `--button-height` (2026-09-27, new) | `--touch-target-minimum` — shared by every in-page button, see `## 1` "One button size" | `44px` |
+| `--button-padding-inline` (2026-09-27, new) | `--space-5` | `20px` |
+| `--button-icon-size` (2026-09-27, new) | `--icon-size-lg` | `1.25rem` (20px) |
+| `--elevation-lift` (2026-09-27, new) | `0 var(--space-1) 0 var(--color-accent-primary)` — md/DESIGN-SYSTEM.md §7 | `0 4px 0 #00BAA5` |
 | `--card-bg` | `--color-background-surface` | `#242424` |
 | `--card-border` | `--color-border-default` | `#3D3D3D` |
+| `--card-border-hover` | not consumed — `.card:hover`/`:focus-within` use `--color-interactive-hover` directly | `#00E5CB` |
 | `--card-radius` | `--border-radius-md` | `8px` |
 | `--card-image-bg` | `--color-background-subtle` | `#2F2F2F` |
-| `--card-image-column-width` | — (global `:root` token, see md/DESIGN-SYSTEM.md §4.5) | `42%` |
+| `--card-image-column-width` | — (global `:root` token, unused — no horizontal card layout exists; see `## 3`) | `42%` |
 | `--card-block-link-z` | — | `1` |
-| `--card-cta-z` | — | `2` |
+| `.card-content .link-cta`'s `z-index` (2026-09-27 — not a named token, inline in style.css) | — | `2` |
 | `--image-viewer-controls-z` | — (local to `.image-viewer`) | `1` |
 | `--tag-border` | `--color-accent-primary` | `#00BAA5` |
 | `--tag-border-hover` | `--color-accent-primary-text` | `#00E5CB` |
@@ -2004,6 +2021,8 @@ Updated 2026-09-24 (reading comfort token update, Parts A–D) to current hex va
 | `--tag-text-hover` | `--color-accent-primary-text` | `#00E5CB` |
 | `--tag-bg` | `transparent` | `transparent` |
 | `--tag-bg-hover` | `--color-background-base` | `#1C1C1C` |
+| `--color-link` (2026-09-27) | `--color-accent-primary` (swapped with `--color-link-hover` below — teal interaction rule, dark at rest) | `#00BAA5` |
+| `--color-link-hover` (2026-09-27) | `--color-accent-primary-text` (swapped — bright on hover) | `#00E5CB` |
 | `--nav-bg` | `--color-background-base` | `#1C1C1C` |
 | `--nav-link-color` | `--color-text-secondary` | `#AEAEAE` |
 | `--nav-link-active` | `--color-text-primary` | `#E8E8E8` |
