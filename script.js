@@ -353,14 +353,18 @@ function initTocRail() {
     // only on Standard Page entries), so sharing the literal classes
     // carries no collision risk. .toc-trigger-group carries no display
     // override of its own — .action-rail-group's own base display: flex
-    // (style.css) already applies unconditionally; show/hide is
-    // scroll-threshold driven (matching .back-to-top's own mechanism, via
-    // .action-rail-group--visible, the same modifier class Archive's
-    // trigger already uses) rather than Archive's drawer-open-state
-    // toggle, since this trigger has no drawer-open state of its own to
-    // key off.
+    // (style.css) already applies unconditionally. Visible from page load
+    // at every breakpoint (2026-09-30 — previously scroll-threshold gated
+    // like .back-to-top, which left a keyboard user at the top of an entry
+    // with no way to reach it at all; Archive's own Filters trigger was
+    // already always-visible, see initArchive() below, so this now matches
+    // that instead). .action-rail-group--visible is still the real
+    // mechanism — set immediately here rather than waiting for a scroll
+    // event — because openPanel()/closePanel() below still use that same
+    // class to hide the trigger while the panel is open and restore it on
+    // close; only the "how it first turns on" part changed.
     const triggerGroup = document.createElement('div');
-    triggerGroup.className = 'action-rail-group toc-trigger-group';
+    triggerGroup.className = 'action-rail-group toc-trigger-group action-rail-group--visible';
 
     const trigger = document.createElement('button');
     trigger.type = 'button';
@@ -401,12 +405,6 @@ function initTocRail() {
     trigger.append(triggerLabel, badge);
     triggerGroup.appendChild(trigger);
     document.body.insertBefore(triggerGroup, main);
-
-    // Same scroll-threshold value as .back-to-top's own (initBackToTop()
-    // above) — not approximated.
-    window.addEventListener('scroll', () => {
-        triggerGroup.classList.toggle('action-rail-group--visible', window.scrollY > 400);
-    }, { passive: true });
 
     // Panel: <nav>, aria-label matches the trigger's own accessible
     // purpose — not role="dialog": the Filter Drawer's own role="dialog"
@@ -497,23 +495,23 @@ function initTocRail() {
     }
 
     // Closes the panel the moment the underlying page scrolls, per spec —
-    // without this, the trigger's own scroll-threshold listener (above,
-    // shared with .back-to-top) has no idea the panel is open and re-shows
-    // itself the instant background scroll crosses 400px again, visually
-    // overlapping the still-open panel (confirmed via direct reproduction:
-    // openPanel()'s one-time class removal only holds until the next
-    // scroll event re-evaluates that unrelated listener). Reuses window's
-    // native 'scroll' event rather than separate wheel/touchmove/keydown
-    // listeners — confirmed via direct testing that .toc-panel's own
-    // internal overflow-y: auto scroll (the height-cap fix's scrollable
+    // the panel is position: fixed (anchored to the viewport, not to any
+    // point in page content), so it would otherwise just sit open,
+    // unmoving, while the user scrolls the page behind it; closing on
+    // background scroll keeps it from lingering open once the user has
+    // clearly moved on to reading elsewhere (2026-09-30: this is no longer
+    // about racing the trigger's own visibility, since the trigger has none
+    // to race — it's a standalone UX decision now, kept as-is). Reuses
+    // window's native 'scroll' event rather than separate wheel/touchmove/
+    // keydown listeners — confirmed via direct testing that .toc-panel's
+    // own internal overflow-y: auto scroll (the height-cap fix's scrollable
     // region) never reaches this listener: element-level scroll events
     // don't bubble, and only a capture-phase listener on window would see
-    // them despite that — this one is bubble-phase (no `capture`), same as
-    // the trigger's own existing scroll listener above, so it only ever
-    // fires for genuine page scroll. openScrollY + the small tolerance
-    // below guards against closing on imperceptible sub-pixel jitter (e.g.
-    // the first frame of a touch momentum scroll) rather than a real,
-    // intentional scroll.
+    // them despite that — this one is bubble-phase (no `capture`), so it
+    // only ever fires for genuine page scroll. openScrollY + the small
+    // tolerance below guards against closing on imperceptible sub-pixel
+    // jitter (e.g. the first frame of a touch momentum scroll) rather than
+    // a real, intentional scroll.
     let openScrollY = 0;
     function handlePanelScroll() {
         if (Math.abs(window.scrollY - openScrollY) > 2) closePanel({ returnFocus: false });
@@ -531,11 +529,11 @@ function initTocRail() {
 
         getTocInertTargets().forEach(el => el.setAttribute('inert', ''));
 
-        // Same visibility mechanism the scroll-threshold show/hide above
-        // already uses (.action-rail-group--visible) — one hide method for
-        // the trigger, not two. Mirrors exactly how initFilterDrawer()'s
-        // openDrawer() hides Archive's own .action-rail-group while its
-        // drawer is open (script.js, above).
+        // Same .action-rail-group--visible class the trigger is created
+        // with above (2026-09-30) — removing it here is the only place
+        // that ever hides the trigger now. Mirrors exactly how
+        // initFilterDrawer()'s openDrawer() hides Archive's own
+        // .action-rail-group while its drawer is open (script.js, above).
         triggerGroup.classList.remove('action-rail-group--visible');
 
         removeTrapFocus = trapFocus(panel);

@@ -2505,9 +2505,10 @@ footer p {
    trigger uses, safe to share since the two never appear on the same
    page. .toc-trigger-group carries no display override of its own —
    .action-rail-group's own base display: flex (below) already applies
-   unconditionally; real show/hide is opacity/visibility-driven via
-   .action-rail-group--visible (scroll-threshold), same as every other
-   breakpoint already used.
+   unconditionally; the trigger carries .action-rail-group--visible from
+   page load at every breakpoint (2026-09-30 — previously scroll-threshold
+   gated like .back-to-top; see script.js's initTocRail()), removed only
+   while the panel itself is open.
 ================================ */
 .toc-panel {
     display: none;
