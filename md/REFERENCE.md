@@ -1,7 +1,7 @@
 # Personal Website — Project Reference Document
-**Version:** 1.7.0
+**Version:** 1.8.0
 **Last Updated:** 2026-09-30
-**Status:** In Progress — Home page ready to build
+**Status:** Live since 2026-09-08 — corrected 2026-09-30, was "In Progress — Home page ready to build"
 
 ---
 
@@ -37,8 +37,8 @@ Tokens Studio free tier does not reliably resolve aliases between token sets. Fi
 ### Hosting URLs
 | Branch | Environment | URL |
 |---|---|---|
-| `main` | Production (live site) | Assigned by Netlify on setup |
-| `dev` | Development preview | Assigned by Netlify on setup |
+| `main` | Production (live site) | https://crzdevz.com |
+| `dev` | Development preview | https://dev--crzdev.netlify.app |
 
 ---
 
@@ -69,11 +69,12 @@ my-website/
 ├── style.css           — All styles and design tokens as CSS variables
 ├── script.js           — JS: component injection, mobile nav, aria-current, back-to-top, Archive filter/search/sort, Filter Drawer, ToC trigger/panel, tooltip escape
 ├── _redirects          — Netlify redirect rules (repo root is the publish directory); currently one 301 pair for the renamed Welcome entry
-├── work/                — Individual Work entry pages (hand-authored static HTML, one file per entry)
-├── thoughts/             — Individual Thoughts entry pages (hand-authored static HTML, one file per entry)
-├── templates/
-│   ├── work-entry-template.html
-│   └── thought-entry-template.html
+├── entries/             — Corrected 2026-09-30: work/, thoughts/, templates/ moved under entries/ in the 2026-09-05 reorg; the tree below previously showed them at repo root
+│   ├── work/            — Individual Work entry pages (hand-authored static HTML, one file per entry)
+│   ├── thoughts/        — Individual Thoughts entry pages (hand-authored static HTML, one file per entry)
+│   └── templates/
+│       ├── work-entry-template.html
+│       └── thought-entry-template.html
 ├── data/
 │   └── archive-entries.json — Manifest driving archive.html's listing/filtering and any JS-built card; Home's Featured cards are hand-written and NOT synced to this file. Optional per-entry fields: `blockLinkLabel` (overrides the default `{Read|View} {title}` card block-link label; no entry currently sets it), `published: false` (hides the entry everywhere)
 ├── assets/
@@ -83,6 +84,7 @@ my-website/
 ├── tokens/
 │   └── design-system.json — Design tokens in Tokens Studio format (reference only)
 ├── md/                  — Governance docs: REFERENCE.md (this document), DESIGN-SYSTEM.md, COMPONENTS.md, PROMPT-GUIDE.md, NEW-ENTRY-PROCESS.md
+│   └── specs/           — Added 2026-09-30. Spec docs drafted in the claude.ai Project, dropped in by Chris before the matching prompt runs. Naming: YYYY-MM-DD-short-name-spec.md. Specs dated before 2026-09-29 live in the claude.ai Project only — see md/specs/README.md and §14's note above
 └── .gitignore          — Node template, covers OS files and .env
 ```
 
@@ -550,8 +552,7 @@ Short visible labels with `.sr-only` hidden context for screen readers.
 ### JavaScript
 - Vanilla JS only — no libraries or frameworks
 - Components injected via `fetch()` on `DOMContentLoaded`
-- `initNav()` called only after nav markup is in the DOM
-- `aria-current="page"` set on active nav link after injection
+- `aria-current="page"` set on both the header nav link and the tab bar item by normalised path matching — `setActiveNavLink()`/`setActiveTabBar()` share one `normalizeNavPath()` helper (corrected 2026-09-30; the previous `initNav()` line was removed 2026-09-27 along with the dead function it described — see the Session History entry below)
 - Tooltip Escape key dismiss handled globally
 - No inline JavaScript in HTML files — exception: a flash-prevention `<script>` in every page `<head>` reads `localStorage.getItem('theme')` and sets `data-theme` on `<html>` before CSS loads, preventing a visible accent colour flicker on load; external scripts run after HTML parsing and are too late to avoid it
 
@@ -646,6 +647,8 @@ For reference when working with engineers or handing off to Claude Code:
 ---
 
 ## 14. Session Handoff Notes
+
+**Note added 2026-09-30, replacing the repeated "spec doc does not exist in this repo" flags below (2026-08-23, 2026-09-18, 2026-09-19, 2026-09-20 entries):** those docs were being drafted in the claude.ai Project, outside version control, at the time — expected, not a defect. `md/specs/` now holds spec docs going forward (see `md/specs/README.md`); anything dated before 2026-09-29 still lives in the claude.ai Project only.
 
 **2026-06-24**
 - Base HTML, CSS, and JS set up and live on Netlify
@@ -788,6 +791,8 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
 
   20 of 22 real image uses got the attribute; the two without a built `-full.webp` (`atla-cabbages.png`, `editor-concepts-plugin-toolbar-new-window.webp`) correctly show only their thumbnail now, with zero failed requests, confirmed via Playwright — clicking every trigger on both entries and checking the console found 0 errors. `md/NEW-ENTRY-PROCESS.md` gained a new "In-Body Images" note describing the convention for future entries.
 - **Part D — `.about-contact-links`.** Zero consumers anywhere (any HTML page, `script.js`) — confirmed via repo-wide grep, same finding as the 2026-09-29 audit, which left it in place only because that pass was scoped to "audit, don't remove." This pass's instruction was to delete a zero-consumer rule outright, so the `style.css` rule is gone; `about.html` itself never referenced it and needed no change.
+- **Documentation-only pass (no CSS/JS/HTML touched).** `md/specs/` created (`README.md` — purpose + `YYYY-MM-DD-short-name-spec.md` naming convention). PROMPT-GUIDE.md: new Rule 6 bullet on verifying dev-dependent changes against `https://dev--crzdev.netlify.app` post-deploy (Netlify Pretty URLs rewrites served HTML, including fetched `nav.html` — never compare raw hrefs/paths, normalise both sides), with a provenance line citing the 2026-09-28 aria-current bug; new rule that a prompt-cited spec not yet in `md/specs/` makes the pasted prompt itself authoritative, not a blocker. DESIGN-SYSTEM.md: §1.1 primitive grey table rebuilt from the live `:root` values (added `#AEAEAE`/`#707070`/`#474747`/`#3D3D3D`/`#2F2F2F`/`#242424`/`#1C1C1C`, removed 8 dead rows and `pink-light`); new Icon Size Scale table (§9.2) and ToC/`--drawer-secondary-height` rows (§4.5); §4.5's `--card-image-column-width` corrected to dormant, matching §15 below; §1.8's fictional `--tag-border`/`--tag-border-hover`/`--tag-bg-hover` rows removed. COMPONENTS.md: `## 2`/`## 2b` fictional `--tag-*`/`--chip-*` Component Token blocks replaced with the real semantic values `.tag`/`.tag-chip` actually reference; both States tables corrected from a `font-weight: bold` hover/active claim to the real `text-shadow` faux-bold mechanism (font-weight never changes); Component Token Reference table's `--tag-*` rows corrected the same way, including two rows that had the wrong value (hover border doesn't change; hover background is `--color-background-subtle`, not `--color-background-base`); Navigation Desktop's Design Intent/Anatomy/Responsive Behaviour corrected from "logo centred above four links" to the real left-logo/right-links row at 1024px+ with three links (Home/Archive/About), logo hidden below that; Mobile Tab Bar corrected from four sections to the real three. REFERENCE.md: header status line, Hosting URLs (real `crzdevz.com`/`dev--crzdev.netlify.app`), §4 file tree (`work/`/`thoughts/`/`templates/` moved under `entries/`, `md/specs/` added), §11 JS standards (dead `initNav()` line removed, aria-current line updated to describe the real normalised-path mechanism). Every token/class named across all four docs was grepped against `style.css`/`script.js` and confirmed to exist or be explicitly marked dormant/reserved — see the audit note below.
+- **Flagged, not fixed (out of this pass's explicit scope):** REFERENCE.md §5's own duplicate/stale Primitive Scale table (still the pre-2026-09-24 12-row grey list, same staleness as DESIGN-SYSTEM.md §1.1 before today's fix, and REFERENCE.md §7/§4.4's own "Home, Work, Thoughts, About" nav-link lists (real links are Home/Archive/About — same finding as COMPONENTS.md's now-corrected Navigation sections, but these two instances weren't in today's explicit fix list). DESIGN-SYSTEM.md §4.4's Mobile tab bar "Items: Home, Work, Thoughts, About" line has the same four-vs-three staleness. DESIGN-SYSTEM.md §10 / REFERENCE.md §5 Icons both say "none currently in use, text-only site-wide," which is in tension with the `--icon-size-*` tokens' real consumers documented today (ToC icons, `.link-inline-icon`, `.contact-icon-btn svg`) — worth a follow-up pass to reconcile "no icon library" (still true — these are inline SVGs, not a Tabler/CDN library) with "no icons," which reads as stronger than the real state. COMPONENTS.md's `--nav-*`/`--tab-bar-*` Component Token blocks have the same fictional-token issue already fixed for `--tag-*`/`--chip-*` today (confirmed via grep: zero real consumers) — flagged inline in the Component Token Reference footnote, not resolved.
 
 ---
 

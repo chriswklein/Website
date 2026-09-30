@@ -1,5 +1,5 @@
 # Design System — Component Specifications
-**Version:** 2.4.0
+**Version:** 2.5.0
 **Last Updated:** 2026-09-30
 **Status:** Active — source of truth for all component build decisions
 
@@ -168,21 +168,28 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--tag-*` was never a real set of CSS custom properties; `.tag` in `style.css` references shared semantic tokens directly. Listed here as the real values each state uses, not as named `--tag-*` tokens:
+
 ```css
---tag-border:                var(--color-accent-primary);
---tag-border-hover:          var(--color-accent-primary);
---tag-text:                  var(--color-accent-primary);
---tag-text-hover:            var(--color-accent-primary);
---tag-bg:                    transparent;
---tag-bg-hover:              var(--color-background-subtle);
---tag-padding-x:             var(--space-3);
---tag-padding-y:             var(--space-1);
---tag-font-size:             var(--font-size-sm);
---tag-font-weight:           var(--font-weight-regular);
---tag-font-weight-hover:     var(--font-weight-bold);
---tag-letter-spacing:        var(--letter-spacing-wide);
---tag-radius:                var(--border-radius-lg);
---tag-transition:            var(--duration-fast) var(--ease-out);
+/* Default */
+border:      var(--border-width-thin) solid var(--color-accent-primary);
+background:  transparent;
+color:       var(--color-accent-primary);
+padding:     var(--space-1) var(--space-3);
+font-size:   var(--font-size-sm);
+font-weight: var(--font-weight-regular);   /* constant — see States, hover "bold" is text-shadow, not a weight change */
+letter-spacing: var(--letter-spacing-wide);
+border-radius: var(--border-radius-lg);
+
+/* Hover */
+background-color: var(--color-background-subtle);
+border-color:      var(--color-accent-primary);   /* unchanged from default */
+color:              var(--color-accent-primary-text);
+text-shadow:        0.4px 0 currentColor, -0.4px 0 currentColor;   /* faux-bold */
+
+/* Focus-visible */
+outline: var(--border-width-medium) solid var(--color-interactive-focus);
+outline-offset: 3px;
 ```
 
 ### Anatomy
@@ -197,11 +204,13 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 ### States
 
-| State | Background | Border | Text | Font-Weight |
+**Corrected 2026-09-30** — Hover was documented as a `font-weight: bold` change; `.tag:hover` never sets `font-weight` (it stays `regular` always). The bold *look* on hover comes from `text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor` stacked on the new hover text colour, plus the text colour itself changing to `--color-accent-primary-text` (not staying `--color-accent-primary`).
+
+| State | Background | Border | Text | Emphasis |
 |---|---|---|---|---|
-| Default | `transparent` | `--color-accent-primary` | `--color-accent-primary` | `regular` |
-| Hover | `--color-background-subtle` | `--color-accent-primary` | `--color-accent-primary` | `bold` |
-| Focus | `transparent` | `--color-accent-primary` | `--color-accent-primary` + focus ring | `regular` |
+| Default | `transparent` | `--color-accent-primary` | `--color-accent-primary` | None — `font-weight: regular` |
+| Hover | `--color-background-subtle` | `--color-accent-primary` (unchanged) | `--color-accent-primary-text` | `text-shadow` faux-bold — `font-weight` stays `regular` |
+| Focus | `transparent` | `--color-accent-primary` | `--color-accent-primary` + focus ring | None |
 
 ### Accessibility
 
@@ -246,27 +255,33 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--chip-*` was never a real set of CSS custom properties; `.tag-chip` in `style.css` references shared semantic tokens directly. Listed here as the real values each state uses, not as named `--chip-*` tokens:
+
 ```css
 /* Default */
---chip-border:             var(--border-width-thin) solid var(--color-accent-primary);
---chip-bg:                 transparent;
---chip-text:               var(--color-accent-primary);
---chip-font-weight:        var(--font-weight-regular);
+border:      var(--border-width-thin) solid var(--color-accent-primary);
+background:  transparent;
+color:       var(--color-accent-primary);
+font-weight: var(--font-weight-regular);
 
-/* Hover */
---chip-bg-hover:           var(--color-background-subtle);
---chip-font-weight-hover:  var(--font-weight-bold);
+/* Hover (non-active) */
+background-color: var(--color-background-subtle);
+border-color:      var(--color-accent-primary);   /* unchanged */
+color:              var(--color-accent-primary-text);
+text-shadow:        0.4px 0 currentColor, -0.4px 0 currentColor;   /* faux-bold, not font-weight */
 
-/* Active */
---chip-border-active:      var(--border-width-medium) solid var(--color-accent-primary-text);
---chip-bg-active:          var(--color-background-surface);
---chip-text-active:        var(--color-accent-primary-text);
---chip-font-weight-active: var(--font-weight-bold);
+/* Active — bold look is permanent (text-shadow), not hover-only */
+border:      var(--border-width-medium) solid var(--color-accent-primary-text);
+background:  var(--color-background-surface);
+color:       var(--color-accent-primary-text);
+text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+/* .tag-chip--active:hover is identical to .tag-chip--active — active state does not change on hover */
 
-/* Dim — recoloured 2026-09-24 (reading comfort token update) */
---chip-border-dim:         var(--border-width-thin) solid var(--color-border-strong);
---chip-bg-dim:             transparent;
---chip-text-dim:           var(--color-text-secondary);
+/* Dim — recoloured 2026-09-24 (reading comfort token update); real font-weight, no text-shadow */
+border:      var(--border-width-thin) solid var(--color-border-strong);
+background:  transparent;
+color:       var(--color-text-secondary);
+font-weight: var(--font-weight-regular);
 ```
 
 ### Anatomy
@@ -283,12 +298,14 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 
 ### States
 
-| State | Background | Border | Text | Font-Weight |
+**Corrected 2026-09-30** — Hover and Active were documented as `font-weight: bold` changes; neither `.tag-chip:hover` nor `.tag-chip--active` sets `font-weight` (only `.tag-chip--dim` uses a real `font-weight`, and it stays `regular`). Hover's and Active's bold *look* comes from `text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor`. Active's text-shadow is permanent (not hover-only) — `.tag-chip--active:hover` is visually identical to `.tag-chip--active`.
+
+| State | Background | Border | Text | Emphasis |
 |---|---|---|---|---|
-| Default | `transparent` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `regular` |
-| Hover | `--color-background-subtle` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `bold` |
-| Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `bold` |
-| Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | `regular` |
+| Default | `transparent` | `thin` + `--color-accent-primary` | `--color-accent-primary` | None — `font-weight: regular` |
+| Hover | `--color-background-subtle` | `thin` + `--color-accent-primary` (unchanged) | `--color-accent-primary-text` | `text-shadow` faux-bold |
+| Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `text-shadow` faux-bold (permanent, not hover-only) |
+| Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | None — `font-weight: regular` |
 
 **What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`). This only actually happens for type chips (`.filter-drawer-primary-chips`) — that row is never hidden, so selecting Work visibly dims Thoughts. Tag chips (`#filter-drawer-chips`) always pass `anyActive: false` (2026-09-27, simplified from an earlier `isDuplicateOfActiveRow` special case that computed a real Dim state for them) — `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state could never have been seen regardless of how it was computed. `.tag-chip--dim` itself is left in place in `style.css`, ready for a future layout that keeps the tag grid visible alongside active selections.
 
@@ -719,7 +736,7 @@ Same content order, padding, and hover treatment as Feature — see above. `.car
 **HTML Element:** `<header><nav class="site-nav" aria-label="Main navigation">`
 
 ### Design Intent
-The desktop nav is the persistent wayfinding element. Logo/name is centred above the nav links. It stays sticky at the top so users always have access to navigation without scrolling back up.
+The desktop nav is the persistent wayfinding element. It stays sticky at the top so users always have access to navigation without scrolling back up. **Corrected 2026-09-30** (was: "Logo/name is centred above the nav links" — never matched the real CSS): at 1024px and up, `.site-nav .container` is `flex-direction: row; justify-content: space-between` — the logo sits to the **left** of the nav links, not above them. Below 1024px the logo is hidden outright (`.nav-logo { display: none; }`) — tablet (768–1023px) shows the same sticky header with links only, centred as the container's sole child (`.site-nav .container`'s own base `flex-direction: column; align-items/justify-content: center`, which only visually centres a single child once the logo is gone); mobile replaces the header entirely with the tab bar (`## 5` below).
 
 ### Component Tokens
 
@@ -741,16 +758,17 @@ The desktop nav is the persistent wayfinding element. Logo/name is centred above
 
 ### Anatomy
 
+**Corrected 2026-09-30** — the diagram and link list below previously showed a centred logo-above-links layout with four links (Home/Work/Thoughts/About); the real markup (`nav.html`) has three links and, at 1024px+, a left-logo/right-links row:
+
 ```
-[ .nav-logo "Christopher Klein" centred ]
-[ .nav-links centred below logo ]
-  [ a Home ] [ a Work ] [ a Thoughts ] [ a About ]
+1024px+:        [ .nav-logo "Christopher Klein" ]        [ .nav-links: Home  Archive  About ]
+below 1024px:   .nav-logo hidden — [ .nav-links: Home  Archive  About ] centred
 ```
 
-- Container: `<nav class="site-nav" aria-label="Main navigation">`
-- Logo: `<a href="index.html" class="nav-logo">Christopher Klein</a>` — centred, `--nav-logo-size`, `--nav-logo-weight`
-- Links wrapper: `<ul class="nav-links" role="list">` — centred below logo
-- Each link: `<li><a href="{page}.html">{Label}</a></li>`
+- Container: `<nav class="site-nav" aria-label="Main navigation"><div class="container">`
+- Logo: `<a href="/index.html" class="nav-logo">Christopher Klein</a>` — left-aligned at 1024px+, `--nav-logo-size`, `--nav-logo-weight`; hidden below 1024px
+- Links wrapper: `<ul class="nav-links" id="nav-menu" role="list">`
+- Each link: `<li><a href="/{page}.html">{Label}</a></li>` — real links are Home, Archive, About
 - Active link: `aria-current="page"` set dynamically via `script.js` after nav injection
 
 ### Active State (updated 2026-09-27)
@@ -779,7 +797,8 @@ Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thi
 
 ### Responsive Behaviour
 
-- Desktop: visible — centred layout
+- Desktop (1024px+): visible — `.site-nav .container` is `flex-direction: row; justify-content: space-between`, logo left, links right (corrected 2026-09-30 — was "centred layout")
+- Tablet (768–1023px): visible — logo hidden, links only, centred as the container's sole child
 - Mobile: hidden via `display: none` — replaced by tab bar
 
 ---
@@ -791,7 +810,7 @@ Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thi
 **HTML Element:** `<nav class="tab-bar" aria-label="Mobile navigation">`
 
 ### Design Intent
-The tab bar replaces the desktop nav entirely on mobile. It is always visible, fixed to the top of the viewport, giving users constant access to all four primary sections without scrolling. Icon and text label always shown together. Never icon only.
+The tab bar replaces the desktop nav entirely on mobile. It is always visible, fixed to the top of the viewport, giving users constant access to all three primary sections (Home, Archive, About — corrected 2026-09-30, was "four") without scrolling. Icon and text label always shown together. Never icon only.
 
 ### Component Tokens
 
@@ -817,28 +836,29 @@ The tab bar replaces the desktop nav entirely on mobile. It is always visible, f
 
 ### Anatomy — Current (text-only)
 
+**Corrected 2026-09-30** — previously showed four items (Home/Work/Thoughts/About); the real markup has three (`index.html`, `archive.html`, `about.html` all confirm this):
+
 ```
-[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
-  [ Home ]          [ Work ]          [ Thoughts ]      [ About ]
+[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
+  [ Home ]          [ Archive ]       [ About ]
 ```
 
-Each item: `<a href="{page}.html" class="tab-bar-item"><span>{Label}</span></a>`
+Each item: `<a href="/{page}.html" class="tab-bar-item"><span>{Label}</span></a>`
 
 ### Anatomy — Future (with self-hosted icons)
 
 ```
-[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
-  [ icon ]          [ icon ]          [ icon ]          [ icon ]
-  [ Home ]          [ Work ]          [ Thoughts ]      [ About ]
+[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
+  [ icon ]          [ icon ]          [ icon ]
+  [ Home ]          [ Archive ]       [ About ]
 ```
 
 Planned icon mapping (Tabler Icons, outline):
 - Home: `ti-home`
-- Work: `ti-briefcase`
-- Thoughts: `ti-pencil`
+- Archive: `ti-archive`
 - About: `ti-user`
 
-Each item: `<a href="{page}.html" class="tab-bar-item">`
+Each item: `<a href="/{page}.html" class="tab-bar-item">`
 Icon: `<i class="ti ti-{name}" aria-hidden="true"></i>`
 Label: `<span>{Label}</span>`
 
@@ -2037,12 +2057,10 @@ Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current
 | `--card-block-link-z` | — | `1` |
 | `.card-content .link-cta`'s `z-index` (2026-09-27 — not a named token, inline in style.css) | — | `2` |
 | `--image-viewer-controls-z` | — (local to `.image-viewer`) | `1` |
-| `--tag-border` | `--color-accent-primary` | `#00BAA5` |
-| `--tag-border-hover` | `--color-accent-primary-text` | `#00E5CB` |
-| `--tag-text` | `--color-accent-primary` | `#00BAA5` |
-| `--tag-text-hover` | `--color-accent-primary-text` | `#00E5CB` |
-| `--tag-bg` | `transparent` | `transparent` |
-| `--tag-bg-hover` | `--color-background-base` | `#1C1C1C` |
+| `.tag`/`.tag-chip` default border + text (2026-09-30 — replaces fictional `--tag-border`/`--tag-text`; see footnote) | `--color-accent-primary` | `#00BAA5` |
+| `.tag`/`.tag-chip` default background | `transparent` | `transparent` |
+| `.tag`/`.tag-chip` hover background (2026-09-30 — was wrongly listed as `--tag-bg-hover` → `--color-background-base`) | `--color-background-subtle` | `#2F2F2F` |
+| `.tag`/`.tag-chip` hover text (2026-09-30 — replaces fictional `--tag-text-hover`; border stays `--color-accent-primary`, unchanged from default — the old `--tag-border-hover` → `--color-accent-primary-text` row was wrong) | `--color-accent-primary-text` | `#00E5CB` |
 | `--color-link` (2026-09-27) | `--color-accent-primary` (swapped with `--color-link-hover` below — teal interaction rule, dark at rest) | `#00BAA5` |
 | `--color-link-hover` (2026-09-27) | `--color-accent-primary-text` (swapped — bright on hover) | `#00E5CB` |
 | `--nav-bg` | `--color-background-base` | `#1C1C1C` |
@@ -2058,7 +2076,7 @@ Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current
 | `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#00BAA5` |
 | `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
 
-`--tag-border`/`--tag-border-hover`/`--tag-bg-hover` are documented here (and in DESIGN-SYSTEM.md §1.8) as named component tokens, but neither actually exists as a CSS custom property in style.css — `.tag`/`.tag-chip` reference the semantic tokens directly. Pre-existing drift, not caused by this update and not resolved here (see the 2026-09-24 audit's Flags).
+**Fixed 2026-09-30:** the `--tag-*`/`--chip-*` families (`--tag-border`, `--tag-border-hover`, `--tag-text`, `--tag-text-hover`, `--tag-bg`, `--tag-bg-hover`, and the `## 2b` `--chip-*` set) never existed as CSS custom properties anywhere in `style.css` — `.tag`/`.tag-chip` reference the semantic tokens listed above directly, and this table (and `## 2`/`## 2b` above) now document the real values instead of the fictional named tokens. Two of the old rows also had the wrong value (hover border was documented as changing to `--color-accent-primary-text`; it doesn't — border stays `--color-accent-primary`. Hover background was documented as `--color-background-base` `#1C1C1C`; it's actually `--color-background-subtle` `#2F2F2F`). `--nav-*` and `--tab-bar-*` below have the same fictional-token issue (no `--nav-*`/`--tab-bar-*` custom property exists in `style.css` either) but are out of scope for this pass — flagged, not fixed.
 
 ---
 

@@ -1,6 +1,6 @@
 # Prompt Guide — Claude Code Session Rules
-**Version:** 1.3.0
-**Last Updated:** 2026-09-27
+**Version:** 1.4.0
+**Last Updated:** 2026-09-30
 **Purpose:** Defines which resources to load and which tools to use for each task type. Follow this document at the start of every session to avoid loading unnecessary context and consuming excess tokens.
  
 ---
@@ -101,6 +101,9 @@ After completing all tasks, run these checks before reporting completion:
 - Confirm the change was applied consistently across all breakpoints the decision covers per Rule 5a (all three by default, unless explicitly scoped narrower) — not just the breakpoint that happened to be top of mind
 - When a browser-automation tool (Playwright/Chrome) is available, use it to confirm the rendered result at mobile, tablet, and desktop widths — do not rely on static code/CSS review alone when a rendering check is possible. If no such tool is available in the session, say so explicitly in the completion report rather than reporting full verification.
 - If the change touches colour tokens, backgrounds, borders, or interactive-state selectors, complete Rule 6a's state-coverage and token-blast-radius checks and include the contrast table in the report — do not consider verification complete without it.
+- Every task ends with a push to dev. Anything that depends on URLs, hrefs, paths or served HTML must also be verified on https://dev--crzdev.netlify.app after the deploy finishes, not only on the local server. Netlify's Pretty URLs post-processing rewrites served HTML, including the fetched nav.html: /index.html is served as /, .html is stripped from links and URLs, and attribute quotes may change. Code must never compare raw hrefs or paths; normalise both sides.
+
+This bullet exists because of a concrete case: the 2026-09-28 `aria-current` bug — `normalizeNavPath()` normalized `window.location.pathname` but never `link.getAttribute('href')`, which passed every check on the local server (where `nav.html` already hardcodes canonical `/page.html` hrefs) and failed on dev (where Netlify's Pretty URLs post-processing had already stripped `.html` from the served hrefs, so the two sides never matched).
 
 **Report file changes concisely.**
 What changed: file(s) and the specific rule/element.
@@ -144,6 +147,14 @@ Never use generic messages like "update styles" or "fix bugs".
 **Local dev server caching:** Local dev servers (e.g. Python's `http.server`) send no cache-control headers, and Chromium will silently keep serving a cached copy of `style.css`, `script.js`, or even the HTML document itself across navigations in the same browser tab — even after the file changed on disk. This produces false-negative verification results: a fix looks like it "didn't work" when it's actually just not being loaded.
 
 If an edit doesn't appear to take effect during Playwright/browser verification, don't conclude the change is wrong — first restart the dev server on a fresh port (forces a new origin, guaranteeing no cached assets) before re-checking. A same-tab stylesheet-only reload (replacing the `<link>` element via `page.evaluate`) can work for CSS alone, but a fresh port is the reliable fix when HTML or script.js are also in question.
+
+---
+
+## Rule 9 — Spec Docs (added 2026-09-30)
+
+Spec docs live in `md/specs/`, named `YYYY-MM-DD-short-name-spec.md` (see `md/specs/README.md`). Chris drafts them in the claude.ai Project and drops the file into `md/specs/` before the matching prompt runs.
+
+If a prompt cites a spec file that isn't in `md/specs/`, do not treat the missing file as a blocker. Specs dated before 2026-09-29 were never committed to this repo — the pasted prompt itself is the authoritative, complete spec in that case, exactly as if the file were present.
 
 ---
  
