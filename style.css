@@ -2805,13 +2805,6 @@ footer p {
     font-style: normal;
 }
 
-.about-contact-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
-}
-
 /* About page responsive */
 @media (max-width: 767px) {
     .about-history-meta {
