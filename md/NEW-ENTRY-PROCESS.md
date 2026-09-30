@@ -36,6 +36,10 @@ Every `<h2>` and `<h3>` within `.standard-page-content` must have an `id` attrib
 
 **Purpose:** Groundwork for a future Table of Contents. Do not build any ToC UI, anchor links, or navigation — IDs only.
 
+### In-Body Images (added 2026-09-30)
+
+Every `<img>` inside `.standard-page-content` is wrapped by `initImageViewer()` (`script.js`) as a click-to-zoom trigger. If `scripts/build-images.js` produced a `-full.webp` variant for that image (its high-res, click-to-zoom source), add `data-full-src="{path to the -full.webp file}"` to the `<img>` tag. If no `-full.webp` was produced, leave `data-full-src` off entirely — the viewer falls back to the thumbnail's own `src` with no extra request, rather than guessing a filename and generating a failed 404 request for a file that was never built. See `md/COMPONENTS.md`'s Image Viewer notes ("## 14. Standard Page Template") for the full mechanism.
+
 ### Starting Point
 
 Copy the appropriate template from `templates/`:

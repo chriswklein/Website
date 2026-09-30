@@ -2171,21 +2171,6 @@ function initImageViewer() {
         ].filter(Boolean);
     }
 
-    // The image viewer shows a higher-resolution version of whatever
-    // thumbnail was clicked, assuming every in-body image has a sibling
-    // file with the same name plus a "-full" suffix before the extension
-    // (e.g. "diagram.webp" → "diagram-full.webp") — a naming convention
-    // enforced by how images are exported/added, not something this
-    // function can verify; if a "-full" file is missing, the browser's own
-    // broken-image handling is what a visitor would see. Mechanically:
-    // "…/foo.png" or "…/foo.webp" -> "…/foo-full.webp" — the -full variant
-    // is always .webp regardless of the thumbnail's own extension (see
-    // scripts/build-images.js), so this replaces whatever extension is
-    // there rather than assuming .webp on both sides.
-    function deriveFullSrc(thumbSrc) {
-        const dot = thumbSrc.lastIndexOf('.');
-        return dot === -1 ? thumbSrc : `${thumbSrc.slice(0, dot)}-full.webp`;
-    }
 
     function applyTransform() {
         enlargedImg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
@@ -2262,19 +2247,30 @@ function initImageViewer() {
         const img = images[currentIndex];
         const thumbSrc = img.src;
 
-        // Requests the high-res -full.webp variant (scripts/build-images.js)
-        // derived from the thumbnail's own src — no per-<img> data attribute
-        // to add/maintain. onerror falls back to the thumbnail automatically
-        // for any image that doesn't have a -full variant yet, so nothing
-        // breaks for images not yet processed by that script. Set before
-        // assigning the new src (not after) so a same-tick failure — e.g. a
-        // request the browser resolves as a network error before yielding
-        // back to this function — still has a handler in place to catch it.
-        enlargedImg.onerror = () => {
-            enlargedImg.onerror = null; // one retry only — no loop if the thumbnail itself ever fails to load
+        // Explicit opt-in (2026-09-30 — was a guessed "-full.webp" filename
+        // derived from the thumbnail's own src, which requested a file that
+        // didn't exist, and so failed with a real 404, for any image whose
+        // -full variant hadn't been built yet). data-full-src is written on
+        // the <img> only where scripts/build-images.js actually produced a
+        // -full.webp for it (see md/NEW-ENTRY-PROCESS.md); its absence now
+        // means "use the thumbnail, no extra request" rather than "guess and
+        // hope." onerror is still kept as a safety net for the case where a
+        // data-full-src attribute is present but that specific file is
+        // missing or fails to load (e.g. a typo, a file moved after the
+        // attribute was added) — set before assigning the new src (not
+        // after) so a same-tick failure still has a handler in place to
+        // catch it.
+        const fullSrc = img.dataset.fullSrc;
+        if (fullSrc) {
+            enlargedImg.onerror = () => {
+                enlargedImg.onerror = null; // one retry only — no loop if the thumbnail itself ever fails to load
+                enlargedImg.src = thumbSrc;
+            };
+            enlargedImg.src = fullSrc;
+        } else {
+            enlargedImg.onerror = null;
             enlargedImg.src = thumbSrc;
-        };
-        enlargedImg.src = deriveFullSrc(thumbSrc);
+        }
         enlargedImg.alt = img.alt;
         // Accessible name reuses the image's own real alt text — no new
         // invented copy. Empty-alt fallback is defensive only: every real
