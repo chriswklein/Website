@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initShareButtons();
     autoplayUnlessReducedMotion('.video-demo video');
     initImageViewer();
+    initTableWrapFocus();
     const filterDrawer = initFilterDrawer();
     initArchive(filterDrawer);
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
@@ -156,6 +157,37 @@ function initShareButtons() {
                 // Clipboard write failed silently — no fallback needed
             });
         });
+    });
+}
+
+// Makes a .table-wrap (in-body table scroll container, md/COMPONENTS.md
+// §14) a Tab stop only while it actually has something to scroll —
+// scrollWidth > clientWidth. A table that already fits its column at the
+// current width has nothing to scroll, so a static tabindex="0" (2026-09-29
+// through 2026-09-29) left it a real Tab stop that did nothing at desktop
+// width, confirmed via a real Tab walkthrough. role="region" and
+// aria-label stay on the markup unconditionally — the accessible name is
+// valid either way (md/COMPONENTS.md §14) — only tabindex is conditional.
+// A ResizeObserver per wrapper (not a single window 'resize' listener)
+// catches every real cause of its scrollWidth/clientWidth relationship
+// changing — viewport resize, but also font-load reflow and any future
+// content change — without a separate debounce: ResizeObserver callbacks
+// already coalesce to at most once per frame.
+function initTableWrapFocus() {
+    const wraps = document.querySelectorAll('.table-wrap');
+    if (!wraps.length) return;
+
+    function update(wrap) {
+        if (wrap.scrollWidth > wrap.clientWidth) {
+            wrap.setAttribute('tabindex', '0');
+        } else {
+            wrap.removeAttribute('tabindex');
+        }
+    }
+
+    wraps.forEach(wrap => {
+        update(wrap);
+        new ResizeObserver(() => update(wrap)).observe(wrap);
     });
 }
 

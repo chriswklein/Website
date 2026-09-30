@@ -1355,7 +1355,7 @@ The standard page template provides a consistent reading experience for all long
   [ ul/ol lists, blockquote, code blocks as needed ]
   [ figure > img + figcaption — captioned in-body image, loading="lazy" ]
   [ img — bare, uncaptioned in-body image, loading="lazy" ]
-  [ div.table-wrap[role="region"][tabindex="0"][aria-label] > table — 65ch reading column, scrolls horizontally on narrow viewports, keyboard-reachable ]
+  [ div.table-wrap[role="region"][aria-label] > table — 65ch reading column, scrolls horizontally on narrow viewports; tabindex="0" added/removed at runtime by initTableWrapFocus(), only while it actually scrolls ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-footer — unchanged by the 2026-09-25 revision, still centred ]
   [ .standard-page-footer-actions ]
@@ -1421,26 +1421,34 @@ rest; shown on `:hover` and on `:focus-visible`; always shown under
 `@media (hover: none)`, since touch has no hover. The fade uses
 `--duration-fast` / `--ease-out`, covered by the sitewide reduced-motion rule.
 
-**In-body tables (2026-08-18, wrapper accessibility fixed 2026-09-29):** every
-table in body content is wrapped in `<div class="table-wrap" role="region"
-tabindex="0" aria-label="{descriptive label}, scrollable horizontally">` —
-this section previously (incorrectly) documented `overflow-x: auto` as living
-directly on the table with no wrapper; the real, live markup has always used
-`.table-wrap` as a separate scroll container (`style.css`: `.table-wrap {
-overflow-x: auto; }`, plus `.standard-page-content .table-wrap` for the 65ch
-cap — a per-instance `max-width` override if a specific table genuinely needs
-more columns). `role="region"` + `tabindex="0"` + `aria-label` together are
-required, not any one alone: a `tabindex="0"` div is what makes the scrollable
-region keyboard-reachable at all (WCAG 2.1.1 — otherwise a keyboard user has
-no way to trigger the horizontal scroll), but `aria-label` on a plain `<div>`
-with no ARIA role is not well-supported by assistive tech (confirmed via
-axe-core's `aria-prohibited-attr` check) — `role="region"` is what makes the
-label valid. The sitewide `:focus-visible` ring covers `.table-wrap`
-automatically (no ancestor `overflow: hidden` clips it) — confirmed via
-direct focus + screenshot, 2026-09-29. **Every future table must use this
-exact wrapper from the start** — same convention as `.code-wrap` above, and
-the same category of bug (a missing wrapper/attribute discovered as an axe
-finding rather than built in from day one). `th` reuses
+**In-body tables (2026-08-18, wrapper accessibility fixed 2026-09-29, tabindex
+made conditional 2026-09-30):** every table in body content is wrapped in
+`<div class="table-wrap" role="region" aria-label="{descriptive label},
+scrollable horizontally">` — this section previously (incorrectly) documented
+`overflow-x: auto` as living directly on the table with no wrapper; the real,
+live markup has always used `.table-wrap` as a separate scroll container
+(`style.css`: `.table-wrap { overflow-x: auto; }`, plus
+`.standard-page-content .table-wrap` for the 65ch cap — a per-instance
+`max-width` override if a specific table genuinely needs more columns).
+`role="region"` + `aria-label` are written in the markup; `tabindex="0"` is
+**not** — `initTableWrapFocus()` (`script.js`) adds it only while the wrapper
+actually has something to scroll (`scrollWidth > clientWidth`), and removes
+it otherwise, re-evaluated via a `ResizeObserver` per wrapper (viewport
+resize, font-load reflow, any future content change). A table that already
+fits its column at the current width has nothing to scroll, so a static
+`tabindex="0"` (as this briefly shipped, 2026-09-29) left it a real Tab stop
+that did nothing at desktop width — confirmed via a real Tab walkthrough.
+`role="region"` + `aria-label` together are still both required regardless of
+scroll state: `aria-label` on a plain `<div>` with no ARIA role is not
+well-supported by assistive tech (confirmed via axe-core's
+`aria-prohibited-attr` check) — `role="region"` is what makes the label
+valid, independent of whether the wrapper happens to be scrollable right now.
+The sitewide `:focus-visible` ring covers `.table-wrap` automatically (no
+ancestor `overflow: hidden` clips it) — confirmed via direct focus +
+screenshot. **Every future table must use this exact wrapper from the
+start** — same convention as `.code-wrap` above, and the same category of bug
+(a missing wrapper/attribute/behaviour discovered as an axe finding or a dead
+Tab stop rather than built in from day one). `th` reuses
 `.standard-page-details-label`'s exact label treatment (size/weight/color) by
 value, not by selector reference. `td` matches body paragraph text. Row separators use
 the sitewide thin-border convention, with the last row's border removed the
