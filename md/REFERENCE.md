@@ -1,6 +1,6 @@
 # Personal Website — Project Reference Document
-**Version:** 1.6.3
-**Last Updated:** 2026-09-29
+**Version:** 1.7.0
+**Last Updated:** 2026-09-30
 **Status:** In Progress — Home page ready to build
 
 ---
@@ -578,8 +578,9 @@ Accessibility is a stated project pillar (see Core Principles, §1), not a post-
 - Escape closes the drawer, with focus returned to whichever trigger opened it
 - Image viewer (click-to-zoom on Standard Page images, `initImageViewer()`): an accessible modal on the same mechanics as the drawer — `role="dialog"`, `aria-modal="true"`, named from the image's own alt text, background `inert`, `trapFocus()`, Escape closes, focus lands on Close on open and returns to the image's trigger on close. Each image's trigger is a real button (`View larger image: {alt}`). Zoom works without a pointer (+/− buttons, `+`/`−` keys); arrow keys pan when zoomed (drag alternative), and Previous/Next (2+ images only) are disabled while zoomed because the same arrows then pan
 - The invisible full-card click overlay (`.card-block-link`) is `aria-hidden="true"` and `tabindex="-1"` on every card (`index.html`, `buildCard()` in `script.js`, `design-system.html`'s previews) as of 2026-09-02 — mouse convenience never creates a redundant or confusing tab stop. The real, visible, keyboard-focusable link on each card is now `.link-cta` (md/COMPONENTS.md §17), which sits above the block-link (`z-index: 2` vs `1`) and carries a full descriptive `aria-label`. Confirmed via a real accessibility-tree snapshot and Tab-key walkthrough, not just markup review — Tab moves directly from content before the card to `.link-cta`, and the block-link never receives focus.
-- In-body tables (`.table-wrap`, md/COMPONENTS.md §14) are keyboard-reachable — `tabindex="0"` plus `role="region"` (added 2026-09-29 so the accompanying `aria-label` is valid; a `div` with no ARIA role doesn't support `aria-label` per axe's `aria-prohibited-attr` check) lets a keyboard user Tab to the scroll container and use arrow keys to scroll it horizontally on narrow viewports, satisfying WCAG 2.1.1 for content that would otherwise be mouse/touch-drag only. The sitewide `:focus-visible` ring covers it with no clipping (confirmed via direct focus + screenshot).
+- In-body tables (`.table-wrap`, md/COMPONENTS.md §14) are keyboard-reachable exactly when they need to be — `role="region"` + `aria-label` are static markup (added 2026-09-29 so the label is valid; a `div` with no ARIA role doesn't support `aria-label` per axe's `aria-prohibited-attr` check), but `tabindex="0"` is applied/removed at runtime by `initTableWrapFocus()` (`script.js`, added 2026-09-30) only while the wrapper's `scrollWidth > clientWidth` — a static `tabindex="0"` (as this briefly shipped 2026-09-29) left it a real Tab stop that did nothing at desktop width, where the table already fits. A keyboard user can Tab to it and use arrow keys to scroll it horizontally wherever it's actually scrollable (WCAG 2.1.1), re-evaluated via `ResizeObserver` on viewport resize. The sitewide `:focus-visible` ring covers it with no clipping (confirmed via computed style — the same unclipped mechanism already screenshot-verified at desktop width, where the table's full box fits in one viewport; at mobile the box is taller than the viewport so a single screenshot can't show the whole ring, but the computed `outline` value is identical).
 - "Skip Table of Contents" link removed 2026-09-29 (see Visual & Contrast below) — it targeted a heading list that's no longer a real Tab-order concern now that the panel it lived in is `hidden` until opened.
+- The ToC "Contents" trigger (`.toc-trigger-group`, entry pages) is visible from page load at every breakpoint as of 2026-09-30 — previously gated behind a 400px scroll threshold (matching `.back-to-top`), which meant a keyboard user starting at the top of an entry had no way to reach it at all, since nothing before it in the DOM could substitute (Archive's own Filters trigger was never scroll-gated to begin with). Confirmed via a real Tab walkthrough: Skip to main content → nav-logo → Home → Archive → About → Contents trigger → page content (the breadcrumb). Hides while the panel is open and restores on close, unchanged; still closes on background scroll, unchanged. **Known visual overlap, not fixed this pass** — at the top of `star-engine.html` (the longest entry's header block), the always-visible trigger (fixed, vertically centred in the viewport) overlaps the bottom-right corner of the lead image at tablet width (834px) and the Details card at mobile width (390px); no overlap at desktop (1440px), where the reading column's right gutter is wide enough. Reported per instruction, not worked around.
 
 **Screen Reader & Semantic**
 - Real NVDA testing conducted during development — not automated-only
@@ -754,6 +755,39 @@ Figma MCP connection via Claude Code to be explored for tighter design-to-code f
 
 **2026-09-28**
 - **Current-page indicator fixed for the deployed site.** The 2026-09-27 `normalizeNavPath()` fix (Part D) only normalized `window.location.pathname`, never `link.getAttribute('href')` — harmless locally, where the repo's own `nav.html`/tab-bar markup already hardcodes canonical `/page.html` hrefs, but broken on the deployed dev site: confirmed via direct fetch that Netlify's Pretty URLs post-processing rewrites the deployed HTML — including `/nav.html`, fetched client-side by `loadComponent()` — to extension-stripped, single-quoted hrefs (`href='/'`, `href='/archive'`, `href='/about'`), which never matched the normalized pathname, so `aria-current` was never set anywhere on the live site. Fix: `normalizeNavPath()` now runs on both sides of every comparison in `setActiveNavLink()`/`setActiveTabBar()`. Verified locally (`127.0.0.1:5500`, both `/` and `/index.html`, `/archive.html?type=work`, desktop header and mobile tab bar) and against the full pathname × href matrix (`/`, `/index`, `/index.html`, `/archive`, `/archive/`, `/archive.html`, `/about`, `/about.html`, in every combination) resolving to one of three canonical forms regardless of side, plus a real entry-page pathname correctly matching none of them.
+
+**2026-09-30**
+- **Part A — Contents trigger always visible (cleanup item 28).** `initTocRail()`'s `.toc-trigger-group` no longer waits for a 400px scroll threshold — it carries `.action-rail-group--visible` from creation, matching Archive's own Filters trigger, which was never scroll-gated. Hide-while-panel-open and restore-on-close (`openPanel()`/`closePanel()`) and close-on-background-scroll (`handlePanelScroll`) are unchanged in behaviour; only their comments were rewritten, since the original reasoning for `handlePanelScroll` specifically cited racing the now-removed scroll listener. Verified via a real Tab walkthrough (see Keyboard & Focus above) and via screenshots at all three breakpoints on `star-engine.html` (the longest entry's header block): **no overlap at desktop (1440px)**; **real overlap found and reported, not fixed** — the trigger sits on the lead image's bottom-right corner at tablet (834px) and on the Details card at mobile (390px), since the trigger is `position: fixed; top: 50%` (vertically centred in the viewport) and this entry's header content reaches that far down the page at narrower widths.
+- **Part B — table wrapper focusable only when it scrolls (item 15 follow-up).** `.table-wrap`'s `tabindex="0"` (added 2026-09-29) was static, so on desktop — where `entries/work/this-website.html`'s table fits without scrolling — it was a real Tab stop that did nothing. Removed from the markup; `initTableWrapFocus()` (`script.js`, new) now sets it only while `scrollWidth > clientWidth`, per `.table-wrap`, re-evaluated via a `ResizeObserver` (catches viewport resize and font-load reflow alike, no manual debounce needed). `role="region"` and `aria-label` stay static. Verified: desktop, not a Tab stop (`scrollWidth === clientWidth`); mobile (390px), `tabindex="0"` present (`scrollWidth` 434 vs `clientWidth` 343), the sitewide focus ring applies with no clipping (confirmed via computed style), and real `ArrowRight`/`ArrowLeft` key presses scroll it (`scrollLeft` 0 → 40 → 0). No entry template currently contains a table, so nothing there needed the same edit; `md/COMPONENTS.md`'s table section corrected to describe this.
+- **Part C — explicit high-res source for the image viewer (cleanup item 17).** `deriveFullSrc()` guessed `{name}-full.webp` for every in-body image and requested it unconditionally; two real images never had a `-full` variant built, producing a real failed request (and a console error) on every load of the page containing them. Deleted `deriveFullSrc()`; `showImageAt()` (`script.js`) now reads `img.dataset.fullSrc` — present only where the file genuinely exists on disk — and shows the thumbnail's own `src` directly (no extra request) when it's absent. `onerror` kept as a safety net for a present-but-broken `data-full-src`. Audited every `.standard-page-content img` on both Work entries with in-body images (Thoughts entries currently have none) against the real files in `assets/images/entries/`:
+
+  | Entry | Image | `-full` exists | `data-full-src` added |
+  |---|---|---|---|
+  | this-website | search-intentional-design.webp | yes | yes |
+  | this-website | atla-cabbages.png | **no** | no |
+  | this-website | search-implementation-bugs.webp | yes | yes |
+  | this-website | filter-implementation.webp | yes | yes |
+  | this-website | Table-of-contents.webp | yes | yes |
+  | star-engine | section-1/what-is-star-engine.webp | yes | yes |
+  | star-engine | section-3/editor-interface.webp (2 uses) | yes | yes |
+  | star-engine | section-3/Editor-Window-Functions.webp | yes | yes |
+  | star-engine | section-3/editor-concepts-plugin-functionality.webp | yes | yes |
+  | star-engine | section-3/editor-concepts-plugin-toolbar-new-window.webp | **no** | no |
+  | star-engine | section-2/foundations-helpful-mentors.webp | yes | yes |
+  | star-engine | section-2/foundations-interviews.webp | yes | yes |
+  | star-engine | section-2/foundations-workflow.webp | yes | yes |
+  | star-engine | section-3/toolbox-help-documentation.webp | yes | yes |
+  | star-engine | section-3/toolbox-help-documentation-improvement.webp | yes | yes |
+  | star-engine | section-4/rastar-render.webp | yes | yes |
+  | star-engine | section-4/rastar-editor-tool.webp | yes | yes |
+  | star-engine | section-5/viewport-render-issues.webp | yes | yes |
+  | star-engine | section-5/viewport-visual-manager.webp | yes | yes |
+  | star-engine | section-6/object-references-flow-comparison.webp | yes | yes |
+  | star-engine | section-6/object-references-window-diagram.webp | yes | yes |
+  | star-engine | conclusion.webp | yes | yes |
+
+  20 of 22 real image uses got the attribute; the two without a built `-full.webp` (`atla-cabbages.png`, `editor-concepts-plugin-toolbar-new-window.webp`) correctly show only their thumbnail now, with zero failed requests, confirmed via Playwright — clicking every trigger on both entries and checking the console found 0 errors. `md/NEW-ENTRY-PROCESS.md` gained a new "In-Body Images" note describing the convention for future entries.
+- **Part D — `.about-contact-links`.** Zero consumers anywhere (any HTML page, `script.js`) — confirmed via repo-wide grep, same finding as the 2026-09-29 audit, which left it in place only because that pass was scoped to "audit, don't remove." This pass's instruction was to delete a zero-consumer rule outright, so the `style.css` rule is gone; `about.html` itself never referenced it and needed no change.
 
 ---
 
