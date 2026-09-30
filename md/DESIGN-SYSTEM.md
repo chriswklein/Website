@@ -1,5 +1,5 @@
 # Design System — Atomic Foundation
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Last Updated:** 2026-09-30
 **Status:** Active — source of truth for all design and build decisions
 
@@ -471,8 +471,7 @@ On tablet (≤1023px) and mobile: all card rows collapse to single column.
 - Height: `64px`
 - Background: `--color-background-surface`
 - Border bottom: `1px solid --color-border-default`
-- Items: Home, Work, Thoughts, About — icon above label
-- Icon size: `20px`
+- Items: Home, Archive, About — text-only today (icons deferred, no icon above label currently — see §10)
 - Label style: `nav-tab` type style
 - Active item: `--color-interactive-default`
 - Inactive item: `--color-text-secondary`
@@ -690,9 +689,15 @@ Visually hidden until keyboard focus. First child of `<body>` on every page.
 
 ## 10. Icons
 
-**None currently in use — text-only site-wide.** Tabler Icons (outline style) was removed completely 2026-07-05 (commit 7d71326): CDN link dropped from every page `<head>`, all icon elements removed, tab bar and Back to Top button rebuilt text-only. No icon CDN or library should be added to any page.
+**Corrected 2026-09-30** (was "None currently in use — text-only site-wide," a leftover from the 2026-07-05 removal that conflated "no icon library" with "no icons"): **no icon library or CDN is loaded on any page** — Tabler Icons (outline style) was removed completely 2026-07-05 (commit 7d71326), CDN link dropped from every page `<head>`. That part of the original note still holds; no icon CDN or library should be added to any page. But icons themselves are in active use today, hand-authored as **inline `<svg>` markup** (in `script.js` template strings, or directly in HTML), not loaded from any external source:
 
-A future iteration may reintroduce Tabler Icons **self-hosted** (webfont downloaded into `assets/icons/`, not via CDN) — see md/COMPONENTS.md's Mobile Tab Bar and Back to Top Button "Deferred" sections for the planned icon mapping and sizes. If that happens:
+- Path fill: `fill="currentColor"` on each `<path>` — the icon always matches its element's own text colour, in every state, with no separate icon-colour token
+- Decorative icons: `aria-hidden="true" focusable="false"` on the `<svg>` — the icon never has its own accessible name; the containing control's label (visible text or `aria-label`) covers it
+- Sizing: the `--icon-size-xs`/`-sm`/`-md`/`-lg` scale (§9.2) for most icons — `--icon-size-lg` is also aliased as `--button-icon-size` for every in-page button-like control's icon. One exception: the image viewer's expand icon sizes via `--space-5`, not the icon-size scale (pre-dates it, not yet reconciled — flagged, not resolved here)
+
+**Where used today:** the floating rail triggers (Archive's Filters trigger, the entry-page Contents trigger — both share `.action-rail-trigger-icon`), the card/entry CTA link arrow (`.link-cta-icon`), the ToC panel's label icon and each H3 row's sub-section icon (`.toc-panel-label-icon`, `.toc-sub-icon`), the in-body image viewer's expand icon, the Filter Drawer's label icon (`.filter-drawer-label-icon`), and the About page's contact buttons (`.contact-icon-btn svg`, Email/LinkedIn). `.link-inline-icon` (`--icon-size-sm`) is also part of this scale but currently has no live page consumer.
+
+The Mobile Tab Bar is the one exception, still genuinely text-only today (see `## 4`/`md/COMPONENTS.md`'s Mobile Tab Bar section) — a future iteration may add icons there, self-hosted (webfont downloaded into `assets/icons/`, not via CDN) rather than via the inline-SVG pattern above, since a webfont better suits a small fixed icon set reused per label. If that happens:
 - Always use outline variants — never use `-filled` suffix variants
 - Always add `aria-hidden="true"` to decorative icons
 - Icon-only interactive elements must have an `aria-label`

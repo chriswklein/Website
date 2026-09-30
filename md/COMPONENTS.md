@@ -1,5 +1,5 @@
 # Design System — Component Specifications
-**Version:** 2.6.0
+**Version:** 2.7.0
 **Last Updated:** 2026-09-30
 **Status:** Active — source of truth for all component build decisions
 
@@ -751,20 +751,44 @@ The desktop nav is the persistent wayfinding element. It stays sticky at the top
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--nav-*` was never a real set of CSS custom properties; `header`/`.site-nav`/`.nav-logo`/`.nav-links` reference shared semantic tokens directly. Listed here as the real values each part uses, not as named `--nav-*` tokens (same treatment `--tag-*`/`--chip-*` got 2026-09-29):
+
 ```css
---nav-bg:               var(--color-background-base);
---nav-border:           var(--color-border-default);
---nav-height:           64px;
---nav-logo-size:        var(--font-size-base);
---nav-logo-weight:      var(--font-weight-bold);
---nav-link-size:        var(--font-size-sm);
---nav-link-weight:      var(--font-weight-medium);
---nav-link-spacing:     var(--letter-spacing-widest);
---nav-link-color:       var(--color-text-secondary);
---nav-link-hover:       var(--color-text-primary);
---nav-link-active:      var(--color-text-primary);
---nav-link-gap:         var(--space-8);
---nav-transition:       var(--duration-fast) var(--ease-out);
+/* header (bg + bottom border) */
+background-color: var(--color-background-base);
+border-bottom:     var(--border-width-thin) solid var(--color-border-default);
+
+/* .site-nav .container */
+height: 64px;
+
+/* .nav-logo */
+font-size:   var(--font-size-base);
+font-weight: var(--font-weight-bold);
+color:       var(--color-text-primary);
+letter-spacing: var(--letter-spacing-wide);
+
+/* .nav-logo:hover */
+color: var(--color-interactive-hover);
+
+/* .nav-links */
+gap: var(--space-20);   /* corrected 2026-09-30 — was wrongly documented as --space-8 */
+
+/* .nav-links a (default) */
+font-size:      var(--font-size-sm);
+font-weight:    var(--font-weight-medium);
+color:          var(--color-text-secondary);
+letter-spacing: var(--letter-spacing-widest);
+transition:     color var(--duration-fast) var(--ease-out);
+
+/* .nav-links a:hover, a:focus-visible */
+color: var(--color-interactive-hover);
+
+/* .nav-links a[aria-current="page"] — current-page indicator, see Active State below */
+color:                    var(--color-text-primary);
+text-decoration:          underline;
+text-decoration-thickness: var(--border-width-medium);  /* 2px */
+text-underline-offset:     var(--space-1);                /* 4px */
+text-decoration-color:     var(--color-accent-primary-text);
 ```
 
 ### Anatomy
@@ -795,7 +819,7 @@ Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thi
 
 | State | Colour | Decoration |
 |---|---|---|
-| Default | `--nav-link-color` | None |
+| Default | `--color-text-secondary` (2026-09-30 — corrected from the fictional `--nav-link-color` token name; same real value) | None |
 | Hover / Focus | `--color-interactive-hover` (2026-09-27 — was `--nav-link-hover`/`--color-text-primary`) | None |
 | Active (current page) | `--color-text-primary` | Underline — see Active State above |
 
@@ -825,21 +849,40 @@ The tab bar replaces the desktop nav entirely on mobile. It is always visible, f
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--tab-bar-*` was never a real set of CSS custom properties; `.tab-bar`/`.tab-bar-item` reference shared semantic tokens directly (same treatment `--tag-*`/`--chip-*` got 2026-09-29). One value was also wrong, not just fictionally named: the current-page colour was documented as `--color-interactive-default`; the real rule uses `--color-text-primary` plus an underline, not a colour swap alone (see below):
+
 ```css
---tab-bar-bg:               var(--color-background-surface);
---tab-bar-border:           var(--color-border-default);
---tab-bar-height:           64px;
---tab-bar-icon-size:        20px;
---tab-bar-label-size:       var(--font-size-xs);
---tab-bar-label-weight:     var(--font-weight-medium);
---tab-bar-label-spacing:    var(--letter-spacing-widest);
---tab-bar-item-color:       var(--color-text-secondary);
---tab-bar-item-active:      var(--color-interactive-default);
---tab-bar-item-min-width:   44px;
---tab-bar-item-min-height:  44px;
---tab-bar-transition:       var(--duration-fast) var(--ease-out);
---tab-bar-z-index:          200;
+/* .tab-bar (mobile override, style.css MOBILE block) */
+display:          flex;
+position:          fixed;
+top:                0;
+height:             64px;
+background-color:  var(--color-background-surface);
+border-bottom:      var(--border-width-thin) solid var(--color-border-default);
+z-index:            200;
+
+/* .tab-bar-item (default) */
+min-width:      var(--touch-target-minimum);   /* 44px */
+min-height:     var(--touch-target-minimum);   /* 44px */
+color:          var(--color-text-secondary);
+font-size:      var(--font-size-xs);
+font-weight:    var(--font-weight-medium);
+letter-spacing: var(--letter-spacing-widest);
+transition:     color var(--duration-fast) var(--ease-out);
+
+/* .tab-bar-item:hover, :focus-visible */
+color: var(--color-interactive-hover);
+
+/* .tab-bar-item[aria-current="page"] — current-page indicator, matches
+   .nav-links a[aria-current="page"] exactly (Rule 3a) */
+color:                    var(--color-text-primary);   /* corrected 2026-09-30 — was wrongly documented as --color-interactive-default */
+text-decoration:          underline;
+text-decoration-thickness: var(--border-width-medium);  /* 2px */
+text-underline-offset:     var(--space-1);                /* 4px */
+text-decoration-color:     var(--color-accent-primary-text);
 ```
+
+No icon-size token is listed — the tab bar is text-only today (no icon element exists to size); see `## 10. Icons` in `md/DESIGN-SYSTEM.md` for the deferred self-hosted-icon plan.
 
 ### Icons — Deferred
 
@@ -879,7 +922,7 @@ Active item: `[aria-current="page"]` only — `.tab-bar-item.is-active` was remo
 
 | State | Colour | Decoration |
 |---|---|---|
-| Default | `--tab-bar-item-color` | None |
+| Default | `--color-text-secondary` (2026-09-30 — corrected from the fictional `--tab-bar-item-color` token name; same real value) | None |
 | Hover / Focus | `--color-interactive-hover` (2026-09-27 — previously no explicit hover/focus rule existed at all) | None |
 | Active (current page) | `--color-text-primary` | Underline, `text-decoration-thickness: var(--border-width-medium)`, `text-underline-offset: var(--space-1)`, `text-decoration-color: var(--color-accent-primary-text)` — matches `.nav-links a[aria-current]`'s own treatment exactly (`## 4`, Rule 3a). Previously colour-only, an WCAG 1.4.1 gap fixed 2026-09-27 |
 
@@ -2074,12 +2117,14 @@ Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current
 | `.tag`/`.tag-chip` hover text (2026-09-30 — replaces fictional `--tag-text-hover`; border stays `--color-accent-primary`, unchanged from default — the old `--tag-border-hover` → `--color-accent-primary-text` row was wrong) | `--color-accent-primary-text` | `#00E5CB` |
 | `--color-link` (2026-09-27) | `--color-accent-primary` (swapped with `--color-link-hover` below — teal interaction rule, dark at rest) | `#00BAA5` |
 | `--color-link-hover` (2026-09-27) | `--color-accent-primary-text` (swapped — bright on hover) | `#00E5CB` |
-| `--nav-bg` | `--color-background-base` | `#1C1C1C` |
-| `--nav-link-color` | `--color-text-secondary` | `#AEAEAE` |
-| `--nav-link-active` | `--color-text-primary` | `#E8E8E8` |
-| `--tab-bar-bg` | `--color-background-surface` | `#242424` |
-| `--tab-bar-item-color` | `--color-text-secondary` | `#AEAEAE` |
-| `--tab-bar-item-active` | `--color-interactive-default` | `#E8E8E8` |
+| `header` background (2026-09-30 — replaces fictional `--nav-bg`; see footnote) | `--color-background-base` | `#1C1C1C` |
+| `.nav-links a` default text (replaces fictional `--nav-link-color`) | `--color-text-secondary` | `#AEAEAE` |
+| `.nav-links a[aria-current="page"]` text (replaces fictional `--nav-link-active`) | `--color-text-primary` | `#E8E8E8` |
+| `.tab-bar` background (replaces fictional `--tab-bar-bg`) | `--color-background-surface` | `#242424` |
+| `.tab-bar-item` default text (replaces fictional `--tab-bar-item-color`) | `--color-text-secondary` | `#AEAEAE` |
+| `.tab-bar-item[aria-current="page"]` text (2026-09-30 — replaces fictional `--tab-bar-item-active`; the old row's value was also wrong, not just fictionally named — real current-page colour is `--color-text-primary`, not `--color-interactive-default`) | `--color-text-primary` | `#E8E8E8` |
+| `.nav-links a[aria-current="page"]` / `.tab-bar-item[aria-current="page"]` underline (current-page indicator, both identical — Rule 3a) | `--color-accent-primary-text`, `text-decoration-thickness: var(--border-width-medium)` (2px), `text-underline-offset: var(--space-1)` (4px) | `#00E5CB` |
+| `.nav-links a:hover`/`:focus-visible`, `.tab-bar-item:hover`/`:focus-visible`, `.nav-logo:hover` | `--color-interactive-hover` | `#00E5CB` |
 | `--tooltip-bg` | `--color-tooltip-bg` → `--color-background-surface` | `#242424` |
 | `--tooltip-border` | `--color-tooltip-border` → `--color-accent-primary` | `#00BAA5` |
 | `--toast-border` | `--color-accent-primary` | `#00BAA5` |
@@ -2087,7 +2132,7 @@ Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current
 | `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#00BAA5` |
 | `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
 
-**Fixed 2026-09-30:** the `--tag-*`/`--chip-*` families (`--tag-border`, `--tag-border-hover`, `--tag-text`, `--tag-text-hover`, `--tag-bg`, `--tag-bg-hover`, and the `## 2b` `--chip-*` set) never existed as CSS custom properties anywhere in `style.css` — `.tag`/`.tag-chip` reference the semantic tokens listed above directly, and this table (and `## 2`/`## 2b` above) now document the real values instead of the fictional named tokens. Two of the old rows also had the wrong value (hover border was documented as changing to `--color-accent-primary-text`; it doesn't — border stays `--color-accent-primary`. Hover background was documented as `--color-background-base` `#1C1C1C`; it's actually `--color-background-subtle` `#2F2F2F`). `--nav-*` and `--tab-bar-*` below have the same fictional-token issue (no `--nav-*`/`--tab-bar-*` custom property exists in `style.css` either) but are out of scope for this pass — flagged, not fixed.
+**Fixed 2026-09-30:** the `--tag-*`/`--chip-*` families (`--tag-border`, `--tag-border-hover`, `--tag-text`, `--tag-text-hover`, `--tag-bg`, `--tag-bg-hover`, and the `## 2b` `--chip-*` set) never existed as CSS custom properties anywhere in `style.css` — `.tag`/`.tag-chip` reference the semantic tokens listed above directly, and this table (and `## 2`/`## 2b` above) now document the real values instead of the fictional named tokens. Two of the old rows also had the wrong value (hover border was documented as changing to `--color-accent-primary-text`; it doesn't — border stays `--color-accent-primary`. Hover background was documented as `--color-background-base` `#1C1C1C`; it's actually `--color-background-subtle` `#2F2F2F`). **Fixed 2026-09-30:** `--nav-*` and `--tab-bar-*` (flagged above, unresolved as of 2026-09-29) had the same issue — no `--nav-*`/`--tab-bar-*` custom property exists in `style.css` either, `header`/`.site-nav`/`.nav-logo`/`.nav-links`/`.tab-bar`/`.tab-bar-item` reference the semantic tokens above directly. `--tab-bar-item-active` also had the wrong *value*, not just the wrong name (documented as `--color-interactive-default`; the real current-page rule is `--color-text-primary` plus an underline — see `## 4`/`## 5` above for the full Component Tokens rewrite, including the current-page indicator and hover colour).
 
 ---
 
