@@ -60,5 +60,18 @@
     "image": "",
     "imageAlt": "",
     "published": false
+  },
+  {
+    "id": "sharing-and-caring-part-1",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "Sharing and Caring for Your Game, Part 1: Rewards",
+    "excerpt": "Sharing your game early, often, and with new people is both a chance for valuable feedback and a security risk.",
+    "tags": ["Game Development", "Quality Assurance", "User Experience"],
+    "date": "TBD",
+    "url": "/entries/thoughts/sharing-and-caring-part-1.html",
+    "image": "/assets/images/entries/thoughts/sharing-and-caring-part-1/final-game.webp",
+    "imageAlt": "In-game screenshot of Tessallation's classroom, with students at rows of desks and a chalkboard diagramming the game's time-travel rules.",
+    "published": false
   }
 ]
