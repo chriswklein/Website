@@ -1981,16 +1981,26 @@ No component-scoped tokens — reuses semantic tokens directly:
 color:  var(--color-link);          /* rest */
 color:  var(--color-link-hover);    /* hover */
 ```
+**No `font-size`/`font-weight` of its own (2026-10-05, confirmed never has had one)** — `.link-inline` always inherits the font-size and weight of whatever body copy it sits inside (18px/`--font-weight-regular` in current entry body text). This was already the one correct reference point when `.link-cta`'s own undocumented 14px/`--font-weight-medium` was traced and removed from its own base rule — see `## 17`'s Component Tokens for that correction.
 Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
 
 ### Anatomy
 ```
 [ Label text ][ trailing icon ]
 ```
-- Container: `<a class="link-inline">`
-- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor
+- Container: `<a class="link-inline">` — plain inline (not `inline-flex`; see Known Issue below for why)
+- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor, written with **no whitespace character** between the label text and the `<svg>` in the markup (e.g. `label text<svg ...>`, not `label text <svg ...>`) — the intended, but not fully sufficient (see Known Issue), measure against the icon orphaning onto its own line when the link text wraps
+- Icon spacing/alignment (2026-10-05, plain-inline rule): `.link-inline-icon` carries its own `margin-left: var(--space-1)` (replaces the old `inline-flex` `gap`) and `vertical-align: -2px` (nudges the icon onto the text baseline — inline replaced elements default to `vertical-align: baseline`, which sits visibly low against surrounding glyphs)
 - `font-style: normal` is set explicitly on `.link-inline` — a deliberate reset so the link never inherits italics from an italic context (e.g. inside a `<cite>` or `<em>`), per the "no italics" requirement
 - No separate `aria-label` — the visible label text is the accessible name
+
+### Known Issue — Icon Can Still Orphan Onto Its Own Line (open, 2026-10-05)
+
+`.link-inline`/`.link-cta` were originally built `display: inline-flex` with `align-items: center`. When a link's text wrapped across multiple lines, that centered the trailing icon against the *flex container's total height* (the whole wrapped block), not any single line — visually detaching it from the last word. Switching both to plain inline flow was expected to fix this outright, on the reasoning that an inline-replaced element (the `<svg>`) immediately abutting the preceding text with no whitespace character has no valid break point before it, so it could never land alone on a new line.
+
+**That assumption was wrong, confirmed by direct measurement, not just eyeballing.** A real-browser width sweep (Chromium, real `viewport` resizes, not a simulated container) found the icon **orphaned onto its own line — with no preceding word — at several discrete widths**, on both a real link (the "PC Gamer" item in `entries/thoughts/sharing-and-caring-part-1.html`'s Links and Articles list, orphaned at 320px) and a deliberately long synthetic test link (orphaned at 1024px and 1440px, not at 500px or 700px — the effect is intermittent and width-dependent, not confined to narrow viewports). Browsers are evidently permitted to break between running text and an adjacent inline-replaced element even with zero whitespace in the source — the no-space markup convention above reduces how often this happens but does not prevent it.
+
+**Status: unresolved.** The discussed fallback — wrapping the last word and the icon together in a `white-space: nowrap` span — is a markup change (not CSS-only) requiring separate sign-off; not yet applied anywhere. Any future entry using `.link-inline`/`.link-cta` on body-copy-length link text should be spot-checked at a few widths until this is resolved.
 
 ### States
 
@@ -2010,7 +2020,7 @@ Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
 Same at all breakpoints — no responsive overrides defined.
 
 ### Status
-Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Not yet applied to any real page** — a visual reference only, pending a follow-up task to apply it to existing inline links (e.g. the Home hero subtitle's "Christopher Klein" link). Flagged for review in that same section: the icon at `var(--icon-size-sm)` (14px) may read large against 16px body copy — `var(--icon-size-xs)` (12px) is the first fallback to try.
+Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Correction, 2026-10-05:** this previously read "not yet applied to any real page" — stale. It's live in two places: `entries/work/star-engine.html` (two citation links, pre-dating this correction) and `entries/thoughts/sharing-and-caring-part-1.html` (ten links — two mid-paragraph, eight in a standalone list). The Home hero subtitle's "Christopher Klein" link has still not been converted to `.link-inline`. Flagged for review in Section 24: the icon at `var(--icon-size-sm)` (14px) may read large against 18px body copy (body text moved from 16px to 18px in the 2026-09-24 reading-comfort update, after this note was first written) — `var(--icon-size-xs)` (12px) is the first fallback to try.
 
 ---
 
@@ -2034,25 +2044,35 @@ The real, visible, keyboard-focusable link on every Card component as of 2026-09
 ### Component Tokens
 No component-scoped tokens — reuses semantic tokens directly:
 ```css
+/* Base rule — standalone usage, not inside a Card */
 color:   var(--color-link);          /* rest */
 color:   var(--color-link-hover);    /* hover */
 padding: var(--space-3) var(--space-2);
-margin:  calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+margin:  0 calc(var(--space-2) * -1);
 ```
+**Font-size correction, 2026-10-05:** the base rule carries no `font-size`/`font-weight` of its own and inherits ambient body text size — same behaviour as `## 16. Inline Link`. It previously set `font-size: var(--font-size-sm); font-weight: var(--font-weight-medium)` (14px/600) unconditionally, which was never a real §17 decision — it was leftover styling from when `.link-cta` only ever existed inside a Card (where 14px *is* correct, matching `.card-date`/`.card-tag`'s scale), surfaced as a real bug the first time `.link-cta` was reused standalone in body content (the itch.io CTA in `entries/thoughts/sharing-and-caring-part-1.html` rendered visibly smaller than the surrounding 18px body text). See Card-Scope Exception below for where 14px/600 is still correct and still applied.
+
 Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 
 ### Anatomy
 ```
 [ Label text ][ trailing icon ]
 ```
-- Container: `<a class="link-cta" aria-label="{Title} — {action}">`
-- Label text: `"View this work"` (Work entries) or `"View this thought"` (Thoughts entries) — driven by `entry.type` in `buildCard()` (`script.js`), not hardcoded per card; `index.html`'s hand-written cards match this exactly per-card
-- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor
-- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) — the visible "View this work" / "View this thought" text alone would be ambiguous out of context (several cards share the same visible label on one page), so the accessible name adds the title
+- Container: `<a class="link-cta" aria-label="{Title} — {action}">` — plain inline (not `inline-flex`) outside a Card; see `## 16`'s Known Issue, which applies identically here
+- Label text: `"View this work"` (Work entries) or `"View this thought"` (Thoughts entries) inside a Card, driven by `entry.type` in `buildCard()` (`script.js`); free text when used standalone outside a Card (e.g. `"Play Tessallation on itch.io"`)
+- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor, no whitespace character before it in the markup (see `## 16`'s Anatomy note — same convention, same caveat)
+- Icon spacing/alignment (2026-10-05, plain-inline base rule): `.link-cta-icon` carries `margin-left: var(--space-1)` and `vertical-align: -2px`, same mechanism as `.link-inline-icon` — overridden back to `margin-left: 0` inside a Card (see Card-Scope Exception)
+- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) when inside a Card, where the visible label alone is ambiguous (several cards share it on one page); a standalone CTA whose visible text is already unambiguous on its own (e.g. the itch.io CTA) can use a plainer `aria-label` describing the action instead
 - `font-style: normal` set explicitly, same reset rationale as `.link-inline`
 
 ### Touch-Target Padding
-`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. This is offset by an equal, negated `margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1)` so the added padding doesn't visually shift the link's position — the padding grows the hit area only.
+`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. **Revised 2026-10-05:** the vertical halves of the old compensating margin (`margin-top`/`margin-bottom: calc(var(--space-3) * -1)`) are removed — vertical margin has no effect on a plain inline, non-replaced box in any browser (CSS spec, not something this change caused), so once `.link-cta` stopped being `inline-flex` those declarations did nothing and were dropped as genuinely dead code, not just redundant. The horizontal halves are kept (`margin: 0 calc(var(--space-2) * -1)`): horizontal margin *does* apply normally to inline boxes, so the pair still cancels the horizontal padding's visual shift exactly as before.
+
+This was verified by direct measurement, not assumed either way: `document.elementFromPoint()` sampled vertically through a real rendered `.link-cta` (the itch.io CTA) before and after adding padding. With the restored padding, the real clickable hit area measured **48.7px tall** (the 24.7px text/icon box plus 12px top + 12px bottom padding) — continuous, with no gap — comfortably over the 44px minimum, and the padded area did not bleed into or steal clicks from the image above or the paragraph below. That non-bleeding result depends on `.link-cta` always sitting alone on its own line, which is true of every current usage (Card and standalone alike) — `.link-cta` is documented as "not for mid-sentence use" specifically for this reason among others (see When NOT to Use, above); if that constraint were ever violated, the vertical padding could visually overlap and intercept clicks meant for an adjacent line of real body text.
+
+### Card-Scope Exception
+
+Inside `.card-content`, `.link-cta` keeps its original, full `inline-flex` layout — `display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium)` — layered on top of the base rule via `.card-content .link-cta`. This is a deliberate, scoped exception, not an oversight: `margin-top: auto` (pinning the link to the bottom of `.card-content`'s flex column so two cards in the same row align their links regardless of excerpt length — see `## 3. Card`, Spacing) only works on a flex item, so plain inline flow isn't an option here. `.card-content .link-cta .link-cta-icon` separately resets `margin-left: 0` and restores `flex-shrink: 0`, so the base rule's plain-inline icon spacing doesn't stack with the flex `gap` here and double the visible gap. Every live Card instance (`index.html`'s two Featured Work cards plus "Welcome" Featured Thought card, `design-system.html` Section 14's two previews) was confirmed pixel-identical before and after the 2026-10-05 base-rule change — same font-size, same weight, same `display: flex` (blockified from `inline-flex` as a flex item, per spec), same computed margins.
 
 **Card context override (2026-09-27):** `.card-content .link-cta` repoints the top value of that margin to `auto` — `margin: auto calc(var(--space-2) * -1) calc(var(--space-3) * -1)` — so the link pins itself to the bottom of `.card-content`'s flex column regardless of excerpt length (see `## 3` Card's Spacing section). Horizontal and bottom values are unchanged from the base rule above.
 

@@ -1106,9 +1106,6 @@ pre code {
    inline links within a block of text from the 44px minimum.
 ================================ */
 .link-inline {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
     color: var(--color-link);
     text-decoration: underline;
     font-style: normal;
@@ -1118,31 +1115,64 @@ pre code {
     color: var(--color-link-hover);
 }
 
+/* Plain inline (not inline-flex, 2026-10-05 fix): the icon must stay
+   glued to whichever word precedes it when the link text wraps across
+   lines. inline-flex centered the icon against the flex container's
+   total cross-axis size, which for a wrapped multi-line text item is the
+   whole block's height, not any single line — visually detaching the
+   icon from the last line. Plain inline flow has no such concept; the
+   icon is just the next glyph-like box in reading order, so it wraps
+   together with whatever word it's adjacent to. margin-left replaces the
+   old flex gap (no breakable space is written between the text and the
+   <svg> in any instance's markup, so there is nothing for the line-
+   breaking algorithm to split on). vertical-align nudges it onto the
+   text baseline, since inline replaced elements default to
+   vertical-align: baseline, which sits visibly low against text glyphs. */
 .link-inline-icon {
     width: var(--icon-size-sm);
     height: var(--icon-size-sm);
-    flex-shrink: 0;
+    margin-left: var(--space-1);
+    vertical-align: -2px;
 }
 
 /* ================================
    CTA LINK
    Replaces .card-block-link as the real, visible, keyboard-focusable
    link on cards (see .card-block-link's aria-hidden/tabindex=-1 above).
-   Underlined text link, not a button — no border/background/chrome —
-   but padded to meet the 44px touch target since it isn't sitting
-   inline in a line of surrounding text the way .link-inline does.
+   Underlined text link, not a button — no border/background/chrome.
+   Base rule (2026-10-05, see .link-inline's comment above for the full
+   wrap-bug explanation): plain inline, inherits ambient font-size — the
+   old inline-flex + explicit --font-size-sm/--font-weight-medium here
+   was never a documented §17 decision, just leftover styling from when
+   .link-cta only ever existed inside a 14px card. Touch-target padding
+   is kept — measured directly (elementFromPoint sampled across the
+   rendered box, not assumed): vertical padding on a plain inline,
+   non-replaced element DOES still extend the real clickable hit area in
+   this engine, because it never affects line-box layout/position in the
+   first place (nothing to push away), so there was never anything for a
+   compensating margin to cancel vertically. The vertical halves of the
+   old negative margin (top/bottom) are dropped because they're genuinely
+   inert on a plain inline box — CSS spec, not an assumption — confirmed
+   by the same measurement showing identical hit geometry with or without
+   them. The horizontal halves (left/right) are kept, since horizontal
+   margin does apply to inline boxes and still cancels the horizontal
+   padding's visual shift exactly as before. Real measured hit height:
+   48.7px (12px+12px padding plus the 24.7px text/icon box), safely over
+   the 44px minimum, with no bleed into the image above or the paragraph
+   below in current usage — every .link-cta sits on its own line today;
+   see §17's docs for why that's load-bearing for this padding trick, not
+   just current usage. Card usage (.card-content .link-cta, below) still
+   needs the full original flex layout — flex is what makes
+   margin-top: auto's bottom-pinning behaviour possible — so that's
+   restored there in full, keeping every live Card instance
+   pixel-identical to before.
 ================================ */
 .link-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
     padding: var(--space-3) var(--space-2);
-    margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+    margin: 0 calc(var(--space-2) * -1);
     color: var(--color-link);
     text-decoration: underline;
     font-style: normal;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
 }
 
 .link-cta:hover {
@@ -1152,7 +1182,27 @@ pre code {
 .link-cta-icon {
     width: var(--icon-size-md);
     height: var(--icon-size-md);
-    flex-shrink: 0;
+    margin-left: var(--space-1);
+    vertical-align: -2px;
+}
+
+/* Shared by .link-inline and .link-cta (2026-10-05) — wraps the link's
+   last word together with its trailing icon so the pair can never be
+   separated by a line break. Plain-inline flow alone (above) was not
+   enough: real-browser testing found a browser can still break between
+   running text and an adjacent inline-replaced element (the <svg>) even
+   with zero whitespace in the source, orphaning the icon alone on its
+   own line at several discrete widths (confirmed on a real link at
+   320px, and a long synthetic test link at 1024px/1440px — the effect
+   is width-dependent and intermittent, not confined to narrow
+   viewports). white-space: nowrap on just this last word + icon is the
+   only thing that actually prevents it — the single property forbids
+   any line break inside the span, so the pair always travels together,
+   wrapping as a unit onto whatever line has room. Not used on
+   .card-content .link-cta — Card usage keeps its original inline-flex
+   layout (below), which never wraps in the first place. */
+.link-nowrap {
+    white-space: nowrap;
 }
 
 /* Sits above .card-block-link (z-index 1) so it stays the real,
@@ -1168,7 +1218,25 @@ pre code {
 .card-content .link-cta {
     position: relative;
     z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-2);
     margin: auto calc(var(--space-2) * -1) calc(var(--space-3) * -1);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Undoes the base .link-cta-icon's plain-inline margin-left/vertical-align
+   (above) back to the flex gap/align-items this card context restores —
+   without this override, a card's icon would get both the flex gap AND
+   the inline margin-left stacked, doubling the visible gap. flex-shrink:0
+   is restored for the same reason: irrelevant to plain inline content,
+   but needed again now that this icon is back inside a flex container. */
+.card-content .link-cta .link-cta-icon {
+    margin-left: 0;
+    vertical-align: baseline;
+    flex-shrink: 0;
 }
 
 /* Hover/keyboard-focus on the card highlights its own link text too —
