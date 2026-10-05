@@ -1961,7 +1961,7 @@ No breakpoint-specific overrides — `max-width: 100%` plus the video's own `wid
 ## 16. Inline Link
 
 **CSS Class:** `.link-inline`
-**HTML Element:** `<a href="{url}" class="link-inline">{Label}<svg class="link-inline-icon">...</svg></a>`
+**HTML Element:** `<a href="{url}" class="link-inline">{Label text}<span class="link-nowrap">{last word}<svg class="link-inline-icon">...</svg></span><span class="sr-only"> (opens in new tab)</span></a>` (the `.sr-only` suffix only when `target="_blank"` — see Accessibility)
 
 Not yet named in Figma — built directly in code 2026-09-02, no Figma component reference exists yet.
 
@@ -1986,21 +1986,27 @@ Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
 
 ### Anatomy
 ```
-[ Label text ][ trailing icon ]
+[ Label text ][ .link-nowrap: last word + trailing icon ][ .sr-only: " (opens in new tab)" if target="_blank" ]
 ```
-- Container: `<a class="link-inline">` — plain inline (not `inline-flex`; see Known Issue below for why)
-- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor, written with **no whitespace character** between the label text and the `<svg>` in the markup (e.g. `label text<svg ...>`, not `label text <svg ...>`) — the intended, but not fully sufficient (see Known Issue), measure against the icon orphaning onto its own line when the link text wraps
+- Container: `<a class="link-inline">` — plain inline (not `inline-flex`; see "Last Word + Icon Never Separate" below for why)
+- `.link-nowrap` span (added 2026-10-05, see below): wraps the link's **last word together with the trailing icon** — `<span class="link-nowrap">{last word}<svg class="link-inline-icon" ...>...</svg></span>`. Whenever a link's text is edited, this span must move to wrap whatever word is now last (see `md/NEW-ENTRY-PROCESS.md`'s placeholder-URL checklist for the concrete case this bites: filling in a `[URL TBD]` marker).
+- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — inside `.link-nowrap`, immediately after the last word's text with no whitespace character before it in the markup
 - Icon spacing/alignment (2026-10-05, plain-inline rule): `.link-inline-icon` carries its own `margin-left: var(--space-1)` (replaces the old `inline-flex` `gap`) and `vertical-align: -2px` (nudges the icon onto the text baseline — inline replaced elements default to `vertical-align: baseline`, which sits visibly low against surrounding glyphs)
+- New-tab suffix (added 2026-10-05): when the link carries `target="_blank"`, a `<span class="sr-only"> (opens in new tab)</span>` sits as the anchor's last child, after `.link-nowrap`. Internal links (same tab) never get this span. See Accessibility below for why this exists and the "contains" rule it follows.
 - `font-style: normal` is set explicitly on `.link-inline` — a deliberate reset so the link never inherits italics from an italic context (e.g. inside a `<cite>` or `<em>`), per the "no italics" requirement
-- No separate `aria-label` — the visible label text is the accessible name
+- No `aria-label` override — the accessible name is computed from content (visible label + the `.sr-only` suffix when present), never set directly
 
-### Known Issue — Icon Can Still Orphan Onto Its Own Line (open, 2026-10-05)
+### Internal Links Use Plain `<a>`, Not This Component (clarified 2026-10-05)
+
+`.link-inline` (and `.link-cta`, `## 17`) are for **external** links only — leaving crzdevz.com, trailing arrow, new-tab. An internal link (same site, same tab) stays a plain `<a>` with no component class; the sitewide default link styling (underline-at-rest, see `style.css`'s general link rule near `## TAGS`) already covers it, and there's no arrow to add since nothing opens elsewhere. **Correction:** this section previously named the Home hero subtitle's "Christopher Klein" link (→ `/about.html`, internal) as a pending conversion target for `.link-inline` — that was wrong; it's internal and correctly stays a plain `<a>`. Removed from Status below.
+
+### Last Word + Icon Never Separate — `.link-nowrap` (added 2026-10-05)
 
 `.link-inline`/`.link-cta` were originally built `display: inline-flex` with `align-items: center`. When a link's text wrapped across multiple lines, that centered the trailing icon against the *flex container's total height* (the whole wrapped block), not any single line — visually detaching it from the last word. Switching both to plain inline flow was expected to fix this outright, on the reasoning that an inline-replaced element (the `<svg>`) immediately abutting the preceding text with no whitespace character has no valid break point before it, so it could never land alone on a new line.
 
-**That assumption was wrong, confirmed by direct measurement, not just eyeballing.** A real-browser width sweep (Chromium, real `viewport` resizes, not a simulated container) found the icon **orphaned onto its own line — with no preceding word — at several discrete widths**, on both a real link (the "PC Gamer" item in `entries/thoughts/sharing-and-caring-part-1.html`'s Links and Articles list, orphaned at 320px) and a deliberately long synthetic test link (orphaned at 1024px and 1440px, not at 500px or 700px — the effect is intermittent and width-dependent, not confined to narrow viewports). Browsers are evidently permitted to break between running text and an adjacent inline-replaced element even with zero whitespace in the source — the no-space markup convention above reduces how often this happens but does not prevent it.
+**That assumption was wrong, confirmed by direct measurement, not just eyeballing.** A real-browser width sweep (Chromium, real `viewport` resizes, not a simulated container) found the icon **orphaned onto its own line — with no preceding word — at several discrete widths**, on both a real link (the "PC Gamer" item in `entries/thoughts/sharing-and-caring-part-1.html`'s Links and Articles list, orphaned at 320px) and a deliberately long synthetic test link (orphaned at 1024px and 1440px, not at 500px or 700px — the effect is intermittent and width-dependent, not confined to narrow viewports). Browsers are evidently permitted to break between running text and an adjacent inline-replaced element even with zero whitespace in the source — the no-space markup convention alone reduces how often this happens but does not prevent it.
 
-**Status: unresolved.** The discussed fallback — wrapping the last word and the icon together in a `white-space: nowrap` span — is a markup change (not CSS-only) requiring separate sign-off; not yet applied anywhere. Any future entry using `.link-inline`/`.link-cta` on body-copy-length link text should be spot-checked at a few widths until this is resolved.
+**Resolved, 2026-10-05:** `.link-nowrap { white-space: nowrap; }` (`style.css`) wraps the last word + icon together (Anatomy, above) — the pair can no longer be split by a line break, since `white-space: nowrap` forbids any break inside the span. Re-verified with a real width sweep, 320px–1440px, after applying the span: zero orphans at every width checked, including the two widths that previously failed. Applied to every non-card `.link-inline`/`.link-cta` instance sitewide (`entries/thoughts/sharing-and-caring-part-1.html`, `entries/work/star-engine.html`). Not used on `.card-content .link-cta` — Card usage keeps its original `inline-flex` layout (`## 17`'s Card-Scope Exception), which never wraps in the first place.
 
 ### States
 
@@ -2013,21 +2019,24 @@ Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
 ### Accessibility
 
 - No touch-target padding — WCAG 2.5.5 (Target Size) exempts inline links within a running block of text from the 44px minimum, since `.link-inline` is never meant to appear as a standalone target the way `.link-cta` is
-- Icon: `aria-hidden="true" focusable="false"` — decorative; the label text alone carries the accessible name
+- Icon: `aria-hidden="true" focusable="false"` — decorative; excluded from the accessible name either way
+- Accessible name rule (2026-10-05): the computed accessible name must **contain** the visible label text (WCAG 2.5.3, Label in Name) — starting with it is preferred for any new link, but "contains" is the actual pass bar, since a documented exception already relies on it (`## 17`'s Card `aria-label`, `"{Title} — {action}"`, starts with the title rather than the visible label). No `aria-label` override on `.link-inline`/`.link-cta` outside that one documented Card exception — the accessible name is always computed from content.
+- New-tab announcement (2026-10-05): when `target="_blank"` is present, a `<span class="sr-only"> (opens in new tab)</span>` is the anchor's last child (Anatomy, above), so the accessible name reads "{visible label} (opens in new tab)" — contains (and starts with) the visible text, satisfying 2.5.3 without an `aria-label`. This reuses the exact wording and `.sr-only`-suffix pattern the site's footer links already use for similar context (e.g. `<span class="sr-only"> — view more entries in the Work section</span>`), not a new pattern. Internal (same-tab) links never get this span. Before this, the component had **no new-tab announcement at all** — a real gap against the sitewide convention already used on `.contact-icon-btn`/`.about-history-company` (`aria-label="{Name} (opens in new tab)"`), caught in the 2026-10-05 sitewide link audit.
 - Focus ring: inherited from the sitewide `:focus-visible` rule (`style.css`, "FOCUS STYLES") — no component-level override
 
 ### Responsive Behaviour
 Same at all breakpoints — no responsive overrides defined.
 
 ### Status
-Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Correction, 2026-10-05:** this previously read "not yet applied to any real page" — stale. It's live in two places: `entries/work/star-engine.html` (two citation links, pre-dating this correction) and `entries/thoughts/sharing-and-caring-part-1.html` (ten links — two mid-paragraph, eight in a standalone list). The Home hero subtitle's "Christopher Klein" link has still not been converted to `.link-inline`. Flagged for review in Section 24: the icon at `var(--icon-size-sm)` (14px) may read large against 18px body copy (body text moved from 16px to 18px in the 2026-09-24 reading-comfort update, after this note was first written) — `var(--icon-size-xs)` (12px) is the first fallback to try.
+Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Correction, 2026-10-05:** this previously read "not yet applied to any real page" — stale. It's live in two places: `entries/work/star-engine.html` (four links — the two original citation links plus two plain `<a>` tags converted to `.link-inline` in the 2026-10-05 link audit) and `entries/thoughts/sharing-and-caring-part-1.html` (ten links — two mid-paragraph, eight in a standalone list). **Second correction, same date:** this section previously named the Home hero subtitle's "Christopher Klein" link as a pending `.link-inline` conversion target — removed; that link is internal and correctly stays a plain `<a>` (see "Internal Links Use Plain `<a>`" above). Flagged for review in Section 24: the icon at `var(--icon-size-sm)` (14px) may read large against 18px body copy (body text moved from 16px to 18px in the 2026-09-24 reading-comfort update, after this note was first written) — `var(--icon-size-xs)` (12px) is the first fallback to try.
 
 ---
 
 ## 17. CTA Link
 
 **CSS Class:** `.link-cta`
-**HTML Element:** `<a href="{url}" class="link-cta" aria-label="{Title} — {action}">{action}<svg class="link-cta-icon">...</svg></a>`
+**HTML Element — Card usage:** `<a href="{url}" class="link-cta" aria-label="{Title} — {action}">{action}<svg class="link-cta-icon">...</svg></a>` (no `.link-nowrap`, no new-tab suffix — Cards never open a new tab)
+**HTML Element — standalone usage:** `<a href="{url}" class="link-cta" target="_blank" rel="noopener noreferrer">{Label text}<span class="link-nowrap">{last word}<svg class="link-cta-icon">...</svg></span><span class="sr-only"> (opens in new tab)</span></a>` (target/rel and the `.sr-only` suffix only when the destination is external — see `## 16`'s Accessibility section, which this follows identically)
 
 Not yet named in Figma — built directly in code 2026-09-02, no Figma component reference exists yet.
 
@@ -2060,9 +2069,9 @@ Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 ```
 - Container: `<a class="link-cta" aria-label="{Title} — {action}">` — plain inline (not `inline-flex`) outside a Card; see `## 16`'s Known Issue, which applies identically here
 - Label text: `"View this work"` (Work entries) or `"View this thought"` (Thoughts entries) inside a Card, driven by `entry.type` in `buildCard()` (`script.js`); free text when used standalone outside a Card (e.g. `"Play Tessallation on itch.io"`)
-- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor, no whitespace character before it in the markup (see `## 16`'s Anatomy note — same convention, same caveat)
+- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — inside `.link-nowrap` for standalone usage (same last-word-plus-icon pattern as `## 16`, including the "move it when the text changes" rule), or directly trailing the label inside a Card, where `inline-flex` means it never needs the span
 - Icon spacing/alignment (2026-10-05, plain-inline base rule): `.link-cta-icon` carries `margin-left: var(--space-1)` and `vertical-align: -2px`, same mechanism as `.link-inline-icon` — overridden back to `margin-left: 0` inside a Card (see Card-Scope Exception)
-- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) when inside a Card, where the visible label alone is ambiguous (several cards share it on one page); a standalone CTA whose visible text is already unambiguous on its own (e.g. the itch.io CTA) can use a plainer `aria-label` describing the action instead
+- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) **only inside a Card**, where the visible label alone is ambiguous (several cards share it on one page) — this is the one documented exception to "no `aria-label` override" (see `## 16`'s Accessibility section for the contains-vs-starts-with rule this relies on). A standalone CTA's visible text is already unambiguous on its own (e.g. "Play Tessallation on itch.io") — no `aria-label`, content computes the accessible name, with the same `.sr-only` new-tab suffix `## 16` uses once the destination is a real external URL with `target="_blank"`.
 - `font-style: normal` set explicitly, same reset rationale as `.link-inline`
 
 ### Touch-Target Padding
@@ -2088,7 +2097,8 @@ Inside `.card-content`, `.link-cta` keeps its original, full `inline-flex` layou
 ### Accessibility
 
 - Sole keyboard-focusable link on the card as of 2026-09-02 — Tab moves directly from whatever precedes the card to `.link-cta`, skipping `.card-block-link` entirely. Confirmed via a real Tab-key walkthrough and a real accessibility-tree snapshot (not just markup review) on both `index.html`'s hand-written cards and `buildCard()`'s Archive cards.
-- `aria-label` carries the full descriptive string so the link is unambiguous read out of context (e.g. in a screen reader's links list, where several cards' plain "View this work" text would otherwise collide)
+- `aria-label` carries the full descriptive string so the link is unambiguous read out of context (e.g. in a screen reader's links list, where several cards' plain "View this work" text would otherwise collide). The resulting accessible name (`"{Title} — {action}"`) contains the visible label but doesn't start with it — confirmed compliant under the "contains" reading of WCAG 2.5.3 (`## 16`'s Accessibility section), kept as-is in the 2026-10-05 link audit rather than changed to satisfy a stricter starts-with reading.
+- **Card links never open a new tab** — no `target="_blank"`, no `.sr-only` new-tab suffix. Confirmed 2026-10-05: every live Card destination is an internal entry page.
 - Icon: `aria-hidden="true" focusable="false"` — decorative
 - Focus ring: inherited from the sitewide `:focus-visible` rule — no component-level override
 - `.card-content .link-cta { position: relative; z-index: 2; }` keeps it above `.card-block-link` (`z-index: 1`) so it remains the real target for both mouse and keyboard, even though the block-link still visually covers the full card for mouse-anywhere convenience
