@@ -1129,34 +1129,45 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 ## 9. Divider
 
 **Figma Component Name:** `Divider`
-**CSS Class:** `hr` (native element, no custom class needed)
-**HTML Element:** `<!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>`
+**CSS Class:** `hr` (native element) + `.standard-page-divider` (modifier, Standard Page Template only)
+**HTML Element:** `<hr class="standard-page-divider">`
 
 ### Design Intent
-Dividers separate major sections of content. Gold accent colour is used site-wide for all dividers — not grey. This is an intentional design decision that gives the site a warm, distinctive feel.
+A plain horizontal rule separating major sections of content — the Standard Page Template's one divider, immediately before the footer (`## 14`). **Corrected 2026-10-05:** this section previously claimed "gold accent colour is used site-wide for all dividers — not grey," and showed the dot-divider's markup under a header for a plain `<hr>`. Both were stale/wrong — teal is the site's only accent (`md/REFERENCE.md` §5, no gold accent exists anywhere live), and the dot divider is a separate component documented at `## 12b`, not this one.
 
-### Component Tokens
-
+### Component Tokens — quoted from style.css
 ```css
---divider-color:    var(--color-divider-accent);
---divider-height:   1px;
---divider-margin:   var(--space-8) 0;
+/* Base hr rule — every <hr> on the site */
+hr {
+    border: none;
+    border-top: var(--border-width-thin) solid var(--color-divider-accent);
+    margin: var(--space-8) 0;
+}
+
+/* .standard-page-divider — the Standard Page Template's one <hr>; caps
+   it to the reading column and re-centers it, overriding the base
+   rule's margin */
+.standard-page-divider {
+    max-width: var(--measure-reading);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
+}
 ```
+`--color-divider-accent: var(--color-accent-primary)` — teal (`#00BAA5`), not gold.
 
 ### Usage
-
 ```html
-<!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+<hr class="standard-page-divider">
 ```
+No additional classes or attributes needed. See `## 14. Standard Page Template`'s Anatomy for where it sits (immediately before the footer — there is exactly one per page).
 
-No additional classes or attributes needed. Styled globally via the `hr` element selector.
+### Two Divider Styles — Not Interchangeable
+Per style.css's own comment above the `hr` rule: two different section-divider styles exist on purpose — a plain `<hr>` (this section) for a simple horizontal rule, and `.divider--dots` (`## 12b`) — three small dots — used between body sections on Standard Page entries and Home. Pick whichever the surrounding page already uses; they're two separate components that happen to serve the same layout purpose, not variants of one component. See `## 12b. Divider — Dots` for the dot divider's own markup, tokens, and accessibility notes — not duplicated here.
 
 ### Accessibility
-
-`<!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>` has an implicit `role="separator"` — screen readers announce it as a thematic break between content sections. No additional ARIA needed.
+A native `<hr>` has an implicit `role="separator"` — screen readers announce it as a thematic break between content sections. No additional ARIA needed.
 
 ---
 
@@ -1167,7 +1178,7 @@ No additional classes or attributes needed. Styled globally via the `hr` element
 **HTML Element:** `<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>`
 
 ### Design Intent
-A subtle section separator using three 4px circles in dark gold. Used when a full-width line would be too heavy — lighter content breaks, end of card sections, between biography paragraphs.
+A subtle section separator using three 4px circles in teal. Used when a full-width line would be too heavy — lighter content breaks, end of card sections, between biography paragraphs.
 
 ### Component Tokens
 
@@ -2160,9 +2171,9 @@ Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current
 | `--toast-border` | `--color-accent-primary` | `#00BAA5` |
 | `--blockquote-border-color` | `--color-quote-border` → `--color-accent-quote` | `#A9407C` |
 | `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#00BAA5` |
-| `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
+| `hr` `border-top` (2026-10-05 — replaces fictional `--divider-color`; see footnote) | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
 
-**Fixed 2026-09-30:** the `--tag-*`/`--chip-*` families (`--tag-border`, `--tag-border-hover`, `--tag-text`, `--tag-text-hover`, `--tag-bg`, `--tag-bg-hover`, and the `## 2b` `--chip-*` set) never existed as CSS custom properties anywhere in `style.css` — `.tag`/`.tag-chip` reference the semantic tokens listed above directly, and this table (and `## 2`/`## 2b` above) now document the real values instead of the fictional named tokens. Two of the old rows also had the wrong value (hover border was documented as changing to `--color-accent-primary-text`; it doesn't — border stays `--color-accent-primary`. Hover background was documented as `--color-background-base` `#1C1C1C`; it's actually `--color-background-subtle` `#2F2F2F`). **Fixed 2026-09-30:** `--nav-*` and `--tab-bar-*` (flagged above, unresolved as of 2026-09-29) had the same issue — no `--nav-*`/`--tab-bar-*` custom property exists in `style.css` either, `header`/`.site-nav`/`.nav-logo`/`.nav-links`/`.tab-bar`/`.tab-bar-item` reference the semantic tokens above directly. `--tab-bar-item-active` also had the wrong *value*, not just the wrong name (documented as `--color-interactive-default`; the real current-page rule is `--color-text-primary` plus an underline — see `## 4`/`## 5` above for the full Component Tokens rewrite, including the current-page indicator and hover colour).
+**Fixed 2026-09-30:** the `--tag-*`/`--chip-*` families (`--tag-border`, `--tag-border-hover`, `--tag-text`, `--tag-text-hover`, `--tag-bg`, `--tag-bg-hover`, and the `## 2b` `--chip-*` set) never existed as CSS custom properties anywhere in `style.css` — `.tag`/`.tag-chip` reference the semantic tokens listed above directly, and this table (and `## 2`/`## 2b` above) now document the real values instead of the fictional named tokens. Two of the old rows also had the wrong value (hover border was documented as changing to `--color-accent-primary-text`; it doesn't — border stays `--color-accent-primary`. Hover background was documented as `--color-background-base` `#1C1C1C`; it's actually `--color-background-subtle` `#2F2F2F`). **Fixed 2026-09-30:** `--nav-*` and `--tab-bar-*` (flagged above, unresolved as of 2026-09-29) had the same issue — no `--nav-*`/`--tab-bar-*` custom property exists in `style.css` either, `header`/`.site-nav`/`.nav-logo`/`.nav-links`/`.tab-bar`/`.tab-bar-item` reference the semantic tokens above directly. `--tab-bar-item-active` also had the wrong *value*, not just the wrong name (documented as `--color-interactive-default`; the real current-page rule is `--color-text-primary` plus an underline — see `## 4`/`## 5` above for the full Component Tokens rewrite, including the current-page indicator and hover colour). **Fixed 2026-10-05:** `--divider-color` had the same issue — no such custom property exists in `style.css`; the bare `hr` selector's `border-top` references `--color-divider-accent` directly (`## 9`'s own Component Tokens, corrected the same day).
 
 ---
 
