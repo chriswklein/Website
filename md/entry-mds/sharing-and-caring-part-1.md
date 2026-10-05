@@ -5,7 +5,7 @@
 <!-- slug: sharing-and-caring-part-1 -->
 <!-- excerpt: Sharing your game early, often, and with new people is both a chance for valuable feedback and a security risk. -->
 <!-- tags: game-development, quality-assurance, user-experience (NEW tags — match the existing tag format in archive-entries.json) -->
-<!-- published date: TBD by Chris -->
+<!-- published date: 2026-10-05 -->
 
 <!-- IMAGE 1 (LEAD IMAGE): in-game screenshot of the final game -->
 <!-- Placement: standard-page-lead, directly after the title. Alt text only, no caption, no zoom (per lead-image convention). -->
