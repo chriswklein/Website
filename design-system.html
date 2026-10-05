@@ -1387,7 +1387,7 @@ function setActiveNavLink() {
                 <p class="preview-section-desc">Added 2026-09-02. <code>.link-inline</code> — for links embedded mid-sentence in body copy (hero subtitle, entry body text). Underlined at rest, not just on hover, so it reads as a link independent of colour alone. Trailing open-link icon at <code>var(--icon-size-sm)</code>, inline with the text. No touch-target padding is added — an inline link within a running block of text is exempt from the 44px minimum under WCAG 2.5.5 (Target Size, AAA), unlike a standalone link such as Section 25's CTA Link. <strong>Not yet applied anywhere real</strong> — this is a visual reference only, for review before it replaces any existing plain-text inline links (e.g. the hero subtitle's "Christopher Klein" link) in a follow-up task.</p>
 
                 <div class="standard-page-content">
-                    <p>Christopher Klein has 13 years within game development, and this <a href="#" class="link-inline">example inline link<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/></svg></a> shows how <code>.link-inline</code> sits inside a normal paragraph, at the site's default body line-height.</p>
+                    <p>Christopher Klein has 13 years within game development, and this <a href="#" class="link-inline">example inline <span class="link-nowrap">link<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/></svg></span></a> shows how <code>.link-inline</code> sits inside a normal paragraph, at the site's default body line-height.</p>
                 </div>
 
                 <p class="preview-section-desc"><strong>Flag for review:</strong> the icon is built at <code>var(--icon-size-sm)</code> (14px) per spec. Against 16px body copy this may read slightly large next to the text — <code>var(--icon-size-xs)</code> (12px) is the first thing to try if it looks oversized once reviewed in context.</p>
@@ -1421,10 +1421,10 @@ function setActiveNavLink() {
 
                 <div class="standard-page-content">
                     <a href="#" class="link-cta" aria-label="Example Entry — View this work">
-                        View this work
-                        <svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                        View this
+                        <span class="link-nowrap">work<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
                             <path d="M20.6667 2C21.403 2.00001 22 2.59697 22 3.33334V15.3334C21.9997 16.0695 21.4028 16.6667 20.6667 16.6667C19.9305 16.6667 19.3336 16.0695 19.3333 15.3334V6.55211L4.27595 21.6095C3.75525 22.1302 2.91123 22.1302 2.39053 21.6095C1.86982 21.0888 1.86982 20.2447 2.39053 19.724L17.4479 4.66668H8.6666C7.93048 4.66637 7.33327 4.06953 7.33326 3.33334C7.33326 2.59715 7.93048 2.00031 8.6666 2H20.6667Z" fill="currentColor"/>
-                        </svg>
+                        </svg></span>
                     </a>
                 </div>
             </section>

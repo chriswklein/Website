@@ -32,8 +32,8 @@
     "tags": ["Web Development", "AI"],
     "date": "2026-09-08",
     "url": "/entries/thoughts/welcome.html",
-    "image": "/assets/images/entries/thoughts/thrilling-beginnings/thrilling-banner.png",
-    "imageAlt": "A small collection of everyday objects arranged on a wooden surface — a brass bolt, a pocket notebook, a stylus, and a desk timer"
+    "image": "",
+    "imageAlt": ""
   },
   {
     "id": "physical-and-digital-media",
@@ -59,6 +59,19 @@
     "url": "/entries/thoughts/industrializing-the-industry.html",
     "image": "",
     "imageAlt": "",
+    "published": false
+  },
+  {
+    "id": "sharing-and-caring-part-1",
+    "type": "thoughts",
+    "author": "Christopher Klein",
+    "title": "Sharing and Caring for Your Game, Part 1: Rewards",
+    "excerpt": "Sharing your game early, often, and with new people is both a chance for valuable feedback and a security risk.",
+    "tags": ["Game Development", "Quality Assurance", "User Experience"],
+    "date": "TBD",
+    "url": "/entries/thoughts/sharing-and-caring-part-1.html",
+    "image": "/assets/images/entries/thoughts/sharing-and-caring-part-1/final-game.webp",
+    "imageAlt": "In-game screenshot of Tessallation's classroom, with students at rows of desks and a chalkboard diagramming the game's time-travel rules.",
     "published": false
   }
 ]

@@ -36,6 +36,17 @@ Every `<h2>` and `<h3>` within `.standard-page-content` must have an `id` attrib
 
 **Purpose:** Groundwork for a future Table of Contents. Do not build any ToC UI, anchor links, or navigation — IDs only.
 
+### In-Body Images (added 2026-09-30)
+
+Every `<img>` inside `.standard-page-content` is wrapped by `initImageViewer()` (`script.js`) as a click-to-zoom trigger. If `scripts/build-images.js` produced a `-full.webp` variant for that image (its high-res, click-to-zoom source), add `data-full-src="{path to the -full.webp file}"` to the `<img>` tag. If no `-full.webp` was produced, leave `data-full-src` off entirely — the viewer falls back to the thumbnail's own `src` with no extra request, rather than guessing a filename and generating a failed 404 request for a file that was never built. See `md/COMPONENTS.md`'s Image Viewer notes ("## 14. Standard Page Template") for the full mechanism.
+
+### Filling In `[URL TBD]` Placeholders Later (added 2026-10-05)
+
+When replacing a `[URL TBD]` marker on a `.link-inline`/`.link-cta` link with its real URL, check both of the following before publishing:
+
+- **The `.link-nowrap` span.** The link's last word — "TBD]" today — is wrapped in `<span class="link-nowrap">...</span>` together with the trailing icon (`md/COMPONENTS.md` `## 16`/`## 17`, "Last Word + Icon Never Separate" and the span's own rule in `style.css`). **This span must keep wrapping whatever the new last word is after the edit** — the mechanism that stops the arrow from landing alone on its own line only works if it stays glued to the actual final word of the link text. If the real URL's link text changes which word is last (e.g. the placeholder text itself is replaced, not just the href), move the `<span class="link-nowrap">` to wrap the new last word before publishing; don't leave it wrapping stale text partway through the link, and don't remove it.
+- **The new-tab suffix.** If the real URL is external (leaving crzdevz.com — true for every current `[URL TBD]` placeholder: itch.io, PC Gamer, IndieDB, ModDB, GameDev Academy, KitGuru, VG247), add `target="_blank" rel="noopener noreferrer"` to the link if not already present, and add `<span class="sr-only"> (opens in new tab)</span>` as the anchor's last child, after `.link-nowrap` (`md/COMPONENTS.md` `## 16` Accessibility). Don't add the suffix before the link actually opens a new tab — announcing "(opens in new tab)" on a link that doesn't is its own accessibility bug, not a smaller version of the one this fixes.
+
 ### Starting Point
 
 Copy the appropriate template from `templates/`:

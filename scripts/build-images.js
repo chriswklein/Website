@@ -13,6 +13,14 @@
 // assets/images/entries/work/star-engine/example.webp (thumbnail) and
 // .../example-full.webp (high-res). raw-exports/ is git-ignored: raw
 // exports are source material, not something the deployed site should ship.
+//
+// Optional argument: scope the run to one subfolder of raw-exports/ instead
+// of processing everything underneath it —
+//
+//   node scripts/build-images.js entries/work/this-website
+//
+// With no argument, behavior is unchanged: every raw image under
+// raw-exports/ is processed, exactly as before this argument existed.
 
 const fs = require('fs');
 const path = require('path');
@@ -81,16 +89,37 @@ async function convertOne(rawPath) {
     return { rawPath, thumbPath, fullPath, rawSize, thumbSize, fullSize };
 }
 
+// Resolves the optional CLI scope argument against RAW_DIR. Rejects a path
+// that doesn't exist under raw-exports/ with a clear error rather than
+// silently falling back to processing everything — a typo'd folder name
+// should never turn into an unscoped full run.
+function resolveScopeDir(scopeArg) {
+    if (!scopeArg) return CONFIG.RAW_DIR;
+
+    const scopeDir = path.resolve(CONFIG.RAW_DIR, scopeArg);
+    const rawRoot = path.resolve(CONFIG.RAW_DIR);
+
+    if (!scopeDir.startsWith(rawRoot + path.sep) && scopeDir !== rawRoot) {
+        throw new Error(`Scope "${scopeArg}" resolves outside raw-exports/ — refusing to run.`);
+    }
+    if (!fs.existsSync(scopeDir) || !fs.statSync(scopeDir).isDirectory()) {
+        throw new Error(`Scope "${scopeArg}" does not exist as a folder under ${CONFIG.RAW_DIR} — nothing was read or written.`);
+    }
+    return scopeDir;
+}
+
 async function main() {
-    const rawImages = findRawImages(CONFIG.RAW_DIR);
+    const scopeArg = process.argv[2];
+    const scopeDir = resolveScopeDir(scopeArg);
+    const rawImages = findRawImages(scopeDir);
 
     if (!rawImages.length) {
-        console.log(`No raw images found in ${CONFIG.RAW_DIR}`);
+        console.log(`No raw images found in ${scopeDir}`);
         console.log(`(expects: ${CONFIG.RAW_EXTENSIONS.join(', ')})`);
         return;
     }
 
-    console.log(`Found ${rawImages.length} raw image(s) in ${CONFIG.RAW_DIR}\n`);
+    console.log(`Found ${rawImages.length} raw image(s) in ${scopeDir}\n`);
 
     const results = [];
     for (const rawPath of rawImages) {
@@ -117,4 +146,7 @@ async function main() {
     console.log(`Total full:  ${formatBytes(totalFull)} (loaded only if/when a viewer opens that image)`);
 }
 
-main();
+main().catch(err => {
+    console.error(err.message);
+    process.exitCode = 1;
+});

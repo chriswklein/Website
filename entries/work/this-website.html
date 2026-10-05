@@ -110,7 +110,7 @@
 
                 <h3 id="tech-stack">Specs and Stack</h3>
                 
-                <div class="table-wrap" tabindex="0" aria-label="Specs and Stack table, scrollable horizontally">
+                <div class="table-wrap" role="region" aria-label="Specs and Stack table, scrollable horizontally">
                     <table>
                         <thead>
                             <tr>
@@ -178,7 +178,7 @@
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
-                <h3 id="Information-Architecture">Information Architecture</h3>
+                <h3 id="information-architecture">Information Architecture</h3>
               
                 <p>My initial goal was to build the following:</p>
 
@@ -200,8 +200,6 @@
                 <h2 id="archive">The Archive</h2>
                 <p>The Archive is made of multiple key components:</p>
 
-                <!-- image -->
-                
                 <ul>
                     <li>The Database</li>
                     <li>Entries and their Tags</li>
@@ -223,7 +221,7 @@
                 <p>Initially on Desktop it was at the top of the page and if the user scrolled down, the Filter Drawer would appear. At the time, Search and Filters were all within the Drawer. This Drawer was also functional across Tablet and Mobile devices.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-intentional-design.webp" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-intentional-design.webp" data-full-src="/assets/images/entries/work/this-website/search-intentional-design-full.webp" alt="diagram of the intended mobile search experience across three states. Left Filter Drawer open, Center Filter active, and Right Search with results visible." width="800" height="450" loading="lazy">
 
                 <p>Now at the time, I was testing primarily through the Live Server via my Microsoft Edge Browser, shifting the response size based on device aspect ratios via the inspector. Judge me for using Edge all you like, but Edge's accessibility is top notch and it implemented Split Window prior to - and wayyyy better than - Chrome or Firefox...But things were working fine and as I had intended. Search functioned, Filters worked. My compact drawer was doing well...that is until I got out of the house.</p>
 
@@ -235,7 +233,7 @@
                 <p>As I picked out a cabbage, the produce sprinkler hit me with cold water. It almost washed away the embarrassment of forgetting something I see every day</p> 
                 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/atla-cabbages.png" alt="The infamous Cabbage vendor from Avatar: The Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/atla-cabbages.webp" data-full-src="/assets/images/entries/work/this-website/atla-cabbages-full.webp" alt="The infamous Cabbage vendor from Avatar: The Last Airbender panics as his cabbages are ruined" width="800" height="450" loading="lazy">
                 
                 <p>Now back home, after putting away the groceries - I pushed changes and tested on my iPhoneSE2. (Again, judge me all you like, but I refuse to upgrade to a giant new impractical rectangle that doesn't fit into my pockets.)</p>
 
@@ -243,7 +241,7 @@
 
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.webp" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/search-implementation-bugs.webp" data-full-src="/assets/images/entries/work/this-website/search-implementation-bugs-full.webp" alt="diagram of the mobile search bugs found during testing. Left scrim not opaque enough to see results, Center zoom truncating the drawer, and Right keyboard and zoom obscuring results." width="800" height="450" loading="lazy">
                                 
                 <p>Issue #1: the virtual keyboard envelops half of the screen space. And depending on the browser and its interpretation of fields - it also uses extra space.</p>
                 
@@ -263,7 +261,7 @@
                 <p>Getting the Drawer to feel good across devices took some tweaking but as it sits right now - it's a solid little drawer.</p>
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/filter-implementation.webp" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/filter-implementation.webp" data-full-src="/assets/images/entries/work/this-website/filter-implementation-full.webp" alt="diagram of the implementation of the Filter Drawer" width="800" height="450" loading="lazy">
 
 
                 <h2 id="contents">Table of Contents</h2>
@@ -273,14 +271,13 @@
 
 
                 <!-- image -->
-                <img src="/assets/images/entries/work/this-website/Table-of-contents.webp" alt="diagram of the table of contents through device breakpoints. Left Mobile, Center Tablet, and Right Desktop" width="800" height="450" loading="lazy">
+                <img src="/assets/images/entries/work/this-website/Table-of-contents.webp" data-full-src="/assets/images/entries/work/this-website/Table-of-contents-full.webp" alt="diagram of the table of contents through device breakpoints. Left Mobile, Center Tablet, and Right Desktop" width="800" height="450" loading="lazy">
                 
 
                 <!-- Dot divider -->
                 <div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
 
                 <h2 id="accessibility">Accessibility</h2>
-                <!-- image -->
 
                 <p>Last but not least, is one of the Core Principles of the site: Accessibility.</p>
                     

@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initShareButtons();
     autoplayUnlessReducedMotion('.video-demo video');
     initImageViewer();
+    initTableWrapFocus();
     const filterDrawer = initFilterDrawer();
     initArchive(filterDrawer);
     // initThemeToggle(); // dormant — toggle UI disabled pending Action Rail
@@ -156,6 +157,37 @@ function initShareButtons() {
                 // Clipboard write failed silently — no fallback needed
             });
         });
+    });
+}
+
+// Makes a .table-wrap (in-body table scroll container, md/COMPONENTS.md
+// §14) a Tab stop only while it actually has something to scroll —
+// scrollWidth > clientWidth. A table that already fits its column at the
+// current width has nothing to scroll, so a static tabindex="0" (2026-09-29
+// through 2026-09-29) left it a real Tab stop that did nothing at desktop
+// width, confirmed via a real Tab walkthrough. role="region" and
+// aria-label stay on the markup unconditionally — the accessible name is
+// valid either way (md/COMPONENTS.md §14) — only tabindex is conditional.
+// A ResizeObserver per wrapper (not a single window 'resize' listener)
+// catches every real cause of its scrollWidth/clientWidth relationship
+// changing — viewport resize, but also font-load reflow and any future
+// content change — without a separate debounce: ResizeObserver callbacks
+// already coalesce to at most once per frame.
+function initTableWrapFocus() {
+    const wraps = document.querySelectorAll('.table-wrap');
+    if (!wraps.length) return;
+
+    function update(wrap) {
+        if (wrap.scrollWidth > wrap.clientWidth) {
+            wrap.setAttribute('tabindex', '0');
+        } else {
+            wrap.removeAttribute('tabindex');
+        }
+    }
+
+    wraps.forEach(wrap => {
+        update(wrap);
+        new ResizeObserver(() => update(wrap)).observe(wrap);
     });
 }
 
@@ -320,23 +352,15 @@ function initTocRail() {
 
     const main = document.getElementById('main-content');
 
-    // A keyboard user tabbing from the top of the page otherwise has to
-    // pass through every heading link in the panel (inserted right before
-    // <main>, below) before ever reaching real page content.
-    // This link — reusing the sitewide .skip-link pattern verbatim
-    // (style.css, "ACCESSIBILITY UTILITIES"), not a new one — jumps past
-    // that list straight to headings[0]: the first heading the ToC itself
-    // links to, not the page's own h1 title, since bypassing "the ToC"
-    // means landing in the body content it indexes. tabindex="-1" makes
-    // that one heading a valid fragment-focus target without adding it
-    // to the normal Tab sequence — the ToC's real heading rows deliberately
-    // stay non-tab-stops, only their <a> rows are (see anatomy above);
-    // this doesn't change that.
-    headings[0].setAttribute('tabindex', '-1');
-    const tocSkipLink = document.createElement('a');
-    tocSkipLink.className = 'skip-link';
-    tocSkipLink.href = `#${headings[0].id}`;
-    tocSkipLink.textContent = 'Skip Table of Contents';
+    // No "Skip Table of Contents" link (removed 2026-09-29) — that skip link
+    // was built for the always-visible desktop rail removed 2026-09-18,
+    // when every heading link in the rail sat in the Tab sequence before
+    // real page content. The panel this section builds below is `hidden`
+    // until the trigger opens it, so its heading links were never real Tab
+    // stops to begin with — the only thing between here and <main> is the
+    // Contents trigger itself, a single stop with no list to skip past.
+    // Also removed the headings[0] tabindex="-1" that existed only as that
+    // link's fragment-focus target.
 
     // content.svg icon markup, shared by the trigger button below and the
     // panel's own label further down — decorative (the adjacent text
@@ -361,14 +385,18 @@ function initTocRail() {
     // only on Standard Page entries), so sharing the literal classes
     // carries no collision risk. .toc-trigger-group carries no display
     // override of its own — .action-rail-group's own base display: flex
-    // (style.css) already applies unconditionally; show/hide is
-    // scroll-threshold driven (matching .back-to-top's own mechanism, via
-    // .action-rail-group--visible, the same modifier class Archive's
-    // trigger already uses) rather than Archive's drawer-open-state
-    // toggle, since this trigger has no drawer-open state of its own to
-    // key off.
+    // (style.css) already applies unconditionally. Visible from page load
+    // at every breakpoint (2026-09-30 — previously scroll-threshold gated
+    // like .back-to-top, which left a keyboard user at the top of an entry
+    // with no way to reach it at all; Archive's own Filters trigger was
+    // already always-visible, see initArchive() below, so this now matches
+    // that instead). .action-rail-group--visible is still the real
+    // mechanism — set immediately here rather than waiting for a scroll
+    // event — because openPanel()/closePanel() below still use that same
+    // class to hide the trigger while the panel is open and restore it on
+    // close; only the "how it first turns on" part changed.
     const triggerGroup = document.createElement('div');
-    triggerGroup.className = 'action-rail-group toc-trigger-group';
+    triggerGroup.className = 'action-rail-group toc-trigger-group action-rail-group--visible';
 
     const trigger = document.createElement('button');
     trigger.type = 'button';
@@ -409,13 +437,6 @@ function initTocRail() {
     trigger.append(triggerLabel, badge);
     triggerGroup.appendChild(trigger);
     document.body.insertBefore(triggerGroup, main);
-    document.body.insertBefore(tocSkipLink, triggerGroup);
-
-    // Same scroll-threshold value as .back-to-top's own (initBackToTop()
-    // above) — not approximated.
-    window.addEventListener('scroll', () => {
-        triggerGroup.classList.toggle('action-rail-group--visible', window.scrollY > 400);
-    }, { passive: true });
 
     // Panel: <nav>, aria-label matches the trigger's own accessible
     // purpose — not role="dialog": the Filter Drawer's own role="dialog"
@@ -506,23 +527,23 @@ function initTocRail() {
     }
 
     // Closes the panel the moment the underlying page scrolls, per spec —
-    // without this, the trigger's own scroll-threshold listener (above,
-    // shared with .back-to-top) has no idea the panel is open and re-shows
-    // itself the instant background scroll crosses 400px again, visually
-    // overlapping the still-open panel (confirmed via direct reproduction:
-    // openPanel()'s one-time class removal only holds until the next
-    // scroll event re-evaluates that unrelated listener). Reuses window's
-    // native 'scroll' event rather than separate wheel/touchmove/keydown
-    // listeners — confirmed via direct testing that .toc-panel's own
-    // internal overflow-y: auto scroll (the height-cap fix's scrollable
+    // the panel is position: fixed (anchored to the viewport, not to any
+    // point in page content), so it would otherwise just sit open,
+    // unmoving, while the user scrolls the page behind it; closing on
+    // background scroll keeps it from lingering open once the user has
+    // clearly moved on to reading elsewhere (2026-09-30: this is no longer
+    // about racing the trigger's own visibility, since the trigger has none
+    // to race — it's a standalone UX decision now, kept as-is). Reuses
+    // window's native 'scroll' event rather than separate wheel/touchmove/
+    // keydown listeners — confirmed via direct testing that .toc-panel's
+    // own internal overflow-y: auto scroll (the height-cap fix's scrollable
     // region) never reaches this listener: element-level scroll events
     // don't bubble, and only a capture-phase listener on window would see
-    // them despite that — this one is bubble-phase (no `capture`), same as
-    // the trigger's own existing scroll listener above, so it only ever
-    // fires for genuine page scroll. openScrollY + the small tolerance
-    // below guards against closing on imperceptible sub-pixel jitter (e.g.
-    // the first frame of a touch momentum scroll) rather than a real,
-    // intentional scroll.
+    // them despite that — this one is bubble-phase (no `capture`), so it
+    // only ever fires for genuine page scroll. openScrollY + the small
+    // tolerance below guards against closing on imperceptible sub-pixel
+    // jitter (e.g. the first frame of a touch momentum scroll) rather than
+    // a real, intentional scroll.
     let openScrollY = 0;
     function handlePanelScroll() {
         if (Math.abs(window.scrollY - openScrollY) > 2) closePanel({ returnFocus: false });
@@ -540,11 +561,11 @@ function initTocRail() {
 
         getTocInertTargets().forEach(el => el.setAttribute('inert', ''));
 
-        // Same visibility mechanism the scroll-threshold show/hide above
-        // already uses (.action-rail-group--visible) — one hide method for
-        // the trigger, not two. Mirrors exactly how initFilterDrawer()'s
-        // openDrawer() hides Archive's own .action-rail-group while its
-        // drawer is open (script.js, above).
+        // Same .action-rail-group--visible class the trigger is created
+        // with above (2026-09-30) — removing it here is the only place
+        // that ever hides the trigger now. Mirrors exactly how
+        // initFilterDrawer()'s openDrawer() hides Archive's own
+        // .action-rail-group while its drawer is open (script.js, above).
         triggerGroup.classList.remove('action-rail-group--visible');
 
         removeTrapFocus = trapFocus(panel);
@@ -2150,21 +2171,6 @@ function initImageViewer() {
         ].filter(Boolean);
     }
 
-    // The image viewer shows a higher-resolution version of whatever
-    // thumbnail was clicked, assuming every in-body image has a sibling
-    // file with the same name plus a "-full" suffix before the extension
-    // (e.g. "diagram.webp" → "diagram-full.webp") — a naming convention
-    // enforced by how images are exported/added, not something this
-    // function can verify; if a "-full" file is missing, the browser's own
-    // broken-image handling is what a visitor would see. Mechanically:
-    // "…/foo.png" or "…/foo.webp" -> "…/foo-full.webp" — the -full variant
-    // is always .webp regardless of the thumbnail's own extension (see
-    // scripts/build-images.js), so this replaces whatever extension is
-    // there rather than assuming .webp on both sides.
-    function deriveFullSrc(thumbSrc) {
-        const dot = thumbSrc.lastIndexOf('.');
-        return dot === -1 ? thumbSrc : `${thumbSrc.slice(0, dot)}-full.webp`;
-    }
 
     function applyTransform() {
         enlargedImg.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
@@ -2241,19 +2247,30 @@ function initImageViewer() {
         const img = images[currentIndex];
         const thumbSrc = img.src;
 
-        // Requests the high-res -full.webp variant (scripts/build-images.js)
-        // derived from the thumbnail's own src — no per-<img> data attribute
-        // to add/maintain. onerror falls back to the thumbnail automatically
-        // for any image that doesn't have a -full variant yet, so nothing
-        // breaks for images not yet processed by that script. Set before
-        // assigning the new src (not after) so a same-tick failure — e.g. a
-        // request the browser resolves as a network error before yielding
-        // back to this function — still has a handler in place to catch it.
-        enlargedImg.onerror = () => {
-            enlargedImg.onerror = null; // one retry only — no loop if the thumbnail itself ever fails to load
+        // Explicit opt-in (2026-09-30 — was a guessed "-full.webp" filename
+        // derived from the thumbnail's own src, which requested a file that
+        // didn't exist, and so failed with a real 404, for any image whose
+        // -full variant hadn't been built yet). data-full-src is written on
+        // the <img> only where scripts/build-images.js actually produced a
+        // -full.webp for it (see md/NEW-ENTRY-PROCESS.md); its absence now
+        // means "use the thumbnail, no extra request" rather than "guess and
+        // hope." onerror is still kept as a safety net for the case where a
+        // data-full-src attribute is present but that specific file is
+        // missing or fails to load (e.g. a typo, a file moved after the
+        // attribute was added) — set before assigning the new src (not
+        // after) so a same-tick failure still has a handler in place to
+        // catch it.
+        const fullSrc = img.dataset.fullSrc;
+        if (fullSrc) {
+            enlargedImg.onerror = () => {
+                enlargedImg.onerror = null; // one retry only — no loop if the thumbnail itself ever fails to load
+                enlargedImg.src = thumbSrc;
+            };
+            enlargedImg.src = fullSrc;
+        } else {
+            enlargedImg.onerror = null;
             enlargedImg.src = thumbSrc;
-        };
-        enlargedImg.src = deriveFullSrc(thumbSrc);
+        }
         enlargedImg.alt = img.alt;
         // Accessible name reuses the image's own real alt text — no new
         // invented copy. Empty-alt fallback is defensive only: every real

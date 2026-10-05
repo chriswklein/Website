@@ -1,6 +1,6 @@
 # Design System — Atomic Foundation
-**Version:** 1.3.1
-**Last Updated:** 2026-09-27
+**Version:** 1.5.0
+**Last Updated:** 2026-09-30
 **Status:** Active — source of truth for all design and build decisions
 
 ---
@@ -23,24 +23,24 @@ Rules for use:
 
 Raw colour values. Never apply these directly to elements. Always reference via semantic tokens.
 
-| Token Name | Hex Value | Description |
-|---|---|---|
-| `grey-0` | `#FFFFFF` | Pure white |
-| `grey-50` | `#F5F5F5` | Near white |
-| `grey-100` | `#E8E8E8` | Light grey |
-| `grey-200` | `#CCCCCC` | Soft grey |
-| `grey-300` | `#AAAAAA` | Mid-light grey |
-| `grey-400` | `#888888` | Mid grey |
-| `grey-500` | `#666666` | Mid-dark grey |
-| `grey-600` | `#444444` | Dark grey |
-| `grey-700` | `#2A2A2A` | Deeper dark grey |
-| `grey-800` | `#1A1A1A` | Near black |
-| `grey-900` | `#111111` | Almost black |
-| `grey-1000` | `#000000` | Pure black |
-| `pink-dark` | `#A9407C` | Deep pink/magenta |
-| `pink-light` | `#FF60BB` | Light pink |
-| `teal-dark` | `#00BAA5` | Dark teal |
-| `teal-light` | `#00E5CB` | Light teal |
+**Rebuilt 2026-09-30** from the live semantic values in `style.css` `:root` — the previous table listed 12 grey steps plus `pink-light`/`FF60BB`, none of which had any real semantic-token consumer (confirmed via grep); it also skipped several greys that real tokens actually use (`#AEAEAE`, `#707070`, `#3D3D3D`, `#2F2F2F`, `#242424`, `#1C1C1C`). `grey-0`, `grey-100`, `grey-500`, `grey-900` are unchanged (still cross-referenced by §1.3/§1.5) — every other row is new or renumbered to match a real consumer:
+
+| Token Name | Hex Value | Description | Real Consumer |
+|---|---|---|---|
+| `grey-0` | `#FFFFFF` | Pure white | `--color-interactive-focus` |
+| `grey-100` | `#E8E8E8` | Light grey | `--color-text-primary`, `--color-interactive-default` |
+| `grey-200` | `#AEAEAE` | Mid-light grey | `--color-text-secondary` |
+| `grey-400` | `#707070` | Mid grey | `--color-border-strong` |
+| `grey-500` | `#666666` | Mid-dark grey | `--color-text-disabled` |
+| `grey-600` | `#474747` | Dark grey | `--color-background-active` |
+| `grey-650` | `#3D3D3D` | Dark grey | `--color-background-hover`, `--color-border-default` |
+| `grey-700` | `#2F2F2F` | Deeper dark grey | `--color-background-subtle` |
+| `grey-750` | `#242424` | Near black | `--color-background-surface` |
+| `grey-800` | `#1C1C1C` | Near black | `--color-background-base` |
+| `grey-900` | `#111111` | Almost black | `--color-text-inverse` |
+| `pink-dark` | `#A9407C` | Deep pink/magenta | `--color-accent-quote` |
+| `teal-dark` | `#00BAA5` | Dark teal | `--color-accent-primary` |
+| `teal-light` | `#00E5CB` | Light teal | `--color-accent-primary-text` |
 
 ### 1.2 Semantic Tokens — Background
 
@@ -128,11 +128,10 @@ Defined once in `:root` next to the other semantic colours, with no primitive of
 
 ### 1.8 Semantic Tokens — Components
 
+**Corrected 2026-09-30:** `--tag-border`, `--tag-border-hover`, and `--tag-bg-hover` were documented below as named component tokens; none exists as a CSS custom property in `style.css` — `.tag`/`.tag-chip` reference `--color-accent-primary`, `--color-accent-primary-text`, and `--color-background-subtle` directly. Removed from this table; see `md/COMPONENTS.md` `## 2`/`## 2b` for the real per-state values (default border/text `--color-accent-primary`; hover background `--color-background-subtle`, hover text `--color-accent-primary-text` with border unchanged; the hover "bold" look is a `text-shadow`, not a font-weight or a token).
+
 | CSS Variable | References | Usage |
 |---|---|---|
-| `--tag-border` | `--color-accent-primary` | Tag default border and text colour |
-| `--tag-border-hover` | `--color-accent-primary` | Tag hover border colour |
-| `--tag-bg-hover` | `--color-background-subtle` | Tag hover background |
 | `--color-link` | `--color-accent-primary` (2026-09-27 — swapped with `--color-link-hover`; see §1.6b) | Hyperlink default colour |
 | `--color-link-hover` | `--color-accent-primary-text` (2026-09-27 — swapped with `--color-link` above) | Hyperlink hover colour |
 | `--color-divider-accent` | `--color-accent-primary` | hr and section dividers site-wide |
@@ -472,8 +471,7 @@ On tablet (≤1023px) and mobile: all card rows collapse to single column.
 - Height: `64px`
 - Background: `--color-background-surface`
 - Border bottom: `1px solid --color-border-default`
-- Items: Home, Work, Thoughts, About — icon above label
-- Icon size: `20px`
+- Items: Home, Archive, About — text-only today (icons deferred, no icon above label currently — see §10)
 - Label style: `nav-tab` type style
 - Active item: `--color-interactive-default`
 - Inactive item: `--color-text-secondary`
@@ -486,8 +484,13 @@ Most component tokens (`--btn-*`, `--tag-*`, `--card-*`, etc.) are scoped locall
 
 | CSS Variable | Value | Usage |
 |---|---|---|
-| `--card-image-column-width` | `42%` | Width of the image column in a horizontal (image-left) card layout, as a percentage of total card width |
+| `--card-image-column-width` | `42%` | **Corrected 2026-09-30** (was documented as live layout ratio — matches md/REFERENCE.md §15 now): dormant. Its only appearance in `style.css` is inside a commented-out `.card--feature` horizontal-layout block; no shipped card layout consumes it |
 | `--measure-reading` | `65ch` | Added 2026-09-24. Reading-column max-width — body copy, entry paragraphs/lists, the Details card, and table wrappers (see §9.3) |
+| `--toc-rail-width` | `240px` | Added 2026-09-30 (pre-existing token, undocumented until now). Width of the Floating ToC's rail |
+| `--toc-panel-top-offset` | `calc(64px + var(--space-6))` | Added 2026-09-30. Top offset of the ToC panel — clears the `64px` sticky header plus a gap |
+| `--toc-panel-height-min` | `calc(var(--space-32) * 2.5)` | Added 2026-09-30. Minimum height of the ToC panel |
+| `--toc-panel-height-max` | `calc(var(--space-32) * 8)` | Added 2026-09-30. Maximum height of the ToC panel |
+| `--drawer-secondary-height` | No `:root` fallback (deliberate) | Added 2026-09-30. Filter Drawer's secondary (tag grid) panel height. Set at runtime by `updateDrawerSecondaryMetrics()` in `script.js`, which calls `filterDrawerEl.style.setProperty('--drawer-secondary-height', …)` before the drawer becomes visible — there is no static value to fall back to, so no `:root` default is defined |
 
 ---
 
@@ -606,9 +609,18 @@ Every in-page button-like control shares three tokens instead of each defining i
 |---|---|---|
 | `--button-height` | `var(--touch-target-minimum)` (44px) | Set via `height`, not `min-height` — `padding-block: 0` and `line-height: var(--button-height)` centre the label without depending on flex alignment, so it applies equally to non-flex buttons (`.archive-sort-toggle`, `.filter-drawer-page-btn`) |
 | `--button-padding-inline` | `var(--space-5)` (20px) | Horizontal padding on every button in the list above |
-| `--button-icon-size` | `var(--icon-size-lg)` (1.25rem/20px) | `.action-rail-trigger-icon`, `.contact-icon-btn svg` — the first real consumer of `--icon-size-lg` (§ Icon Size scale, `md/COMPONENTS.md`'s token reference doesn't define an icon-size scale of its own; the four `--icon-size-*` tokens live only in `style.css` `:root`) |
+| `--button-icon-size` | `var(--icon-size-lg)` (1.25rem/20px) | `.action-rail-trigger-icon`, `.contact-icon-btn svg` — the first real consumer of `--icon-size-lg` (§9.2 Icon Size Scale below; `md/COMPONENTS.md`'s token reference doesn't define an icon-size scale of its own; the four `--icon-size-*` tokens live only in `style.css` `:root`) |
 
 Touch-target-square controls (`.action-rail-clear`, the image viewer controls that reuse it, the mobile icon-only `.action-rail-trigger`) are unaffected — they were already 44px squares and aren't part of this list. `.contact-icon-btn`'s previous 80px desktop / 64px mobile split and 36px/28px icon sizes are gone — one size at every breakpoint now.
+
+#### Icon Size Scale (added 2026-09-30)
+
+| Token | Value | Consumer |
+|---|---|---|
+| `--icon-size-xs` | `0.75rem` (12px) | Reserved — zero consumers in `style.css` currently |
+| `--icon-size-sm` | `0.875rem` (14px) | `.link-inline-icon` |
+| `--icon-size-md` | `1rem` (16px) | `.toc-panel-label-icon`, `.toc-sub-icon`, and other in-ToC icons |
+| `--icon-size-lg` | `1.25rem` (20px) | `--button-icon-size` above (`.action-rail-trigger-icon`, `.contact-icon-btn svg`) |
 
 ### 9.3 Line Length
 
@@ -677,9 +689,15 @@ Visually hidden until keyboard focus. First child of `<body>` on every page.
 
 ## 10. Icons
 
-**None currently in use — text-only site-wide.** Tabler Icons (outline style) was removed completely 2026-07-05 (commit 7d71326): CDN link dropped from every page `<head>`, all icon elements removed, tab bar and Back to Top button rebuilt text-only. No icon CDN or library should be added to any page.
+**Corrected 2026-09-30** (was "None currently in use — text-only site-wide," a leftover from the 2026-07-05 removal that conflated "no icon library" with "no icons"): **no icon library or CDN is loaded on any page** — Tabler Icons (outline style) was removed completely 2026-07-05 (commit 7d71326), CDN link dropped from every page `<head>`. That part of the original note still holds; no icon CDN or library should be added to any page. But icons themselves are in active use today, hand-authored as **inline `<svg>` markup** (in `script.js` template strings, or directly in HTML), not loaded from any external source:
 
-A future iteration may reintroduce Tabler Icons **self-hosted** (webfont downloaded into `assets/icons/`, not via CDN) — see md/COMPONENTS.md's Mobile Tab Bar and Back to Top Button "Deferred" sections for the planned icon mapping and sizes. If that happens:
+- Path fill: `fill="currentColor"` on each `<path>` — the icon always matches its element's own text colour, in every state, with no separate icon-colour token
+- Decorative icons: `aria-hidden="true" focusable="false"` on the `<svg>` — the icon never has its own accessible name; the containing control's label (visible text or `aria-label`) covers it
+- Sizing: the `--icon-size-xs`/`-sm`/`-md`/`-lg` scale (§9.2) for most icons — `--icon-size-lg` is also aliased as `--button-icon-size` for every in-page button-like control's icon. One exception: the image viewer's expand icon sizes via `--space-5`, not the icon-size scale (pre-dates it, not yet reconciled — flagged, not resolved here)
+
+**Where used today:** the floating rail triggers (Archive's Filters trigger, the entry-page Contents trigger — both share `.action-rail-trigger-icon`), the card/entry CTA link arrow (`.link-cta-icon`), the ToC panel's label icon and each H3 row's sub-section icon (`.toc-panel-label-icon`, `.toc-sub-icon`), the in-body image viewer's expand icon, the Filter Drawer's label icon (`.filter-drawer-label-icon`), and the About page's contact buttons (`.contact-icon-btn svg`, Email/LinkedIn). `.link-inline-icon` (`--icon-size-sm`) is also part of this scale but currently has no live page consumer.
+
+The Mobile Tab Bar is the one exception, still genuinely text-only today (see `## 4`/`md/COMPONENTS.md`'s Mobile Tab Bar section) — a future iteration may add icons there, self-hosted (webfont downloaded into `assets/icons/`, not via CDN) rather than via the inline-SVG pattern above, since a webfont better suits a small fixed icon set reused per label. If that happens:
 - Always use outline variants — never use `-filled` suffix variants
 - Always add `aria-hidden="true"` to decorative icons
 - Icon-only interactive elements must have an `aria-label`

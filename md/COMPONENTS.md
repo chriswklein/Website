@@ -1,6 +1,6 @@
 # Design System — Component Specifications
-**Version:** 2.3.1
-**Last Updated:** 2026-09-27
+**Version:** 2.7.0
+**Last Updated:** 2026-09-30
 **Status:** Active — source of truth for all component build decisions
 
 ---
@@ -168,21 +168,28 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--tag-*` was never a real set of CSS custom properties; `.tag` in `style.css` references shared semantic tokens directly. Listed here as the real values each state uses, not as named `--tag-*` tokens:
+
 ```css
---tag-border:                var(--color-accent-primary);
---tag-border-hover:          var(--color-accent-primary);
---tag-text:                  var(--color-accent-primary);
---tag-text-hover:            var(--color-accent-primary);
---tag-bg:                    transparent;
---tag-bg-hover:              var(--color-background-subtle);
---tag-padding-x:             var(--space-3);
---tag-padding-y:             var(--space-1);
---tag-font-size:             var(--font-size-sm);
---tag-font-weight:           var(--font-weight-regular);
---tag-font-weight-hover:     var(--font-weight-bold);
---tag-letter-spacing:        var(--letter-spacing-wide);
---tag-radius:                var(--border-radius-lg);
---tag-transition:            var(--duration-fast) var(--ease-out);
+/* Default */
+border:      var(--border-width-thin) solid var(--color-accent-primary);
+background:  transparent;
+color:       var(--color-accent-primary);
+padding:     var(--space-1) var(--space-3);
+font-size:   var(--font-size-sm);
+font-weight: var(--font-weight-regular);   /* constant — see States, hover "bold" is text-shadow, not a weight change */
+letter-spacing: var(--letter-spacing-wide);
+border-radius: var(--border-radius-lg);
+
+/* Hover */
+background-color: var(--color-background-subtle);
+border-color:      var(--color-accent-primary);   /* unchanged from default */
+color:              var(--color-accent-primary-text);
+text-shadow:        0.4px 0 currentColor, -0.4px 0 currentColor;   /* faux-bold */
+
+/* Focus-visible */
+outline: var(--border-width-medium) solid var(--color-interactive-focus);
+outline-offset: 3px;
 ```
 
 ### Anatomy
@@ -197,11 +204,13 @@ Single variant only — `.tag`. No `.tag--secondary`.
 
 ### States
 
-| State | Background | Border | Text | Font-Weight |
+**Corrected 2026-09-30** — Hover was documented as a `font-weight: bold` change; `.tag:hover` never sets `font-weight` (it stays `regular` always). The bold *look* on hover comes from `text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor` stacked on the new hover text colour, plus the text colour itself changing to `--color-accent-primary-text` (not staying `--color-accent-primary`).
+
+| State | Background | Border | Text | Emphasis |
 |---|---|---|---|---|
-| Default | `transparent` | `--color-accent-primary` | `--color-accent-primary` | `regular` |
-| Hover | `--color-background-subtle` | `--color-accent-primary` | `--color-accent-primary` | `bold` |
-| Focus | `transparent` | `--color-accent-primary` | `--color-accent-primary` + focus ring | `regular` |
+| Default | `transparent` | `--color-accent-primary` | `--color-accent-primary` | None — `font-weight: regular` |
+| Hover | `--color-background-subtle` | `--color-accent-primary` (unchanged) | `--color-accent-primary-text` | `text-shadow` faux-bold — `font-weight` stays `regular` |
+| Focus | `transparent` | `--color-accent-primary` | `--color-accent-primary` + focus ring | None |
 
 ### Accessibility
 
@@ -246,27 +255,33 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--chip-*` was never a real set of CSS custom properties; `.tag-chip` in `style.css` references shared semantic tokens directly. Listed here as the real values each state uses, not as named `--chip-*` tokens:
+
 ```css
 /* Default */
---chip-border:             var(--border-width-thin) solid var(--color-accent-primary);
---chip-bg:                 transparent;
---chip-text:               var(--color-accent-primary);
---chip-font-weight:        var(--font-weight-regular);
+border:      var(--border-width-thin) solid var(--color-accent-primary);
+background:  transparent;
+color:       var(--color-accent-primary);
+font-weight: var(--font-weight-regular);
 
-/* Hover */
---chip-bg-hover:           var(--color-background-subtle);
---chip-font-weight-hover:  var(--font-weight-bold);
+/* Hover (non-active) */
+background-color: var(--color-background-subtle);
+border-color:      var(--color-accent-primary);   /* unchanged */
+color:              var(--color-accent-primary-text);
+text-shadow:        0.4px 0 currentColor, -0.4px 0 currentColor;   /* faux-bold, not font-weight */
 
-/* Active */
---chip-border-active:      var(--border-width-medium) solid var(--color-accent-primary-text);
---chip-bg-active:          var(--color-background-surface);
---chip-text-active:        var(--color-accent-primary-text);
---chip-font-weight-active: var(--font-weight-bold);
+/* Active — bold look is permanent (text-shadow), not hover-only */
+border:      var(--border-width-medium) solid var(--color-accent-primary-text);
+background:  var(--color-background-surface);
+color:       var(--color-accent-primary-text);
+text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor;
+/* .tag-chip--active:hover is identical to .tag-chip--active — active state does not change on hover */
 
-/* Dim — recoloured 2026-09-24 (reading comfort token update) */
---chip-border-dim:         var(--border-width-thin) solid var(--color-border-strong);
---chip-bg-dim:             transparent;
---chip-text-dim:           var(--color-text-secondary);
+/* Dim — recoloured 2026-09-24 (reading comfort token update); real font-weight, no text-shadow */
+border:      var(--border-width-thin) solid var(--color-border-strong);
+background:  transparent;
+color:       var(--color-text-secondary);
+font-weight: var(--font-weight-regular);
 ```
 
 ### Anatomy
@@ -283,12 +298,14 @@ A selected tag renders twice, at every breakpoint: once in `#filter-drawer-activ
 
 ### States
 
-| State | Background | Border | Text | Font-Weight |
+**Corrected 2026-09-30** — Hover and Active were documented as `font-weight: bold` changes; neither `.tag-chip:hover` nor `.tag-chip--active` sets `font-weight` (only `.tag-chip--dim` uses a real `font-weight`, and it stays `regular`). Hover's and Active's bold *look* comes from `text-shadow: 0.4px 0 currentColor, -0.4px 0 currentColor`. Active's text-shadow is permanent (not hover-only) — `.tag-chip--active:hover` is visually identical to `.tag-chip--active`.
+
+| State | Background | Border | Text | Emphasis |
 |---|---|---|---|---|
-| Default | `transparent` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `regular` |
-| Hover | `--color-background-subtle` | `thin` + `--color-accent-primary` | `--color-accent-primary` | `bold` |
-| Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `bold` |
-| Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | `regular` |
+| Default | `transparent` | `thin` + `--color-accent-primary` | `--color-accent-primary` | None — `font-weight: regular` |
+| Hover | `--color-background-subtle` | `thin` + `--color-accent-primary` (unchanged) | `--color-accent-primary-text` | `text-shadow` faux-bold |
+| Active | `--color-background-surface` | `medium` + `--color-accent-primary-text` | `--color-accent-primary-text` | `text-shadow` faux-bold (permanent, not hover-only) |
+| Dim | `transparent` | `thin` + `--color-border-strong` | `--color-text-secondary` | None — `font-weight: regular` |
 
 **What triggers Dim, and where it's actually visible:** `applyChipState()` sets Dim whenever a chip is inactive while any other chip in its own group is active (`anyActive`). This only actually happens for type chips (`.filter-drawer-primary-chips`) — that row is never hidden, so selecting Work visibly dims Thoughts. Tag chips (`#filter-drawer-chips`) always pass `anyActive: false` (2026-09-27, simplified from an earlier `isDuplicateOfActiveRow` special case that computed a real Dim state for them) — `.filter-drawer--tags-active` (set whenever any secondary tag is active — see `## 2c. Filter Drawer`) hides the entire tag grid outright in favour of the selected-tags row alone, so a tag chip's Dim state could never have been seen regardless of how it was computed. `.tag-chip--dim` itself is left in place in `style.css`, ready for a future layout that keeps the tag grid visible alongside active selections.
 
@@ -506,11 +523,22 @@ While the drawer is open, `<body>` is locked using the `position: fixed` body-lo
 
 | Breakpoint | Drawer | Floating trigger (`.action-rail-group`) | Sort + count row |
 |---|---|---|---|
-| Mobile (< 768px) | Bottom sheet, full-bleed, `max-height: 70vh` | Icon + badge only (label is screen-reader-only), `top: 70%` | `position: fixed` below the 64px tab bar, `z-index: 10` |
-| Tablet (768–1023px) | Bottom sheet, capped to `--max-content` and centred | Icon + "Filters" pill + badge, `top: 50%` | `position: fixed` below the 64px header, `z-index: 10` |
-| Desktop (≥ 1024px) | Anchored 632px panel, bottom-right corner pinned to the floating trigger; fades and scales in; `--elevation-xl` | Icon + "Filters" pill + badge, `top: 50%` | In normal flow |
+| Mobile (< 768px) | Bottom sheet, full-bleed, `max-height: 70vh` | Icon + badge only (label is screen-reader-only), bottom-right, `bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px))` — cleanup item 29, 2026-09-30, was vertically centred at `top: 70%`; see Floating Action Rail Position below | `position: fixed` below the 64px tab bar, `z-index: 10` |
+| Tablet (768–1023px) | Bottom sheet, capped to `--max-content` and centred | Icon + "Filters" pill + badge, `top: 50%` — unchanged | `position: fixed` below the 64px header, `z-index: 10` |
+| Desktop (≥ 1024px) | Anchored 632px panel, bottom-right corner pinned to the floating trigger; fades and scales in; `--elevation-xl` | Icon + "Filters" pill + badge, `top: 50%` — unchanged | In normal flow |
 
 The scrim is an invisible hit area (`opacity: 0` in both states) at every breakpoint — results stay fully visible behind the open drawer.
+
+### Floating Action Rail Position (cleanup item 29, 2026-09-30)
+
+`.action-rail-group` is vertically centred (`top: 50%; transform: translateY(-50%)`) at every breakpoint except mobile, where it moves to the bottom-right corner instead — in thumb reach, and clear of the Details card the centred position used to sit on top of at the top of entry pages. This is the same `.action-rail-group` reused verbatim by the entry-page Contents trigger (`## 14. Standard Page Template`); both consumers get the mobile move for free from the one shared rule.
+
+- **Mobile (< 768px) only:** `top: auto; transform: none; bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px))`. `right` is untouched — the same formula applies at every breakpoint. `env(safe-area-inset-bottom, 0px)` clears notched/gesture-bar phones and falls back to `0` everywhere else; no `viewport-fit=cover` was added to any page, so the fallback is what actually applies today.
+- **Tablet/desktop:** unchanged — still vertically centred.
+- **Page clearance:** `main` gains `padding-bottom: calc(var(--button-height) + (2 * var(--space-6)) + env(safe-area-inset-bottom, 0px))` on mobile, so the page's last content (e.g. the Back to Top row) can scroll fully clear of the rail instead of sitting behind it.
+- **Focus not obscured (WCAG 2.4.11):** `html` gains the same value as `scroll-padding-bottom` on mobile, so a keyboard-focused element scrolled into view never lands behind the rail. Verified via a full Tab walkthrough of `entries/work/star-engine.html` at 390×844: every real focusable element, including the last one before the tab bar (`.back-to-top`), scrolls in fully clear of the rail.
+- **`.theme-toggle-rail` (dormant, unused — future Slot 1 of the rail):** its mobile override moves with the rail, one slot above it — `bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px) + var(--touch-target-minimum) + var(--space-8))` — the same `--touch-target-minimum` + `--space-8` gap the tablet/desktop centred layout already uses between the two, just measured from `bottom` now instead of `top`.
+- **Not affected:** the Filter Drawer's own mobile/tablet bottom-sheet position (`position: fixed; bottom: 0; left: 0; right: 0`, independent of the rail entirely) and its desktop anchored-panel pin to the rail (1024px+, unchanged — out of scope, rail is centred there). Confirmed nothing else on mobile positions itself relative to the rail before this change shipped.
 
 ### Z-Index Layering
 
@@ -673,6 +701,8 @@ One vertical-stack layout at every breakpoint — image full-width (`aspect-rati
 
 Same content order, padding, and hover treatment as Feature — see above. `.card--thought .card-image { display: none; }` remains as a safety net, but in practice no `.card-image` element is ever rendered for Thought entries (`buildCard()` only builds the image div when `entry.type === 'work'`).
 
+**Thoughts cards are text-only by design (confirmed 2026-10-05):** `data/archive-entries.json`'s `image`/`imageAlt` fields are only ever read for `entry.type === 'work'` records — a `thoughts`-type record's `image`/`imageAlt` are never rendered anywhere, on Archive or on Home's hand-written Featured cards, regardless of what they contain. This was traced directly after the Welcome record's `image` field was found pointing at a file whose `imageAlt` described a completely different image — the mismatch had no visible effect, precisely because the fields were already inert for this entry type. A Thoughts record may still carry accurate `image`/`imageAlt` values (most current ones are cleared to `""`/`""` instead) in case Thought cards ever gain an image treatment later — the fields aren't wrong to fill in, just currently unused.
+
 #### Anatomy
 
 ```
@@ -719,38 +749,63 @@ Same content order, padding, and hover treatment as Feature — see above. `.car
 **HTML Element:** `<header><nav class="site-nav" aria-label="Main navigation">`
 
 ### Design Intent
-The desktop nav is the persistent wayfinding element. Logo/name is centred above the nav links. It stays sticky at the top so users always have access to navigation without scrolling back up.
+The desktop nav is the persistent wayfinding element. It stays sticky at the top so users always have access to navigation without scrolling back up. **Corrected 2026-09-30** (was: "Logo/name is centred above the nav links" — never matched the real CSS): at 1024px and up, `.site-nav .container` is `flex-direction: row; justify-content: space-between` — the logo sits to the **left** of the nav links, not above them. Below 1024px the logo is hidden outright (`.nav-logo { display: none; }`) — tablet (768–1023px) shows the same sticky header with links only, centred as the container's sole child (`.site-nav .container`'s own base `flex-direction: column; align-items/justify-content: center`, which only visually centres a single child once the logo is gone); mobile replaces the header entirely with the tab bar (`## 5` below).
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--nav-*` was never a real set of CSS custom properties; `header`/`.site-nav`/`.nav-logo`/`.nav-links` reference shared semantic tokens directly. Listed here as the real values each part uses, not as named `--nav-*` tokens (same treatment `--tag-*`/`--chip-*` got 2026-09-29):
+
 ```css
---nav-bg:               var(--color-background-base);
---nav-border:           var(--color-border-default);
---nav-height:           64px;
---nav-logo-size:        var(--font-size-base);
---nav-logo-weight:      var(--font-weight-bold);
---nav-link-size:        var(--font-size-sm);
---nav-link-weight:      var(--font-weight-medium);
---nav-link-spacing:     var(--letter-spacing-widest);
---nav-link-color:       var(--color-text-secondary);
---nav-link-hover:       var(--color-text-primary);
---nav-link-active:      var(--color-text-primary);
---nav-link-gap:         var(--space-8);
---nav-transition:       var(--duration-fast) var(--ease-out);
+/* header (bg + bottom border) */
+background-color: var(--color-background-base);
+border-bottom:     var(--border-width-thin) solid var(--color-border-default);
+
+/* .site-nav .container */
+height: 64px;
+
+/* .nav-logo */
+font-size:   var(--font-size-base);
+font-weight: var(--font-weight-bold);
+color:       var(--color-text-primary);
+letter-spacing: var(--letter-spacing-wide);
+
+/* .nav-logo:hover */
+color: var(--color-interactive-hover);
+
+/* .nav-links */
+gap: var(--space-20);   /* corrected 2026-09-30 — was wrongly documented as --space-8 */
+
+/* .nav-links a (default) */
+font-size:      var(--font-size-sm);
+font-weight:    var(--font-weight-medium);
+color:          var(--color-text-secondary);
+letter-spacing: var(--letter-spacing-widest);
+transition:     color var(--duration-fast) var(--ease-out);
+
+/* .nav-links a:hover, a:focus-visible */
+color: var(--color-interactive-hover);
+
+/* .nav-links a[aria-current="page"] — current-page indicator, see Active State below */
+color:                    var(--color-text-primary);
+text-decoration:          underline;
+text-decoration-thickness: var(--border-width-medium);  /* 2px */
+text-underline-offset:     var(--space-1);                /* 4px */
+text-decoration-color:     var(--color-accent-primary-text);
 ```
 
 ### Anatomy
 
+**Corrected 2026-09-30** — the diagram and link list below previously showed a centred logo-above-links layout with four links (Home/Work/Thoughts/About); the real markup (`nav.html`) has three links and, at 1024px+, a left-logo/right-links row:
+
 ```
-[ .nav-logo "Christopher Klein" centred ]
-[ .nav-links centred below logo ]
-  [ a Home ] [ a Work ] [ a Thoughts ] [ a About ]
+1024px+:        [ .nav-logo "Christopher Klein" ]        [ .nav-links: Home  Archive  About ]
+below 1024px:   .nav-logo hidden — [ .nav-links: Home  Archive  About ] centred
 ```
 
-- Container: `<nav class="site-nav" aria-label="Main navigation">`
-- Logo: `<a href="index.html" class="nav-logo">Christopher Klein</a>` — centred, `--nav-logo-size`, `--nav-logo-weight`
-- Links wrapper: `<ul class="nav-links" role="list">` — centred below logo
-- Each link: `<li><a href="{page}.html">{Label}</a></li>`
+- Container: `<nav class="site-nav" aria-label="Main navigation"><div class="container">`
+- Logo: `<a href="/index.html" class="nav-logo">Christopher Klein</a>` — left-aligned at 1024px+, `--nav-logo-size`, `--nav-logo-weight`; hidden below 1024px
+- Links wrapper: `<ul class="nav-links" id="nav-menu" role="list">`
+- Each link: `<li><a href="/{page}.html">{Label}</a></li>` — real links are Home, Archive, About
 - Active link: `aria-current="page"` set dynamically via `script.js` after nav injection
 
 ### Active State (updated 2026-09-27)
@@ -766,7 +821,7 @@ Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thi
 
 | State | Colour | Decoration |
 |---|---|---|
-| Default | `--nav-link-color` | None |
+| Default | `--color-text-secondary` (2026-09-30 — corrected from the fictional `--nav-link-color` token name; same real value) | None |
 | Hover / Focus | `--color-interactive-hover` (2026-09-27 — was `--nav-link-hover`/`--color-text-primary`) | None |
 | Active (current page) | `--color-text-primary` | Underline — see Active State above |
 
@@ -779,7 +834,8 @@ Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thi
 
 ### Responsive Behaviour
 
-- Desktop: visible — centred layout
+- Desktop (1024px+): visible — `.site-nav .container` is `flex-direction: row; justify-content: space-between`, logo left, links right (corrected 2026-09-30 — was "centred layout")
+- Tablet (768–1023px): visible — logo hidden, links only, centred as the container's sole child
 - Mobile: hidden via `display: none` — replaced by tab bar
 
 ---
@@ -791,25 +847,44 @@ Current page marked by more than colour alone (WCAG 1.4.1) — colour plus a thi
 **HTML Element:** `<nav class="tab-bar" aria-label="Mobile navigation">`
 
 ### Design Intent
-The tab bar replaces the desktop nav entirely on mobile. It is always visible, fixed to the top of the viewport, giving users constant access to all four primary sections without scrolling. Icon and text label always shown together. Never icon only.
+The tab bar replaces the desktop nav entirely on mobile. It is always visible, fixed to the top of the viewport, giving users constant access to all three primary sections (Home, Archive, About — corrected 2026-09-30, was "four") without scrolling. Icon and text label always shown together. Never icon only.
 
 ### Component Tokens
 
+**Corrected 2026-09-30** — `--tab-bar-*` was never a real set of CSS custom properties; `.tab-bar`/`.tab-bar-item` reference shared semantic tokens directly (same treatment `--tag-*`/`--chip-*` got 2026-09-29). One value was also wrong, not just fictionally named: the current-page colour was documented as `--color-interactive-default`; the real rule uses `--color-text-primary` plus an underline, not a colour swap alone (see below):
+
 ```css
---tab-bar-bg:               var(--color-background-surface);
---tab-bar-border:           var(--color-border-default);
---tab-bar-height:           64px;
---tab-bar-icon-size:        20px;
---tab-bar-label-size:       var(--font-size-xs);
---tab-bar-label-weight:     var(--font-weight-medium);
---tab-bar-label-spacing:    var(--letter-spacing-widest);
---tab-bar-item-color:       var(--color-text-secondary);
---tab-bar-item-active:      var(--color-interactive-default);
---tab-bar-item-min-width:   44px;
---tab-bar-item-min-height:  44px;
---tab-bar-transition:       var(--duration-fast) var(--ease-out);
---tab-bar-z-index:          200;
+/* .tab-bar (mobile override, style.css MOBILE block) */
+display:          flex;
+position:          fixed;
+top:                0;
+height:             64px;
+background-color:  var(--color-background-surface);
+border-bottom:      var(--border-width-thin) solid var(--color-border-default);
+z-index:            200;
+
+/* .tab-bar-item (default) */
+min-width:      var(--touch-target-minimum);   /* 44px */
+min-height:     var(--touch-target-minimum);   /* 44px */
+color:          var(--color-text-secondary);
+font-size:      var(--font-size-xs);
+font-weight:    var(--font-weight-medium);
+letter-spacing: var(--letter-spacing-widest);
+transition:     color var(--duration-fast) var(--ease-out);
+
+/* .tab-bar-item:hover, :focus-visible */
+color: var(--color-interactive-hover);
+
+/* .tab-bar-item[aria-current="page"] — current-page indicator, matches
+   .nav-links a[aria-current="page"] exactly (Rule 3a) */
+color:                    var(--color-text-primary);   /* corrected 2026-09-30 — was wrongly documented as --color-interactive-default */
+text-decoration:          underline;
+text-decoration-thickness: var(--border-width-medium);  /* 2px */
+text-underline-offset:     var(--space-1);                /* 4px */
+text-decoration-color:     var(--color-accent-primary-text);
 ```
+
+No icon-size token is listed — the tab bar is text-only today (no icon element exists to size); see `## 10. Icons` in `md/DESIGN-SYSTEM.md` for the deferred self-hosted-icon plan.
 
 ### Icons — Deferred
 
@@ -817,28 +892,29 @@ The tab bar replaces the desktop nav entirely on mobile. It is always visible, f
 
 ### Anatomy — Current (text-only)
 
+**Corrected 2026-09-30** — previously showed four items (Home/Work/Thoughts/About); the real markup has three (`index.html`, `archive.html`, `about.html` all confirm this):
+
 ```
-[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
-  [ Home ]          [ Work ]          [ Thoughts ]      [ About ]
+[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
+  [ Home ]          [ Archive ]       [ About ]
 ```
 
-Each item: `<a href="{page}.html" class="tab-bar-item"><span>{Label}</span></a>`
+Each item: `<a href="/{page}.html" class="tab-bar-item"><span>{Label}</span></a>`
 
 ### Anatomy — Future (with self-hosted icons)
 
 ```
-[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
-  [ icon ]          [ icon ]          [ icon ]          [ icon ]
-  [ Home ]          [ Work ]          [ Thoughts ]      [ About ]
+[ .tab-bar-item ] [ .tab-bar-item ] [ .tab-bar-item ]
+  [ icon ]          [ icon ]          [ icon ]
+  [ Home ]          [ Archive ]       [ About ]
 ```
 
 Planned icon mapping (Tabler Icons, outline):
 - Home: `ti-home`
-- Work: `ti-briefcase`
-- Thoughts: `ti-pencil`
+- Archive: `ti-archive`
 - About: `ti-user`
 
-Each item: `<a href="{page}.html" class="tab-bar-item">`
+Each item: `<a href="/{page}.html" class="tab-bar-item">`
 Icon: `<i class="ti ti-{name}" aria-hidden="true"></i>`
 Label: `<span>{Label}</span>`
 
@@ -848,7 +924,7 @@ Active item: `[aria-current="page"]` only — `.tab-bar-item.is-active` was remo
 
 | State | Colour | Decoration |
 |---|---|---|
-| Default | `--tab-bar-item-color` | None |
+| Default | `--color-text-secondary` (2026-09-30 — corrected from the fictional `--tab-bar-item-color` token name; same real value) | None |
 | Hover / Focus | `--color-interactive-hover` (2026-09-27 — previously no explicit hover/focus rule existed at all) | None |
 | Active (current page) | `--color-text-primary` | Underline, `text-decoration-thickness: var(--border-width-medium)`, `text-underline-offset: var(--space-1)`, `text-decoration-color: var(--color-accent-primary-text)` — matches `.nav-links a[aria-current]`'s own treatment exactly (`## 4`, Rule 3a). Previously colour-only, an WCAG 1.4.1 gap fixed 2026-09-27 |
 
@@ -1055,34 +1131,45 @@ Breadcrumbs tell the user where they are within the site hierarchy. Used on all 
 ## 9. Divider
 
 **Figma Component Name:** `Divider`
-**CSS Class:** `hr` (native element, no custom class needed)
-**HTML Element:** `<!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>`
+**CSS Class:** `hr` (native element) + `.standard-page-divider` (modifier, Standard Page Template only)
+**HTML Element:** `<hr class="standard-page-divider">`
 
 ### Design Intent
-Dividers separate major sections of content. Gold accent colour is used site-wide for all dividers — not grey. This is an intentional design decision that gives the site a warm, distinctive feel.
+A plain horizontal rule separating major sections of content — the Standard Page Template's one divider, immediately before the footer (`## 14`). **Corrected 2026-10-05:** this section previously claimed "gold accent colour is used site-wide for all dividers — not grey," and showed the dot-divider's markup under a header for a plain `<hr>`. Both were stale/wrong — teal is the site's only accent (`md/REFERENCE.md` §5, no gold accent exists anywhere live), and the dot divider is a separate component documented at `## 12b`, not this one.
 
-### Component Tokens
-
+### Component Tokens — quoted from style.css
 ```css
---divider-color:    var(--color-divider-accent);
---divider-height:   1px;
---divider-margin:   var(--space-8) 0;
+/* Base hr rule — every <hr> on the site */
+hr {
+    border: none;
+    border-top: var(--border-width-thin) solid var(--color-divider-accent);
+    margin: var(--space-8) 0;
+}
+
+/* .standard-page-divider — the Standard Page Template's one <hr>; caps
+   it to the reading column and re-centers it, overriding the base
+   rule's margin */
+.standard-page-divider {
+    max-width: var(--measure-reading);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
+}
 ```
+`--color-divider-accent: var(--color-accent-primary)` — teal (`#00BAA5`), not gold.
 
 ### Usage
-
 ```html
-<!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>
+<hr class="standard-page-divider">
 ```
+No additional classes or attributes needed. See `## 14. Standard Page Template`'s Anatomy for where it sits (immediately before the footer — there is exactly one per page).
 
-No additional classes or attributes needed. Styled globally via the `hr` element selector.
+### Two Divider Styles — Not Interchangeable
+Per style.css's own comment above the `hr` rule: two different section-divider styles exist on purpose — a plain `<hr>` (this section) for a simple horizontal rule, and `.divider--dots` (`## 12b`) — three small dots — used between body sections on Standard Page entries and Home. Pick whichever the surrounding page already uses; they're two separate components that happen to serve the same layout purpose, not variants of one component. See `## 12b. Divider — Dots` for the dot divider's own markup, tokens, and accessibility notes — not duplicated here.
 
 ### Accessibility
-
-`<!-- Dot divider -->
-<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>` has an implicit `role="separator"` — screen readers announce it as a thematic break between content sections. No additional ARIA needed.
+A native `<hr>` has an implicit `role="separator"` — screen readers announce it as a thematic break between content sections. No additional ARIA needed.
 
 ---
 
@@ -1093,7 +1180,7 @@ No additional classes or attributes needed. Styled globally via the `hr` element
 **HTML Element:** `<div class="divider--dots" role="separator" aria-hidden="true"><span></span></div>`
 
 ### Design Intent
-A subtle section separator using three 4px circles in dark gold. Used when a full-width line would be too heavy — lighter content breaks, end of card sections, between biography paragraphs.
+A subtle section separator using three 4px circles in teal. Used when a full-width line would be too heavy — lighter content breaks, end of card sections, between biography paragraphs.
 
 ### Component Tokens
 
@@ -1206,7 +1293,7 @@ Block — always wrapped in `.code-wrap` (added 2026-09-03, see below):
 
 **Every block `<pre><code>` must be wrapped in `<div class="code-wrap">`.** `.code-wrap { overflow-x: auto; margin: var(--space-6) 0; }` (`style.css`) — a plain scroll container, no visual styling of its own. `pre` itself also keeps its own `overflow-x: auto` as a defensive fallback, but `.code-wrap` is the reliable fix; do not rely on `pre`'s own overflow alone.
 
-**Why this exists:** a long, unbroken code line (`white-space: pre` — never wrapped; wrapping code text would break formatting/readability, the wrong tradeoff here) can render wider than its container. Without a dedicated scroll container, this silently expanded `window.innerWidth` on a narrow screen instead of producing a scrollbar — confirmed via testing 2026-09-03, the same root mechanism as `.table-wrap` (`## 3. Card`'s sibling table-overflow fix, same date). Never use `white-space: pre-wrap` or `word-break` to force-wrap code text to avoid this — horizontal scroll is the correct pattern for code, same as it is for wide tables.
+**Why this exists:** a long, unbroken code line (`white-space: pre` — never wrapped; wrapping code text would break formatting/readability, the wrong tradeoff here) can render wider than its container. Without a dedicated scroll container, this silently expanded `window.innerWidth` on a narrow screen instead of producing a scrollbar — confirmed via testing 2026-09-03, the same root mechanism as `.table-wrap` (`## 14. Standard Page Template`'s "In-body tables" note, same date). Never use `white-space: pre-wrap` or `word-break` to force-wrap code text to avoid this — horizontal scroll is the correct pattern for code, same as it is for wide tables.
 
 This is currently the only code block on the site (`design-system.html` Section 13) — no Work or Thoughts entry currently contains one — but any future code block, anywhere, must use this wrapper from the start rather than being discovered as a bug later.
 
@@ -1355,7 +1442,7 @@ The standard page template provides a consistent reading experience for all long
   [ ul/ol lists, blockquote, code blocks as needed ]
   [ figure > img + figcaption — captioned in-body image, loading="lazy" ]
   [ img — bare, uncaptioned in-body image, loading="lazy" ]
-  [ table — 65ch reading column, scrolls via overflow-x on narrow viewports ]
+  [ div.table-wrap[role="region"][aria-label] > table — 65ch reading column, scrolls horizontally on narrow viewports; tabindex="0" added/removed at runtime by initTableWrapFocus(), only while it actually scrolls ]
 [ hr.standard-page-divider — max-width 65ch, centred ]
 [ .standard-page-footer — unchanged by the 2026-09-25 revision, still centred ]
   [ .standard-page-footer-actions ]
@@ -1421,12 +1508,34 @@ rest; shown on `:hover` and on `:focus-visible`; always shown under
 `@media (hover: none)`, since touch has no hover. The fade uses
 `--duration-fast` / `--ease-out`, covered by the sitewide reduced-motion rule.
 
-**In-body tables (2026-08-18):** `.standard-page-content table` caps at the
-same 65ch reading column as everything else in body content (a per-instance
-call to override if a specific table genuinely needs more columns) and
-scrolls horizontally (`overflow-x: auto` directly on the table, the same
-approach `pre` already uses for wide content, rather than an extra wrapper
-element) instead of trying to reflow columns on narrow viewports. `th` reuses
+**In-body tables (2026-08-18, wrapper accessibility fixed 2026-09-29, tabindex
+made conditional 2026-09-30):** every table in body content is wrapped in
+`<div class="table-wrap" role="region" aria-label="{descriptive label},
+scrollable horizontally">` — this section previously (incorrectly) documented
+`overflow-x: auto` as living directly on the table with no wrapper; the real,
+live markup has always used `.table-wrap` as a separate scroll container
+(`style.css`: `.table-wrap { overflow-x: auto; }`, plus
+`.standard-page-content .table-wrap` for the 65ch cap — a per-instance
+`max-width` override if a specific table genuinely needs more columns).
+`role="region"` + `aria-label` are written in the markup; `tabindex="0"` is
+**not** — `initTableWrapFocus()` (`script.js`) adds it only while the wrapper
+actually has something to scroll (`scrollWidth > clientWidth`), and removes
+it otherwise, re-evaluated via a `ResizeObserver` per wrapper (viewport
+resize, font-load reflow, any future content change). A table that already
+fits its column at the current width has nothing to scroll, so a static
+`tabindex="0"` (as this briefly shipped, 2026-09-29) left it a real Tab stop
+that did nothing at desktop width — confirmed via a real Tab walkthrough.
+`role="region"` + `aria-label` together are still both required regardless of
+scroll state: `aria-label` on a plain `<div>` with no ARIA role is not
+well-supported by assistive tech (confirmed via axe-core's
+`aria-prohibited-attr` check) — `role="region"` is what makes the label
+valid, independent of whether the wrapper happens to be scrollable right now.
+The sitewide `:focus-visible` ring covers `.table-wrap` automatically (no
+ancestor `overflow: hidden` clips it) — confirmed via direct focus +
+screenshot. **Every future table must use this exact wrapper from the
+start** — same convention as `.code-wrap` above, and the same category of bug
+(a missing wrapper/attribute/behaviour discovered as an axe finding or a dead
+Tab stop rather than built in from day one). `th` reuses
 `.standard-page-details-label`'s exact label treatment (size/weight/color) by
 value, not by selector reference. `td` matches body paragraph text. Row separators use
 the sitewide thin-border convention, with the last row's border removed the
@@ -1442,7 +1551,7 @@ A modal dialog (`role="dialog"`, `aria-modal="true"`, `aria-label` = the current
 - **Anatomy:** `.image-viewer-scrim` (`z-index` 269, `--color-background-base`, 0.85 opacity when open) and `.image-viewer` (`z-index` 270) containing Close (×, top-right), the enlarged image, zoom − / + (bottom centre) and Previous / Next (left / right edge; only created when the page has 2+ images, and they wrap around). All controls are `.btn.action-rail-clear` buttons with neutral hover.
 - **Zoom and pan:** 1× (fit) to 4× in 0.5 steps, applied as `translate() scale()` on the image; pan is clamped so the visible edge never crosses the fit-to-view frame. Zoom out is disabled at 1×, zoom in at 4×, and Previous / Next are disabled while zoomed (arrows pan instead).
 - **Input:** Esc closes. `+`/`=` and `-`/`_` zoom. Arrow keys pan by 40px when zoomed, and navigate (Left/Right) at 1×. The scroll wheel over the image zooms; dragging the image pans when zoomed; two-finger pinch zooms at any level. Pressing a control never starts a pan (drag is bound to the image only).
-- **High-res tier:** the dialog loads `{name}-full.webp`, derived from the thumbnail's `src` by `deriveFullSrc()` (always `.webp`); `scripts/build-images.js` generates it at `HIGH_RES_SCALE` (2×) the 800px thumbnail width. If the `-full` file is missing, `onerror` falls back once to the thumbnail, so an image not yet processed still opens.
+- **High-res tier (explicit opt-in, 2026-09-30):** the dialog loads whatever the clicked `<img>`'s own `data-full-src` attribute points to, written on the markup only where `scripts/build-images.js` actually produced a `-full.webp` (`HIGH_RES_SCALE`, 2× the 800px thumbnail width) — see `md/NEW-ENTRY-PROCESS.md`. No `data-full-src` means the dialog shows the thumbnail's own `src` with no extra request — not a guessed filename. Previously (2026-08-18 through 2026-09-29) the viewer derived `{name}-full.webp` from the thumbnail's `src` for every image regardless of whether that file existed, which meant a real failed request (and a console error) for any image without one; replaced because two real entry images (`entries/work/this-website.html`'s `atla-cabbages.png`, `entries/work/star-engine.html`'s `editor-concepts-plugin-toolbar-new-window.webp`) never had a `-full` variant built and were hitting this on every real page load. `onerror` is still kept as a safety net for when `data-full-src` is present but that specific file fails to load.
 - **Layering:** every control has `z-index: var(--image-viewer-controls-z)` (a local custom property, `1`, on `.image-viewer` — the same convention as `--card-block-link-z`), so it renders above the enlarged image at every zoom and pan state. Without it the transformed image painted over Close from about 1.5× zoom. DOM order (which is also Tab order) is unchanged.
 - **Focus and screen readers:** opening focuses Close; Esc or Close returns focus to the exact trigger for the image on screen (it follows Previous / Next); Tab and Shift+Tab stay inside the dialog. A `.sr-only` polite region announces "Image N of M: {alt}" as the image changes. The background is `inert` and body scroll is locked while open.
 - **Known gap:** the scrim has a click-to-close handler, but `.image-viewer` covers it, so clicking the empty area of the dialog does not close it today (Esc and Close do).
@@ -1865,7 +1974,7 @@ No breakpoint-specific overrides — `max-width: 100%` plus the video's own `wid
 ## 16. Inline Link
 
 **CSS Class:** `.link-inline`
-**HTML Element:** `<a href="{url}" class="link-inline">{Label}<svg class="link-inline-icon">...</svg></a>`
+**HTML Element:** `<a href="{url}" class="link-inline">{Label text}<span class="link-nowrap">{last word}<svg class="link-inline-icon">...</svg></span><span class="sr-only"> (opens in new tab)</span></a>` (the `.sr-only` suffix only when `target="_blank"` — see Accessibility)
 
 Not yet named in Figma — built directly in code 2026-09-02, no Figma component reference exists yet.
 
@@ -1885,16 +1994,32 @@ No component-scoped tokens — reuses semantic tokens directly:
 color:  var(--color-link);          /* rest */
 color:  var(--color-link-hover);    /* hover */
 ```
+**No `font-size`/`font-weight` of its own (2026-10-05, confirmed never has had one)** — `.link-inline` always inherits the font-size and weight of whatever body copy it sits inside (18px/`--font-weight-regular` in current entry body text). This was already the one correct reference point when `.link-cta`'s own undocumented 14px/`--font-weight-medium` was traced and removed from its own base rule — see `## 17`'s Component Tokens for that correction.
 Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
 
 ### Anatomy
 ```
-[ Label text ][ trailing icon ]
+[ Label text ][ .link-nowrap: last word + trailing icon ][ .sr-only: " (opens in new tab)" if target="_blank" ]
 ```
-- Container: `<a class="link-inline">`
-- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor
+- Container: `<a class="link-inline">` — plain inline (not `inline-flex`; see "Last Word + Icon Never Separate" below for why)
+- `.link-nowrap` span (added 2026-10-05, see below): wraps the link's **last word together with the trailing icon** — `<span class="link-nowrap">{last word}<svg class="link-inline-icon" ...>...</svg></span>`. Whenever a link's text is edited, this span must move to wrap whatever word is now last (see `md/NEW-ENTRY-PROCESS.md`'s placeholder-URL checklist for the concrete case this bites: filling in a `[URL TBD]` marker).
+- Icon: `<svg class="link-inline-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — inside `.link-nowrap`, immediately after the last word's text with no whitespace character before it in the markup
+- Icon spacing/alignment (2026-10-05, plain-inline rule): `.link-inline-icon` carries its own `margin-left: var(--space-1)` (replaces the old `inline-flex` `gap`) and `vertical-align: -2px` (nudges the icon onto the text baseline — inline replaced elements default to `vertical-align: baseline`, which sits visibly low against surrounding glyphs)
+- New-tab suffix (added 2026-10-05): when the link carries `target="_blank"`, a `<span class="sr-only"> (opens in new tab)</span>` sits as the anchor's last child, after `.link-nowrap`. Internal links (same tab) never get this span. See Accessibility below for why this exists and the "contains" rule it follows.
 - `font-style: normal` is set explicitly on `.link-inline` — a deliberate reset so the link never inherits italics from an italic context (e.g. inside a `<cite>` or `<em>`), per the "no italics" requirement
-- No separate `aria-label` — the visible label text is the accessible name
+- No `aria-label` override — the accessible name is computed from content (visible label + the `.sr-only` suffix when present), never set directly
+
+### Internal Links Use Plain `<a>`, Not This Component (clarified 2026-10-05)
+
+`.link-inline` (and `.link-cta`, `## 17`) are for **external** links only — leaving crzdevz.com, trailing arrow, new-tab. An internal link (same site, same tab) stays a plain `<a>` with no component class; the sitewide default link styling (underline-at-rest, see `style.css`'s general link rule near `## TAGS`) already covers it, and there's no arrow to add since nothing opens elsewhere. **Correction:** this section previously named the Home hero subtitle's "Christopher Klein" link (→ `/about.html`, internal) as a pending conversion target for `.link-inline` — that was wrong; it's internal and correctly stays a plain `<a>`. Removed from Status below.
+
+### Last Word + Icon Never Separate — `.link-nowrap` (added 2026-10-05)
+
+`.link-inline`/`.link-cta` were originally built `display: inline-flex` with `align-items: center`. When a link's text wrapped across multiple lines, that centered the trailing icon against the *flex container's total height* (the whole wrapped block), not any single line — visually detaching it from the last word. Switching both to plain inline flow was expected to fix this outright, on the reasoning that an inline-replaced element (the `<svg>`) immediately abutting the preceding text with no whitespace character has no valid break point before it, so it could never land alone on a new line.
+
+**That assumption was wrong, confirmed by direct measurement, not just eyeballing.** A real-browser width sweep (Chromium, real `viewport` resizes, not a simulated container) found the icon **orphaned onto its own line — with no preceding word — at several discrete widths**, on both a real link (the "PC Gamer" item in `entries/thoughts/sharing-and-caring-part-1.html`'s Links and Articles list, orphaned at 320px) and a deliberately long synthetic test link (orphaned at 1024px and 1440px, not at 500px or 700px — the effect is intermittent and width-dependent, not confined to narrow viewports). Browsers are evidently permitted to break between running text and an adjacent inline-replaced element even with zero whitespace in the source — the no-space markup convention alone reduces how often this happens but does not prevent it.
+
+**Resolved, 2026-10-05:** `.link-nowrap { white-space: nowrap; }` (`style.css`) wraps the last word + icon together (Anatomy, above) — the pair can no longer be split by a line break, since `white-space: nowrap` forbids any break inside the span. Re-verified with a real width sweep, 320px–1440px, after applying the span: zero orphans at every width checked, including the two widths that previously failed. Applied to every non-card `.link-inline`/`.link-cta` instance sitewide (`entries/thoughts/sharing-and-caring-part-1.html`, `entries/work/star-engine.html`). Not used on `.card-content .link-cta` — Card usage keeps its original `inline-flex` layout (`## 17`'s Card-Scope Exception), which never wraps in the first place.
 
 ### States
 
@@ -1907,21 +2032,24 @@ Icon size: `var(--icon-size-sm)` (`.link-inline-icon`).
 ### Accessibility
 
 - No touch-target padding — WCAG 2.5.5 (Target Size) exempts inline links within a running block of text from the 44px minimum, since `.link-inline` is never meant to appear as a standalone target the way `.link-cta` is
-- Icon: `aria-hidden="true" focusable="false"` — decorative; the label text alone carries the accessible name
+- Icon: `aria-hidden="true" focusable="false"` — decorative; excluded from the accessible name either way
+- Accessible name rule (2026-10-05): the computed accessible name must **contain** the visible label text (WCAG 2.5.3, Label in Name) — starting with it is preferred for any new link, but "contains" is the actual pass bar, since a documented exception already relies on it (`## 17`'s Card `aria-label`, `"{Title} — {action}"`, starts with the title rather than the visible label). No `aria-label` override on `.link-inline`/`.link-cta` outside that one documented Card exception — the accessible name is always computed from content.
+- New-tab announcement (2026-10-05): when `target="_blank"` is present, a `<span class="sr-only"> (opens in new tab)</span>` is the anchor's last child (Anatomy, above), so the accessible name reads "{visible label} (opens in new tab)" — contains (and starts with) the visible text, satisfying 2.5.3 without an `aria-label`. This reuses the exact wording and `.sr-only`-suffix pattern the site's footer links already use for similar context (e.g. `<span class="sr-only"> — view more entries in the Work section</span>`), not a new pattern. Internal (same-tab) links never get this span. Before this, the component had **no new-tab announcement at all** — a real gap against the sitewide convention already used on `.contact-icon-btn`/`.about-history-company` (`aria-label="{Name} (opens in new tab)"`), caught in the 2026-10-05 sitewide link audit.
 - Focus ring: inherited from the sitewide `:focus-visible` rule (`style.css`, "FOCUS STYLES") — no component-level override
 
 ### Responsive Behaviour
 Same at all breakpoints — no responsive overrides defined.
 
 ### Status
-Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Not yet applied to any real page** — a visual reference only, pending a follow-up task to apply it to existing inline links (e.g. the Home hero subtitle's "Christopher Klein" link). Flagged for review in that same section: the icon at `var(--icon-size-sm)` (14px) may read large against 16px body copy — `var(--icon-size-xs)` (12px) is the first fallback to try.
+Built in `style.css` and previewed in `design-system.html` Section 24, added 2026-09-02. **Correction, 2026-10-05:** this previously read "not yet applied to any real page" — stale. It's live in two places: `entries/work/star-engine.html` (four links — the two original citation links plus two plain `<a>` tags converted to `.link-inline` in the 2026-10-05 link audit) and `entries/thoughts/sharing-and-caring-part-1.html` (ten links — two mid-paragraph, eight in a standalone list). **Second correction, same date:** this section previously named the Home hero subtitle's "Christopher Klein" link as a pending `.link-inline` conversion target — removed; that link is internal and correctly stays a plain `<a>` (see "Internal Links Use Plain `<a>`" above). Flagged for review in Section 24: the icon at `var(--icon-size-sm)` (14px) may read large against 18px body copy (body text moved from 16px to 18px in the 2026-09-24 reading-comfort update, after this note was first written) — `var(--icon-size-xs)` (12px) is the first fallback to try.
 
 ---
 
 ## 17. CTA Link
 
 **CSS Class:** `.link-cta`
-**HTML Element:** `<a href="{url}" class="link-cta" aria-label="{Title} — {action}">{action}<svg class="link-cta-icon">...</svg></a>`
+**HTML Element — Card usage:** `<a href="{url}" class="link-cta" aria-label="{Title} — {action}">{action}<svg class="link-cta-icon">...</svg></a>` (no `.link-nowrap`, no new-tab suffix — Cards never open a new tab)
+**HTML Element — standalone usage:** `<a href="{url}" class="link-cta" target="_blank" rel="noopener noreferrer">{Label text}<span class="link-nowrap">{last word}<svg class="link-cta-icon">...</svg></span><span class="sr-only"> (opens in new tab)</span></a>` (target/rel and the `.sr-only` suffix only when the destination is external — see `## 16`'s Accessibility section, which this follows identically)
 
 Not yet named in Figma — built directly in code 2026-09-02, no Figma component reference exists yet.
 
@@ -1938,25 +2066,35 @@ The real, visible, keyboard-focusable link on every Card component as of 2026-09
 ### Component Tokens
 No component-scoped tokens — reuses semantic tokens directly:
 ```css
+/* Base rule — standalone usage, not inside a Card */
 color:   var(--color-link);          /* rest */
 color:   var(--color-link-hover);    /* hover */
 padding: var(--space-3) var(--space-2);
-margin:  calc(var(--space-3) * -1) calc(var(--space-2) * -1);
+margin:  0 calc(var(--space-2) * -1);
 ```
+**Font-size correction, 2026-10-05:** the base rule carries no `font-size`/`font-weight` of its own and inherits ambient body text size — same behaviour as `## 16. Inline Link`. It previously set `font-size: var(--font-size-sm); font-weight: var(--font-weight-medium)` (14px/600) unconditionally, which was never a real §17 decision — it was leftover styling from when `.link-cta` only ever existed inside a Card (where 14px *is* correct, matching `.card-date`/`.card-tag`'s scale), surfaced as a real bug the first time `.link-cta` was reused standalone in body content (the itch.io CTA in `entries/thoughts/sharing-and-caring-part-1.html` rendered visibly smaller than the surrounding 18px body text). See Card-Scope Exception below for where 14px/600 is still correct and still applied.
+
 Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 
 ### Anatomy
 ```
 [ Label text ][ trailing icon ]
 ```
-- Container: `<a class="link-cta" aria-label="{Title} — {action}">`
-- Label text: `"View this work"` (Work entries) or `"View this thought"` (Thoughts entries) — driven by `entry.type` in `buildCard()` (`script.js`), not hardcoded per card; `index.html`'s hand-written cards match this exactly per-card
-- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — trailing, last child inside the anchor
-- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) — the visible "View this work" / "View this thought" text alone would be ambiguous out of context (several cards share the same visible label on one page), so the accessible name adds the title
+- Container: `<a class="link-cta" aria-label="{Title} — {action}">` — plain inline (not `inline-flex`) outside a Card; see `## 16`'s Known Issue, which applies identically here
+- Label text: `"View this work"` (Work entries) or `"View this thought"` (Thoughts entries) inside a Card, driven by `entry.type` in `buildCard()` (`script.js`); free text when used standalone outside a Card (e.g. `"Play Tessallation on itch.io"`)
+- Icon: `<svg class="link-cta-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path ... fill="currentColor"/></svg>` — inside `.link-nowrap` for standalone usage (same last-word-plus-icon pattern as `## 16`, including the "move it when the text changes" rule), or directly trailing the label inside a Card, where `inline-flex` means it never needs the span
+- Icon spacing/alignment (2026-10-05, plain-inline base rule): `.link-cta-icon` carries `margin-left: var(--space-1)` and `vertical-align: -2px`, same mechanism as `.link-inline-icon` — overridden back to `margin-left: 0` inside a Card (see Card-Scope Exception)
+- `aria-label`: full descriptive string, `"{Title} — {action}"` (e.g. `"Star Engine — View this work"`) **only inside a Card**, where the visible label alone is ambiguous (several cards share it on one page) — this is the one documented exception to "no `aria-label` override" (see `## 16`'s Accessibility section for the contains-vs-starts-with rule this relies on). A standalone CTA's visible text is already unambiguous on its own (e.g. "Play Tessallation on itch.io") — no `aria-label`, content computes the accessible name, with the same `.sr-only` new-tab suffix `## 16` uses once the destination is a real external URL with `target="_blank"`.
 - `font-style: normal` set explicitly, same reset rationale as `.link-inline`
 
 ### Touch-Target Padding
-`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. This is offset by an equal, negated `margin: calc(var(--space-3) * -1) calc(var(--space-2) * -1)` so the added padding doesn't visually shift the link's position — the padding grows the hit area only.
+`padding: var(--space-3) var(--space-2)` (12px vertical, 8px horizontal) expands the link's clickable/tappable box to meet the 44px WCAG 2.5.5 minimum. **Revised 2026-10-05:** the vertical halves of the old compensating margin (`margin-top`/`margin-bottom: calc(var(--space-3) * -1)`) are removed — vertical margin has no effect on a plain inline, non-replaced box in any browser (CSS spec, not something this change caused), so once `.link-cta` stopped being `inline-flex` those declarations did nothing and were dropped as genuinely dead code, not just redundant. The horizontal halves are kept (`margin: 0 calc(var(--space-2) * -1)`): horizontal margin *does* apply normally to inline boxes, so the pair still cancels the horizontal padding's visual shift exactly as before.
+
+This was verified by direct measurement, not assumed either way: `document.elementFromPoint()` sampled vertically through a real rendered `.link-cta` (the itch.io CTA) before and after adding padding. With the restored padding, the real clickable hit area measured **48.7px tall** (the 24.7px text/icon box plus 12px top + 12px bottom padding) — continuous, with no gap — comfortably over the 44px minimum, and the padded area did not bleed into or steal clicks from the image above or the paragraph below. That non-bleeding result depends on `.link-cta` always sitting alone on its own line, which is true of every current usage (Card and standalone alike) — `.link-cta` is documented as "not for mid-sentence use" specifically for this reason among others (see When NOT to Use, above); if that constraint were ever violated, the vertical padding could visually overlap and intercept clicks meant for an adjacent line of real body text.
+
+### Card-Scope Exception
+
+Inside `.card-content`, `.link-cta` keeps its original, full `inline-flex` layout — `display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium)` — layered on top of the base rule via `.card-content .link-cta`. This is a deliberate, scoped exception, not an oversight: `margin-top: auto` (pinning the link to the bottom of `.card-content`'s flex column so two cards in the same row align their links regardless of excerpt length — see `## 3. Card`, Spacing) only works on a flex item, so plain inline flow isn't an option here. `.card-content .link-cta .link-cta-icon` separately resets `margin-left: 0` and restores `flex-shrink: 0`, so the base rule's plain-inline icon spacing doesn't stack with the flex `gap` here and double the visible gap. Every live Card instance (`index.html`'s two Featured Work cards plus "Welcome" Featured Thought card, `design-system.html` Section 14's two previews) was confirmed pixel-identical before and after the 2026-10-05 base-rule change — same font-size, same weight, same `display: flex` (blockified from `inline-flex` as a flex item, per spec), same computed margins.
 
 **Card context override (2026-09-27):** `.card-content .link-cta` repoints the top value of that margin to `auto` — `margin: auto calc(var(--space-2) * -1) calc(var(--space-3) * -1)` — so the link pins itself to the bottom of `.card-content`'s flex column regardless of excerpt length (see `## 3` Card's Spacing section). Horizontal and bottom values are unchanged from the base rule above.
 
@@ -1972,7 +2110,8 @@ Icon size: `var(--icon-size-md)` (`.link-cta-icon`).
 ### Accessibility
 
 - Sole keyboard-focusable link on the card as of 2026-09-02 — Tab moves directly from whatever precedes the card to `.link-cta`, skipping `.card-block-link` entirely. Confirmed via a real Tab-key walkthrough and a real accessibility-tree snapshot (not just markup review) on both `index.html`'s hand-written cards and `buildCard()`'s Archive cards.
-- `aria-label` carries the full descriptive string so the link is unambiguous read out of context (e.g. in a screen reader's links list, where several cards' plain "View this work" text would otherwise collide)
+- `aria-label` carries the full descriptive string so the link is unambiguous read out of context (e.g. in a screen reader's links list, where several cards' plain "View this work" text would otherwise collide). The resulting accessible name (`"{Title} — {action}"`) contains the visible label but doesn't start with it — confirmed compliant under the "contains" reading of WCAG 2.5.3 (`## 16`'s Accessibility section), kept as-is in the 2026-10-05 link audit rather than changed to satisfy a stricter starts-with reading.
+- **Card links never open a new tab** — no `target="_blank"`, no `.sr-only` new-tab suffix. Confirmed 2026-10-05: every live Card destination is an internal entry page.
 - Icon: `aria-hidden="true" focusable="false"` — decorative
 - Focus ring: inherited from the sitewide `:focus-visible` rule — no component-level override
 - `.card-content .link-cta { position: relative; z-index: 2; }` keeps it above `.card-block-link` (`z-index: 1`) so it remains the real target for both mouse and keyboard, even though the block-link still visually covers the full card for mouse-anywhere convenience
@@ -2015,28 +2154,28 @@ Updated 2026-09-27 (Parts A–F: teal interaction rule, one button size, current
 | `--card-block-link-z` | — | `1` |
 | `.card-content .link-cta`'s `z-index` (2026-09-27 — not a named token, inline in style.css) | — | `2` |
 | `--image-viewer-controls-z` | — (local to `.image-viewer`) | `1` |
-| `--tag-border` | `--color-accent-primary` | `#00BAA5` |
-| `--tag-border-hover` | `--color-accent-primary-text` | `#00E5CB` |
-| `--tag-text` | `--color-accent-primary` | `#00BAA5` |
-| `--tag-text-hover` | `--color-accent-primary-text` | `#00E5CB` |
-| `--tag-bg` | `transparent` | `transparent` |
-| `--tag-bg-hover` | `--color-background-base` | `#1C1C1C` |
+| `.tag`/`.tag-chip` default border + text (2026-09-30 — replaces fictional `--tag-border`/`--tag-text`; see footnote) | `--color-accent-primary` | `#00BAA5` |
+| `.tag`/`.tag-chip` default background | `transparent` | `transparent` |
+| `.tag`/`.tag-chip` hover background (2026-09-30 — was wrongly listed as `--tag-bg-hover` → `--color-background-base`) | `--color-background-subtle` | `#2F2F2F` |
+| `.tag`/`.tag-chip` hover text (2026-09-30 — replaces fictional `--tag-text-hover`; border stays `--color-accent-primary`, unchanged from default — the old `--tag-border-hover` → `--color-accent-primary-text` row was wrong) | `--color-accent-primary-text` | `#00E5CB` |
 | `--color-link` (2026-09-27) | `--color-accent-primary` (swapped with `--color-link-hover` below — teal interaction rule, dark at rest) | `#00BAA5` |
 | `--color-link-hover` (2026-09-27) | `--color-accent-primary-text` (swapped — bright on hover) | `#00E5CB` |
-| `--nav-bg` | `--color-background-base` | `#1C1C1C` |
-| `--nav-link-color` | `--color-text-secondary` | `#AEAEAE` |
-| `--nav-link-active` | `--color-text-primary` | `#E8E8E8` |
-| `--tab-bar-bg` | `--color-background-surface` | `#242424` |
-| `--tab-bar-item-color` | `--color-text-secondary` | `#AEAEAE` |
-| `--tab-bar-item-active` | `--color-interactive-default` | `#E8E8E8` |
+| `header` background (2026-09-30 — replaces fictional `--nav-bg`; see footnote) | `--color-background-base` | `#1C1C1C` |
+| `.nav-links a` default text (replaces fictional `--nav-link-color`) | `--color-text-secondary` | `#AEAEAE` |
+| `.nav-links a[aria-current="page"]` text (replaces fictional `--nav-link-active`) | `--color-text-primary` | `#E8E8E8` |
+| `.tab-bar` background (replaces fictional `--tab-bar-bg`) | `--color-background-surface` | `#242424` |
+| `.tab-bar-item` default text (replaces fictional `--tab-bar-item-color`) | `--color-text-secondary` | `#AEAEAE` |
+| `.tab-bar-item[aria-current="page"]` text (2026-09-30 — replaces fictional `--tab-bar-item-active`; the old row's value was also wrong, not just fictionally named — real current-page colour is `--color-text-primary`, not `--color-interactive-default`) | `--color-text-primary` | `#E8E8E8` |
+| `.nav-links a[aria-current="page"]` / `.tab-bar-item[aria-current="page"]` underline (current-page indicator, both identical — Rule 3a) | `--color-accent-primary-text`, `text-decoration-thickness: var(--border-width-medium)` (2px), `text-underline-offset: var(--space-1)` (4px) | `#00E5CB` |
+| `.nav-links a:hover`/`:focus-visible`, `.tab-bar-item:hover`/`:focus-visible`, `.nav-logo:hover` | `--color-interactive-hover` | `#00E5CB` |
 | `--tooltip-bg` | `--color-tooltip-bg` → `--color-background-surface` | `#242424` |
 | `--tooltip-border` | `--color-tooltip-border` → `--color-accent-primary` | `#00BAA5` |
 | `--toast-border` | `--color-accent-primary` | `#00BAA5` |
 | `--blockquote-border-color` | `--color-quote-border` → `--color-accent-quote` | `#A9407C` |
 | `--code-border-color` | `--color-code-border` → `--color-accent-primary` | `#00BAA5` |
-| `--divider-color` | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
+| `hr` `border-top` (2026-10-05 — replaces fictional `--divider-color`; see footnote) | `--color-divider-accent` → `--color-accent-primary` | `#00BAA5` |
 
-`--tag-border`/`--tag-border-hover`/`--tag-bg-hover` are documented here (and in DESIGN-SYSTEM.md §1.8) as named component tokens, but neither actually exists as a CSS custom property in style.css — `.tag`/`.tag-chip` reference the semantic tokens directly. Pre-existing drift, not caused by this update and not resolved here (see the 2026-09-24 audit's Flags).
+**Fixed 2026-09-30:** the `--tag-*`/`--chip-*` families (`--tag-border`, `--tag-border-hover`, `--tag-text`, `--tag-text-hover`, `--tag-bg`, `--tag-bg-hover`, and the `## 2b` `--chip-*` set) never existed as CSS custom properties anywhere in `style.css` — `.tag`/`.tag-chip` reference the semantic tokens listed above directly, and this table (and `## 2`/`## 2b` above) now document the real values instead of the fictional named tokens. Two of the old rows also had the wrong value (hover border was documented as changing to `--color-accent-primary-text`; it doesn't — border stays `--color-accent-primary`. Hover background was documented as `--color-background-base` `#1C1C1C`; it's actually `--color-background-subtle` `#2F2F2F`). **Fixed 2026-09-30:** `--nav-*` and `--tab-bar-*` (flagged above, unresolved as of 2026-09-29) had the same issue — no `--nav-*`/`--tab-bar-*` custom property exists in `style.css` either, `header`/`.site-nav`/`.nav-logo`/`.nav-links`/`.tab-bar`/`.tab-bar-item` reference the semantic tokens above directly. `--tab-bar-item-active` also had the wrong *value*, not just the wrong name (documented as `--color-interactive-default`; the real current-page rule is `--color-text-primary` plus an underline — see `## 4`/`## 5` above for the full Component Tokens rewrite, including the current-page indicator and hover colour). **Fixed 2026-10-05:** `--divider-color` had the same issue — no such custom property exists in `style.css`; the bare `hr` selector's `border-top` references `--color-divider-accent` directly (`## 9`'s own Component Tokens, corrected the same day).
 
 ---
 
