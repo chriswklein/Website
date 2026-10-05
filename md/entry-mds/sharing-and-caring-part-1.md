@@ -5,7 +5,7 @@
 <!-- slug: sharing-and-caring-part-1 -->
 <!-- excerpt: Sharing your game early, often, and with new people is both a chance for valuable feedback and a security risk. -->
 <!-- tags: game-development, quality-assurance, user-experience (NEW tags — match the existing tag format in archive-entries.json) -->
-<!-- published date: TBD by Chris -->
+<!-- published date: 2026-10-05 -->
 
 <!-- IMAGE 1 (LEAD IMAGE): in-game screenshot of the final game -->
 <!-- Placement: standard-page-lead, directly after the title. Alt text only, no caption, no zoom (per lead-image convention). -->
@@ -116,22 +116,17 @@ I contacted the team, and we decided to give the game a new home on itch.io so i
 <!-- ALT: Draft from the image in Step 0, for Chris's approval. -->
 <!-- CAPTION: TBD by Chris (optional) -->
 
-<!-- LINK: "Play Tessallation on itch.io" → URL TBD (itch.io page not published yet). Use the CTA Link component (COMPONENTS.md §17). -->
+<!-- LINK: "Play Tessallation on itch.io" → https://crzdev.itch.io/tessallation. Use the CTA Link component (COMPONENTS.md §17). -->
 
 I hope you enjoy playing it as much as we enjoyed making it together all those years ago.
 
 ## Links and Articles from the Past
 
-<!-- Each item needs a URL from Chris. Do not invent or search for URLs. -->
-
-- Tessallation – Game – Stay in School. Loop through Time. → URL TBD
-- Tessallation: a time travel puzzle game starring a girl with a Rubik's Cube for a head | PC Gamer → URL TBD
-- Tessallation Windows, Mac game – IndieDB → URL TBD
-- Tessallation Windows, Mac game – ModDB → URL TBD
-- Tessallation – A Puzzle Game – GameDev Academy → URL TBD
-- Exploring time with the Tessallation crew | KitGuru → URL TBD
-- Games People Play: Exploring DePaul's Top-Rated Computer Game Development Program → URL TBD
-- Unity Awards 2013 finalists announced | VG247 → URL TBD
+- Tessallation trailers on YouTube → https://www.youtube.com/@TessallationGame
+- Tessallation: a time travel puzzle game starring a girl with a Rubik's Cube for a head | PC Gamer → https://www.pcgamer.com/tessallation-a-time-travel-puzzle-game-starring-a-girl-with-a-rubiks-cube-for-a-head/
+- The Focus of this First-Person Puzzle Game? "Single-Player Co-op." | Kotaku → https://kotaku.com/the-focus-of-this-first-person-puzzle-game-single-pla-631941094
+- Exploring time with the Tessallation crew | KitGuru → https://www.kitguru.net/gaming/jon-martindale/exploring-time-with-the-tessallation-crew/
+- Unity Awards 2013 — Best Student Project finalists | Unity → https://unity.com/awards/2013
 
 ---
 
