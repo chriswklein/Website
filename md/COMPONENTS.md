@@ -701,6 +701,8 @@ One vertical-stack layout at every breakpoint — image full-width (`aspect-rati
 
 Same content order, padding, and hover treatment as Feature — see above. `.card--thought .card-image { display: none; }` remains as a safety net, but in practice no `.card-image` element is ever rendered for Thought entries (`buildCard()` only builds the image div when `entry.type === 'work'`).
 
+**Thoughts cards are text-only by design (confirmed 2026-10-05):** `data/archive-entries.json`'s `image`/`imageAlt` fields are only ever read for `entry.type === 'work'` records — a `thoughts`-type record's `image`/`imageAlt` are never rendered anywhere, on Archive or on Home's hand-written Featured cards, regardless of what they contain. This was traced directly after the Welcome record's `image` field was found pointing at a file whose `imageAlt` described a completely different image — the mismatch had no visible effect, precisely because the fields were already inert for this entry type. A Thoughts record may still carry accurate `image`/`imageAlt` values (most current ones are cleared to `""`/`""` instead) in case Thought cards ever gain an image treatment later — the fields aren't wrong to fill in, just currently unused.
+
 #### Anatomy
 
 ```

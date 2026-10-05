@@ -58,6 +58,17 @@ Then, every time you have new raw exports to convert:
 
     node scripts/build-images.js
 
+To scope the run to one subfolder of raw-exports/ instead of converting
+everything underneath it, pass that subfolder as an argument (same path
+you'd use under raw-exports/, no leading "raw-exports/"):
+
+    node scripts/build-images.js entries/work/this-website
+
+With no argument, every raw image under raw-exports/ is processed —
+behavior is unchanged either way. A scope that doesn't exist as a real
+folder under raw-exports/ is a hard error; it never falls back to
+processing everything.
+
 
 WHAT YOU GET
 -------------
