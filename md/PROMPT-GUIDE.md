@@ -157,6 +157,14 @@ Spec docs live in `md/specs/`, named `YYYY-MM-DD-short-name-spec.md` (see `md/sp
 If a prompt cites a spec file that isn't in `md/specs/`, do not treat the missing file as a blocker. Specs dated before 2026-09-29 were never committed to this repo — the pasted prompt itself is the authoritative, complete spec in that case, exactly as if the file were present.
 
 ---
+
+## Rule 10 — Commit and Push After Verification (added 2026-10-05)
+
+After a task's verification passes, commit its changes with a descriptive message and push to origin `dev`. Report the commit hash and confirm the push succeeded (`git status` shows "up to date with origin/dev").
+
+Never push to, merge into, or commit on `main` — merging to `main` is always done by Chris.
+
+---
  
 ## Quick Reference — Most Common Task Types
  
