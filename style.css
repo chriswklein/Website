@@ -3291,11 +3291,14 @@ footer p {
    .back-to-top (not display) so that toggle can transition smoothly — the
    sitewide prefers-reduced-motion rule (bottom of file) already shortens
    this transition-duration to near-instant when that's set, same as every
-   other transition on the site. Vertically centred here (tablet/desktop,
-   unchanged); mobile overrides to bottom-right in thumb reach instead —
-   see the MOBILE block's own comment (cleanup item 29, 2026-09-30): the
-   centred position sat directly over the entry page's Details card at
-   the top of the page. */
+   other transition on the site. Vertically centred at every breakpoint,
+   including mobile, via this base top/transform — mobile moves to
+   top: 70% instead of 50% (see the MOBILE block's own comment), never to
+   the corner. A bottom-right-corner mobile position was tried (00379f6,
+   2026-09-30) and reverted (2026-10-15): real-device feedback found a
+   visitor's thumb covered the button there and they never noticed it
+   existed. Accepted trade-off of the centred position: at the top of an
+   entry page, the trigger overlaps the Details card on mobile. */
 .action-rail-group {
     position: fixed;
     right: max(var(--space-6), calc((100vw - var(--max-content)) / 4));
@@ -3928,23 +3931,8 @@ footer p {
 @media (max-width: 767px) {
     h1 { font-size: var(--font-size-3xl); }
 
-    /* scroll-padding-bottom keeps a keyboard-focused element clear of the
-       floating rail (WCAG 2.4.11) — same value as main's own
-       padding-bottom below, so a focused element scrolled into view never
-       lands behind the rail. Mobile only; tablet/desktop don't reposition
-       the rail so need no equivalent (cleanup item 29, 2026-09-30). */
-    html {
-        scroll-padding-bottom: calc(var(--button-height) + (2 * var(--space-6)) + env(safe-area-inset-bottom, 0px));
-    }
-
     main {
         padding-top: var(--space-20);
-        /* Clears the floating action rail, now bottom-right on mobile
-           (cleanup item 29, 2026-09-30) — button height plus the rail's
-           own bottom offset on both sides (one gap between content and
-           rail, one between rail and the safe area/viewport edge), so the
-           page's last content can scroll fully clear of it. */
-        padding-bottom: calc(var(--button-height) + (2 * var(--space-6)) + env(safe-area-inset-bottom, 0px));
     }
 
     /* Featured Work collapses to one column on mobile only — tablet and
@@ -4091,30 +4079,23 @@ footer p {
         display: none;
     }
 
-    /* Cleanup item 29 (2026-09-30): mobile only, bottom-right in thumb
-       reach instead of vertically centred — the centred position sat
-       directly over the Details card at the top of every entry page.
-       Cancels the base rule's top: 50%/transform: translateY(-50%) rather
-       than layering on top of them; bottom (not top) now does the
-       positioning, offset from the safe area on notched/gesture-bar
-       phones (env() falls back to 0 on devices without one — no
-       viewport-fit=cover needed for that). right is untouched — the same
-       formula still applies at every breakpoint. Tablet/desktop keep the
-       centred position unchanged (mobile-only override, per Rule 5a). */
+    /* Mobile is vertically centred, same as tablet/desktop, just lower on
+       the viewport — top: 70% in thumb reach instead of 50%; the base
+       rule's transform: translateY(-50%) still applies, unoverridden. A
+       bottom-right-corner position was tried here (cleanup item 29,
+       00379f6, 2026-09-30) and reverted (2026-10-15): real-device feedback
+       found a visitor's thumb covered the button there and they never
+       noticed it existed. Accepted trade-off: at the top of an entry page
+       this centred position overlaps the Details card on mobile. */
     .action-rail-group {
-        top: auto;
-        transform: none;
-        bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+        top: 70%;
     }
 
-    /* Dormant — stays one slot above the rail's new bottom-right position,
-       same touch-target-minimum + space-8 gap the desktop/tablet centred
-       layout uses, just measured from bottom instead of top now that the
-       rail it's stacked against is bottom-anchored on mobile (2026-09-30). */
+    /* Dormant — stays one slot above the rail, same touch-target-minimum +
+       space-8 gap the tablet/desktop centred layout uses, measured from
+       top to match .action-rail-group's own top: 70% above. */
     .theme-toggle-rail {
-        top: auto;
-        transform: none;
-        bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px) + var(--touch-target-minimum) + var(--space-8));
+        top: calc(70% - var(--touch-target-minimum) - var(--space-8));
     }
 
     /* .contact-icon-btn's own 80px/64px desktop/mobile split removed

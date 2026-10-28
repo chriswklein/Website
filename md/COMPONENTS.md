@@ -523,22 +523,22 @@ While the drawer is open, `<body>` is locked using the `position: fixed` body-lo
 
 | Breakpoint | Drawer | Floating trigger (`.action-rail-group`) | Sort + count row |
 |---|---|---|---|
-| Mobile (< 768px) | Bottom sheet, full-bleed, `max-height: 70vh` | Icon + badge only (label is screen-reader-only), bottom-right, `bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px))` — cleanup item 29, 2026-09-30, was vertically centred at `top: 70%`; see Floating Action Rail Position below | `position: fixed` below the 64px tab bar, `z-index: 10` |
+| Mobile (< 768px) | Bottom sheet, full-bleed, `max-height: 70vh` | Icon + badge only (label is screen-reader-only), vertically centred lower than tablet/desktop at `top: 70%` — the bottom-right-corner position tried in cleanup item 29 (2026-09-30) was reverted 2026-10-15; see Floating Action Rail Position below | `position: fixed` below the 64px tab bar, `z-index: 10` |
 | Tablet (768–1023px) | Bottom sheet, capped to `--max-content` and centred | Icon + "Filters" pill + badge, `top: 50%` — unchanged | `position: fixed` below the 64px header, `z-index: 10` |
 | Desktop (≥ 1024px) | Anchored 632px panel, bottom-right corner pinned to the floating trigger; fades and scales in; `--elevation-xl` | Icon + "Filters" pill + badge, `top: 50%` — unchanged | In normal flow |
 
 The scrim is an invisible hit area (`opacity: 0` in both states) at every breakpoint — results stay fully visible behind the open drawer.
 
-### Floating Action Rail Position (cleanup item 29, 2026-09-30)
+### Floating Action Rail Position (reverted to centred, 2026-10-15)
 
-`.action-rail-group` is vertically centred (`top: 50%; transform: translateY(-50%)`) at every breakpoint except mobile, where it moves to the bottom-right corner instead — in thumb reach, and clear of the Details card the centred position used to sit on top of at the top of entry pages. This is the same `.action-rail-group` reused verbatim by the entry-page Contents trigger (`## 14. Standard Page Template`); both consumers get the mobile move for free from the one shared rule.
+`.action-rail-group` is vertically centred at every breakpoint via one base rule (`top: 50%; transform: translateY(-50%)`); mobile overrides only the `top` value, to `70%`, keeping the same centring transform — never a corner position. This is the same `.action-rail-group` reused verbatim by the entry-page Contents trigger (`## 14. Standard Page Template`); both consumers share the one rule.
 
-- **Mobile (< 768px) only:** `top: auto; transform: none; bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px))`. `right` is untouched — the same formula applies at every breakpoint. `env(safe-area-inset-bottom, 0px)` clears notched/gesture-bar phones and falls back to `0` everywhere else; no `viewport-fit=cover` was added to any page, so the fallback is what actually applies today.
-- **Tablet/desktop:** unchanged — still vertically centred.
-- **Page clearance:** `main` gains `padding-bottom: calc(var(--button-height) + (2 * var(--space-6)) + env(safe-area-inset-bottom, 0px))` on mobile, so the page's last content (e.g. the Back to Top row) can scroll fully clear of the rail instead of sitting behind it.
-- **Focus not obscured (WCAG 2.4.11):** `html` gains the same value as `scroll-padding-bottom` on mobile, so a keyboard-focused element scrolled into view never lands behind the rail. Verified via a full Tab walkthrough of `entries/work/star-engine.html` at 390×844: every real focusable element, including the last one before the tab bar (`.back-to-top`), scrolls in fully clear of the rail.
-- **`.theme-toggle-rail` (dormant, unused — future Slot 1 of the rail):** its mobile override moves with the rail, one slot above it — `bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px) + var(--touch-target-minimum) + var(--space-8))` — the same `--touch-target-minimum` + `--space-8` gap the tablet/desktop centred layout already uses between the two, just measured from `bottom` now instead of `top`.
-- **Not affected:** the Filter Drawer's own mobile/tablet bottom-sheet position (`position: fixed; bottom: 0; left: 0; right: 0`, independent of the rail entirely) and its desktop anchored-panel pin to the rail (1024px+, unchanged — out of scope, rail is centred there). Confirmed nothing else on mobile positions itself relative to the rail before this change shipped.
+- **Mobile (< 768px) only:** `top: 70%` — lower on the viewport, in thumb reach, but still vertically centred via the base rule's `transform: translateY(-50%)`. `right` is untouched — the same formula applies at every breakpoint.
+- **Tablet/desktop:** unchanged — `top: 50%`.
+- **`.theme-toggle-rail` (dormant, unused — future Slot 1 of the rail):** its mobile override stays one slot above the rail, measured from `top` to match — `top: calc(70% - var(--touch-target-minimum) - var(--space-8))`, the same gap the tablet/desktop centred layout uses between the two.
+- **Accepted trade-off:** at the top of an entry page, the centred rail overlaps the first row of the Details card on mobile (confirmed at 390×844 on `entries/work/star-engine.html`).
+
+**History:** cleanup item 29 (00379f6, 2026-09-30) moved the mobile rail to the bottom-right corner instead, to clear the Details card. Real-device feedback (2026-10-15) found a visitor's thumb covered the button there and they never noticed it existed, so the corner position — along with the `main` `padding-bottom` and `html` `scroll-padding-bottom` it required to keep page content and focus clear of it — was reverted back to the original centred `top: 70%`. Nothing else on mobile positions itself relative to the rail, so no other cleanup was needed.
 
 ### Z-Index Layering
 
